@@ -3,4 +3,4 @@ Disallow: /404.html
 Disallow: /newsletter/almost.html
 Disallow: /newsletter/done.html
 
-Sitemap: http://brandonhilkert.github.io/sitemap.xml
+Sitemap: http://brandonhilkert.com/sitemap.xml

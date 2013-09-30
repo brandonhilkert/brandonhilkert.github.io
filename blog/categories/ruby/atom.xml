@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
-  <link href="http://brandonhilkert.github.io/blog/categories/ruby/atom.xml" rel="self"/>
-  <link href="http://brandonhilkert.github.io/"/>
-  <updated>2013-09-30T09:27:49-04:00</updated>
-  <id>http://brandonhilkert.github.io/</id>
+  <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2013-09-30T11:31:32-04:00</updated>
+  <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
     <email><![CDATA[brandonhilkert@gmail.com]]></email>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[The Technology Hump]]></title>
-    <link href="http://brandonhilkert.github.io/blog/the-technology-hump/"/>
+    <link href="http://brandonhilkert.com/blog/the-technology-hump/"/>
     <updated>2013-09-23T20:16:00-04:00</updated>
-    <id>http://brandonhilkert.github.io/blog/the-technology-hump</id>
+    <id>http://brandonhilkert.com/blog/the-technology-hump</id>
     <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
 
 <h3>Rewind 4 years</h3>
