@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: products | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.github.io/blog/categories/products/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.github.io/"/>
+  <updated>2013-09-30T09:22:04-04:00</updated>
+  <id>http://brandonhilkert.github.io/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[The Technology Hump]]></title>
+    <link href="http://brandonhilkert.github.io/blog/the-technology-hump/"/>
+    <updated>2013-09-23T20:16:00-04:00</updated>
+    <id>http://brandonhilkert.github.io/blog/the-technology-hump</id>
+    <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
+
+<h3>Rewind 4 years</h3>
+
+<p>Four years ago I was writing PHP on the side for startups and just getting into software products as both a profession and hobby (more on this too&hellip;). I had reached a level of comfort with PHP where I knew I could solve just about any business problem thrown at me. This feeling was not only comforting, but empowering. Shortly after, I helped create <a href="/about">Meeteor</a>, which was written in <a href="http://rubyonrails.org/">Rails</a> and my world took turn for the better.</p>
+
+<!--more-->
+
+
+<p>Not only was I thrown into a ring of unknown, but I was handed an application that was written by contractors overseas. I won&rsquo;t go in to my feelings about outsourcing here now, but suffice it to say, this experience was less than pleasant.</p>
+
+<p>I spent the next 2-3 weeks learning both <a href="http://www.ruby-lang.org/">Ruby</a> and Rails and largely banging my head against the wall. For me, one of the most frustrating feelings is knowing how to do something in another language/framework, but can&rsquo;t in the one your currently working with. I felt like I was moving backwards, but stuck with it because it felt like the Rails knowledge would be a big pay off going forward.</p>
+
+<p>The next 2 years that followed were largely a blur in what seemed like crash course in creating a product and a business. I&rsquo;m grateful for this experience and believe it has better positioned me for the things I want to accomplish going forward.</p>
+
+<h3>Where I am today</h3>
+
+<p>Today, I&rsquo;m back at that position I was 4 years ago with PHP, but now with Ruby. I&rsquo;m confident I can solve just about anything thrown at me with the tools that I&rsquo;m now most familiar with. Rather than entrench myself with Ruby and Rails books, I&rsquo;m finding articles about retention, conversion, and idea validation more interesting.</p>
+
+<p>I&rsquo;m by no means suggesting that I&rsquo;ve solved every problem on the internet and development is a breeze. In fact, it&rsquo;s quite the opposite. But I now feel more confident in my ability to creativity solve a problem rather than find the answer hidden behind a random <a href="http://stackoverflow.com/">Stack Overflow</a> post. Don&rsquo;t get me wrong, I still encounter challenges I&rsquo;ve never seen before, but that&rsquo;s what not only brought me to development in the first place, but one of the reasons I continue to love what I do.</p>
+
+<p>The technology world changes at a rapid pace. There&rsquo;s a certain amount of dedication involved in staying current on your craft if you want to continue being relevant. But I no longer feel the pressure to spend every waking moment with my head in a Ruby book. Seeing other languages and frameworks emerge (here&rsquo;s looking at you <a href="http://emberjs.com/">Ember.js</a>) is exciting, but takes me back to my experience 4 years ago and the pains involved at the beginning of a learning curve.</p>
+
+<p>I&rsquo;m excited about what&rsquo;s to come now that the technology isn&rsquo;t the most challenging element on my plate.</p>
+
+<p>Have you had similar experiences with a change in focus after becoming more technically capable?</p>
+]]></content>
+  </entry>
+  
+</feed>

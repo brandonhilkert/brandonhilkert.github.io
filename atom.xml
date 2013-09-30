@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.github.io/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.github.io/"/>
+  <updated>2013-09-30T09:22:04-04:00</updated>
+  <id>http://brandonhilkert.github.io/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Loyalty]]></title>
+    <link href="http://brandonhilkert.github.io/blog/loyalty/"/>
+    <updated>2013-09-30T08:34:00-04:00</updated>
+    <id>http://brandonhilkert.github.io/blog/loyalty</id>
+    <content type="html"><![CDATA[<p>Last weekend, I finished an <a href="http://www.tricolumbia.org/events/chesapeakeman-endurance-festival/">Ironman</a>. The training consumed valuable time with both family and friends that I&rsquo;ll never get back. However, the support and love that I received on the days surrounding the race have given me an increased appreciation for the people that are in my life and the unwavering support they offer.</p>
+
+<p>Finishing the race was an incredible experience. The day of the race had its share of extreme ups and downs, both of which I&rsquo;ve come to value now that it&rsquo;s over. Since I no longer have to worry about waking up at 5 a.m. to get to gym, I&rsquo;ve spent a fair amount of time replaying the past 30 weeks and the sacrifices involved in getting here.</p>
+
+<!--more-->
+
+
+<p>People come and go in your life and mine has been no exception. The people pictured below were with me at every possible step of the race. They spent almost 13 hours watching 154 people swim, bike and run 140.6 miles back and forth through sunburn, darkness, and rain.</p>
+
+<p><img class="center" src="http://brandonhilkert.github.io/images/ironman.jpg" title="&#34;My family at the Ironman&#34;" alt="&#34;My family at the Ironman&#34;"></p>
+
+<p>I feel so tremendously lucky to have them in my life and I&rsquo;m pretty sure I don&rsquo;t always make that apparent. I don&rsquo;t think they have any idea how much having them there meant to me. The thought of them standing around the next corner got me those small wins that kept me upright.</p>
+
+<p>To me, the most telling part is that I didn&rsquo;t specifically ask any of them to come. All of them were there because they wanted to be. And that, meant the most.</p>
+
+<p>I&rsquo;ve spent the last week thinking about what I could say or do to show my appreciation. The best I could come up with is to simply say &ldquo;Thank You&rdquo;.</p>
+
+<p>This is loyalty.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The Technology Hump]]></title>
+    <link href="http://brandonhilkert.github.io/blog/the-technology-hump/"/>
+    <updated>2013-09-23T20:16:00-04:00</updated>
+    <id>http://brandonhilkert.github.io/blog/the-technology-hump</id>
+    <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
+
+<h3>Rewind 4 years</h3>
+
+<p>Four years ago I was writing PHP on the side for startups and just getting into software products as both a profession and hobby (more on this too&hellip;). I had reached a level of comfort with PHP where I knew I could solve just about any business problem thrown at me. This feeling was not only comforting, but empowering. Shortly after, I helped create <a href="http://brandonhilkert.github.io/about">Meeteor</a>, which was written in <a href="http://rubyonrails.org/">Rails</a> and my world took turn for the better.</p>
+
+<!--more-->
+
+
+<p>Not only was I thrown into a ring of unknown, but I was handed an application that was written by contractors overseas. I won&rsquo;t go in to my feelings about outsourcing here now, but suffice it to say, this experience was less than pleasant.</p>
+
+<p>I spent the next 2-3 weeks learning both <a href="http://www.ruby-lang.org/">Ruby</a> and Rails and largely banging my head against the wall. For me, one of the most frustrating feelings is knowing how to do something in another language/framework, but can&rsquo;t in the one your currently working with. I felt like I was moving backwards, but stuck with it because it felt like the Rails knowledge would be a big pay off going forward.</p>
+
+<p>The next 2 years that followed were largely a blur in what seemed like crash course in creating a product and a business. I&rsquo;m grateful for this experience and believe it has better positioned me for the things I want to accomplish going forward.</p>
+
+<h3>Where I am today</h3>
+
+<p>Today, I&rsquo;m back at that position I was 4 years ago with PHP, but now with Ruby. I&rsquo;m confident I can solve just about anything thrown at me with the tools that I&rsquo;m now most familiar with. Rather than entrench myself with Ruby and Rails books, I&rsquo;m finding articles about retention, conversion, and idea validation more interesting.</p>
+
+<p>I&rsquo;m by no means suggesting that I&rsquo;ve solved every problem on the internet and development is a breeze. In fact, it&rsquo;s quite the opposite. But I now feel more confident in my ability to creativity solve a problem rather than find the answer hidden behind a random <a href="http://stackoverflow.com/">Stack Overflow</a> post. Don&rsquo;t get me wrong, I still encounter challenges I&rsquo;ve never seen before, but that&rsquo;s what not only brought me to development in the first place, but one of the reasons I continue to love what I do.</p>
+
+<p>The technology world changes at a rapid pace. There&rsquo;s a certain amount of dedication involved in staying current on your craft if you want to continue being relevant. But I no longer feel the pressure to spend every waking moment with my head in a Ruby book. Seeing other languages and frameworks emerge (here&rsquo;s looking at you <a href="http://emberjs.com/">Ember.js</a>) is exciting, but takes me back to my experience 4 years ago and the pains involved at the beginning of a learning curve.</p>
+
+<p>I&rsquo;m excited about what&rsquo;s to come now that the technology isn&rsquo;t the most challenging element on my plate.</p>
+
+<p>Have you had similar experiences with a change in focus after becoming more technically capable?</p>
+]]></content>
+  </entry>
+  
+</feed>

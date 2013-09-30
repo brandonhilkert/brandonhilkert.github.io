@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /404.html
+Disallow: /newsletter/almost.html
+Disallow: /newsletter/done.html
+
+Sitemap: http://brandonhilkert.github.io/sitemap.xml
