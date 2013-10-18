@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-10-16T20:09:40-04:00</updated>
+  <updated>2013-10-18T19:46:06-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -56,7 +56,7 @@ experienced the bug, it&rsquo;s likely that others would too, if they hadn&rsquo
 It&rsquo;s possible there may already be an open pull request, thus
 saving you the effort of preparing the fix.</em></p>
 
-<h3>2. Improve an existing gem to make the world a better place</h3>
+<h3>2. Improve an existing gem to learn more about the subject</h3>
 
 <p>It&rsquo;s best to head towards projects that you either have passion for or use
 heavily.  If you&rsquo;re unsure of the level of effort required for an issue or
@@ -80,8 +80,7 @@ upcoming versions. If you can&rsquo;t find this list documented in the source co
 again, ask the gem&rsquo;s contributors. They&rsquo;ll likely have thought through upcoming
 features and can make recommendations on how to get started.</p>
 
-<p>Another reason to contribute is to learn more about a topic that you don&rsquo;t know
-much about. There&rsquo;s no better way to learn than reading code. Sidekiq uses
+<p>There&rsquo;s no better way to learn than reading code. Sidekiq uses
 Celluloid to handle the concurrency and for me, concurrency was an
 afterthought. I realized this and figured by contributing, it would force me to
 better understand the fundamental patterns of concurrency in Ruby.</p>
@@ -99,7 +98,7 @@ quite a bit more about what makes the system tick. It&rsquo;s by no means a stra
 forward gem and probably one I wouldn&rsquo;t urge you to cut your teeth on, but
 certainly a challenge and very well maintained.</p>
 
-<h3>3. Extract code that you commonly use</h3>
+<h3>3. Create a new gem by extracting code that you commonly use</h3>
 
 <p>Greenfielding Rails apps is exciting. It starts out as <code>rails new
 my-awesome-new-app</code>. You boot the server only to be greeted by the default
