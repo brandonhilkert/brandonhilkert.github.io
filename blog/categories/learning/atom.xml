@@ -4,7 +4,7 @@
   <title><![CDATA[Category: learning | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/learning/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-10-29T20:07:54-04:00</updated>
+  <updated>2013-10-29T20:10:16-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -38,6 +38,9 @@ shopping cart (you&rsquo;ve heard this one before, right???).  The concepts in t
 book generally apply to other products built with Rails, but it was sometimes
 hard for me to see their value elsewhere.  I found that the books and articles often skipped over things that were fairly
 trivial for a more experienced developer, but essential to get a real world application out the door.</p>
+
+<!--more-->
+
 
 <h3>The best way to learn (with a catch)</h3>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-10-29T20:07:54-04:00</updated>
+  <updated>2013-10-29T20:10:16-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -38,6 +38,9 @@ shopping cart (you&rsquo;ve heard this one before, right???).  The concepts in t
 book generally apply to other products built with Rails, but it was sometimes
 hard for me to see their value elsewhere.  I found that the books and articles often skipped over things that were fairly
 trivial for a more experienced developer, but essential to get a real world application out the door.</p>
+
+<!--more-->
+
 
 <h3>The best way to learn (with a catch)</h3>
 
@@ -130,144 +133,6 @@ with software. If the answer is &ldquo;yes&rdquo; to any of them, you have yours
 candidate.</p>
 
 <p>I&rsquo;d love to hear about what you&rsquo;re building and the challenges you&rsquo;re facing.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Why I Wrote sucker_punch]]></title>
-    <link href="http://brandonhilkert.com/blog/why-i-wrote-sucker-punch/"/>
-    <updated>2013-10-20T16:41:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/why-i-wrote-sucker-punch</id>
-    <content type="html"><![CDATA[<p>One of the simplest and most common application of
-background processing is sending emails outside of a web
-request. And while background processing is pretty
-common, Ruby libraries require an additional background
-process to execute jobs. The application I was working on
-was hosted on Heroku, and the cost of adding an
-additional dyno is $35/month. The background jobs did
-very little more than send emails the current solutions
-seemed like overkill to me. So
-<a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a>
-was born&hellip;</p>
-
-<h3>Ruby Background Processing Libraries</h3>
-
-<p>Until I had heard of Sidekiq,
-<a href="https://github.com/collectiveidea/delayed_job/tree/master">delayed_job</a>
-and <a href="https://github.com/resque/resque">Resque</a> were the
-standard options for processing background jobs in Ruby.
-I&rsquo;ve used both and believe each has a great use case.</p>
-
-<p>My experience is that it&rsquo;s easiest to start with
-delayed_job and if you get to the point where the DB is
-your bottleneck, it&rsquo;s time to move on. Redis is a
-dependency of both Resque and Sidekiq, so it requires
-more infrastructure and care to maintain, however, with
-<a href="https://addons.heroku.com/?q=redis">Heroku&rsquo;s hosted Redis
-Add-ons</a>, this
-dependency is much less of a pain any more.</p>
-
-<h3>My work on Sidekiq</h3>
-
-<p>I previously wrote about my my <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">open source
-contributions</a>
-and how I got started. I had spent the previous several
-months contributing to Sidekiq and learning more about
-concurrency patterns in Ruby.</p>
-
-<p>Sidekiq is multi-threaded, which is the reason a single
-Sidekiq process is <a href="https://github.com/mperham/sidekiq/wiki/Testimonials">more
-efficient</a>.
-However, care must be taken to ensure your jobs are
-thread-safe. A helpful <a href="https://github.com/mperham/sidekiq/wiki/Best-Practices">guide to writing thread-safe
-code</a>
-can be found on the Sidekiq wiki.</p>
-
-<h3>My Use Case</h3>
-
-<p>I was working on <a href="http://defriendnotifierapp.com/">Defriend
-Notifier</a> and needed to
-notify users via email when their Facebook friend list
-changed. Using Sidekiq or any of the alternatives
-mentioned above would have worked for my use. In fact,
-the application originally did use Sidekiq and worked
-perfectly. However, I was looking for ways to reduce the
-hosting cost of the application given that it doesn&rsquo;t
-produce any revenue stream outside of advertising.</p>
-
-<p>The only background processing library that doesn&rsquo;t
-require an additional background process is
-<a href="https://github.com/mperham/girl_friday">girl_friday</a>,
-also written by <a href="https://twitter.com/mperham">Mike
-Perham</a>, author of Sidekiq.
-While this solution worked for awhile, I found the syntax
-to be slightly non-intuitive and it felt a little dirty
-to pass around a global variable within the application
-to manage a single job queue. I also experienced some
-memory leaks on Heroku as a result of switching to
-girl_friday, but to be fair, I didn&rsquo;t spend much time
-determining the root cause. It&rsquo;s very likely it could
-have been code that I wrote.</p>
-
-<h3>Celluloid</h3>
-
-<p><a href="https://github.com/celluloid/celluloid">Celluloid</a>
-describes itself as an actor-based concurrent object
-framework for Ruby. Celluloid is the guts behind Sidekiq
-and the reason why the multi-threaded Sidekiq code is so
-readable. Celluloid abstracts away the details of
-concurrency so that the library code doesn&rsquo;t have to
-worry about manually managing thread synchronization and
-object message queuing.</p>
-
-<h3>sucker_punch is born</h3>
-
-<p>girl_friday was written several years previous, before
-Celluloid was created. Realizing the power of Celluloid,
-I figured there was an opportunity for a new library that
-essentially behaved like girl_friday, but utilized
-Celluloid&rsquo;s more reliable multi-threading capabilities.</p>
-
-<p>I <a href="https://twitter.com/brandonhilkert/status/292630123981729793">tweeted at Mike
-Perham</a>
-and his response was enough to affirm my interest.</p>
-
-<p>Fortunately, Celluloid had all of the functionality
-needed for background queues already built-in. While the
-functionality was there, the usage syntax was a little
-awkward given that it wasn&rsquo;t primary usage for the
-framework.</p>
-
-<p>I spent the next few days creating a DSL around the
-Celluloid internals, thus making it feel more specific to
-background queues.</p>
-
-<p>Here is a typical job class:</p>
-
-<p>``` ruby Example sucker_punch job class
-class LogJob
-  include SuckerPunch::Job</p>
-
-<p>  def perform(event)</p>
-
-<pre><code># do some other stuff to
-# record the event in the background
-puts "#{event} just happened"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>I deployed the sucker_punch-converted code to production
-and gave it a week or so before I declared it a success.
-Once I realized sucker_punch was going to be a
-maintainable method for processing background jobs in a
-single web process, I added additional niceties like
-logging and queue configuration details that may be
-valuable for other use cases.</p>
-
-<p>Have you tried sucker_punch yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
 ]]></content>
   </entry>
   
