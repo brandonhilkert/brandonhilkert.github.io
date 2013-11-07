@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-06T20:43:48-05:00</updated>
+  <updated>2013-11-06T21:23:57-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -35,6 +35,13 @@ a pretty good summary of the most common needs in a typical Rails app.</p>
 <li><p>Only 37% of the projects used <a href="http://getbootstrap.com/">Bootstrap</a>. I
 thought this number would be higher. It feels like every MVP out there starts
 with bootstrap.</p></li>
+</ul>
+
+
+<!--more-->
+
+
+<ul>
 <li><p>Only 33% used HAML. I thought this number would be higher as well. I&rsquo;m not a
 huge fan of HAML, but it seems like it&rsquo;s the default templating language for
 most Rails developers I&rsquo;ve worked with.</p></li>
