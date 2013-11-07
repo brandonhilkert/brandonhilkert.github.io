@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-06T21:23:57-05:00</updated>
+  <updated>2013-11-07T15:29:00-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -48,7 +48,7 @@ most Rails developers I&rsquo;ve worked with.</p></li>
 <li><p>Around 1/3 of the projects turned off
 <a href="https://github.com/rails/turbolinks/">Turbolinks</a>. I&rsquo;ve spent a little bit
 of time using Turbolinks and while I&rsquo;m not opposed to it, there are a handful
-of common practices that I was used that didn&rsquo;t work with Turbolinks. I
+of common practices that I was used to that didn&rsquo;t work with Turbolinks. I
 suspect this was the case for many teams and just chose to turn it off out of
 frustration or interest in making progress elsewhere. I&rsquo;ve definitely done
 this in the past when I just wanted to get something out the door.</p></li>
@@ -129,10 +129,10 @@ gem &lsquo;anjlab-bootstrap-rails&rsquo;, :require => &lsquo;bootstrap-rails&rsq
 <pre><code>                          :github =&gt; 'anjlab/bootstrap-rails'
 </code></pre>
 
-<p>gem &lsquo;font-awesome-rails;
-gem 'unicorn&rsquo;</p>
+<p>gem &lsquo;font-awesome-rails&rsquo;
+gem &lsquo;unicorn&rsquo;</p>
 
-<p>em &lsquo;sidekiq&rsquo;, require: &ldquo;sidekiq/web&rdquo;
+<p>gem &lsquo;sidekiq&rsquo;, require: &ldquo;sidekiq/web&rdquo;
 gem &lsquo;sinatra&rsquo;
 gem &lsquo;yajl-ruby&rsquo;, require: &lsquo;yajl/json_gem&rsquo;
 gem &lsquo;newrelic_rpm&rsquo;
@@ -155,7 +155,7 @@ be essential for optimizing SQL and notifying me of the poor decisions I&rsquo;v
 made with regards to database calls. There&rsquo;s really no downside to trying
 either of these. Give them a shot if you haven&rsquo;t!</p></li>
 <li><p>I&rsquo;m still baffled that the logs from assets are so noisy.
-<a href="https://github.com/evrone/quiet_assets">queiet_assets</a> removes this noise
+<a href="https://github.com/evrone/quiet_assets">quiet_assets</a> removes this noise
 allowing you to focus on the logs that matter.</p></li>
 <li><p>I typically add <a href="http://fontawesome.io/">Font Awesome</a> and bootstrap to
 start. The above includes 2 gems that merge these assets in to the Rails
