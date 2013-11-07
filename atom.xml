@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-02T07:32:20-04:00</updated>
+  <updated>2013-11-06T20:43:48-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,207 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Patterns in a Rails Gemfile]]></title>
+    <link href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/"/>
+    <updated>2013-11-06T21:04:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile</id>
+    <content type="html"><![CDATA[<h3>Rails Rumble</h3>
+
+<p>The <a href="http://railsrumble.com/">2013 Rails Rumble</a> concluded last week and like
+in previous years, <a href="http://www.dwellable.com/">Dwellable</a> analyzed the <a href="http://www.dwellable.com/blog/Rails-Rumble-Gem-Teardown">Gemfiles of the submitted
+projects</a>.</p>
+
+<p>While it&rsquo;s not an indication of the only gems used in the Ruby community, it&rsquo;s
+a pretty good summary of the most common needs in a typical Rails app.</p>
+
+<ul>
+<li><p>The majority of the projects used Rails defaults of
+<a href="http://coffeescript.org/">Coffeescript</a>, <a href="http://sass-lang.com/">Sass</a>,
+<a href="http://jquery.com/">jQuery</a>, and
+<a href="http://ruby-doc.org/stdlib-2.0.0/libdoc/erb/rdoc/ERB.html">ERB</a></p></li>
+<li><p>Only 37% of the projects used <a href="http://getbootstrap.com/">Bootstrap</a>. I
+thought this number would be higher. It feels like every MVP out there starts
+with bootstrap.</p></li>
+<li><p>Only 33% used HAML. I thought this number would be higher as well. I&rsquo;m not a
+huge fan of HAML, but it seems like it&rsquo;s the default templating language for
+most Rails developers I&rsquo;ve worked with.</p></li>
+<li><p>Around 1/3 of the projects turned off
+<a href="https://github.com/rails/turbolinks/">Turbolinks</a>. I&rsquo;ve spent a little bit
+of time using Turbolinks and while I&rsquo;m not opposed to it, there are a handful
+of common practices that I was used that didn&rsquo;t work with Turbolinks. I
+suspect this was the case for many teams and just chose to turn it off out of
+frustration or interest in making progress elsewhere. I&rsquo;ve definitely done
+this in the past when I just wanted to get something out the door.</p></li>
+<li><p>Usage of <a href="http://www.mysql.com/">MySQL</a> and
+<a href="http://www.postgresql.org/">Postgres</a> was even. This, to me, is great
+news. The more Postgres is used in the community, the more available it will
+be hosting services (<a href="http://www.heroku.com">Heroku</a> has done a great job
+promoting the usage of Postgres).</p></li>
+<li><p>Javascript front-end frameworks were barely used. 7% is a pretty small
+number. Part of me believes this number would&rsquo;ve been larger if the teams had
+more time to devote to development, but with many people believing JS is the
+future of the web, I&rsquo;m still surprised more projects weren&rsquo;t largely
+JS-based. With the 1.0 release of <a href="http://emberjs.com/">Ember.js</a> behind us, perhaps
+next year will support a continuing movement towards these types of frameworks.</p></li>
+<li><p><a href="http://sidekiq.org/">Sidekiq</a> was the overwhelming favorite for background
+jobs! I love Sidekiq (full disclaimer: I&rsquo;m a contributor), but I thought
+usage of <a href="https://github.com/resque/resque">Resque</a> would be closer to that
+of Sidekiq.</p></li>
+</ul>
+
+
+<h3>My Gemfiles</h3>
+
+<p>Most developers have a handful of gems that they rely on during development.
+This got me thinking about the gems that I most commonly used in my own projects.</p>
+
+<p>I tend to write a lot of small apps, so I create new Rails projects all the
+time. The first hour is always spent setting up the project with the gems I&rsquo;m
+most familiar with. I know there are some tools that could make this process
+easier (<a href="http://edgeguides.rubyonrails.org/rails_application_templates.html">Rails
+templates</a>
+and <a href="https://github.com/drnic/appscrolls">AppScrolls</a> ), but I haven&rsquo;t spent
+the time to implement them in to my workflow.</p>
+
+<p>Below is the Gemfile of an app I recently started:</p>
+
+<figure class='code'><figcaption><span>Gemfile</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">source</span> <span class="s1">&#39;https://rubygems.org&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ruby</span> <span class="s1">&#39;2.0.0&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;rails&#39;</span><span class="p">,</span> <span class="s1">&#39;4.0.1&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">group</span> <span class="ss">:production</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;pg&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;rails_12factor&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">group</span> <span class="ss">:test</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;factory_girl_rails&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;capybara&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;selenium-webdriver&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;database_cleaner&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;shoulda-matchers&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">group</span> <span class="ss">:development</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;quiet_assets&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;rails_best_practices&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;rack-mini-profiler&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;bullet&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;better_errors&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">group</span> <span class="ss">:development</span><span class="p">,</span> <span class="ss">:test</span> <span class="k">do</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;rspec-rails&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;pry&#39;</span>
+</span><span class='line'>  <span class="n">gem</span> <span class="s1">&#39;sqlite3&#39;</span>
+</span><span class='line'><span class="k">end</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;sass-rails&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 4.0.0&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;uglifier&#39;</span><span class="p">,</span> <span class="s1">&#39;&gt;= 1.3.0&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;coffee-rails&#39;</span><span class="p">,</span> <span class="s1">&#39;~&gt; 4.0.0&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;jquery-rails&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;turbolinks&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;unicorn&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;anjlab-bootstrap-rails&#39;</span><span class="p">,</span> <span class="ss">:require</span> <span class="o">=&gt;</span> <span class="s1">&#39;bootstrap-rails&#39;</span><span class="p">,</span>
+</span><span class='line'>                              <span class="ss">:github</span> <span class="o">=&gt;</span> <span class="s1">&#39;anjlab/bootstrap-rails&#39;</span>
+</span><span class='line'><span class="n">gem</span> <span class="s1">&#39;font-awesome-rails;</span>
+</span><span class='line'><span class="s1">gem &#39;</span><span class="n">unicorn</span><span class="s1">&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">em &#39;</span><span class="n">sidekiq</span><span class="s1">&#39;, require: &quot;sidekiq/web&quot;</span>
+</span><span class='line'><span class="s1">gem &#39;</span><span class="n">sinatra</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">gem &#39;</span><span class="n">yajl</span><span class="o">-</span><span class="n">ruby</span><span class="s1">&#39;, require: &#39;</span><span class="n">yajl</span><span class="o">/</span><span class="n">json_gem</span><span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">gem &#39;</span><span class="n">newrelic_rpm</span><span class="err">&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A few comments:</p>
+
+<ul>
+<li><p>Most of my apps end up on Heroku, at least to start, so, for ease, I tend to
+developing locally using <a href="http://www.sqlite.org/">SQLite</a>, while using
+Postgres on Heroku. As far as deployments go, I haven&rsquo;t seen any easier than Rails on Heroku.</p></li>
+<li><p>My testing stack is what I would consider to be the standard
+<a href="https://github.com/rspec/rspec">Rspec</a> setup with integration specs using
+Capybara. I never got on the Cucumber bandwagon. I&rsquo;ve experimented with using
+<a href="http://docs.seattlerb.org/minitest/">Minitest</a>, but I always end up back
+with Rspec for one reason or another. Mostly, for no other reason than I&rsquo;m more comfortable with Rspec and can things done faster as a result.</p></li>
+<li><p>I&rsquo;ve found <a href="https://github.com/flyerhzm/bullet">bullet</a> and
+<a href="https://github.com/MiniProfiler/rack-mini-profiler">rack-mini-profiler</a> to
+be essential for optimizing SQL and notifying me of the poor decisions I&rsquo;ve
+made with regards to database calls. There&rsquo;s really no downside to trying
+either of these. Give them a shot if you haven&rsquo;t!</p></li>
+<li><p>I&rsquo;m still baffled that the logs from assets are so noisy.
+<a href="https://github.com/evrone/quiet_assets">queiet_assets</a> removes this noise
+allowing you to focus on the logs that matter.</p></li>
+<li><p>I typically add <a href="http://fontawesome.io/">Font Awesome</a> and bootstrap to
+start. The above includes 2 gems that merge these assets in to the Rails
+<a href="http://guides.rubyonrails.org/asset_pipeline.html">asset pipeline</a>
+seamlessly.</p></li>
+<li><p>I love the <a href="http://pryrepl.org/">Pry</a> gem. I probably use less than 10% of
+its designed functionality. But, to me, it&rsquo;s king of debugging both live
+requests and tests. I used to use the debugger gem, but got frustrated with
+its dependencies when using different versions of Ruby. The pry gem has never
+been a problem in that regard.</p></li>
+</ul>
+
+
+<p>When I encounter code I&rsquo;m not familiar with, the Gemfile is often one of the
+first places I explore to feel out what&rsquo;s going on. It&rsquo;s almost like a personal signature. There are so many gems, and so little time&hellip;I
+feel like I&rsquo;m just scratching the surface for awesome functionality.</p>
+
+<p>Leave a comment let me know what your favorite gems are!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build something]]></title>
