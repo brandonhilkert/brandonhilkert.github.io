@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-07T15:42:39-05:00</updated>
+  <updated>2013-11-09T13:11:36-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -123,7 +123,6 @@ gem &lsquo;uglifier&rsquo;, &lsquo;>= 1.3.0&rsquo;
 gem &lsquo;coffee-rails&rsquo;, &lsquo;~> 4.0.0&rsquo;
 gem &lsquo;jquery-rails&rsquo;
 gem &lsquo;turbolinks&rsquo;
-gem &lsquo;unicorn&rsquo;
 gem &lsquo;anjlab-bootstrap-rails&rsquo;, :require => &lsquo;bootstrap-rails&rsquo;,</p>
 
 <pre><code>                          :github =&gt; 'anjlab/bootstrap-rails'
