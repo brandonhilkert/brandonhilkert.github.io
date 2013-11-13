@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: aws | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/aws/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2013-11-12T20:03:37-05:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Setting up a Cloudfront CDN for Rails]]></title>
+    <link href="http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails/"/>
+    <updated>2013-11-12T21:18:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails</id>
+    <content type="html"><![CDATA[<p>Implementing a <a href="http://en.wikipedia.org/wiki/Content_delivery_network">CDN</a> to
+serve compiled assets in Rails is one of the most significant performance
+enhancements I&rsquo;ve seen. Having done so for 2 fairly large applications, it&rsquo;s
+hard for me to imagine serving assets locally anymore.</p>
+
+<h3>The Asset Pipeline</h3>
+
+<p>The addition of the Rails <a href="http://guides.rubyonrails.org/asset_pipeline.html">asset
+pipeline</a> has reduced both
+the number of assets served and the size of these files. Users on slow
+connections have been the biggest beneficiary of these changes.</p>
+
+<h3>The Problem</h3>
+
+<p>Even with the asset pipeline, content is transmitted to the end user
+over their, sometimes slow, connection. Distance plays a role in the speed at which
+data can be delivered. Because of this, users further away from your servers get a
+sluggish experience. This decreases both the users' patience and your ability to effectively
+engage them.</p>
+
+<!--more-->
+
+
+<h3>The Solution</h3>
+
+<p>CDNs are networks of servers that host your content so that when
+you make a request, the request is served from a server closest
+to you. This can often reduce transmission time by several
+seconds (&hellip;think users in Asia requesting content that&rsquo;s
+served from Virginia &ndash; this is the case if you deploy to Heroku).</p>
+
+<p>The use of a CDN also reduces the number of requests to your
+application servers. Most Ruby applications use
+<a href="http://wiki.nginx.org/Main">Nginx</a> or <a href="http://httpd.apache.org/">Apache</a> in
+front of the Ruby processes. These HTTP servers are really good at serving
+static content, but no one will deny &ndash; the fewer requests, the better.</p>
+
+<h3>Option 1: <em>Push</em> your assets to the CDN during deployment</h3>
+
+<p>Depending on your method of deployment, pushing assets to a CDN isn&rsquo;t always
+trivial. The <a href="https://github.com/rumblelabs/asset_sync">asset_sync</a> gem has
+made this relatively straight forward if you choose to host your assets from
+<a href="http://aws.amazon.com/s3/">Amazon S3</a>. Out of the 2 options, this is the most
+efficient because all requests for assets will be diverted away from your
+application, leaving its precious processing power to serve more important
+application requests.</p>
+
+<h3>Option 2: Assets are <em>pulled</em> to the CDN on first request</h3>
+
+<p>This option won&rsquo;t change deployment and is simple to
+setup. The only downside is that upon first request to an asset, the CDN will
+pull it from your web server and cache it (it&rsquo;s hardly a downside if you&rsquo;re
+currently serving <em>all</em> your assets from your web server). All subsequent
+requests to that asset will be served straight from the CDN. The simplicity of
+this option generally makes it my preferred option.</p>
+
+<p>So let&rsquo;s get to it&hellip;</p>
+
+<h3>Amazon Cloudfront</h3>
+
+<p>Log in to your Amazon EC2 account and click &ldquo;Cloudfront&rdquo;:</p>
+
+<p><img class="center" src="/images/cdn/cloudfront.png" title="&ldquo;Click Cloudfront in the AWS web console&rdquo;" ></p>
+
+<p>Click &ldquo;Create Distribution&rdquo;:</p>
+
+<p><img class="center" src="/images/cdn/create.png" title="&ldquo;Create a Cloudfront distribution endpoint&rdquo;" ></p>
+
+<p>Enter the domain where your assets currently live (ignore Origin ID &ndash; it&rsquo;ll be filled in for you):</p>
+
+<p><img class="center" src="/images/cdn/settings.png" title="&ldquo;Settings for a typical CDN&rdquo;" ></p>
+
+<p>Make note of the Cloudfront distribution URL</p>
+
+<p><img class="center" src="/images/cdn/domain.png" title="&ldquo;Cloudfront distribution URL&rdquo;" ></p>
+
+<h3>Rails</h3>
+
+<p>Rails provides and easy way to change the host URL of the assets (images,
+stylesheets, javascripts, fonts&hellip;). Enter the Cloudfront
+distribution URL from above as the Rails <code>asset_host</code>.</p>
+
+<p><code>ruby config/environments/production.rb
+config.action_controller.asset_host = "d24xjtg100euk4.cloudfront.net"
+</code></p>
+
+<p>At this point, the domain of all Rails asset helpers <code>image_tag</code>, <code>stylesheet_link_tag</code>, and <code>javascript_include_tag</code>
+will be prefaced with the asset host URL that you configured above.</p>
+
+<p>For example:</p>
+
+<p>``` ruby
+image_tag(&ldquo;shark_teeth.png&rdquo;)</p>
+
+<h1><a href="http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png">http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png</a></h1>
+
+<p>```</p>
+
+<p><em>Note: if you only change <code>config/environments/production.rb</code>, you won&rsquo;t see
+any changes in your <code>development</code> environment.</em></p>
+
+<p>And that&rsquo;s it!</p>
+
+<h3>In Summary</h3>
+
+<p>This is the ultimate low-hanging fruit optimization. If you haven&rsquo;t served your
+assets from a CDN before, I&rsquo;d suggest giving it a try. The <a href="http://aws.amazon.com/cloudfront/pricing/">cost of
+Cloudfront</a> is minimal, and in my
+mind, worth 10x that.</p>
+
+<p>I&rsquo;ve recently been trying out a service called
+<a href="http://www.fastly.com/">Fastly</a>, which is an alternative to Cloudfront. It&rsquo;s
+slightly more expensive, but seems to have better and more consistent
+performance.</p>
+]]></content>
+  </entry>
+  
+</feed>
