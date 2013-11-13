@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-12T20:22:21-05:00</updated>
+  <updated>2013-11-12T20:35:04-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,130 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Relative Timestamps in Rails]]></title>
-    <link href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/"/>
-    <updated>2013-11-27T11:05:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/relative-timestamps-in-rails</id>
-    <content type="html"><![CDATA[<p>Comment systems and forum software made the relative timestamp format of &ldquo;X
-hours ago&rdquo; a popular option. For good reason too&hellip;why print an absolute
-timestamp so that people have to do the calculation in their head.</p>
-
-<h3>Rails helpers to the rescue</h3>
-
-<p>Rails has a view helper aptly named <code>time_ago_in_words</code>. So if you used the
-<code>created_at</code> field from a record, once could easily embed a relative timestamp
-in their views:</p>
-
-<p><code>ruby
-Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
-</code></p>
-
-<p>This is great! Er&hellip;except when a user sits on a page for a couple hours and
-the post are no longer posted &ldquo;1 minute ago&rdquo;.</p>
-
-<!--more-->
-
-
-<p>Additionally, Rails 4 encourages the use of <a href="http://edgeguides.rubyonrails.org/caching_with_rails.html">russian doll
-caching</a>, so if you
-cached the comments of a post, the relative time of the post would never change
-with time. No bueno!</p>
-
-<h3>The Solution</h3>
-
-<p><a href="http://timeago.yarp.com/">Timeago.js</a> is a jQuery plugin that converts
-timestamps to their relative format. They also boast the following on their
-website:</p>
-
-<ul>
-<li><p>Avoid timestamps dated &ldquo;1 minute ago&rdquo; even though the page was opened 10
-minutes ago; timeago refreshes automatically.</p></li>
-<li><p>You can take full advantage of page caching in your web applications, because
-the timestamps aren&rsquo;t calculated on the server.</p></li>
-<li><p>You get to use microformats like the cool kids.</p></li>
-</ul>
-
-
-<p>Here&rsquo;s how I use it&hellip;</p>
-
-<p>Download the plugin and place in <code>vendor/javascripts/timeago.jquery.js</code>.</p>
-
-<p>Add the following line to your <code>application.js</code> manifest file, so it&rsquo;s picked
-up by the asset pipeline:</p>
-
-<p><code>
-//= require jquery.timeago
-</code></p>
-
-<p>Create a helper that you can use from your views that will do the dirty work for you:</p>
-
-<p>``` ruby app/helpers/application.rb
-Module ApplicationHelper
-  def timeago(time, options = {})</p>
-
-<pre><code>options[:class] ||= "timeago"
-content_tag(
-  :time,
-  time.to_s,
-  options.merge(datetime: time.getutc.iso8601)
-) if time
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>From your views, use the new helper:</p>
-
-<p><code>ruby app/views/posts/show.html.erb
-&lt;%= timeago(post.created_at) %&gt;
-</code></p>
-
-<p>This generates the following HTML tag:</p>
-
-<p><code>html
-&lt;time class="timeago" datetime="2013-11-08T20:05:37Z" title="2013-11-08 20:05:37 UTC"&gt;&lt;/time&gt;
-</code></p>
-
-<p>Now that <code>timeago.js</code> is loaded and you have the right HTML tags on the page,
-you need to invoke the plugin and let it do its thing. Add the following to the
-bottom of your layout for this to work on all pages of your application:</p>
-
-<p>``` erb app/views/layouts/application.html.erb
-&lt;%= javascript_tag do %>
-  $(function() {</p>
-
-<pre><code>$("time.timeago").timeago();
-</code></pre>
-
-<p>  });
-&lt;% end %>
-```</p>
-
-<p>Once the <code>timeago()</code> function is called, the timestamp above will look like:</p>
-
-<p><code>
-&lt;time class="timeago" datetime="2013-11-08T20:05:37Z" title="2013-11-08 20:05:37 UTC"&gt;2 days ago&lt;/time&gt;
-</code></p>
-
-<p>And that&rsquo;s it&hellip;sit on the page long enough and watch the timestamps increment.
-You&rsquo;ve now got yourself a solution that is dynamic and allows you to cache the
-views until the cows come home!</p>
-
-<h3>In Summary</h3>
-
-<p>While Rails paved the way for simple relatively timestamps, moving this
-mechanism to the client side makes sense. Another benefit you get is that the
-plugin will interpret the local timezone for you. So even though we print the
-UTC time in the HTML tag, the plugin will detect the local timezone from the
-browser and adjust accordingly. In my experience, timezones are a huge pain and
-the more you can offload to a solution like this, the better.</p>
-
-<p>Happy timestamping!</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Setting up a Cloudfront CDN for Rails]]></title>
@@ -677,6 +553,40 @@ community. Work on things you love and make open source software better than
 when you started.</p>
 
 <p>What will your next open source project be?</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The Technology Hump]]></title>
+    <link href="http://brandonhilkert.com/blog/the-technology-hump/"/>
+    <updated>2013-09-23T20:16:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/the-technology-hump</id>
+    <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
+
+<h3>Rewind 4 years</h3>
+
+<p>Four years ago I was writing PHP on the side for startups and just getting into software products as both a profession and hobby (more on this too&hellip;). I had reached a level of comfort with PHP where I knew I could solve just about any business problem thrown at me. This feeling was not only comforting, but empowering. Shortly after, I helped create <a href="/about">Meeteor</a>, which was written in <a href="http://rubyonrails.org/">Rails</a> and my world took turn for the better.</p>
+
+<!--more-->
+
+
+<p>Not only was I thrown into a ring of unknown, but I was handed an application that was written by contractors overseas. I won&rsquo;t go in to my feelings about outsourcing here now, but suffice it to say, this experience was less than pleasant.</p>
+
+<p>I spent the next 2-3 weeks learning both <a href="http://www.ruby-lang.org/">Ruby</a> and Rails and largely banging my head against the wall. For me, one of the most frustrating feelings is knowing how to do something in another language/framework, but can&rsquo;t in the one your currently working with. I felt like I was moving backwards, but stuck with it because it felt like the Rails knowledge would be a big pay off going forward.</p>
+
+<p>The next 2 years that followed were largely a blur in what seemed like crash course in creating a product and a business. I&rsquo;m grateful for this experience and believe it has better positioned me for the things I want to accomplish going forward.</p>
+
+<h3>Where I am today</h3>
+
+<p>Today, I&rsquo;m back at that position I was 4 years ago with PHP, but now with Ruby. I&rsquo;m confident I can solve just about anything thrown at me with the tools that I&rsquo;m now most familiar with. Rather than entrench myself with Ruby and Rails books, I&rsquo;m finding articles about retention, conversion, and idea validation more interesting.</p>
+
+<p>I&rsquo;m by no means suggesting that I&rsquo;ve solved every problem on the internet and development is a breeze. In fact, it&rsquo;s quite the opposite. But I now feel more confident in my ability to creativity solve a problem rather than find the answer hidden behind a random <a href="http://stackoverflow.com/">Stack Overflow</a> post. Don&rsquo;t get me wrong, I still encounter challenges I&rsquo;ve never seen before, but that&rsquo;s what not only brought me to development in the first place, but one of the reasons I continue to love what I do.</p>
+
+<p>The technology world changes at a rapid pace. There&rsquo;s a certain amount of dedication involved in staying current on your craft if you want to continue being relevant. But I no longer feel the pressure to spend every waking moment with my head in a Ruby book. Seeing other languages and frameworks emerge (here&rsquo;s looking at you <a href="http://emberjs.com/">Ember.js</a>) is exciting, but takes me back to my experience 4 years ago and the pains involved at the beginning of a learning curve.</p>
+
+<p>I&rsquo;m excited about what&rsquo;s to come now that the technology isn&rsquo;t the most challenging element on my plate.</p>
+
+<p>Have you had similar experiences with a change in focus after becoming more technically capable?</p>
 ]]></content>
   </entry>
   

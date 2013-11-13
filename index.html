@@ -117,58 +117,6 @@
   
 
 
-<time datetime="2013-11-27T11:05:00-05:00" data-updated="true" itemprop="datePublished">November 27<span>th</span>, 2013</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/relative-timestamps-in-rails/" itemprop="url">Relative Timestamps in Rails</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/jquery/'>jquery</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/timestamps/'>timestamps</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>Comment systems and forum software made the relative timestamp format of &ldquo;X
-hours ago&rdquo; a popular option. For good reason too&hellip;why print an absolute
-timestamp so that people have to do the calculation in their head.</p>
-
-<h3>Rails helpers to the rescue</h3>
-
-<p>Rails has a view helper aptly named <code>time_ago_in_words</code>. So if you used the
-<code>created_at</code> field from a record, once could easily embed a relative timestamp
-in their views:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="ss">Posted</span><span class="p">:</span> <span class="o">&lt;%=</span> <span class="n">time_ago_in_words</span><span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">created_at</span><span class="p">)</span> <span class="o">%&gt;</span> <span class="n">ago</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This is great! Er&hellip;except when a user sits on a page for a couple hours and
-the post are no longer posted &ldquo;1 minute ago&rdquo;.</p>
-
-
-		
-		<a href="/blog/relative-timestamps-in-rails/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
 <time datetime="2013-11-12T21:18:00-05:00" data-updated="true" itemprop="datePublished">November 12<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/setting-up-a-cloudfront-cdn-for-rails/" itemprop="url">Setting Up a Cloudfront CDN for Rails</a></h1>
   <div class="tags">
