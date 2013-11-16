@@ -4,7 +4,7 @@
   <title><![CDATA[Category: marketing | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/marketing/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-14T20:34:03-05:00</updated>
+  <updated>2013-11-16T06:27:41-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -24,8 +24,7 @@ found the following:</p>
 
 <p><img class="center" src="/images/blogcopy/rubyconn.png" title="&ldquo;Rubyconn&rdquo;" ></p>
 
-<p>Never having heard of it before, I clicked on
-<a href="http://rubyconn.herokuapp.com/">RubyConn</a>. I clicked one of the first links on
+<p>Never having heard of it before, I clicked it. I then clicked one of the first links on
 the page and saw this:</p>
 
 <!--more-->
@@ -33,7 +32,7 @@ the page and saw this:</p>
 
 <p><img class="center" src="/images/blogcopy/other.png" title="&ldquo;Blog copy&rdquo;" ></p>
 
-<p>And here&rsquo;s mine:</p>
+<p>Here&rsquo;s my blog:</p>
 
 <p><img class="center" src="/images/blogcopy/myblog.png" title="&ldquo;Brandon Hilkert&rsquo;s blog&rdquo;" ></p>
 
@@ -42,8 +41,8 @@ the title of a previous blog post <a href="http://brandonhilkert.com/blog/build-
 Something</a>.</p>
 
 <p>The <a href="http://blog.rkcudjoe.com/">copied blog</a> has a Github link so I clicked it.
-And sure enough&hellip;<a href="https://github.com/rkcudjoe/blog/commits/master">not even
-forked</a>. Just local clone, showing mostly commits by me.</p>
+And sure enough&hellip;my entire repo (not even forked). Just a local clone, showing
+mostly commits by me.</p>
 
 <p>Now, you&rsquo;re probably asking yourself why I put it on Github in the first place.
 Honestly, it&rsquo;s the perfect backup. And I never thought any one would copy the
@@ -58,6 +57,9 @@ investing that much time, it&rsquo;s a bummer to see your work copied in 5 minut
 without care or inquiry.</p>
 
 <p>So the question is&hellip;what would you do?</p>
+
+<p><em>Update:</em> Even after several requests to take the design down, the person in
+question has disagreed, even without my consent to use the code I wrote.</p>
 ]]></content>
   </entry>
   
