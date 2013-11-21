@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-20T20:44:25-05:00</updated>
+  <updated>2013-11-20T20:48:02-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -18,7 +18,9 @@
     <link href="http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails/"/>
     <updated>2013-11-12T21:18:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails</id>
-    <content type="html"><![CDATA[<p>Implementing a <a href="http://en.wikipedia.org/wiki/Content_delivery_network">CDN</a> to
+    <content type="html"><![CDATA[<p><em>Update: I&rsquo;ve since added a post on <a href="/blog/serving-fonts-for-firefox-with-fastly/">serving fonts for Firefox with Fastly</a>.</em></p>
+
+<p>Implementing a <a href="http://en.wikipedia.org/wiki/Content_delivery_network">CDN</a> to
 serve compiled assets in Rails is one of the most significant performance
 enhancements I&rsquo;ve seen. Having done so for 2 fairly large applications, it&rsquo;s
 hard for me to imagine serving assets locally anymore.</p>
@@ -132,8 +134,6 @@ mind, worth 10x that.</p>
 <a href="http://www.fastly.com/">Fastly</a>, which is an alternative to Cloudfront. It&rsquo;s
 slightly more expensive, but seems to have better and more consistent
 performance.</p>
-
-<p><em>Update: I&rsquo;ve since added a post on <a href="/blog/serving-fonts-for-firefox-with-fastly/">serving fonts for Firefox with Fastly</a>.</em></p>
 ]]></content>
   </entry>
   
