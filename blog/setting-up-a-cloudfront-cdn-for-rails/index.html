@@ -25,6 +25,8 @@
   <link href='http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy:400,400italic' rel='stylesheet' type='text/css'>
   <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
   <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
+  <script src="/javascripts/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 
@@ -194,9 +196,7 @@ this option generally makes it my preferred option.</p>
 stylesheets, javascripts, fonts&hellip;). Enter the Cloudfront
 distribution URL from above as the Rails <code>asset_host</code>.</p>
 
-<figure class='code'><figcaption><span>config/environments/production.rb</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">config</span><span class="o">.</span><span class="n">action_controller</span><span class="o">.</span><span class="n">asset_host</span> <span class="o">=</span> <span class="s2">&quot;d24xjtg100euk4.cloudfront.net&quot;</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>config/environments/production.rb</span></figcaption><pre><code>config.action_controller.asset_host = "d24xjtg100euk4.cloudfront.net"</code></pre></figure>
 
 
 <p>At this point, the domain of all Rails asset helpers <code>image_tag</code>, <code>stylesheet_link_tag</code>, and <code>javascript_include_tag</code>
@@ -204,11 +204,8 @@ will be prefaced with the asset host URL that you configured above.</p>
 
 <p>For example:</p>
 
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">image_tag</span><span class="p">(</span><span class="s2">&quot;shark_teeth.png&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="c1"># http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png</span>
-</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><figcaption><span>config/environments/production.rb</span></figcaption><pre><code>image_tag("shark_teeth.png")
+# http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png</code></pre></figure>
 
 
 <p><em>Note: if you only change <code>config/environments/production.rb</code>, you won&rsquo;t see

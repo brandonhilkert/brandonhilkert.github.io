@@ -26,6 +26,8 @@ one of the first performance &hellip;">
   <link href='http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy:400,400italic' rel='stylesheet' type='text/css'>
   <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
   <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
+  <script src="/javascripts/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
 </head>
 
 
@@ -124,18 +126,12 @@ assets that were fronted by a <a href="http://aws.amazon.com/cloudfront/">Amazon
 Cloudfront</a> CDN. In order to make it work
 with this setup, I had to add to the following to our Nginx configuration:</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>location ~* \.(ttf|ttc|otf|eot|woff|svg|font.css)$ {
-</span><span class='line'>    add_header Access-Control-Allow-Origin *;
-</span><span class='line'>    expires 1M;
-</span><span class='line'>    access_log off;
-</span><span class='line'>    add_header Cache-Control "public";
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+<figure class='code'><pre><code>location ~* \.(ttf|ttc|otf|eot|woff|svg|font.css)$ {
+    add_header Access-Control-Allow-Origin *;
+    expires 1M;
+    access_log off;
+    add_header Cache-Control "public";
+}</code></pre></figure>
 
 
 
