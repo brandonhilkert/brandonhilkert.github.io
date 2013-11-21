@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: firefox | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/firefox/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2013-11-20T19:58:48-05:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Serving Fonts for Firefox with Fastly]]></title>
+    <link href="http://brandonhilkert.com/blog/serving-fonts-for-firefox-with-fastly/"/>
+    <updated>2013-11-20T09:57:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/serving-fonts-for-firefox-with-fastly</id>
+    <content type="html"><![CDATA[<p><a href="/blog/setting-up-a-cloudfront-cdn-for-rails/">Setting up a CDN to host assets</a> is
+one of the first performance improvements I make to a production Rails
+application. The first time I attempted to host assets from a different domain,
+I quickly realized that <a href="http://davidwalsh.name/cdn-fonts">Firefox won&rsquo;t download fonts from a different
+domain</a> without specific headers.</p>
+
+<h3>Nginx Fix</h3>
+
+<p>At the time, our system was using <a href="http://wiki.nginx.org/Main">Nginx</a> to serve
+assets that were fronted by a <a href="http://aws.amazon.com/cloudfront/">Amazon
+Cloudfront</a> CDN. In order to make it work
+with this setup, I had to add to the following to our Nginx configuration:</p>
+
+<p>```
+location ~* .(ttf|ttc|otf|eot|woff|svg|font.css)$ {</p>
+
+<pre><code>add_header Access-Control-Allow-Origin *;
+expires 1M;
+access_log off;
+add_header Cache-Control "public";
+</code></pre>
+
+<p>}
+```</p>
+
+<!--more-->
+
+
+<p>This added the <code>Access-Control-Allow-Origin</code> header for all fonts and
+font-related assets.</p>
+
+<h3>Enter Fastly</h3>
+
+<p>Fast-forward a few months and we&rsquo;ve taken the next step in serving assets by
+uploading them to S3. As mentioned in my previous post about <a href="/blog/setup-a-cloudfront-cdn-for-rails/">setting up a
+Cloudfront CDN</a>, we&rsquo;ve also started
+using <a href="http://fastly.com">Fastly</a> as our CDN.</p>
+
+<p>Fastly&rsquo;s caching service is really powerful, but can be overwhelming at times.
+They make heavy use of <a href="https://www.varnish-cache.org/">Varnish</a>, even to the
+point of allowing you to write your own Varnish configurations if you choose.
+I&rsquo;m a Varnish amateur so I&rsquo;ll go down the GUI route here.</p>
+
+<p>Setting the headers in S3 upon upload would&rsquo;ve been ideal, but wasn&rsquo;t possible
+given the mechanism were were using to upload. Fortunately, Fastly allows you
+to <a href="http://docs.fastly.com/guides/21835572/23999817">set custom headers</a> at any
+point in the caching life cycle.</p>
+
+<h3>The Solution</h3>
+
+<p>In Fastly, go to <code>Configure -&gt; Content -&gt; Headers -&gt; + New</code> and enter the
+following:</p>
+
+<p><img class="center" src="/images/fastly/headers.png" title="&ldquo;Fastly headers&rdquo;" ></p>
+
+<p>This configuration will add the <code>Access-Control-Allow-Origin</code> header to all
+asset responses. But we can do one better than this!</p>
+
+<p>Fastly&rsquo;s <a href="http://docs.fastly.com/guides/21835572/23472072">headers can take
+conditions</a>&hellip;knowing I only
+wanted to add this header to fonts, I clicked <code>Response Conditions</code> on the
+header I previously added:</p>
+
+<p><img class="center" src="/images/fastly/conditions.png" title="&ldquo;Fastly Conditions&rdquo;" ></p>
+
+<p>And entered the following:</p>
+
+<p><img class="center" src="/images/fastly/condition.png" title="&ldquo;Fastly Condition&rdquo;" ></p>
+
+<p>This condition looks at the URL of the incoming request to determine whether it
+matches any of the following regex conditions: <code>req.url ~
+"(ttf|ttc|otf|eot|woff|svg|font\.css)$"</code>. If it does, it&rsquo;ll apply the
+<code>Access-Control-Allow-Origin</code> header.</p>
+
+<p><em>Note: Once you&rsquo;ve made these changes, don&rsquo;t forget to click the <code>Deploy</code>
+button, otherwise, you won&rsquo;t see the new headers.</em></p>
+
+<h3>In Summary</h3>
+
+<p>While Fastly can be overwhelming, the power of being able to modify any aspect
+of the caching stack is valuable. Asset download times have generally been
+somewhere between 30-50 ms. Cloudfont offered this performance at times, but
+wasn&rsquo;t very consistent &ndash; some would be 30 ms, and others would take 150 ms. I
+haven&rsquo;t noticed this inconsistency with Fastly and would happily recommend
+their service to anyone looking to improved their caching layer.</p>
+]]></content>
+  </entry>
+  
+</feed>
