@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-01T06:05:39-05:00</updated>
+  <updated>2013-12-01T06:10:00-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -32,14 +32,14 @@ motivation for a particular product.</p>
 
 <h3>Week of Hustle</h3>
 
-<p>Week of Hustle is a 8-day sprint to launch something. Anything really&hellip;could
+<p>Week of Hustle is an 8-day sprint to launch something. Anything really&hellip;could
 be an existing product that you need to put the finishing touches on, or a
 brand new idea. It was one of the things that attracted most to JFDI.</p>
 
 <p>Launching any kind of product is time consuming. And with a family and other
 full-time responsibilities, life can get in the way. I feel like I&rsquo;m pretty
 good at managing my time efficiently, but when accountability is involved, it&rsquo;s
-much hard to put it off.</p>
+much harder to put it off.</p>
 
 <!--more-->
 
@@ -79,12 +79,7 @@ posts, which tells me there&rsquo;s clearly a need for this kind of discussion.<
 
 <p>The Ruby gem ecosystem is really powerful, but equally confusing, in my
 opinion. There are <em>strong</em> recommendations about how to structure the
-internals of a gem, and without being intimately familiar with this, can make
-writing your first gem pretty frustrating.</p>
-
-<p>I&rsquo;ve thought about this a lot, but I think if there are more Ruby developers
-contributing to open source, the Ruby world will be a stronger and better
-place.</p>
+internals of a gem, which can make writing your first gem pretty frustrating.</p>
 
 <h3>My plan this week</h3>
 
