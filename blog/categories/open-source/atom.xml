@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-11-30T16:06:12-05:00</updated>
+  <updated>2013-12-01T06:05:39-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,142 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem - WOH - Day 1]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/"/>
+    <updated>2013-12-01T05:37:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1</id>
+    <content type="html"><![CDATA[<h3>JFDI</h3>
+
+<p>Living outside a major metropolitan area has made it hard to surround myself
+with other entrepreneurs. Fortunately, the internet has made the world a
+smaller place. Last week I joined <a href="http://jfdi.bz/">JFDI.bz</a>, a community for
+solo-founders launching their own thing.</p>
+
+<p>My goal for joining this community was to have access to other motivated
+entrepreneurs that I could use as a sounding-board. I also figured it&rsquo;d be
+great opportunity to peek in to other solo founders launch process and
+motivation for a particular product.</p>
+
+<h3>Week of Hustle</h3>
+
+<p>Week of Hustle is a 8-day sprint to launch something. Anything really&hellip;could
+be an existing product that you need to put the finishing touches on, or a
+brand new idea. It was one of the things that attracted most to JFDI.</p>
+
+<p>Launching any kind of product is time consuming. And with a family and other
+full-time responsibilities, life can get in the way. I feel like I&rsquo;m pretty
+good at managing my time efficiently, but when accountability is involved, it&rsquo;s
+much hard to put it off.</p>
+
+<!--more-->
+
+
+<h3>My Goal</h3>
+
+<p>This week I will be launching a free <strong>5-day email course</strong> focused on
+<strong>Building a Ruby Gem</strong>. My goal for the course is to build my newsletter
+audience and work through the steps of building a smaller info product to
+determine if there&rsquo;s enough interest in the subject to warrant writing an
+ebook.</p>
+
+<p>As part of 8-day process, I will be posting blog entries daily about my
+progress and the challenges I&rsquo;m facing at each step. If you&rsquo;re interested in
+receiving these updates via email, subscribe here:</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: open source" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<h3>Why an email course on Building a Ruby Gem?</h3>
+
+<p>One of the first blog posts I wrote was about <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">how to get started contributing
+to Open Source</a>. I
+wrote it because I remember being somewhat unsure about the topic early in my
+Ruby career. Additionally, it garnered far more attention than any of my other
+posts, which tells me there&rsquo;s clearly a need for this kind of discussion.</p>
+
+<p><img class="center" src="/images/woh/ga.png" title="&ldquo;Google Analytics of my first few blog posts.&rdquo;" ></p>
+
+<p>The Ruby gem ecosystem is really powerful, but equally confusing, in my
+opinion. There are <em>strong</em> recommendations about how to structure the
+internals of a gem, and without being intimately familiar with this, can make
+writing your first gem pretty frustrating.</p>
+
+<p>I&rsquo;ve thought about this a lot, but I think if there are more Ruby developers
+contributing to open source, the Ruby world will be a stronger and better
+place.</p>
+
+<h3>My plan this week</h3>
+
+<p>So getting down to business&hellip;here&rsquo;s my tentative plan this week:</p>
+
+<ul>
+<li><p>Day 1 &ndash; Overall topic and organize what content goes on which days, setup GH
+project and ready tags, write WOH day blog, why gem discussion (ref. open
+source blog &ndash; pics of GA)</p></li>
+<li><p>Day 2 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 3 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 4 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 5 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 6 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 7 &ndash;  Setup auto responder and way to capture for the course, write emails for each day of sequence</p></li>
+<li><p>Day 8 &ndash; Launch with new landing page and notify subscribers</p></li>
+</ul>
+
+
+<h3>Time Management</h3>
+
+<p>I do have a full-time job and will be working all week. Because I try to spend
+as much time as possible with my daughter, my goal is to accomplish the steps
+above early in the AM. This morning I set my alarm for 6am, but got up 4:30am
+because I was excited to start the week. Today was a relatively easy day in
+terms of time-consuming tasks, so I&rsquo;m guessing I&rsquo;ll shoot for 5am the remainder
+of the week. We&rsquo;ll see!</p>
+
+<h3>Today&rsquo;s Accomplishments</h3>
+
+<ul>
+<li>I created a <a href="https://github.com/brandonhilkert/so_meta_course">Github project to house the code I&rsquo;ll write</a></li>
+<li>I wrote this post</li>
+<li>I setup a mail chimp entry form for subscription to my WOH updates</li>
+<li>I created the structure for the email course content</li>
+<li>I searched through <a href="http://reddit.com">Reddit</a> and found a <a href="http://www.reddit.com/r/ruby/comments/1qplmu/tutorial_build_a_gem_from_scratch/">few posts that
+express</a>
+a need to <a href="http://www.reddit.com/r/ruby/comments/1qmb29/building_a_gem_from_scratch_google_hangout_today/">learn about about writing Ruby
+gems</a>.
+Those interested in these posts would be a great target audience.</li>
+</ul>
+
+
+<p>So having said all that&hellip;if you&rsquo;re interested in staying up to date on my
+progress or hearing about the launch of my FREE <strong>Building a Ruby Gem email
+course</strong>, subscribe below:</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: open source" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<p>Until tomorrow!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[3 Ways To Get Started Contributing To Open Source]]></title>

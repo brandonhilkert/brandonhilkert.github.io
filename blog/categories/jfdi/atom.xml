@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: marketing | Brandon Hilkert]]></title>
-  <link href="http://brandonhilkert.com/blog/categories/marketing/atom.xml" rel="self"/>
+  <title><![CDATA[Category: jfdi | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/jfdi/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
   <updated>2013-12-01T06:05:39-05:00</updated>
   <id>http://brandonhilkert.com/</id>
@@ -59,7 +59,7 @@ receiving these updates via email, subscribe here:</p>
 <p><div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
     <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: marketing" />
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: jfdi" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
     <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
     <br class="clear">
@@ -136,7 +136,7 @@ course</strong>, subscribe below:</p>
 <p><div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
     <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: marketing" />
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: jfdi" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
     <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
     <br class="clear">
@@ -146,56 +146,6 @@ course</strong>, subscribe below:</p>
 </p>
 
 <p>Until tomorrow!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Blog Design Copied - What Would You Do?]]></title>
-    <link href="http://brandonhilkert.com/blog/blog-design-copied-what-would-you-do/"/>
-    <updated>2013-11-14T07:19:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/blog-design-copied-what-would-you-do</id>
-    <content type="html"><![CDATA[<p>I posted a blog post yesterday, so the first thing I did when I woke up this
-morning was look at Google Analytics to for the most popular traffic sources. I
-found the following:</p>
-
-<p><img class="center" src="/images/blogcopy/rubyconn.png" title="&ldquo;Rubyconn&rdquo;" ></p>
-
-<p>Never having heard of it before, I clicked it. I then clicked one of the first links on
-the page and saw this:</p>
-
-<!--more-->
-
-
-<p><img class="center" src="/images/blogcopy/other.png" title="&ldquo;Blog copy&rdquo;" ></p>
-
-<p>Here&rsquo;s my blog:</p>
-
-<p><img class="center" src="/images/blogcopy/myblog.png" title="&ldquo;Brandon Hilkert&rsquo;s blog&rdquo;" ></p>
-
-<p>Wow! Full-on copy of my blog design. The blog title &ldquo;build_something!&rdquo; was even
-the title of a previous blog post <a href="http://brandonhilkert.com/blog/build-something/">Build
-Something</a>.</p>
-
-<p>The <a href="http://blog.rkcudjoe.com/">copied blog</a> has a Github link so I clicked it.
-And sure enough&hellip;my entire repo (not even forked). Just a local clone, showing
-mostly commits by me.</p>
-
-<p>Now, you&rsquo;re probably asking yourself why I put it on Github in the first place.
-Honestly, it&rsquo;s the perfect backup. And I never thought any one would copy the
-entire thing!</p>
-
-<p>I spent several months with the help of a <a href="http://jodyferry.com/">really talented UI
-designer</a> to finalize my blog design. And in the end,
-was really happy with the outcome.</p>
-
-<p>The whole thing is disappointing&hellip;sure I could try to ignore it, but after
-investing that much time, it&rsquo;s a bummer to see your work copied in 5 minutes
-without care or inquiry.</p>
-
-<p>So the question is&hellip;what would you do?</p>
-
-<p><em>Update:</em> Even after several requests to take the design down, the person in
-question has disagreed, even without my consent to use the code.</p>
 ]]></content>
   </entry>
   
