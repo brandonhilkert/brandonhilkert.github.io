@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-01T10:44:50-05:00</updated>
+  <updated>2013-12-02T07:41:32-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,116 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a ruby gem email course - week of hustle - day 2]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/"/>
+    <updated>2013-12-02T07:02:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2</id>
+    <content type="html"><![CDATA[<p>Alright, back at it! I didn&rsquo;t quite hit the
+5:00am goal I had, but was early enough to accomplish
+what I was shooting for. (Setting my alarm for
+11:58pm because namecheap.com had hourly Cyber Monday
+coupon codes didn&rsquo;t help&hellip;).</p>
+
+<p>If you remember from the <a href="/blog/build-a-ruby-gem-woh-day-1/">previous
+post</a>, I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: ruby" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<h3>What I Accomplished today</h3>
+
+<p>Today I wrote the first post out of 5 and it went
+relatively smooth. Yesterday I created a rough outline
+for the course content using
+<a href="http://evernote.com/">Evernote</a>. I&rsquo;ve used it mainly as
+a place to spew out the ideas that are not necessarily
+organized, but just general notes about things I want to
+make sure get covered (imagine that, using Evernote for
+notes?!?!).</p>
+
+<!--more-->
+
+
+<p>Writing my entry for the email course caused me to
+realize that I had to make a few changes to my blog to
+facilitate the course (ie. hide newsletter signup at the
+end of each course). Those changes probably took 10-15
+min. However, I got them out of the way so I won&rsquo;t have
+to worry about it anymore for future courses (I know, fat
+chance a web developer leaves something alone for very
+long&hellip;).</p>
+
+<h3>What I&rsquo;m working on</h3>
+
+<p>There&rsquo;s been some weirdness with my Mailchimp sign up
+form, mostly around signing up for multiple groups as an
+existing recipient. I&rsquo;ve submitted a support request and
+have been reaching out to people that are far more
+knowledgable than I using email lists and hope to have it
+resolved by the end of the day, at which point I&rsquo;ll notify my existing
+email list of the course.</p>
+
+<h3>My new timeline</h3>
+
+<p>I made a few changes/additions to my project timeline as
+you can see below:</p>
+
+<ul>
+<li><p><del>Day 1 &ndash; Overall topic and organize what content goes on which days, setup GH
+project and ready tags, write WOH day blog, why gem discussion (ref. open
+source blog &ndash; pics of GA)</del></p></li>
+<li><p><del>Day 2 &ndash; Write content and WOH blog (notify subscribers)</del></p></li>
+<li><p>Day 3 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 4 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 5 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 6 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 7 &ndash;  Setup auto responder and way to capture for the course, write emails for each day of sequence (depending on the content). Proofread all course posts.</p></li>
+<li><p>Day 8 &ndash; Launch with new landing page and notify subscribers</p></li>
+</ul>
+
+
+<p>I realized I needed to separate out time to proofread previous email course
+content posts. After writing for over an hour, I don&rsquo;t feel like I&rsquo;m in the
+best position to be critical of my writing. I think editing after the fact will
+also reveal some places where content can be removed due to wordiness.</p>
+
+<h3>Marketing</h3>
+
+<p>I wanted to add a marketing section to each of these updates because building
+an audience is such a critical piece of this process. Yesterday, I posted my
+<a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> post around the internet and got
+overwhelmingly positive feedback.</p>
+
+<p>The &ldquo;sign up for updates&rdquo; form yielded around 40 subscriptions. My wife and I
+went to the movies yesterday and at one point I looked at my phone and saw
+this:</p>
+
+<p><img class="center" src="/images/woh/mailbox.png" title="&ldquo;My mailbox showing Mailchimp subscriptions&rdquo;" ></p>
+
+<p>Yesterday I mentioned part of my motivation for launching this <strong>Build a Ruby
+Gem</strong> email course was to determine if there was enough interest in the topic
+to warrant an ebook. So far, so good&hellip;</p>
+
+<p>Total visits to the site was 337. I&rsquo;ll take a 10% conversion rate any day!</p>
+
+<p><img class="center" src="/images/woh/ga-day1.png" title="&ldquo;Google Analytics from Day 1&rdquo;" ></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 1]]></title>
@@ -551,141 +661,6 @@ with software. If the answer is &ldquo;yes&rdquo; to any of them, you have yours
 candidate.</p>
 
 <p>I&rsquo;d love to hear about what you&rsquo;re building and the challenges you&rsquo;re facing.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[3 Ways To Get Started Contributing To Open Source]]></title>
-    <link href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/"/>
-    <updated>2013-10-15T16:30:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source</id>
-    <content type="html"><![CDATA[<p>Towards the end of 2012, I began feeling like a had a good grip on the Ruby
-language. As mentioned in a <a href="/blog/the-technology-hump/">previous
-post</a>, I felt confident enough in my skills that
-I could make a positive contribution to the open source community.</p>
-
-<p>I learned a lot by watching certain projects and getting involved with others
-and hope that my notes are helpful for you and your endeavors.</p>
-
-<h3>1. Fix a bug in an existing gem because it affects you</h3>
-
-<p>My experience with <a href="/about">Meeteor</a> and <a href="/about">Spokely</a> caused me to move
-FAST and break a lot of things along the way. Because of the pace, when I did
-find a bug, I wasn&rsquo;t great at contributing code back to the source repository.
-In many cases, my fixes were brute force <a href="http://en.wikipedia.org/wiki/Monkey_patch">monkey
-patches</a> or something else that I
-would probably be pretty embarassed about today.</p>
-
-<!--more-->
-
-
-<p>Some of the more extreme cases caused me to <a href="https://github.com/brandonhilkert/jquery-tokeninput">fork a
-gem</a> and <a href="https://github.com/brandonhilkert/jquery-tokeninput/commits/master">commit
-changes</a> to
-my version of the repo and reference my version of them gem in the application.
-Thinking back on this now, doing so probably did more harm than good. The
-downside is that it creates yet another fork of the gem and it also suffers
-from lack of future updates by the original author. Unless, of course, you&rsquo;re
-diligent about merging in changes from master, but let&rsquo;s admit, this never
-happens.</p>
-
-<p>In hindsight, I should have spent the extra 30 minutes to write organized and
-tested code in order to contribute back to the original project. If I
-experienced the bug, it&rsquo;s likely that others would too, if they hadn&rsquo;t already.</p>
-
-<p><em>Be sure to review the Github issues for other reports of the bug.
-It&rsquo;s possible there may already be an open pull request, thus
-saving you the effort of preparing the fix.</em></p>
-
-<h3>2. Improve an existing gem to learn more about the subject</h3>
-
-<p>It&rsquo;s best to head towards projects that you either have passion for or use
-heavily.  If you&rsquo;re unsure of the level of effort required for an issue or
-feature, ask the gem&rsquo;s author. Also, before you prepare that killer feature
-that&rsquo;s going to take you 2 weeks to prepare, make sure it&rsquo;s known and approved
-by the auther. It&rsquo;s a bummer to put in all that work only to learn that it&rsquo;s
-not something the author is interested in adding and supporting. They&rsquo;ll likely
-be happy for the extra help and point you in the right direction.</p>
-
-<p>For me, this was <a href="http://sidekiq.org/">Sidekiq</a>. I had been a long time user of
-<a href="https://github.com/collectiveidea/delayed_job">Delayed Job</a> and
-<a href="https://github.com/resque/resque">Resque</a>. When I first tried Sidekiq, I was
-dumbfounded at how much faster it was because of its multi-threading
-capabilities. I was also really surprised how easy it was to get started.
-Sidekiq&rsquo;s author, <a href="https://twitter.com/mperham">Mike Perham</a>, has done a great job at
-keeping the API similar to that of Resque, thus minimizing the pain of
-switching.</p>
-
-<p>Often, a popular gem will have a list of pending features to be written for
-upcoming versions. If you can&rsquo;t find this list documented in the source code,
-again, ask the gem&rsquo;s contributors. They&rsquo;ll likely have thought through upcoming
-features and can make recommendations on how to get started.</p>
-
-<p>There&rsquo;s no better way to learn than reading code. Sidekiq uses
-Celluloid to handle the concurrency and for me, concurrency was an
-afterthought. I realized this and figured by contributing, it would force me to
-better understand the fundamental patterns of concurrency in Ruby.</p>
-
-<p>I can hear the next question&hellip;how can you contribute to a codebase you want to
-learn about but know nothing about?  At the time, Sidekiq&rsquo;s Web UI wasn&rsquo;t
-great. Web applications are what I&rsquo;m good at, so I took it as an opportunity to
-improve the Sidekiq Web UI, while I became more familiar with Sidekiq&rsquo;s
-internals. I spent a few weeks <a href="https://github.com/mperham/sidekiq/contributors">playing with graphs and improving Sidekiq&rsquo;s
-internal API</a> and was able to
-make the Web UI significantly better than it was before I started.</p>
-
-<p>That was the start of my contribution to Sidekiq and since then have learned
-quite a bit more about what makes the system tick. It&rsquo;s by no means a straight
-forward gem and probably one I wouldn&rsquo;t urge you to cut your teeth on, but
-certainly a challenge and very well maintained.</p>
-
-<h3>3. Create a new gem by extracting code that you commonly use</h3>
-
-<p>Greenfielding Rails apps is exciting. It starts out as <code>rails new
-my-awesome-new-app</code>. You boot the server only to be greeted by the default
-index page. The next steps are a series of copying and pasting from previous
-applications or blog posts on the subject of configuring a Rails app. Whichever
-<a href="http://words.steveklabnik.com/rails-has-two-default-stacks">stack</a> you prefer,
-there&rsquo;s generally a number of changes/additions that need to be made to kickstart the productivity.</p>
-
-<p>Rather than paste in the same old code to handle &ldquo;______&rdquo; (insert your
-favoritie super important feature), what better than to simply include a gem
-that does it all for you. And what better person to create this gem than YOU!</p>
-
-<p>On a previous project, I found myself calling the same view helper methods over
-and over again, so I pulled it out into a
-<a href="https://github.com/brandonhilkert/so_meta">gem</a> so I didn&rsquo;t have to worry
-about copying the code across projects. It&rsquo;s a trivial example, but one that
-can save you a lot of time and headache.</p>
-
-<p>The ease of creating a gem is both a blessing and a curse for the community.
-Ruby advocates writing code in a way that&rsquo;s modular, which tends to make
-extracting that code to a gem pretty easy when done correctly. With a little
-<a href="https://www.google.com/search?q=how+to+make+a+ruby+gem&amp;oq=how+to+make+a+ruby+gem">Google'ing</a>,
-you can pretty quickly extract a feature that&rsquo;s already written and have it up
-on RubyGems for the world to consume in no time.</p>
-
-<h3>In summary</h3>
-
-<p>I spent a fair amount of time trying to plot my entrace in to the Open Source
-community. <a href="http://github.com">Github</a> has made it tremendously easy to not
-only collaborate, but scour other products in search of code that might be
-interesting to both learn and contribute to.</p>
-
-<p>For those that write Ruby, I would urge you to avoid starting by contributing
-to gems like Rails or other large codebases. Despite having plenty of work to
-do, they&rsquo;re often hard to navigate and have quite a few idosyncrasies due to
-their long and complex histories. It&rsquo;s also hard to know whether other people
-are working on the same issue you might think is relatively trivial. There&rsquo;s
-not much worse than putting in a few hard hours on a bug, only to have a pull
-request fixing the same buy show up a few minutes before.</p>
-
-<p>Start with a smaller project and figure out the path that works best for you.
-Everyone is different, but that&rsquo;s what makes you so valuable to the open source
-community. Work on things you love and make open source software better than
-when you started.</p>
-
-<p>What will your next open source project be?</p>
 ]]></content>
   </entry>
   

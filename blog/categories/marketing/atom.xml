@@ -4,7 +4,7 @@
   <title><![CDATA[Category: marketing | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/marketing/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-01T10:44:50-05:00</updated>
+  <updated>2013-12-02T07:41:32-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,116 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a ruby gem email course - week of hustle - day 2]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/"/>
+    <updated>2013-12-02T07:02:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2</id>
+    <content type="html"><![CDATA[<p>Alright, back at it! I didn&rsquo;t quite hit the
+5:00am goal I had, but was early enough to accomplish
+what I was shooting for. (Setting my alarm for
+11:58pm because namecheap.com had hourly Cyber Monday
+coupon codes didn&rsquo;t help&hellip;).</p>
+
+<p>If you remember from the <a href="/blog/build-a-ruby-gem-woh-day-1/">previous
+post</a>, I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: marketing" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<h3>What I Accomplished today</h3>
+
+<p>Today I wrote the first post out of 5 and it went
+relatively smooth. Yesterday I created a rough outline
+for the course content using
+<a href="http://evernote.com/">Evernote</a>. I&rsquo;ve used it mainly as
+a place to spew out the ideas that are not necessarily
+organized, but just general notes about things I want to
+make sure get covered (imagine that, using Evernote for
+notes?!?!).</p>
+
+<!--more-->
+
+
+<p>Writing my entry for the email course caused me to
+realize that I had to make a few changes to my blog to
+facilitate the course (ie. hide newsletter signup at the
+end of each course). Those changes probably took 10-15
+min. However, I got them out of the way so I won&rsquo;t have
+to worry about it anymore for future courses (I know, fat
+chance a web developer leaves something alone for very
+long&hellip;).</p>
+
+<h3>What I&rsquo;m working on</h3>
+
+<p>There&rsquo;s been some weirdness with my Mailchimp sign up
+form, mostly around signing up for multiple groups as an
+existing recipient. I&rsquo;ve submitted a support request and
+have been reaching out to people that are far more
+knowledgable than I using email lists and hope to have it
+resolved by the end of the day, at which point I&rsquo;ll notify my existing
+email list of the course.</p>
+
+<h3>My new timeline</h3>
+
+<p>I made a few changes/additions to my project timeline as
+you can see below:</p>
+
+<ul>
+<li><p><del>Day 1 &ndash; Overall topic and organize what content goes on which days, setup GH
+project and ready tags, write WOH day blog, why gem discussion (ref. open
+source blog &ndash; pics of GA)</del></p></li>
+<li><p><del>Day 2 &ndash; Write content and WOH blog (notify subscribers)</del></p></li>
+<li><p>Day 3 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 4 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 5 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 6 &ndash; Write content and WOH blog (notify subscribers)</p></li>
+<li><p>Day 7 &ndash;  Setup auto responder and way to capture for the course, write emails for each day of sequence (depending on the content). Proofread all course posts.</p></li>
+<li><p>Day 8 &ndash; Launch with new landing page and notify subscribers</p></li>
+</ul>
+
+
+<p>I realized I needed to separate out time to proofread previous email course
+content posts. After writing for over an hour, I don&rsquo;t feel like I&rsquo;m in the
+best position to be critical of my writing. I think editing after the fact will
+also reveal some places where content can be removed due to wordiness.</p>
+
+<h3>Marketing</h3>
+
+<p>I wanted to add a marketing section to each of these updates because building
+an audience is such a critical piece of this process. Yesterday, I posted my
+<a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> post around the internet and got
+overwhelmingly positive feedback.</p>
+
+<p>The &ldquo;sign up for updates&rdquo; form yielded around 40 subscriptions. My wife and I
+went to the movies yesterday and at one point I looked at my phone and saw
+this:</p>
+
+<p><img class="center" src="/images/woh/mailbox.png" title="&ldquo;My mailbox showing Mailchimp subscriptions&rdquo;" ></p>
+
+<p>Yesterday I mentioned part of my motivation for launching this <strong>Build a Ruby
+Gem</strong> email course was to determine if there was enough interest in the topic
+to warrant an ebook. So far, so good&hellip;</p>
+
+<p>Total visits to the site was 337. I&rsquo;ll take a 10% conversion rate any day!</p>
+
+<p><img class="center" src="/images/woh/ga-day1.png" title="&ldquo;Google Analytics from Day 1&rdquo;" ></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 1]]></title>
