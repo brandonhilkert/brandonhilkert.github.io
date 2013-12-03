@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-02T17:44:29-05:00</updated>
+  <updated>2013-12-03T06:59:16-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,20 +14,17 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Build a ruby gem email course - week of hustle - day 2]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/"/>
-    <updated>2013-12-02T07:02:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2</id>
-    <content type="html"><![CDATA[<p>Alright, back at it! I didn&rsquo;t quite hit the
-5:00am goal I had, but was early enough to accomplish
-what I was shooting for. (Setting my alarm for
-11:58pm because namecheap.com had hourly Cyber Monday
-coupon codes didn&rsquo;t help&hellip;).</p>
-
-<p>If you remember from the <a href="/blog/build-a-ruby-gem-woh-day-1/">previous
-post</a>, I&rsquo;m doing an
+    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 3]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/"/>
+    <updated>2013-12-03T06:15:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3</id>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
 <strong>8-day sprint</strong> where I&rsquo;m launching an email course on
-how to <strong>Build a Ruby Gem</strong>.</p>
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
+Day 3</p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
@@ -42,6 +39,121 @@ how to <strong>Build a Ruby Gem</strong>.</p>
 </div>
 
 </p>
+
+<h3>Back at it</h3>
+
+<p>I hit the 5:00am goal this morning! It&rsquo;s 6:15am and I&rsquo;ve wrapped up the 2nd day of
+the Build a Ruby Gem Email Course.</p>
+
+<p>Yesterday, I had some anxiety about the amount of writing involved in putting
+this course together. I&rsquo;ve read a number of blog posts about building a Ruby
+gem, but most seem to assume you have a pretty in depth knowledge of creating
+gems, while others skip important details of the process. So I knew going in to
+it that I wanted to write about it a little differently. I wanted to talk more
+about theory of why things are being done vs. how the Ruby language works.</p>
+
+<p>Thinking back to my first Ruby gem, I remember my frustration trying to
+understand the conventions of naming and file structure. So I&rsquo;m writing the course I
+wish I had when I started.</p>
+
+<!--more-->
+
+
+<h3>Flow</h3>
+
+<p>It&rsquo;s been 3 days since I started documenting this process and the writing
+process has gotten significantly easier. Since I started my blog, I&rsquo;ve read a
+number of posts recommending the value of writing every day, regardless of the
+subject. I&rsquo;m beginning to see the benefit of this consistency. I&rsquo;ll report back
+on this by the end of the week as it should be even more apparent by then.</p>
+
+<h3>What I Accomplished today</h3>
+
+<p>I wrote Day 2 of the Build a Ruby Gem Email Course. The content organization
+that I did on the first day has proved to be valuable. Outside of moving a few
+topics around, it&rsquo;s stayed largely in tact. So here&rsquo;s to organization!!!</p>
+
+<p>I think I also solved my email list problems. Actually, it was less &ldquo;problems&rdquo;, and
+more, I need to learn how to use <a href="http://mailchimp.com/">Mailchimp</a>. I was in touch with their support
+over an issue around signing up for multiple lists. I originally had the
+subscriptions to the Week of Hustle updates going to my personal newsletter
+list. This caused a semi-alarming error message if you were already on the
+list.</p>
+
+<p>The solution was to create a separate list and manage it outside of the realm
+of my newsletter. Despite seeming over-complicated at first, I now feel
+comfortable with this solution and I think it actually fits my goals better.
+I&rsquo;ve already started to think of the best way to manage the email course once
+it&rsquo;s live.</p>
+
+<h3>What I&rsquo;m working on today</h3>
+
+<p>A few people have pointed out some oddities with the formatting of my email
+updates and there are a few design changes I&rsquo;d like to make on the sign up
+forms. However, because the email updates are going out daily, it&rsquo;s my first
+priority.</p>
+
+<p>There have been no changes to the timeline I posted yesterday, and still feel
+like I&rsquo;m on schedule to finish by the end of the weekend!</p>
+
+<h3>Marketing</h3>
+
+<p>I was originally worried that the buzz surrounding the course and my updates
+about the process would die off and I&rsquo;d get another couple people throughout
+the week. This appears to not be the case. However, I&rsquo;m not convinced it&rsquo;ll
+continue this way throughout the week.</p>
+
+<p><img class="center" src="/images/woh/ga-day2.png" title="&ldquo;Google Analytics day 2 results&rdquo;" ></p>
+
+<p>As you can see, traffic to the blog was almost exactly the same as the previous
+day (Sunday).</p>
+
+<p>I screwed up the Google Analytics tracking code on the layouts, so I wasn&rsquo;t
+tracking email list conversions until late last night. But the good news is
+that according to Mailchimp, I signed up another 25 subscribers to the updates list.</p>
+
+<p><img class="center" src="/images/woh/mailchimp-day2.png" title="&ldquo;Mailchimp day 2 results&rdquo;" ></p>
+
+<p>This is down from the previous day, but overall, I couldn&rsquo;t be happier. I did
+get a little boost because I sent a campaign about the course and my updates to
+my newsletter email list, which seemed to account for maybe 8-10 subscriptions.</p>
+
+<p>See you tomorrow!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 2]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/"/>
+    <updated>2013-12-02T07:02:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2</id>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
+Day 2 |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a></p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: ruby" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<p>Alright, back at it! I didn&rsquo;t quite hit the
+5:00am goal I had, but was early enough to accomplish
+what I was shooting for. (Setting my alarm for
+11:58pm because namecheap.com had hourly Cyber Monday
+coupon codes didn&rsquo;t help&hellip;).</p>
 
 <h3>What I Accomplished today</h3>
 
@@ -128,7 +240,29 @@ to warrant an ebook. So far, so good&hellip;</p>
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/"/>
     <updated>2013-12-01T05:37:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1</id>
-    <content type="html"><![CDATA[<h3>JFDI</h3>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p>Day 1 |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a></p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: ruby" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<h3>JFDI</h3>
 
 <p>Living outside a major metropolitan area has made it hard to surround myself
 with other entrepreneurs. Fortunately, the internet has made the world a
@@ -538,129 +672,6 @@ first places I explore to feel out what&rsquo;s going on. It&rsquo;s almost like
 feel like I&rsquo;m just scratching the surface for awesome functionality.</p>
 
 <p>Leave a comment let me know what your favorite gems are!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build something]]></title>
-    <link href="http://brandonhilkert.com/blog/build-something/"/>
-    <updated>2013-10-29T20:10:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/build-something</id>
-    <content type="html"><![CDATA[<p><em>A variation of this post originally appeared on the <a href="http://railsmasterclass.com/">Rails Masterclass</a>
-newsletter.</em></p>
-
-<p>Learning new technologies can be a challenge. With books, forums, videos, blog
-posts&hellip;where do you start?!?! I&rsquo;ve used all these resources in the past and
-only one thing has reliably led to me to really learn the concepts &ndash; building something REAL!</p>
-
-<h3>How I learned Ruby and Rails</h3>
-
-<p>Several years ago, I was learning both <a href="https://www.ruby-lang.org/en/">Ruby</a>
-and <a href="http://rubyonrails.org/">Rails</a> and trying to figure out which books were
-worth the time. I ended up starting with <a href="http://pragprog.com/book/rails4/agile-web-development-with-rails-4">Agile Web Development with
-Rails</a>,
-which was a fantastic introduction to the features and benefits you&rsquo;ll get from
-learning the Rails framework. However, like many other books, it guides you
-through building a website with little real world value &ndash; an e-commerce
-shopping cart (you&rsquo;ve heard this one before, right???).  The concepts in the
-book generally apply to other products built with Rails, but it was sometimes
-hard for me to see their value elsewhere.  I found that the books and articles often skipped over things that were fairly
-trivial for a more experienced developer, but essential to get a real world application out the door.</p>
-
-<!--more-->
-
-
-<h3>The best way to learn (with a catch)</h3>
-
-<p>I propose you build something&hellip;anything really. But it would be more useful if
-the thing you build is useful to either you, someone else, or even
-better&hellip;everyone! But there&rsquo;s a catch&hellip;whatever you build, you must not only
-put it out there for the world to see, but you must share it in whatever way
-you feel comfortable.</p>
-
-<h3>My Craigslist Scraper</h3>
-
-<p>A few years ago, I was in the market for a new job. I built a small Craigslist
-scraper that searched for &ldquo;my perfect job&rdquo; and had it notify me via email
-whenever it found a similar post.</p>
-
-<p>The process of creating this little scraper did two things for me. First, it
-allowed me to learn (I wrote it in Perl and at the time knew very little about
-the language&hellip;). And second, it saved the 15 minutes or so it would take me
-each day to sift through the new job postings. It really was a win-win!</p>
-
-<h3>Start to Finish</h3>
-
-<p>It&rsquo;s easy to copy and paste code snippets from a blog post or book. It&rsquo;s much
-harder to see these applications through to the point where they&rsquo;re useful. Who
-cares if no one uses it? The value you get from seeing your application code
-all the way to the point of production is exponentially greater than the value
-of having run &ldquo;rails server&rdquo; on your local development machine.</p>
-
-<p>Questions such as &ldquo;How will I log and be notified of errors?&rdquo; and &ldquo;How will I
-backup my production data store?&rdquo; take time and thought to answer.</p>
-
-<p>There are so many easy to use
-<a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PAAS</a> platforms
-now-a-days, even if you&rsquo;re not the devops guru that you aspire to be, you too
-can have production code running with minimal effort for FREE!
-<a href="https://www.heroku.com">Heroku</a> is a great example of a place that you can
-host your Rails applications without hassle or cost. If you have an application
-running locally that you&rsquo;d like to share, hosting it at Heroku is a no-brainer.</p>
-
-<p>If you have more aspirational goals of managing servers and understanding what
-makes a Rails application tick, servers at <a href="https://www.digitalocean.com/">Digital
-Ocean</a>, <a href="https://www.linode.com/">Linode</a>, and
-<a href="http://www.rackspace.com/">Rackspace</a> can be extremely cost effective.</p>
-
-<h3>Dogfooding</h3>
-
-<p>Building an application that can save you time in your daily routine (ie. task
-tracker, appt. reminder, etc.) is a great first step to learning more. It&rsquo;s
-also very possible that if the application helps you, it could help other
-people. I&rsquo;ll leave the marketing talk for another time, but stepping back and
-being an actual user of your application will cause you to look at it in a very
-different light. It&rsquo;s likely that you&rsquo;ll find ways to drastically improve your
-application within the first 10 minutes of usage.</p>
-
-<h3>Sharing (this is my favorite part)</h3>
-
-<p>You&rsquo;ve now spent several weeks/months building something interesting &ndash; tell the
-world about it. Tweet about it, post it to your local user group mailing list,
-email your friends, anything&hellip;the more people that see it, the better. Like
-dogfooding, you&rsquo;ll get valuable feedback that you might not have gotten
-otherwise.</p>
-
-<p>I can hear all the perfectionists now&hellip;&ldquo;I don&rsquo;t want to share it until it&rsquo;s
-perfect&rdquo;. Having worked on a number of large applications, the candid truth is
-that it will <strong>NEVER</strong> be perfect. The feedback you&rsquo;ll get sooner is more
-valuable than the time you&rsquo;ll waste by attempting perfection. Besides, I have a
-feeling that most the features you thought you <em>had</em> to have before you
-launched are unimportant to the people that actually want to use your
-application.</p>
-
-<p>There&rsquo;s a more subtle point to sharing your new application&hellip;subconsciously
-you&rsquo;re likely not going to share something that you think is crappy. If your
-goal is to ultimately share what you&rsquo;ve built, you&rsquo;ll put the work in to make
-it worthy of sharing, and in the process, learn about the finer details of
-releasing a web application in to the wild, not just a basic shopping cart that
-has minimal real-world value.</p>
-
-<h3>Where to go from here?</h3>
-
-<p>Knowing what you want to build is easier said than done. I keep a list of ideas
-that I ultimately want to build someday. Some have very little use outside my
-own world and others probably have potential to be used by other people, but
-either way, bringing these ideas to life with new technologies or concepts
-really helps me to solidify their real-world value.</p>
-
-<p>If you don&rsquo;t have ideas, a quick Google search for &ldquo;startup ideas&rdquo; will provide
-you with some very interesting results. However, I&rsquo;d think about the things
-you&rsquo;re doing everyday and ask yourself if any of them can be solved, or aided,
-with software. If the answer is &ldquo;yes&rdquo; to any of them, you have yourself a great
-candidate.</p>
-
-<p>I&rsquo;d love to hear about what you&rsquo;re building and the challenges you&rsquo;re facing.</p>
 ]]></content>
   </entry>
   

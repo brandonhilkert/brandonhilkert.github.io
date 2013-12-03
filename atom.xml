@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-02T17:44:29-05:00</updated>
+  <updated>2013-12-03T06:59:16-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,33 +14,144 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Build a ruby gem email course - week of hustle - day 2]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/"/>
-    <updated>2013-12-02T07:02:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2</id>
-    <content type="html"><![CDATA[<p>Alright, back at it! I didn&rsquo;t quite hit the
-5:00am goal I had, but was early enough to accomplish
-what I was shooting for. (Setting my alarm for
-11:58pm because namecheap.com had hourly Cyber Monday
-coupon codes didn&rsquo;t help&hellip;).</p>
-
-<p>If you remember from the <a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">previous
-post</a>, I&rsquo;m doing an
+    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 3]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/"/>
+    <updated>2013-12-03T06:15:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3</id>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
 <strong>8-day sprint</strong> where I&rsquo;m launching an email course on
-how to <strong>Build a Ruby Gem</strong>.</p>
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
+Day 3</p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
     <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a ruby gem email course - week of hustle - day 2" />
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Email Course - Week of Hustle - Day 3" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
     <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
     <br class="clear">
   </form>
 </div>
 
+
+<h3>Back at it</h3>
+
+<p>I hit the 5:00am goal this morning! It&rsquo;s 6:15am and I&rsquo;ve wrapped up the 2nd day of
+the Build a Ruby Gem Email Course.</p>
+
+<p>Yesterday, I had some anxiety about the amount of writing involved in putting
+this course together. I&rsquo;ve read a number of blog posts about building a Ruby
+gem, but most seem to assume you have a pretty in depth knowledge of creating
+gems, while others skip important details of the process. So I knew going in to
+it that I wanted to write about it a little differently. I wanted to talk more
+about theory of why things are being done vs. how the Ruby language works.</p>
+
+<p>Thinking back to my first Ruby gem, I remember my frustration trying to
+understand the conventions of naming and file structure. So I&rsquo;m writing the course I
+wish I had when I started.</p>
+
+<!--more-->
+
+
+<h3>Flow</h3>
+
+<p>It&rsquo;s been 3 days since I started documenting this process and the writing
+process has gotten significantly easier. Since I started my blog, I&rsquo;ve read a
+number of posts recommending the value of writing every day, regardless of the
+subject. I&rsquo;m beginning to see the benefit of this consistency. I&rsquo;ll report back
+on this by the end of the week as it should be even more apparent by then.</p>
+
+<h3>What I Accomplished today</h3>
+
+<p>I wrote Day 2 of the Build a Ruby Gem Email Course. The content organization
+that I did on the first day has proved to be valuable. Outside of moving a few
+topics around, it&rsquo;s stayed largely in tact. So here&rsquo;s to organization!!!</p>
+
+<p>I think I also solved my email list problems. Actually, it was less &ldquo;problems&rdquo;, and
+more, I need to learn how to use <a href="http://mailchimp.com/">Mailchimp</a>. I was in touch with their support
+over an issue around signing up for multiple lists. I originally had the
+subscriptions to the Week of Hustle updates going to my personal newsletter
+list. This caused a semi-alarming error message if you were already on the
+list.</p>
+
+<p>The solution was to create a separate list and manage it outside of the realm
+of my newsletter. Despite seeming over-complicated at first, I now feel
+comfortable with this solution and I think it actually fits my goals better.
+I&rsquo;ve already started to think of the best way to manage the email course once
+it&rsquo;s live.</p>
+
+<h3>What I&rsquo;m working on today</h3>
+
+<p>A few people have pointed out some oddities with the formatting of my email
+updates and there are a few design changes I&rsquo;d like to make on the sign up
+forms. However, because the email updates are going out daily, it&rsquo;s my first
+priority.</p>
+
+<p>There have been no changes to the timeline I posted yesterday, and still feel
+like I&rsquo;m on schedule to finish by the end of the weekend!</p>
+
+<h3>Marketing</h3>
+
+<p>I was originally worried that the buzz surrounding the course and my updates
+about the process would die off and I&rsquo;d get another couple people throughout
+the week. This appears to not be the case. However, I&rsquo;m not convinced it&rsquo;ll
+continue this way throughout the week.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/woh/ga-day2.png" title="&#34;Google Analytics day 2 results&#34;" alt="&#34;Google Analytics day 2 results&#34;"></p>
+
+<p>As you can see, traffic to the blog was almost exactly the same as the previous
+day (Sunday).</p>
+
+<p>I screwed up the Google Analytics tracking code on the layouts, so I wasn&rsquo;t
+tracking email list conversions until late last night. But the good news is
+that according to Mailchimp, I signed up another 25 subscribers to the updates list.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/woh/mailchimp-day2.png" title="&#34;Mailchimp day 2 results&#34;" alt="&#34;Mailchimp day 2 results&#34;"></p>
+
+<p>This is down from the previous day, but overall, I couldn&rsquo;t be happier. I did
+get a little boost because I sent a campaign about the course and my updates to
+my newsletter email list, which seemed to account for maybe 8-10 subscriptions.</p>
+
+<p>See you tomorrow!</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 2]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/"/>
+    <updated>2013-12-02T07:02:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2</id>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
+Day 2 |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a></p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Email Course - Week of Hustle - Day 2" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+
+<p>Alright, back at it! I didn&rsquo;t quite hit the
+5:00am goal I had, but was early enough to accomplish
+what I was shooting for. (Setting my alarm for
+11:58pm because namecheap.com had hourly Cyber Monday
+coupon codes didn&rsquo;t help&hellip;).</p>
 
 <h3>What I Accomplished today</h3>
 
@@ -127,7 +238,28 @@ to warrant an ebook. So far, so good&hellip;</p>
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/"/>
     <updated>2013-12-01T05:37:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1</id>
-    <content type="html"><![CDATA[<h3>JFDI</h3>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p>Day 1 |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a></p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Email Course - Week of Hustle - Day 1" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+
+<h3>JFDI</h3>
 
 <p>Living outside a major metropolitan area has made it hard to surround myself
 with other entrepreneurs. Fortunately, the internet has made the world a
