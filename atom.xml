@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-03T06:59:16-05:00</updated>
+  <updated>2013-12-04T07:31:01-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 4]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/"/>
+    <updated>2013-12-04T06:15:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4</id>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
+Day 4</p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Email Course - Week of Hustle - Day 4" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+
+<p>I let myself sleep in until 5:30am this morning ;) I spent a few very
+unsuccessful hours wrestling with Wordpress last night and didn&rsquo;t get to bed at
+the time I wanted. However, all is well. I was able to push out Day 4 of the
+Build a Ruby Gem Email Course without issue.</p>
+
+<p>One of the things that I&rsquo;m noticing about putting the course posts together is
+how much the content relies on outside resources. Whether it&rsquo;s an external URL,
+the output of a command prompt, or a diff on Github&hellip;getting those together is
+a non-trivial amount of time.</p>
+
+<!--more-->
+
+
+<p>A side effect of getting up early is that by 7:30am (when I&rsquo;ve typically finish
+this post), I feel really productive. At this point, I&rsquo;ve worked for 2 straight
+hours, all of which have been highly focused. So at 7:30am, I take a break, get
+some breakfast and take a shower and &ldquo;start&rdquo; the rest of my day. It feels like
+the day starts out on a better foot as a result.</p>
+
+<p>I&rsquo;ve also found that I&rsquo;ve been able to focus better early in the morning vs.
+later at night. I know this is personal thing, some people do their best work
+in the wee hours of the night. Not me, I&rsquo;m a morning person and have embraced
+it. My productivity in the morning is probably 2-3x that of my normal
+productivity during the day. I&rsquo;m not sure if it&rsquo;s because I&rsquo;m refreshed or
+fewer distractions (it&rsquo;s dark, no TV, no social media, no other windows
+open&hellip;).</p>
+
+<h3>What I Accomplished Today</h3>
+
+<p>I pushed out the latest day of the email course. I feel like it&rsquo;s just starting
+to get in to the thick of things. I&rsquo;ve been really sensitive to the fact that
+not every person that takes the course will be a Ruby veteran. Hopefully the
+detailed discussions on load paths and basic installations won&rsquo;t detract from
+the value for those that are.</p>
+
+<p>Yesterday I mentioned the non-optimal formatting of my email campaigns on
+mobile devices. I spent some time with Mailchimp last night and applied a more
+responsive template to the campaign. It&rsquo;s better, but still somewhat finicky in
+the iOS Gmail app. I&rsquo;ve sent a support request and hopefully I&rsquo;ll have that
+ironed out soon. But for those on every other platform, you should&rsquo;ve had a
+much better reading experience!</p>
+
+<h3>Marketing</h3>
+
+<p>As I expected, the growth of both the mailing list and page views slowed down a bit.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/woh/ga-day3.png" title="&#34;Google Analytics day 3 results&#34;" alt="&#34;Google Analytics day 3 results&#34;"></p>
+
+<p>I got a 15% bump in mailing list subscriptions, which is better than nothing!</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/woh/mailchimp-day3.png" title="&#34;Mailchimp day 3 results&#34;" alt="&#34;Mailchimp day 3 results&#34;"></p>
+
+<p>I&rsquo;m sending the daily update campaigns at 8pm. I didn&rsquo;t put much thought in to
+this time, other than the fact that I stumbled on an email marketing post that
+suggested the hours between 8-12am get the best open rates. According to the
+campaign report, the open rate is doing well, as compared with the average.
+However, I have a tendency to believe it&rsquo;s more due to the nature of the
+opted-in target audience. This is a very specific topic that people
+specifically wanted to read about. So it makes sense to me that the open rate
+would be pretty high.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/woh/campaign-day3.png" title="&#34;Mailchimp day 3 campaign report&#34;" alt="&#34;Mailchimp day 3 campaign report&#34;"></p>
+
+<p>Reddit continues to be a positive source of traffic. I had haphazardly posted
+to Reddit in the past, but it&rsquo;s been driving more traffic than any other
+source. Along with views, it&rsquo;s also yielded one of the highest conversion rates
+for the mailing list. So I&rsquo;ll continue to post my updates there.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/woh/sources-day3.png" title="&#34;Google Analytics day 3 traffic sources&#34;" alt="&#34;Google Analytics day 3 traffic sources&#34;"></p>
+
+<p>Until tomorrow&hellip;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 3]]></title>
@@ -24,7 +125,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 
 <p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
 <a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-Day 3</p>
+Day 3 |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
@@ -132,7 +234,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 
 <p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
 Day 2 |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a></p>
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
@@ -244,7 +347,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 
 <p>Day 1 |
 <a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a></p>
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
+<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
