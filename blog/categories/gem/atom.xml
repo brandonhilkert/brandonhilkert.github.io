@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-04T20:59:53-05:00</updated>
+  <updated>2013-12-05T07:16:48-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,120 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 5]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/"/>
+    <updated>2013-12-05T06:15:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5</id>
+    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
+<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
+how to <strong>Build a Ruby Gem</strong>.</em></p>
+
+<p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
+Day 5</p>
+
+<p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=5619d347df" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: gem" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <br class="clear">
+  </form>
+</div>
+
+</p>
+
+<p>I&rsquo;m tired. Getting up around 5am all week has worn on me. Yesterday I felt like
+zombie&hellip;and it was mostly my own fault because I didn&rsquo;t make it a priority to
+get bed a decent hour.</p>
+
+<p>I&rsquo;m not sure about you, but I function best with 7-8 hours of sleep. I
+generally can&rsquo;t sleep long than 8, and anything less than 7 is OK for a
+day or two, otherwise, it catches up with me. And I think that&rsquo;s what&rsquo;s going
+on here.</p>
+
+<!--more-->
+
+
+<p>Having realized this, I got to sleep last night around 9:30pm. I figured I&rsquo;d
+sleep in until 6am or so, but naturally woke up around 5:15am. So while I&rsquo;m
+feeling better this morning, I&rsquo;m still feeling the side effects of not getting
+enough sleep from the first few days of the week.</p>
+
+<p>I&rsquo;ll be more cautious of this for the rest of the week and see if I can get
+back to a normal functioning Brandon (whatever that means!).</p>
+
+<h3>What I Accomplished Today</h3>
+
+<p>Like the previous days, I was able to write Day 4 of the Build a Ruby Gem Email
+Course. I had a bit of trouble getting in to the flow of writing this morning.
+I&rsquo;m not sure if it&rsquo;s due to the lack of sleep mentioned above, or just a little
+speed bump in the normal creative process. It took 15 min. or so until I felt
+like words were coming out naturally.</p>
+
+<h3>Changes to the Email Course</h3>
+
+<p>On Day 3, I realized I hadn&rsquo;t gotten to the meat of the Ruby gem and was still
+writing about important, somewhat theoretical topics. It occurred to me that
+it&rsquo;s probably best not to cut the content, but rather, extend the course. So
+instead of a 5-day course, it might be 6 or 7. My goal is write the best content possible, and if after 7 day, I
+feel like I&rsquo;ve covered the topic thoroughly, I&rsquo;ll wrap it up.</p>
+
+<p>One thought that has crossed my mind is removing some of the content for an
+ebook. I could make the course somewhat abbreviated, while offering the book as
+an up-sell to those interested in the details. I&rsquo;ll think about this some more
+and once the course content shakes out.</p>
+
+<p>Additionally , I think I&rsquo;m also going to spread the course out. So rather than
+send 1 email per day, do it every 2-3 days, so that I can market the course as
+a 14 or 21-day email course. I feel like the people that will get the most
+value out of this content won&rsquo;t be cramming Ruby content and would benefit from
+some time in between each lesson.</p>
+
+<h3>Marketing</h3>
+
+<p>Visits were slightly down yesterday, and I suspect the allure of the announcement has worn off.</p>
+
+<p><img class="center" src="/images/woh/ga-day4.png" title="&ldquo;Google Analytics day 4 results&rdquo;" ></p>
+
+<p>Thinking more about it, I&rsquo;ve not been great at seeking out marketing channels
+for people that might be a good fit for the course. I&rsquo;ve been posting to the
+same channels, which has produced a decreasing level of interest over the past
+4 days. Truthfully, I&rsquo;m pretty worn out by the time I finish the email course
+lesson and this update post, so it&rsquo;s difficult to get worked up for that. But
+I&rsquo;ll think more about it and report back.</p>
+
+<p>The mailing list is up to 82 subscribers, so while the growth is slowing, it&rsquo;s
+still a 10% lift over the previous day. This, too, probably reiterates my need
+to find users elsewhere.</p>
+
+<p><img class="center" src="/images/woh/mailchimp-day4.png" title="&ldquo;Mailchimp day 4 results&rdquo;" ></p>
+
+<p>I setup the subscription form to track what page the user was on when they
+subscribed. I would have guessed that it was a few posts in, however,
+subscriptions are coming from all over the place. It appears that people are
+still landing on the first post of the series and converting there.</p>
+
+<p><img class="center" src="/images/woh/mailchimp-conversion-sources-day4.png" title="&ldquo;Mailchimp conversion sources for day 4&rdquo;" ></p>
+
+<p>Again, Reddit appears to be the best source for traffic and subscriptions.</p>
+
+<p><img class="center" src="/images/woh/sources-day4.png" title="&ldquo;Google Analytics day 4 traffic sources&rdquo;" ></p>
+
+<p>Once the email course is live, I&rsquo;ll make a better effort to market the landing
+page elsewhere. I think these updates may be better suited for a different
+target audience anyway.</p>
+
+<p>The end is near!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 4]]></title>
@@ -25,7 +139,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 <p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-Day 4</p>
+Day 4 |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
@@ -127,7 +242,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 <p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
 Day 3 |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a></p>
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
@@ -237,7 +353,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 <p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
 Day 2 |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a></p>
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
@@ -351,7 +468,8 @@ how to <strong>Build a Ruby Gem</strong>.</em></p>
 <p>Day 1 |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a></p>
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
+<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a></p>
 
 <p>If you&rsquo;d like to stay updated via email on my progress, subscribe below.</p>
 
