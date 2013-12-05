@@ -4,7 +4,7 @@
   <title><![CDATA[Category: week of hustle | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/week-of-hustle/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-05T07:16:48-05:00</updated>
+  <updated>2013-12-05T08:27:23-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -47,9 +47,9 @@ zombie&hellip;and it was mostly my own fault because I didn&rsquo;t make it a pr
 get bed a decent hour.</p>
 
 <p>I&rsquo;m not sure about you, but I function best with 7-8 hours of sleep. I
-generally can&rsquo;t sleep long than 8, and anything less than 7 is OK for a
-day or two, otherwise, it catches up with me. And I think that&rsquo;s what&rsquo;s going
-on here.</p>
+generally can&rsquo;t sleep longer than 8, and anything less than 7 is OK for a
+day or two, otherwise, it catches up with me. I think that&rsquo;s what&rsquo;s going
+on here&hellip;</p>
 
 <!--more-->
 
@@ -60,7 +60,7 @@ feeling better this morning, I&rsquo;m still feeling the side effects of not get
 enough sleep from the first few days of the week.</p>
 
 <p>I&rsquo;ll be more cautious of this for the rest of the week and see if I can get
-back to a normal functioning Brandon (whatever that means!).</p>
+back to a normal (whatever that means!).</p>
 
 <h3>What I Accomplished Today</h3>
 
@@ -73,9 +73,9 @@ like words were coming out naturally.</p>
 <h3>Changes to the Email Course</h3>
 
 <p>On Day 3, I realized I hadn&rsquo;t gotten to the meat of the Ruby gem and was still
-writing about important, somewhat theoretical topics. It occurred to me that
+writing about important, but somewhat theoretical topics. It occurred to me that
 it&rsquo;s probably best not to cut the content, but rather, extend the course. So
-instead of a 5-day course, it might be 6 or 7. My goal is write the best content possible, and if after 7 day, I
+instead of a 5-day course, it might be 6 or 7. My goal is write the best content possible and if after 7 days, I
 feel like I&rsquo;ve covered the topic thoroughly, I&rsquo;ll wrap it up.</p>
 
 <p>One thought that has crossed my mind is removing some of the content for an
@@ -83,11 +83,10 @@ ebook. I could make the course somewhat abbreviated, while offering the book as
 an up-sell to those interested in the details. I&rsquo;ll think about this some more
 and once the course content shakes out.</p>
 
-<p>Additionally , I think I&rsquo;m also going to spread the course out. So rather than
-send 1 email per day, do it every 2-3 days, so that I can market the course as
-a 14 or 21-day email course. I feel like the people that will get the most
-value out of this content won&rsquo;t be cramming Ruby content and would benefit from
-some time in between each lesson.</p>
+<p>Additionally , I thinking about spreading the course out. So rather than
+send 1 email a day, shoot for every 2-3 days, so that I can market the course as
+a 14 or 21-day email course. I also feel like the people that will get the most
+value out of the content  would benefit from extra time in between each lesson.</p>
 
 <h3>Marketing</h3>
 
@@ -109,13 +108,12 @@ to find users elsewhere.</p>
 <p><img class="center" src="/images/woh/mailchimp-day4.png" title="&ldquo;Mailchimp day 4 results&rdquo;" ></p>
 
 <p>I setup the subscription form to track what page the user was on when they
-subscribed. I would have guessed that it was a few posts in, however,
-subscriptions are coming from all over the place. It appears that people are
-still landing on the first post of the series and converting there.</p>
+subscribed. Subscriptions are coming from all over the place. It appears that even after 4 days, people are
+still landing on the first post of the series and converting.</p>
 
 <p><img class="center" src="/images/woh/mailchimp-conversion-sources-day4.png" title="&ldquo;Mailchimp conversion sources for day 4&rdquo;" ></p>
 
-<p>Again, Reddit appears to be the best source for traffic and subscriptions.</p>
+<p>Again, Reddit appears to be the best source for both traffic and conversions.</p>
 
 <p><img class="center" src="/images/woh/sources-day4.png" title="&ldquo;Google Analytics day 4 traffic sources&rdquo;" ></p>
 
