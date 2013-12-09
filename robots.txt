@@ -3,4 +3,6 @@ Disallow: /404.html
 Disallow: /newsletter/almost.html
 Disallow: /newsletter/done.html
 
+Disallow: /courses/build-a-ruby-gem/almost.html
+Disallow: /courses/build-a-ruby-gem/done.html
 Sitemap: http://brandonhilkert.com/sitemap.xml
