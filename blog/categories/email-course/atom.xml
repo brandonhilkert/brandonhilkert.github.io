@@ -4,7 +4,7 @@
   <title><![CDATA[Category: email course | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/email-course/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-13T21:32:52-05:00</updated>
+  <updated>2013-12-13T22:22:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -66,7 +66,7 @@ hooks in to the framework when using a Railtie, it almost deserves a separate
 course. I did save the removed content, so I&rsquo;ll have to figure out where it&rsquo;s
 best presented.</p>
 
-<h3>What I Accomplished This Weekend</h3>
+<h2>What I Accomplished This Weekend</h2>
 
 <p>As mentioned above, I rewrote the course content around a simpler gem example.
 It did simplify the course, so I hope it&rsquo;ll be easier to navigate for those
@@ -80,13 +80,13 @@ more time doing that lately and finally feel like I&rsquo;m hitting the mark.</p
 <p>The only thing left to do is proofread the course content and setup the course
 drip campaign in Mailchimp.</p>
 
-<h3>Launch Date</h3>
+<h2>Launch Date</h2>
 
 <p>I&rsquo;m excited to announce the course will launch this <strong>Wednesday (12/11) at 7AM
 EST</strong>. I&rsquo;ll send an announcement on Wednesday morning with the registration
 URL.</p>
 
-<h3>Marketing</h3>
+<h2>Marketing</h2>
 
 <p>Signups continued to trickle in throughout the weekend and I added another 30
 subscriptions to this update list:</p>
@@ -153,7 +153,7 @@ because of the lack thereof.</p>
 <p>Looking at this now, I&rsquo;ll probably go back and rework Day 3 to either split out
 some of the content, or remove it during editing depending on its value.</p>
 
-<h3>What I Accomplished Today</h3>
+<h2>What I Accomplished Today</h2>
 
 <p>This morning I finished Day 5 of the Build a Ruby Gem Email Course. I&rsquo;m happy
 with where it left off and can now say there&rsquo;s only 1 (2 at most) more to
@@ -162,7 +162,7 @@ write. And even those will be more wrap-up. All the code is finished.</p>
 <p>I got in to the flow of writing pretty quickly this morning. I naturally woke
 up around 6am, so I was probably less in a daze when I started.</p>
 
-<h3>Marketing</h3>
+<h2>Marketing</h2>
 
 <p>I was looking forward to writing this section&hellip;Yesterday, I opened my inbox and saw this:</p>
 
@@ -243,7 +243,7 @@ enough sleep from the first few days of the week.</p>
 <p>I&rsquo;ll be more cautious of this for the rest of the week and see if I can get
 back to a normal (whatever that means!).</p>
 
-<h3>What I Accomplished Today</h3>
+<h2>What I Accomplished Today</h2>
 
 <p>Like the previous days, I was able to write Day 4 of the Build a Ruby Gem Email
 Course. I had a bit of trouble getting in to the flow of writing this morning.
@@ -251,7 +251,7 @@ I&rsquo;m not sure if it&rsquo;s due to the lack of sleep mentioned above, or ju
 speed bump in the normal creative process. It took 15 min. or so until I felt
 like words were coming out naturally.</p>
 
-<h3>Changes to the Email Course</h3>
+<h2>Changes to the Email Course</h2>
 
 <p>On Day 3, I realized I hadn&rsquo;t gotten to the meat of the Ruby gem and was still
 writing about important, but somewhat theoretical topics. It occurred to me that
@@ -269,7 +269,7 @@ send 1 email a day, shoot for every 2-3 days, so that I can market the course as
 a 14 or 21-day email course. I also feel like the people that will get the most
 value out of the content  would benefit from extra time in between each lesson.</p>
 
-<h3>Marketing</h3>
+<h2>Marketing</h2>
 
 <p>Visits were slightly down yesterday, and I suspect the allure of the announcement has worn off.</p>
 
@@ -353,7 +353,7 @@ productivity during the day. I&rsquo;m not sure if it&rsquo;s because I&rsquo;m 
 fewer distractions (it&rsquo;s dark, no TV, no social media, no other windows
 open&hellip;).</p>
 
-<h3>What I Accomplished Today</h3>
+<h2>What I Accomplished Today</h2>
 
 <p>I pushed out the latest day of the email course. I feel like it&rsquo;s just starting
 to get in to the thick of things. I&rsquo;ve been really sensitive to the fact that
@@ -368,7 +368,7 @@ the iOS Gmail app. I&rsquo;ve sent a support request and hopefully I&rsquo;ll ha
 ironed out soon. But for those on every other platform, you should&rsquo;ve had a
 much better reading experience!</p>
 
-<h3>Marketing</h3>
+<h2>Marketing</h2>
 
 <p>As I expected, the growth of both the mailing list and page views slowed down a bit.</p>
 
@@ -417,7 +417,7 @@ Day 3 |
 <a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
 <a href="/blog/build-a-ruby-gem-email-course-weekend-update/">Weekend Update</a></p>
 
-<h3>Back at it</h3>
+<h2>Back at it</h2>
 
 <p>I hit the 5:00am goal this morning! It&rsquo;s 6:15am and I&rsquo;ve wrapped up the 2nd day of
 the Build a Ruby Gem Email Course.</p>
@@ -436,7 +436,7 @@ wish I had when I started.</p>
 <!--more-->
 
 
-<h3>Flow</h3>
+<h2>Flow</h2>
 
 <p>It&rsquo;s been 3 days since I started documenting this process and the writing
 process has gotten significantly easier. Since I started my blog, I&rsquo;ve read a
@@ -444,7 +444,7 @@ number of posts recommending the value of writing every day, regardless of the
 subject. I&rsquo;m beginning to see the benefit of this consistency. I&rsquo;ll report back
 on this by the end of the week as it should be even more apparent by then.</p>
 
-<h3>What I Accomplished today</h3>
+<h2>What I Accomplished today</h2>
 
 <p>I wrote Day 2 of the Build a Ruby Gem Email Course. The content organization
 that I did on the first day has proved to be valuable. Outside of moving a few
@@ -463,7 +463,7 @@ comfortable with this solution and I think it actually fits my goals better.
 I&rsquo;ve already started to think of the best way to manage the email course once
 it&rsquo;s live.</p>
 
-<h3>What I&rsquo;m working on today</h3>
+<h2>What I&rsquo;m working on today</h2>
 
 <p>A few people have pointed out some oddities with the formatting of my email
 updates and there are a few design changes I&rsquo;d like to make on the sign up
@@ -473,7 +473,7 @@ priority.</p>
 <p>There have been no changes to the timeline I posted yesterday, and still feel
 like I&rsquo;m on schedule to finish by the end of the weekend!</p>
 
-<h3>Marketing</h3>
+<h2>Marketing</h2>
 
 <p>I was originally worried that the buzz surrounding the course and my updates
 about the process would die off and I&rsquo;d get another couple people throughout

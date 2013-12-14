@@ -4,7 +4,7 @@
   <title><![CDATA[Category: aws | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/aws/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-13T21:32:52-05:00</updated>
+  <updated>2013-12-13T22:22:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -25,14 +25,14 @@ serve compiled assets in Rails is one of the most significant performance
 enhancements I&rsquo;ve seen. Having done so for 2 fairly large applications, it&rsquo;s
 hard for me to imagine serving assets locally anymore.</p>
 
-<h3>The Asset Pipeline</h3>
+<h2>The Asset Pipeline</h2>
 
 <p>The addition of the Rails <a href="http://guides.rubyonrails.org/asset_pipeline.html">asset
 pipeline</a> has reduced both
 the number of assets served and the size of these files. Users on slow
 connections have been the biggest beneficiary of these changes.</p>
 
-<h3>The Problem</h3>
+<h2>The Problem</h2>
 
 <p>Even with the asset pipeline, content is transmitted to the end user
 over their, sometimes slow, connection. Distance plays a role in the speed at which
@@ -43,7 +43,7 @@ engage them.</p>
 <!--more-->
 
 
-<h3>The Solution</h3>
+<h2>The Solution</h2>
 
 <p>CDNs are networks of servers that host your content so that when
 you make a request, the request is served from a server closest
@@ -57,7 +57,7 @@ application servers. Most Ruby applications use
 front of the Ruby processes. These HTTP servers are really good at serving
 static content, but no one will deny &ndash; the fewer requests, the better.</p>
 
-<h3>Option 1: <em>Push</em> your assets to the CDN during deployment</h3>
+<h2>Option 1: <em>Push</em> your assets to the CDN during deployment</h2>
 
 <p>Depending on your method of deployment, pushing assets to a CDN isn&rsquo;t always
 trivial. The <a href="https://github.com/rumblelabs/asset_sync">asset_sync</a> gem has
@@ -67,7 +67,7 @@ efficient because all requests for assets will be diverted away from your
 application, leaving its precious processing power to serve more important
 application requests.</p>
 
-<h3>Option 2: Assets are <em>pulled</em> to the CDN on first request</h3>
+<h2>Option 2: Assets are <em>pulled</em> to the CDN on first request</h2>
 
 <p>This option won&rsquo;t change deployment and is simple to
 setup. The only downside is that upon first request to an asset, the CDN will
@@ -78,7 +78,7 @@ this option generally makes it my preferred option.</p>
 
 <p>So let&rsquo;s get to it&hellip;</p>
 
-<h3>Amazon Cloudfront</h3>
+<h2>Amazon Cloudfront</h2>
 
 <p>Log in to your Amazon EC2 account and click &ldquo;Cloudfront&rdquo;:</p>
 
@@ -96,7 +96,7 @@ this option generally makes it my preferred option.</p>
 
 <p><img class="center" src="/images/cdn/domain.png" title="&ldquo;Cloudfront distribution URL&rdquo;" ></p>
 
-<h3>Rails</h3>
+<h2>Rails</h2>
 
 <p>Rails provides and easy way to change the host URL of the assets (images,
 stylesheets, javascripts, fonts&hellip;). Enter the Cloudfront
@@ -123,7 +123,7 @@ any changes in your <code>development</code> environment.</em></p>
 
 <p>And that&rsquo;s it!</p>
 
-<h3>In Summary</h3>
+<h2>In Summary</h2>
 
 <p>This is the ultimate low-hanging fruit optimization. If you haven&rsquo;t served your
 assets from a CDN before, I&rsquo;d suggest giving it a try. The <a href="http://aws.amazon.com/cloudfront/pricing/">cost of

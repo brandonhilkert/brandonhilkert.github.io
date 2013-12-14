@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-13T21:32:52-05:00</updated>
+  <updated>2013-12-13T22:22:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -18,7 +18,7 @@
     <link href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/"/>
     <updated>2013-11-06T21:04:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile</id>
-    <content type="html"><![CDATA[<h3>Rails Rumble</h3>
+    <content type="html"><![CDATA[<h2>Rails Rumble</h2>
 
 <p>The <a href="http://railsrumble.com/">2013 Rails Rumble</a> concluded last week and like
 in previous years, <a href="http://www.dwellable.com/">Dwellable</a> analyzed the <a href="http://www.dwellable.com/blog/Rails-Rumble-Gem-Teardown">Gemfiles of the submitted
@@ -70,7 +70,7 @@ of Sidekiq.</p></li>
 </ul>
 
 
-<h3>My Gemfiles</h3>
+<h2>My Gemfiles</h2>
 
 <p>Most developers have a handful of gems that they rely on during development.
 This got me thinking about the gems that I most commonly used in my own projects.</p>
@@ -188,7 +188,7 @@ newsletter.</em></p>
 posts&hellip;where do you start?!?! I&rsquo;ve used all these resources in the past and
 only one thing has reliably led to me to really learn the concepts &ndash; building something REAL!</p>
 
-<h3>How I learned Ruby and Rails</h3>
+<h2>How I learned Ruby and Rails</h2>
 
 <p>Several years ago, I was learning both <a href="https://www.ruby-lang.org/en/">Ruby</a>
 and <a href="http://rubyonrails.org/">Rails</a> and trying to figure out which books were
@@ -205,7 +205,7 @@ trivial for a more experienced developer, but essential to get a real world appl
 <!--more-->
 
 
-<h3>The best way to learn (with a catch)</h3>
+<h2>The best way to learn (with a catch)</h2>
 
 <p>I propose you build something&hellip;anything really. But it would be more useful if
 the thing you build is useful to either you, someone else, or even
@@ -213,7 +213,7 @@ better&hellip;everyone! But there&rsquo;s a catch&hellip;whatever you build, you
 put it out there for the world to see, but you must share it in whatever way
 you feel comfortable.</p>
 
-<h3>My Craigslist Scraper</h3>
+<h2>My Craigslist Scraper</h2>
 
 <p>A few years ago, I was in the market for a new job. I built a small Craigslist
 scraper that searched for &ldquo;my perfect job&rdquo; and had it notify me via email
@@ -224,7 +224,7 @@ allowed me to learn (I wrote it in Perl and at the time knew very little about
 the language&hellip;). And second, it saved the 15 minutes or so it would take me
 each day to sift through the new job postings. It really was a win-win!</p>
 
-<h3>Start to Finish</h3>
+<h2>Start to Finish</h2>
 
 <p>It&rsquo;s easy to copy and paste code snippets from a blog post or book. It&rsquo;s much
 harder to see these applications through to the point where they&rsquo;re useful. Who
@@ -248,7 +248,7 @@ makes a Rails application tick, servers at <a href="https://www.digitalocean.com
 Ocean</a>, <a href="https://www.linode.com/">Linode</a>, and
 <a href="http://www.rackspace.com/">Rackspace</a> can be extremely cost effective.</p>
 
-<h3>Dogfooding</h3>
+<h2>Dogfooding</h2>
 
 <p>Building an application that can save you time in your daily routine (ie. task
 tracker, appt. reminder, etc.) is a great first step to learning more. It&rsquo;s
@@ -258,7 +258,7 @@ being an actual user of your application will cause you to look at it in a very
 different light. It&rsquo;s likely that you&rsquo;ll find ways to drastically improve your
 application within the first 10 minutes of usage.</p>
 
-<h3>Sharing (this is my favorite part)</h3>
+<h2>Sharing (this is my favorite part)</h2>
 
 <p>You&rsquo;ve now spent several weeks/months building something interesting &ndash; tell the
 world about it. Tweet about it, post it to your local user group mailing list,
@@ -281,7 +281,7 @@ it worthy of sharing, and in the process, learn about the finer details of
 releasing a web application in to the wild, not just a basic shopping cart that
 has minimal real-world value.</p>
 
-<h3>Where to go from here?</h3>
+<h2>Where to go from here?</h2>
 
 <p>Knowing what you want to build is easier said than done. I keep a list of ideas
 that I ultimately want to build someday. Some have very little use outside my
@@ -312,7 +312,7 @@ I could make a positive contribution to the open source community.</p>
 <p>I learned a lot by watching certain projects and getting involved with others
 and hope that my notes are helpful for you and your endeavors.</p>
 
-<h3>1. Fix a bug in an existing gem because it affects you</h3>
+<h2>1. Fix a bug in an existing gem because it affects you</h2>
 
 <p>My experience with <a href="/about">Meeteor</a> and <a href="/about">Spokely</a> caused me to move
 FAST and break a lot of things along the way. Because of the pace, when I did
@@ -342,7 +342,7 @@ experienced the bug, it&rsquo;s likely that others would too, if they hadn&rsquo
 It&rsquo;s possible there may already be an open pull request, thus
 saving you the effort of preparing the fix.</em></p>
 
-<h3>2. Improve an existing gem to learn more about the subject</h3>
+<h2>2. Improve an existing gem to learn more about the subject</h2>
 
 <p>It&rsquo;s best to head towards projects that you either have passion for or use
 heavily.  If you&rsquo;re unsure of the level of effort required for an issue or
@@ -384,7 +384,7 @@ quite a bit more about what makes the system tick. It&rsquo;s by no means a stra
 forward gem and probably one I wouldn&rsquo;t urge you to cut your teeth on, but
 certainly a challenge and very well maintained.</p>
 
-<h3>3. Create a new gem by extracting code that you commonly use</h3>
+<h2>3. Create a new gem by extracting code that you commonly use</h2>
 
 <p>Greenfielding Rails apps is exciting. It starts out as <code>rails new
 my-awesome-new-app</code>. You boot the server only to be greeted by the default
@@ -410,7 +410,7 @@ extracting that code to a gem pretty easy when done correctly. With a little
 you can pretty quickly extract a feature that&rsquo;s already written and have it up
 on RubyGems for the world to consume in no time.</p>
 
-<h3>In summary</h3>
+<h2>In summary</h2>
 
 <p>I spent a fair amount of time trying to plot my entrace in to the Open Source
 community. <a href="http://github.com">Github</a> has made it tremendously easy to not
@@ -441,7 +441,7 @@ when you started.</p>
     <id>http://brandonhilkert.com/blog/the-technology-hump</id>
     <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
 
-<h3>Rewind 4 years</h3>
+<h2>Rewind 4 years</h2>
 
 <p>Four years ago I was writing PHP on the side for startups and just getting into software products as both a profession and hobby (more on this too&hellip;). I had reached a level of comfort with PHP where I knew I could solve just about any business problem thrown at me. This feeling was not only comforting, but empowering. Shortly after, I helped create <a href="/about">Meeteor</a>, which was written in <a href="http://rubyonrails.org/">Rails</a> and my world took turn for the better.</p>
 
@@ -454,7 +454,7 @@ when you started.</p>
 
 <p>The next 2 years that followed were largely a blur in what seemed like crash course in creating a product and a business. I&rsquo;m grateful for this experience and believe it has better positioned me for the things I want to accomplish going forward.</p>
 
-<h3>Where I am today</h3>
+<h2>Where I am today</h2>
 
 <p>Today, I&rsquo;m back at that position I was 4 years ago with PHP, but now with Ruby. I&rsquo;m confident I can solve just about anything thrown at me with the tools that I&rsquo;m now most familiar with. Rather than entrench myself with Ruby and Rails books, I&rsquo;m finding articles about retention, conversion, and idea validation more interesting.</p>
 

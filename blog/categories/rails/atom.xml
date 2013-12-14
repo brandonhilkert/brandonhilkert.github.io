@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-13T21:32:52-05:00</updated>
+  <updated>2013-12-13T22:22:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -25,14 +25,14 @@ serve compiled assets in Rails is one of the most significant performance
 enhancements I&rsquo;ve seen. Having done so for 2 fairly large applications, it&rsquo;s
 hard for me to imagine serving assets locally anymore.</p>
 
-<h3>The Asset Pipeline</h3>
+<h2>The Asset Pipeline</h2>
 
 <p>The addition of the Rails <a href="http://guides.rubyonrails.org/asset_pipeline.html">asset
 pipeline</a> has reduced both
 the number of assets served and the size of these files. Users on slow
 connections have been the biggest beneficiary of these changes.</p>
 
-<h3>The Problem</h3>
+<h2>The Problem</h2>
 
 <p>Even with the asset pipeline, content is transmitted to the end user
 over their, sometimes slow, connection. Distance plays a role in the speed at which
@@ -43,7 +43,7 @@ engage them.</p>
 <!--more-->
 
 
-<h3>The Solution</h3>
+<h2>The Solution</h2>
 
 <p>CDNs are networks of servers that host your content so that when
 you make a request, the request is served from a server closest
@@ -57,7 +57,7 @@ application servers. Most Ruby applications use
 front of the Ruby processes. These HTTP servers are really good at serving
 static content, but no one will deny &ndash; the fewer requests, the better.</p>
 
-<h3>Option 1: <em>Push</em> your assets to the CDN during deployment</h3>
+<h2>Option 1: <em>Push</em> your assets to the CDN during deployment</h2>
 
 <p>Depending on your method of deployment, pushing assets to a CDN isn&rsquo;t always
 trivial. The <a href="https://github.com/rumblelabs/asset_sync">asset_sync</a> gem has
@@ -67,7 +67,7 @@ efficient because all requests for assets will be diverted away from your
 application, leaving its precious processing power to serve more important
 application requests.</p>
 
-<h3>Option 2: Assets are <em>pulled</em> to the CDN on first request</h3>
+<h2>Option 2: Assets are <em>pulled</em> to the CDN on first request</h2>
 
 <p>This option won&rsquo;t change deployment and is simple to
 setup. The only downside is that upon first request to an asset, the CDN will
@@ -78,7 +78,7 @@ this option generally makes it my preferred option.</p>
 
 <p>So let&rsquo;s get to it&hellip;</p>
 
-<h3>Amazon Cloudfront</h3>
+<h2>Amazon Cloudfront</h2>
 
 <p>Log in to your Amazon EC2 account and click &ldquo;Cloudfront&rdquo;:</p>
 
@@ -96,7 +96,7 @@ this option generally makes it my preferred option.</p>
 
 <p><img class="center" src="/images/cdn/domain.png" title="&ldquo;Cloudfront distribution URL&rdquo;" ></p>
 
-<h3>Rails</h3>
+<h2>Rails</h2>
 
 <p>Rails provides and easy way to change the host URL of the assets (images,
 stylesheets, javascripts, fonts&hellip;). Enter the Cloudfront
@@ -123,7 +123,7 @@ any changes in your <code>development</code> environment.</em></p>
 
 <p>And that&rsquo;s it!</p>
 
-<h3>In Summary</h3>
+<h2>In Summary</h2>
 
 <p>This is the ultimate low-hanging fruit optimization. If you haven&rsquo;t served your
 assets from a CDN before, I&rsquo;d suggest giving it a try. The <a href="http://aws.amazon.com/cloudfront/pricing/">cost of
@@ -142,7 +142,7 @@ performance.</p>
     <link href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/"/>
     <updated>2013-11-06T21:04:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile</id>
-    <content type="html"><![CDATA[<h3>Rails Rumble</h3>
+    <content type="html"><![CDATA[<h2>Rails Rumble</h2>
 
 <p>The <a href="http://railsrumble.com/">2013 Rails Rumble</a> concluded last week and like
 in previous years, <a href="http://www.dwellable.com/">Dwellable</a> analyzed the <a href="http://www.dwellable.com/blog/Rails-Rumble-Gem-Teardown">Gemfiles of the submitted
@@ -194,7 +194,7 @@ of Sidekiq.</p></li>
 </ul>
 
 
-<h3>My Gemfiles</h3>
+<h2>My Gemfiles</h2>
 
 <p>Most developers have a handful of gems that they rely on during development.
 This got me thinking about the gems that I most commonly used in my own projects.</p>
@@ -312,7 +312,7 @@ newsletter.</em></p>
 posts&hellip;where do you start?!?! I&rsquo;ve used all these resources in the past and
 only one thing has reliably led to me to really learn the concepts &ndash; building something REAL!</p>
 
-<h3>How I learned Ruby and Rails</h3>
+<h2>How I learned Ruby and Rails</h2>
 
 <p>Several years ago, I was learning both <a href="https://www.ruby-lang.org/en/">Ruby</a>
 and <a href="http://rubyonrails.org/">Rails</a> and trying to figure out which books were
@@ -329,7 +329,7 @@ trivial for a more experienced developer, but essential to get a real world appl
 <!--more-->
 
 
-<h3>The best way to learn (with a catch)</h3>
+<h2>The best way to learn (with a catch)</h2>
 
 <p>I propose you build something&hellip;anything really. But it would be more useful if
 the thing you build is useful to either you, someone else, or even
@@ -337,7 +337,7 @@ better&hellip;everyone! But there&rsquo;s a catch&hellip;whatever you build, you
 put it out there for the world to see, but you must share it in whatever way
 you feel comfortable.</p>
 
-<h3>My Craigslist Scraper</h3>
+<h2>My Craigslist Scraper</h2>
 
 <p>A few years ago, I was in the market for a new job. I built a small Craigslist
 scraper that searched for &ldquo;my perfect job&rdquo; and had it notify me via email
@@ -348,7 +348,7 @@ allowed me to learn (I wrote it in Perl and at the time knew very little about
 the language&hellip;). And second, it saved the 15 minutes or so it would take me
 each day to sift through the new job postings. It really was a win-win!</p>
 
-<h3>Start to Finish</h3>
+<h2>Start to Finish</h2>
 
 <p>It&rsquo;s easy to copy and paste code snippets from a blog post or book. It&rsquo;s much
 harder to see these applications through to the point where they&rsquo;re useful. Who
@@ -372,7 +372,7 @@ makes a Rails application tick, servers at <a href="https://www.digitalocean.com
 Ocean</a>, <a href="https://www.linode.com/">Linode</a>, and
 <a href="http://www.rackspace.com/">Rackspace</a> can be extremely cost effective.</p>
 
-<h3>Dogfooding</h3>
+<h2>Dogfooding</h2>
 
 <p>Building an application that can save you time in your daily routine (ie. task
 tracker, appt. reminder, etc.) is a great first step to learning more. It&rsquo;s
@@ -382,7 +382,7 @@ being an actual user of your application will cause you to look at it in a very
 different light. It&rsquo;s likely that you&rsquo;ll find ways to drastically improve your
 application within the first 10 minutes of usage.</p>
 
-<h3>Sharing (this is my favorite part)</h3>
+<h2>Sharing (this is my favorite part)</h2>
 
 <p>You&rsquo;ve now spent several weeks/months building something interesting &ndash; tell the
 world about it. Tweet about it, post it to your local user group mailing list,
@@ -405,7 +405,7 @@ it worthy of sharing, and in the process, learn about the finer details of
 releasing a web application in to the wild, not just a basic shopping cart that
 has minimal real-world value.</p>
 
-<h3>Where to go from here?</h3>
+<h2>Where to go from here?</h2>
 
 <p>Knowing what you want to build is easier said than done. I keep a list of ideas
 that I ultimately want to build someday. Some have very little use outside my
@@ -430,7 +430,7 @@ candidate.</p>
     <id>http://brandonhilkert.com/blog/the-technology-hump</id>
     <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
 
-<h3>Rewind 4 years</h3>
+<h2>Rewind 4 years</h2>
 
 <p>Four years ago I was writing PHP on the side for startups and just getting into software products as both a profession and hobby (more on this too&hellip;). I had reached a level of comfort with PHP where I knew I could solve just about any business problem thrown at me. This feeling was not only comforting, but empowering. Shortly after, I helped create <a href="/about">Meeteor</a>, which was written in <a href="http://rubyonrails.org/">Rails</a> and my world took turn for the better.</p>
 
@@ -443,7 +443,7 @@ candidate.</p>
 
 <p>The next 2 years that followed were largely a blur in what seemed like crash course in creating a product and a business. I&rsquo;m grateful for this experience and believe it has better positioned me for the things I want to accomplish going forward.</p>
 
-<h3>Where I am today</h3>
+<h2>Where I am today</h2>
 
 <p>Today, I&rsquo;m back at that position I was 4 years ago with PHP, but now with Ruby. I&rsquo;m confident I can solve just about anything thrown at me with the tools that I&rsquo;m now most familiar with. Rather than entrench myself with Ruby and Rails books, I&rsquo;m finding articles about retention, conversion, and idea validation more interesting.</p>
 

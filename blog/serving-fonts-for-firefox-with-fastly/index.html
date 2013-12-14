@@ -36,7 +36,7 @@ one of the first performance improvements I make to a production Rails &hellip;"
 	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-  <link href='http://fonts.googleapis.com/css?family=Sorts+Mill+Goudy:400,400italic' rel='stylesheet' type='text/css'>
+  <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
   <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
   <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
   <script src="/javascripts/highlight.min.js"></script>
@@ -132,7 +132,7 @@ application. The first time I attempted to host assets from a different domain,
 I quickly realized that <a href="http://davidwalsh.name/cdn-fonts">Firefox won&rsquo;t download fonts from a different
 domain</a> without specific headers.</p>
 
-<h3>Nginx Fix</h3>
+<h2>Nginx Fix</h2>
 
 <p>At the time, our system was using <a href="http://wiki.nginx.org/Main">Nginx</a> to serve
 assets that were fronted by a <a href="http://aws.amazon.com/cloudfront/">Amazon
@@ -155,7 +155,7 @@ with this setup, I had to add to the following to our Nginx configuration:</p>
 <p>This added the <code>Access-Control-Allow-Origin</code> header for all fonts and
 font-related assets.</p>
 
-<h3>Enter Fastly</h3>
+<h2>Enter Fastly</h2>
 
 <p>Fast-forward a few months and we&rsquo;ve taken the next step in serving assets by
 uploading them to S3. As mentioned in my previous post about <a href="/blog/setup-a-cloudfront-cdn-for-rails/">setting up a
@@ -172,7 +172,7 @@ given the mechanism were were using to upload. Fortunately, Fastly allows you
 to <a href="http://docs.fastly.com/guides/21835572/23999817">set custom headers</a> at any
 point in the caching life cycle.</p>
 
-<h3>The Solution</h3>
+<h2>The Solution</h2>
 
 <p>In Fastly, go to <code>Configure -&gt; Content -&gt; Headers -&gt; + New</code> and enter the
 following:</p>
@@ -201,7 +201,7 @@ matches any of the following regex conditions: <code>req.url ~
 <p><em>Note: Once you&rsquo;ve made these changes, don&rsquo;t forget to click the <code>Deploy</code>
 button, otherwise, you won&rsquo;t see the new headers.</em></p>
 
-<h3>In Summary</h3>
+<h2>In Summary</h2>
 
 <p>While Fastly can be overwhelming, the power of being able to modify any aspect
 of the caching stack is valuable. Asset download times have generally been

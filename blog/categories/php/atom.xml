@@ -4,7 +4,7 @@
   <title><![CDATA[Category: php | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/php/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-13T21:32:52-05:00</updated>
+  <updated>2013-12-13T22:22:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -20,7 +20,7 @@
     <id>http://brandonhilkert.com/blog/the-technology-hump</id>
     <content type="html"><![CDATA[<p>For the past few years, I&rsquo;ve spent most of my waking moments either reading about or writing code. For me, it&rsquo;s about the constant pursuit of learning and getting better at my craft. In hindsight, I can say that that mentality has helped me have a leg up on the competition (for reasons I will detail in future posts).</p>
 
-<h3>Rewind 4 years</h3>
+<h2>Rewind 4 years</h2>
 
 <p>Four years ago I was writing PHP on the side for startups and just getting into software products as both a profession and hobby (more on this too&hellip;). I had reached a level of comfort with PHP where I knew I could solve just about any business problem thrown at me. This feeling was not only comforting, but empowering. Shortly after, I helped create <a href="/about">Meeteor</a>, which was written in <a href="http://rubyonrails.org/">Rails</a> and my world took turn for the better.</p>
 
@@ -33,7 +33,7 @@
 
 <p>The next 2 years that followed were largely a blur in what seemed like crash course in creating a product and a business. I&rsquo;m grateful for this experience and believe it has better positioned me for the things I want to accomplish going forward.</p>
 
-<h3>Where I am today</h3>
+<h2>Where I am today</h2>
 
 <p>Today, I&rsquo;m back at that position I was 4 years ago with PHP, but now with Ruby. I&rsquo;m confident I can solve just about anything thrown at me with the tools that I&rsquo;m now most familiar with. Rather than entrench myself with Ruby and Rails books, I&rsquo;m finding articles about retention, conversion, and idea validation more interesting.</p>
 
