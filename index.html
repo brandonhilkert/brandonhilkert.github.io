@@ -118,51 +118,6 @@
   
 
 
-<time datetime="2013-12-14T07:05:00-05:00" data-updated="true" itemprop="datePublished">December 14<span>th</span>, 2013</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/page-specific-javascript-in-rails/" itemprop="url">Page-Specific Javascript in Rails</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/asset-pipeline/'>asset pipeline</a>, <a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>The asset pipeline has made including javascript in Rails applications a
-breeze. Without any additional changes, the code included in your app is
-executed on every page. However, with a combination of CSS class scopes and
-simple jQuery plugin, you can be sure certain javascript code will only run on
-certain pages.</p>
-
-<h2>The Problem</h2>
-
-<p>jet&rsquo;s imagine you have 2 pages in your application (landing and contact) and
-need an alert box to show up on the contact page only. How would you do it?</p>
-
-
-		
-		<a href="/blog/page-specific-javascript-in-rails/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
 <time datetime="2013-12-09T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 9<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/" itemprop="url">Build a Ruby Gem Email Course - Weekend Update</a></h1>
   <div class="tags">
@@ -696,6 +651,62 @@ the page and saw this:</p>
 
 		
 		<a href="/blog/blog-design-copied-what-would-you-do/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-12T21:18:00-05:00" data-updated="true" itemprop="datePublished">November 12<span>th</span>, 2013</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/setting-up-a-cloudfront-cdn-for-rails/" itemprop="url">Setting Up a Cloudfront CDN for Rails</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/aws/'>aws</a>, <a class='category' href='/blog/categories/cdn/'>cdn</a>, <a class='category' href='/blog/categories/cloudfront/'>cloudfront</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p><em>Update: I&rsquo;ve since added a post on <a href="/blog/serving-fonts-for-firefox-with-fastly/">serving fonts for Firefox with Fastly</a>.</em></p>
+
+<p>Implementing a <a href="http://en.wikipedia.org/wiki/Content_delivery_network">CDN</a> to
+serve compiled assets in Rails is one of the most significant performance
+enhancements I&rsquo;ve seen. Having done so for 2 fairly large applications, it&rsquo;s
+hard for me to imagine serving assets locally anymore.</p>
+
+<h2>The Asset Pipeline</h2>
+
+<p>The addition of the Rails <a href="http://guides.rubyonrails.org/asset_pipeline.html">asset
+pipeline</a> has reduced both
+the number of assets served and the size of these files. Users on slow
+connections have been the biggest beneficiary of these changes.</p>
+
+<h2>The Problem</h2>
+
+<p>Even with the asset pipeline, content is transmitted to the end user
+over their, sometimes slow, connection. Distance plays a role in the speed at which
+data can be delivered. Because of this, users further away from your servers get a
+sluggish experience. This decreases both the users&#8217; patience and your ability to effectively
+engage them.</p>
+
+
+		
+		<a href="/blog/setting-up-a-cloudfront-cdn-for-rails/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>
