@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: env | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/env/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2013-12-20T07:17:02-05:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Flexible Rails Environment Configuration]]></title>
+    <link href="http://brandonhilkert.com/blog/flexible-rails-environment-configuration/"/>
+    <updated>2013-12-19T18:44:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/flexible-rails-environment-configuration</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s hard to write a Rails app without interfacing with an external service or
+API. In most cases, these services require a secret token or password. Since
+checking passwords in to source control is generally a bad practice, we need a
+good way to safely and reliably access these values in code.</p>
+
+<p>I&rsquo;ve tried a few gems that attempt to make this process easier and ultimately
+settled on a simpler solution &ndash; the combination of a few lines of code and
+<a href="http://en.wikipedia.org/wiki/Environment_variable">ENV variables</a>, which are
+accessible whether you manage your own infrastructure or use a
+<a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> service like
+<a href="http://www.heroku.com">Heroku</a>.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>In a recent Rails app, I used <a href="http://pusher.com/">Pusher</a> and it requires the
+unique URL to be setup in an initializer:</p>
+
+<p>```</p>
+
+<h1>config/initializers/pusher.rb</h1>
+
+<p>Pusher.url = &ldquo;<a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a>&rdquo;
+```</p>
+
+<p>If I need to set this URL in multiple place &ndash; copying/pasting is not a great
+solution because it sets me up for copy/paste errors. It&rsquo;s also a headache to
+find all occurrences of the URL when it changes.</p>
+
+<h2>The Solution</h2>
+
+<p>Setup a <a href="http://en.wikipedia.org/wiki/YAML">yaml</a> file similar to this:</p>
+
+<p>```</p>
+
+<h1>config/application.yml</h1>
+
+<p>defaults: &amp;defaults
+  PUSHER_URL: <a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a></p>
+
+<p>development:
+  &lt;&lt;: *defaults</p>
+
+<p>test:
+  &lt;&lt;: *defaults
+```</p>
+
+<p>Add the following to <code>config/application.rb</code> before the Rails application class
+is defined:</p>
+
+<p>```
+if File.exists?(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>))
+  config = YAML.load(File.read(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>)))
+  config.merge! config.fetch(Rails.env, {})
+  config.each do |key, value|</p>
+
+<pre><code>ENV[key] ||= value.to_s unless value.kind_of? Hash
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Resulting in a <code>config/application.rb</code> that looks something like this:</p>
+
+<p>```</p>
+
+<h1>config/application.rb</h1>
+
+<p>require File.expand_path(&lsquo;../boot&rsquo;, <strong>FILE</strong>)</p>
+
+<p>require &lsquo;rails/all&rsquo;</p>
+
+<h1>Require the gems listed in Gemfile, including any gems</h1>
+
+<h1>you&rsquo;ve limited to :test, :development, or :production.</h1>
+
+<p>Bundler.require(:default, Rails.env)</p>
+
+<p>if File.exists?(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>))
+  config = YAML.load(File.read(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>)))
+  config.merge! config.fetch(Rails.env, {})
+  config.each do |key, value|</p>
+
+<pre><code>ENV[key] ||= value.to_s unless value.kind_of? Hash
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>module NewApp
+  class Application &lt; Rails::Application</p>
+
+<pre><code># ...
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The added code first looks for an <code>application.yml</code> file. If it finds one, it
+reads in the values for that environment (development, test, production, etc.)
+and merges them in to the existing Ruby ENV hash.</p>
+
+<p><em>Note: Since <code>application.yml</code> will typically hold passwords and other secret
+keys, it should be added to <code>.gitignore</code> so they don&rsquo;t end up in source
+control.</em></p>
+
+<p>Now, when the application is initialized, <code>PUSHER_URL</code> is
+available in the ENV hash. This allows me to the update the pusher initializer to:</p>
+
+<p>```</p>
+
+<h1>config/initializers/pusher.rb</h1>
+
+<p>Pusher.url = ENV[&ldquo;PUSHER_URL&rdquo;]
+```</p>
+
+<p>If I&rsquo;m deploying to Heroku, I need to set the config value using the following
+command:</p>
+
+<p><code>heroku config:set PUSHER_URL=http://asdfa@api.pusherapp.com</code></p>
+
+<p>Or if I&rsquo;m deploying to Ubuntu, I can set the ENV variable for all users on the system:</p>
+
+<p>```</p>
+
+<h1>/etc/environment</h1>
+
+<p>&hellip;
+export PUSHER_URL=<a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a>
+```</p>
+
+<p><em>Note: If you choose not to set ENV variables on the host system, you can
+easily mimic the development environment and drop the <code>config/application.yml</code>
+file on to the system. This is no different than using a <code>database.yml</code> that
+most Rails developers are used to.</em></p>
+
+<p>That&rsquo;s it! So with 7 lines of code and a configuration file, you have yourself
+an environment configuration setup that&rsquo;s flexible for most deployment
+solutions.</p>
+]]></content>
+  </entry>
+  
+</feed>

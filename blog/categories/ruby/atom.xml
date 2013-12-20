@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2013-12-19T15:20:13-05:00</updated>
+  <updated>2013-12-20T07:17:02-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,157 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Flexible Rails Environment Configuration]]></title>
+    <link href="http://brandonhilkert.com/blog/flexible-rails-environment-configuration/"/>
+    <updated>2013-12-19T18:44:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/flexible-rails-environment-configuration</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s hard to write a Rails app without interfacing with an external service or
+API. In most cases, these services require a secret token or password. Since
+checking passwords in to source control is generally a bad practice, we need a
+good way to safely and reliably access these values in code.</p>
+
+<p>I&rsquo;ve tried a few gems that attempt to make this process easier and ultimately
+settled on a simpler solution &ndash; the combination of a few lines of code and
+<a href="http://en.wikipedia.org/wiki/Environment_variable">ENV variables</a>, which are
+accessible whether you manage your own infrastructure or use a
+<a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> service like
+<a href="http://www.heroku.com">Heroku</a>.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>In a recent Rails app, I used <a href="http://pusher.com/">Pusher</a> and it requires the
+unique URL to be setup in an initializer:</p>
+
+<p>```</p>
+
+<h1>config/initializers/pusher.rb</h1>
+
+<p>Pusher.url = &ldquo;<a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a>&rdquo;
+```</p>
+
+<p>If I need to set this URL in multiple place &ndash; copying/pasting is not a great
+solution because it sets me up for copy/paste errors. It&rsquo;s also a headache to
+find all occurrences of the URL when it changes.</p>
+
+<h2>The Solution</h2>
+
+<p>Setup a <a href="http://en.wikipedia.org/wiki/YAML">yaml</a> file similar to this:</p>
+
+<p>```</p>
+
+<h1>config/application.yml</h1>
+
+<p>defaults: &amp;defaults
+  PUSHER_URL: <a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a></p>
+
+<p>development:
+  &lt;&lt;: *defaults</p>
+
+<p>test:
+  &lt;&lt;: *defaults
+```</p>
+
+<p>Add the following to <code>config/application.rb</code> before the Rails application class
+is defined:</p>
+
+<p>```
+if File.exists?(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>))
+  config = YAML.load(File.read(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>)))
+  config.merge! config.fetch(Rails.env, {})
+  config.each do |key, value|</p>
+
+<pre><code>ENV[key] ||= value.to_s unless value.kind_of? Hash
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Resulting in a <code>config/application.rb</code> that looks something like this:</p>
+
+<p>```</p>
+
+<h1>config/application.rb</h1>
+
+<p>require File.expand_path(&lsquo;../boot&rsquo;, <strong>FILE</strong>)</p>
+
+<p>require &lsquo;rails/all&rsquo;</p>
+
+<h1>Require the gems listed in Gemfile, including any gems</h1>
+
+<h1>you&rsquo;ve limited to :test, :development, or :production.</h1>
+
+<p>Bundler.require(:default, Rails.env)</p>
+
+<p>if File.exists?(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>))
+  config = YAML.load(File.read(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>)))
+  config.merge! config.fetch(Rails.env, {})
+  config.each do |key, value|</p>
+
+<pre><code>ENV[key] ||= value.to_s unless value.kind_of? Hash
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>module NewApp
+  class Application &lt; Rails::Application</p>
+
+<pre><code># ...
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The added code first looks for an <code>application.yml</code> file. If it finds one, it
+reads in the values for that environment (development, test, production, etc.)
+and merges them in to the existing Ruby ENV hash.</p>
+
+<p><em>Note: Since <code>application.yml</code> will typically hold passwords and other secret
+keys, it should be added to <code>.gitignore</code> so they don&rsquo;t end up in source
+control.</em></p>
+
+<p>Now, when the application is initialized, <code>PUSHER_URL</code> is
+available in the ENV hash. This allows me to the update the pusher initializer to:</p>
+
+<p>```</p>
+
+<h1>config/initializers/pusher.rb</h1>
+
+<p>Pusher.url = ENV[&ldquo;PUSHER_URL&rdquo;]
+```</p>
+
+<p>If I&rsquo;m deploying to Heroku, I need to set the config value using the following
+command:</p>
+
+<p><code>heroku config:set PUSHER_URL=http://asdfa@api.pusherapp.com</code></p>
+
+<p>Or if I&rsquo;m deploying to Ubuntu, I can set the ENV variable for all users on the system:</p>
+
+<p>```</p>
+
+<h1>/etc/environment</h1>
+
+<p>&hellip;
+export PUSHER_URL=<a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a>
+```</p>
+
+<p><em>Note: If you choose not to set ENV variables on the host system, you can
+easily mimic the development environment and drop the <code>config/application.yml</code>
+file on to the system. This is no different than using a <code>database.yml</code> that
+most Rails developers are used to.</em></p>
+
+<p>That&rsquo;s it! So with 7 lines of code and a configuration file, you have yourself
+an environment configuration setup that&rsquo;s flexible for most deployment
+solutions.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem Email Course - Weekend Update]]></title>
@@ -397,105 +548,6 @@ for the mailing list. So I&rsquo;ll continue to post my updates there.</p>
 <p><img class="center" src="/images/woh/sources-day3.png" title="&ldquo;Google Analytics day 3 traffic sources&rdquo;" ></p>
 
 <p>Until tomorrow&hellip;</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 3]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/"/>
-    <updated>2013-12-03T06:15:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3</id>
-    <content type="html"><![CDATA[<p><em>I&rsquo;m doing an
-<strong>8-day sprint</strong> where I&rsquo;m launching an email course on
-how to <strong>Build a Ruby Gem</strong>.</em></p>
-
-<p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-Day 3 |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="/blog/build-a-ruby-gem-email-course-weekend-update/">Weekend Update</a></p>
-
-<h2>Back at it</h2>
-
-<p>I hit the 5:00am goal this morning! It&rsquo;s 6:15am and I&rsquo;ve wrapped up the 2nd day of
-the Build a Ruby Gem Email Course.</p>
-
-<p>Yesterday, I had some anxiety about the amount of writing involved in putting
-this course together. I&rsquo;ve read a number of blog posts about building a Ruby
-gem, but most seem to assume you have a pretty in depth knowledge of creating
-gems, while others skip important details of the process. So I knew going in to
-it that I wanted to write about it a little differently. I wanted to talk more
-about theory of why things are being done vs. how the Ruby language works.</p>
-
-<p>Thinking back to my first Ruby gem, I remember my frustration trying to
-understand the conventions of naming and file structure. So I&rsquo;m writing the course I
-wish I had when I started.</p>
-
-<!--more-->
-
-
-<h2>Flow</h2>
-
-<p>It&rsquo;s been 3 days since I started documenting this process and the writing
-process has gotten significantly easier. Since I started my blog, I&rsquo;ve read a
-number of posts recommending the value of writing every day, regardless of the
-subject. I&rsquo;m beginning to see the benefit of this consistency. I&rsquo;ll report back
-on this by the end of the week as it should be even more apparent by then.</p>
-
-<h2>What I Accomplished today</h2>
-
-<p>I wrote Day 2 of the Build a Ruby Gem Email Course. The content organization
-that I did on the first day has proved to be valuable. Outside of moving a few
-topics around, it&rsquo;s stayed largely in tact. So here&rsquo;s to organization!!!</p>
-
-<p>I think I also solved my email list problems. Actually, it was less &ldquo;problems&rdquo;, and
-more, I need to learn how to use <a href="http://mailchimp.com/">Mailchimp</a>. I was in touch with their support
-over an issue around signing up for multiple lists. I originally had the
-subscriptions to the Week of Hustle updates going to my personal newsletter
-list. This caused a semi-alarming error message if you were already on the
-list.</p>
-
-<p>The solution was to create a separate list and manage it outside of the realm
-of my newsletter. Despite seeming over-complicated at first, I now feel
-comfortable with this solution and I think it actually fits my goals better.
-I&rsquo;ve already started to think of the best way to manage the email course once
-it&rsquo;s live.</p>
-
-<h2>What I&rsquo;m working on today</h2>
-
-<p>A few people have pointed out some oddities with the formatting of my email
-updates and there are a few design changes I&rsquo;d like to make on the sign up
-forms. However, because the email updates are going out daily, it&rsquo;s my first
-priority.</p>
-
-<p>There have been no changes to the timeline I posted yesterday, and still feel
-like I&rsquo;m on schedule to finish by the end of the weekend!</p>
-
-<h2>Marketing</h2>
-
-<p>I was originally worried that the buzz surrounding the course and my updates
-about the process would die off and I&rsquo;d get another couple people throughout
-the week. This appears to not be the case. However, I&rsquo;m not convinced it&rsquo;ll
-continue this way throughout the week.</p>
-
-<p><img class="center" src="/images/woh/ga-day2.png" title="&ldquo;Google Analytics day 2 results&rdquo;" ></p>
-
-<p>As you can see, traffic to the blog was almost exactly the same as the previous
-day (Sunday).</p>
-
-<p>I screwed up the Google Analytics tracking code on the layouts, so I wasn&rsquo;t
-tracking email list conversions until late last night. But the good news is
-that according to Mailchimp, I signed up another 25 subscribers to the updates list.</p>
-
-<p><img class="center" src="/images/woh/mailchimp-day2.png" title="&ldquo;Mailchimp day 2 results&rdquo;" ></p>
-
-<p>This is down from the previous day, but overall, I couldn&rsquo;t be happier. I did
-get a little boost because I sent a campaign about the course and my updates to
-my newsletter email list, which seemed to account for maybe 8-10 subscriptions.</p>
-
-<p>See you tomorrow!</p>
 ]]></content>
   </entry>
   
