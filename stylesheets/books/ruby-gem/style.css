@@ -574,17 +574,22 @@ abbr { text-transform: none; }
 
 /* 6.6 Newsletter */
 
+#newsletter {
+  text-align: center;
+}
+
 #newsletter.row {
-  padding:25px 0 25px 0;
+  padding: 25px 0 25px 0;
 }
 
 #newsletter h2 {
-  width:460px;
-  margin:0 20px 0 0;
-  float:left;
+  margin-bottom: 20px;
   color:#737373;
 }
 
+#newsletter input[type="email"] {
+  width: 50%;
+}
 
 input[type="email"] {
   width: 230px;
@@ -1229,30 +1234,6 @@ a#contact_close_counter {
   #author_image {
     margin:0 10px 0 0;
   }
-
-  /*Newsletter*/
-
-  #newsletter h2 {
-    width:320px;
-    margin:0 0 5px 0;
-    float:left;
-  }
-
-  #newsletter form {
-    margin:20px 0 0 0;
-    float:right;
-  }
-
-  #newsletter input#e-mail {
-    width:240px;
-    margin:5px 10px 5px 0;
-  }
-
-  #newsletter input#submit {
-    float:right;
-    margin:5px 0 0 0;
-  }
-
 
   /*Footer*/
 
