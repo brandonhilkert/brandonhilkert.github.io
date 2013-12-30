@@ -5,4 +5,7 @@ Disallow: /newsletter/done.html
 
 Disallow: /courses/build-a-ruby-gem/almost.html
 Disallow: /courses/build-a-ruby-gem/done.html
+
+Disallow: /books/build-a-ruby-gem/almost.html
+Disallow: /books/build-a-ruby-gem/done.html
 Sitemap: http://brandonhilkert.com/sitemap.xml
