@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-07T09:15:15-05:00</updated>
+  <updated>2014-01-07T14:46:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -21,7 +21,7 @@
     <content type="html"><![CDATA[<p>About a month ago, I joined <a href="http://jfdi.bz/">JFDI.bz</a> &ndash; a community for
 solo-founders launching their own thing. Once a month, the group engages in a
 <em>Week of Hustle</em> &ndash; a week long sprint to launch something.
-I chose to launch an email course on the topic of <a href="http://blog.dev/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary">building a Ruby
+I chose to launch an email course on the topic of <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary">building a Ruby
 gem</a>.</p>
 
 <!--more-->
