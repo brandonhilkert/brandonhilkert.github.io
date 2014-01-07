@@ -4,7 +4,7 @@
   <title><![CDATA[Category: book | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/book/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-05T13:20:16-05:00</updated>
+  <updated>2014-01-07T08:47:37-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How I Launched an Email Course to 500+ People]]></title>
+    <link href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/"/>
+    <updated>2014-01-06T06:15:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/how-i-launched-an-email-course</id>
+    <content type="html"><![CDATA[<p>About a month ago, I joined <a href="http://jfdi.bz/">JFDI.bz</a> &ndash; a community for
+solo-founders launching their own thing. Once a month, the group engages in a
+<em>Week of Hustle</em> &ndash; a week long sprint to launch something.
+I chose to launch an email course on the topic of <a href="http://blog.dev/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary">building a Ruby
+gem</a>.</p>
+
+<!--more-->
+
+
+<h2>Why <em>Build a Ruby Gem</em>?</h2>
+
+<p>A few years ago, I was building my first Ruby gem and I was left pretty
+confused with the process and conventions. After working through my
+frustrations, I thought the information I learned could be useful to others.</p>
+
+<p>Honestly, I thought to write an eBook at first, however, the last thing I
+wanted was to invest a month or two of my time only to find out people
+weren&rsquo;t interested.</p>
+
+<p>An email course was a good medium &ndash; I could cover the basics well enough to get
+people through their hangups, while also validating the need for an eBook. I
+figured if I got <strong>100-200</strong> people to sign up for the course, I would move
+forward with the book.</p>
+
+<h2>Results</h2>
+
+<p>It turns out my marketing efforts were more successful than I anticipated.</p>
+
+<h3>Today, almost 600 people have taken the Build a Ruby Gem email course!</h3>
+
+<h2>Email is King&hellip;still</h2>
+
+<p>Prior to launching this email course, I&rsquo;d read about the value of building an
+email list from people like <a href="http://nathanbarry.com/">Nathan Barry</a>, <a href="http://unicornfree.com/">Amy
+Hoy</a> and <a href="http://justinjackson.ca/">Justin Jackson</a>.</p>
+
+<p>I&rsquo;d also read countless other posts describing the most common regrets when
+launching a new product. Almost all of them included not building an email
+list. With that said, it was one of the first things I setup.</p>
+
+<p>I blogged each day about my progress. Each post had a
+mailing list subscription form that sent them subsequent daily updates.  Subscriptions
+were slow at first, but interest built.  By then end of the week <strong>232</strong> people had
+subscribed. And the day the course went live, I was able to to convert <strong>115</strong>
+(~50%) of them.</p>
+
+<p>The people subscribed were <strong>EXACTLY</strong> my target audience so it&rsquo;s no surprise
+conversion was high.</p>
+
+<h2>Finding Your Target Audience</h2>
+
+<p>Fortunately for me, my target audience was Ruby developers and they hang out
+online (surprise, surprise). But where online&hellip;</p>
+
+<p>Let me hit you with something that seems obvious in hindsight:</p>
+
+<h3>Marketing is easy when you build a product for an audience you&rsquo;re already part of.</h3>
+
+<p>This was something I&rsquo;d <a href="http://unicornfree.com/2013/how-do-you-create-a-product-people-want-to-buy">read over the past few
+months</a>,
+but not seen its value until now.</p>
+
+<p>The email course is for <strong>Ruby developers</strong>, I&rsquo;m a <strong>Ruby Developer</strong>, so the
+question becomes&hellip;.<em>where do I hang out online?</em></p>
+
+<p>That question is <strong>easy</strong> to answer &ndash; <a href="http://rubyweekly.com/">Ruby weekly</a>,
+<a href="http://www.reddit.com/r/ruby">Reddit</a> and
+<a href="http://www.rubyflow.com/">RubyFlow</a>.</p>
+
+<p>And don&rsquo;t you know&hellip;it turns out those 3 sources have been the highest
+converting sources since the course launched:</p>
+
+<ol>
+<li>Ruby weekly &ndash; 131</li>
+<li>RubyFlow &ndash; 65</li>
+<li>Reddit &ndash; 62</li>
+</ol>
+
+
+<p>The remaining sources were a combination of direct links, social media and
+other technology news aggregation sites (probably mostly stemming from the top
+sources above).</p>
+
+<p><em>Note: I&rsquo;ve been reading <a href="http://www.amazon.com/80-20-Sales-Marketing-Definitive/dp/1599185059">80/20 Sales and
+Marketing</a>
+and the numbers above coincide, almost exactly, to the 80/20 curve. That is,
+80% of the conversion came from 20% of the sources.</em></p>
+
+<h2>Twitter Tip</h2>
+
+<p>The last day of the email course has a <em>Summary</em> section thanking people for
+taking the course and attempting to get feedback. While I haven&rsquo;t received much
+constructive criticism, I dropped this little doozie at the bottom:</p>
+
+<p><img class="center" src="/images/email-course/click-to-tweet.png" title="&ldquo;Build a Ruby Gem Email Course Click To Tweet&rdquo;" ></p>
+
+<p>I&rsquo;d read a post about <a href="http://grinnick.com/posts/how-groove-s-email-copy-makes-their-posts-go-viral?ref=hn">GroveHQ&rsquo;s emails going
+viral</a>
+and this was something they did in their campaigns.</p>
+
+<p>The link allows people to click and immediately be setup to Tweet the
+following:</p>
+
+<p><img class="center" src="/images/email-course/course-tweet.png" title="&ldquo;Build a Ruby Gem Email Course Tweet&rdquo;" ></p>
+
+<p>It&rsquo;s difficult to determine the value of those tweets, but over 10 people have
+clicked and tweeted. To me, this was surprising, but valuable.</p>
+
+<p>I&rsquo;ll probably look to make it stand out a bit more to hopefully improve the
+click-through.</p>
+
+<h2>In Summary</h2>
+
+<p>I spent a total of <strong>16 hours</strong> creating the <em>Build a Ruby Gem</em> email
+course, which has since <strong>validated the need for a book</strong>. While interest
+in a free email course doesn&rsquo;t guarantee a book on the same subject will sell, it was
+the closet thing I could think to do outside of taking pre-orders.</p>
+
+<p>I&rsquo;ve started writing the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary"><em>Build a Ruby Gem</em>
+book</a>.
+If you&rsquo;re interested in receiving updates on my progress, enter your email
+below:</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: book" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+</p>
+
+<p>Members of this list will also receive a <strong>20% discount coupon</strong> when the book
+launches!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Be Ambitious]]></title>

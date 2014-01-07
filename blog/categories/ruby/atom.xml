@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-05T13:20:16-05:00</updated>
+  <updated>2014-01-07T08:47:37-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,150 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How I Launched an Email Course to 500+ People]]></title>
+    <link href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/"/>
+    <updated>2014-01-06T06:15:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/how-i-launched-an-email-course</id>
+    <content type="html"><![CDATA[<p>About a month ago, I joined <a href="http://jfdi.bz/">JFDI.bz</a> &ndash; a community for
+solo-founders launching their own thing. Once a month, the group engages in a
+<em>Week of Hustle</em> &ndash; a week long sprint to launch something.
+I chose to launch an email course on the topic of <a href="http://blog.dev/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary">building a Ruby
+gem</a>.</p>
+
+<!--more-->
+
+
+<h2>Why <em>Build a Ruby Gem</em>?</h2>
+
+<p>A few years ago, I was building my first Ruby gem and I was left pretty
+confused with the process and conventions. After working through my
+frustrations, I thought the information I learned could be useful to others.</p>
+
+<p>Honestly, I thought to write an eBook at first, however, the last thing I
+wanted was to invest a month or two of my time only to find out people
+weren&rsquo;t interested.</p>
+
+<p>An email course was a good medium &ndash; I could cover the basics well enough to get
+people through their hangups, while also validating the need for an eBook. I
+figured if I got <strong>100-200</strong> people to sign up for the course, I would move
+forward with the book.</p>
+
+<h2>Results</h2>
+
+<p>It turns out my marketing efforts were more successful than I anticipated.</p>
+
+<h3>Today, almost 600 people have taken the Build a Ruby Gem email course!</h3>
+
+<h2>Email is King&hellip;still</h2>
+
+<p>Prior to launching this email course, I&rsquo;d read about the value of building an
+email list from people like <a href="http://nathanbarry.com/">Nathan Barry</a>, <a href="http://unicornfree.com/">Amy
+Hoy</a> and <a href="http://justinjackson.ca/">Justin Jackson</a>.</p>
+
+<p>I&rsquo;d also read countless other posts describing the most common regrets when
+launching a new product. Almost all of them included not building an email
+list. With that said, it was one of the first things I setup.</p>
+
+<p>I blogged each day about my progress. Each post had a
+mailing list subscription form that sent them subsequent daily updates.  Subscriptions
+were slow at first, but interest built.  By then end of the week <strong>232</strong> people had
+subscribed. And the day the course went live, I was able to to convert <strong>115</strong>
+(~50%) of them.</p>
+
+<p>The people subscribed were <strong>EXACTLY</strong> my target audience so it&rsquo;s no surprise
+conversion was high.</p>
+
+<h2>Finding Your Target Audience</h2>
+
+<p>Fortunately for me, my target audience was Ruby developers and they hang out
+online (surprise, surprise). But where online&hellip;</p>
+
+<p>Let me hit you with something that seems obvious in hindsight:</p>
+
+<h3>Marketing is easy when you build a product for an audience you&rsquo;re already part of.</h3>
+
+<p>This was something I&rsquo;d <a href="http://unicornfree.com/2013/how-do-you-create-a-product-people-want-to-buy">read over the past few
+months</a>,
+but not seen its value until now.</p>
+
+<p>The email course is for <strong>Ruby developers</strong>, I&rsquo;m a <strong>Ruby Developer</strong>, so the
+question becomes&hellip;.<em>where do I hang out online?</em></p>
+
+<p>That question is <strong>easy</strong> to answer &ndash; <a href="http://rubyweekly.com/">Ruby weekly</a>,
+<a href="http://www.reddit.com/r/ruby">Reddit</a> and
+<a href="http://www.rubyflow.com/">RubyFlow</a>.</p>
+
+<p>And don&rsquo;t you know&hellip;it turns out those 3 sources have been the highest
+converting sources since the course launched:</p>
+
+<ol>
+<li>Ruby weekly &ndash; 131</li>
+<li>RubyFlow &ndash; 65</li>
+<li>Reddit &ndash; 62</li>
+</ol>
+
+
+<p>The remaining sources were a combination of direct links, social media and
+other technology news aggregation sites (probably mostly stemming from the top
+sources above).</p>
+
+<p><em>Note: I&rsquo;ve been reading <a href="http://www.amazon.com/80-20-Sales-Marketing-Definitive/dp/1599185059">80/20 Sales and
+Marketing</a>
+and the numbers above coincide, almost exactly, to the 80/20 curve. That is,
+80% of the conversion came from 20% of the sources.</em></p>
+
+<h2>Twitter Tip</h2>
+
+<p>The last day of the email course has a <em>Summary</em> section thanking people for
+taking the course and attempting to get feedback. While I haven&rsquo;t received much
+constructive criticism, I dropped this little doozie at the bottom:</p>
+
+<p><img class="center" src="/images/email-course/click-to-tweet.png" title="&ldquo;Build a Ruby Gem Email Course Click To Tweet&rdquo;" ></p>
+
+<p>I&rsquo;d read a post about <a href="http://grinnick.com/posts/how-groove-s-email-copy-makes-their-posts-go-viral?ref=hn">GroveHQ&rsquo;s emails going
+viral</a>
+and this was something they did in their campaigns.</p>
+
+<p>The link allows people to click and immediately be setup to Tweet the
+following:</p>
+
+<p><img class="center" src="/images/email-course/course-tweet.png" title="&ldquo;Build a Ruby Gem Email Course Tweet&rdquo;" ></p>
+
+<p>It&rsquo;s difficult to determine the value of those tweets, but over 10 people have
+clicked and tweeted. To me, this was surprising, but valuable.</p>
+
+<p>I&rsquo;ll probably look to make it stand out a bit more to hopefully improve the
+click-through.</p>
+
+<h2>In Summary</h2>
+
+<p>I spent a total of <strong>16 hours</strong> creating the <em>Build a Ruby Gem</em> email
+course, which has since <strong>validated the need for a book</strong>. While interest
+in a free email course doesn&rsquo;t guarantee a book on the same subject will sell, it was
+the closet thing I could think to do outside of taking pre-orders.</p>
+
+<p>I&rsquo;ve started writing the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary"><em>Build a Ruby Gem</em>
+book</a>.
+If you&rsquo;re interested in receiving updates on my progress, enter your email
+below:</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: ruby" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="woh1" />
+    <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+</p>
+
+<p>Members of this list will also receive a <strong>20% discount coupon</strong> when the book
+launches!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Flexible Rails Environment Configuration]]></title>
@@ -454,100 +598,6 @@ page elsewhere. I think these updates may be better suited for a different
 target audience anyway.</p>
 
 <p>The end is near!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 4]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/"/>
-    <updated>2013-12-04T06:15:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4</id>
-    <content type="html"><![CDATA[<p><p>
-  <em>I did an <strong>8-day sprint</strong> to launch my <a
-  href="/courses/build-a-ruby-gem/" target="_blank"><strong>Build a Ruby Gem</strong> email course</a>
-  and documented my progress through this series of blog posts.</em>
-</p>
-
-<p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/">Weekend Update</a>
-</p>
-
-<p>I let myself sleep in until 5:30am this morning ;) I spent a few very
-unsuccessful hours wrestling with Wordpress last night and didn&rsquo;t get to bed at
-the time I wanted. However, all is well. I was able to push out Day 4 of the
-Build a Ruby Gem Email Course without issue.</p>
-
-<p>One of the things that I&rsquo;m noticing about putting the course posts together is
-how much the content relies on outside resources. Whether it&rsquo;s an external URL,
-the output of a command prompt, or a diff on Github&hellip;getting those together is
-a non-trivial amount of time.</p>
-
-<!--more-->
-
-
-<p>A side effect of getting up early is that by 7:30am (when I&rsquo;ve typically finish
-this post), I feel really productive. At this point, I&rsquo;ve worked for 2 straight
-hours, all of which have been highly focused. So at 7:30am, I take a break, get
-some breakfast and take a shower and &ldquo;start&rdquo; the rest of my day. It feels like
-the day starts out on a better foot as a result.</p>
-
-<p>I&rsquo;ve also found that I&rsquo;ve been able to focus better early in the morning vs.
-later at night. I know this is personal thing, some people do their best work
-in the wee hours of the night. Not me, I&rsquo;m a morning person and have embraced
-it. My productivity in the morning is probably 2-3x that of my normal
-productivity during the day. I&rsquo;m not sure if it&rsquo;s because I&rsquo;m refreshed or
-fewer distractions (it&rsquo;s dark, no TV, no social media, no other windows
-open&hellip;).</p>
-
-<h2>What I Accomplished Today</h2>
-
-<p>I pushed out the latest day of the email course. I feel like it&rsquo;s just starting
-to get in to the thick of things. I&rsquo;ve been really sensitive to the fact that
-not every person that takes the course will be a Ruby veteran. Hopefully the
-detailed discussions on load paths and basic installations won&rsquo;t detract from
-the value for those that are.</p>
-
-<p>Yesterday I mentioned the non-optimal formatting of my email campaigns on
-mobile devices. I spent some time with Mailchimp last night and applied a more
-responsive template to the campaign. It&rsquo;s better, but still somewhat finicky in
-the iOS Gmail app. I&rsquo;ve sent a support request and hopefully I&rsquo;ll have that
-ironed out soon. But for those on every other platform, you should&rsquo;ve had a
-much better reading experience!</p>
-
-<h2>Marketing</h2>
-
-<p>As I expected, the growth of both the mailing list and page views slowed down a bit.</p>
-
-<p><img class="center" src="/images/woh/ga-day3.png" title="&ldquo;Google Analytics day 3 results&rdquo;" ></p>
-
-<p>I got a 15% bump in mailing list subscriptions, which is better than nothing!</p>
-
-<p><img class="center" src="/images/woh/mailchimp-day3.png" title="&ldquo;Mailchimp day 3 results&rdquo;" ></p>
-
-<p>I&rsquo;m sending the daily update campaigns at 8pm. I didn&rsquo;t put much thought in to
-this time, other than the fact that I stumbled on an email marketing post that
-suggested the hours between 8-12am get the best open rates. According to the
-campaign report, the open rate is doing well, as compared with the average.
-However, I have a tendency to believe it&rsquo;s more due to the nature of the
-opted-in target audience. This is a very specific topic that people
-specifically wanted to read about. So it makes sense to me that the open rate
-would be pretty high.</p>
-
-<p><img class="center" src="/images/woh/campaign-day3.png" title="&ldquo;Mailchimp day 3 campaign report&rdquo;" ></p>
-
-<p>Reddit continues to be a positive source of traffic. I had haphazardly posted
-to Reddit in the past, but it&rsquo;s been driving more traffic than any other
-source. Along with views, it&rsquo;s also yielded one of the highest conversion rates
-for the mailing list. So I&rsquo;ll continue to post my updates there.</p>
-
-<p><img class="center" src="/images/woh/sources-day3.png" title="&ldquo;Google Analytics day 3 traffic sources&rdquo;" ></p>
-
-<p>Until tomorrow&hellip;</p>
 ]]></content>
   </entry>
   
