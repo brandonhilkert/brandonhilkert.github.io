@@ -2,7 +2,7 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://brandonhilkert.com/blog/the-technology-hump/</loc>
-        <lastmod>2013-12-13T22:14:49-05:00</lastmod>
+        <lastmod>2014-01-10T23:12:42-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/loyalty/</loc>
@@ -36,7 +36,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/</loc>
-        <lastmod>2014-01-03T13:23:58-05:00</lastmod>
+        <lastmod>2014-01-10T22:42:50-05:00</lastmod>
     </url>
     <url>
         <loc>
@@ -84,7 +84,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/how-i-launched-an-email-course/</loc>
-        <lastmod>2014-01-07T14:46:22-05:00</lastmod>
+        <lastmod>2014-01-07T15:28:54-05:00</lastmod>
+    </url>
+    <url>
+        <loc>http://brandonhilkert.com/blog/relative-timestamps-in-rails/</loc>
+        <lastmod>2014-01-13T07:17:08-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
@@ -92,19 +96,19 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2014-01-07T14:46:22-05:00</lastmod>
+        <lastmod>2014-01-13T07:17:08-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/almost.html</loc>
-        <lastmod>2014-01-01T16:01:07-05:00</lastmod>
+        <lastmod>2014-01-13T07:18:44-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/done.html</loc>
-        <lastmod>2014-01-01T16:01:01-05:00</lastmod>
+        <lastmod>2014-01-13T07:18:44-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2014-01-07T14:46:22-05:00</lastmod>
+        <lastmod>2014-01-13T07:18:44-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -116,11 +120,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2014-01-07T14:46:22-05:00</lastmod>
+        <lastmod>2014-01-13T07:17:08-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2014-01-07T14:46:22-05:00</lastmod>
+        <lastmod>2014-01-13T07:17:08-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -132,7 +136,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2014-01-07T14:46:22-05:00</lastmod>
+        <lastmod>2014-01-13T07:17:08-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
