@@ -4,7 +4,7 @@
   <title><![CDATA[Category: nginx | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/nginx/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-16T19:43:46-05:00</updated>
+  <updated>2014-01-16T22:16:56-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -54,7 +54,7 @@ font-related assets.</p>
 <p>Fast-forward a few months and we&rsquo;ve taken the next step in serving assets by
 uploading them to S3. As mentioned in my previous post about <a href="/blog/setup-a-cloudfront-cdn-for-rails/">setting up a
 Cloudfront CDN</a>, we&rsquo;ve also started
-using <a href="http://fastly.com">Fastly</a> as our CDN.</p>
+using <a href="http://www.fastly.com">Fastly</a> as our CDN.</p>
 
 <p>Fastly&rsquo;s caching service is really powerful, but can be overwhelming at times.
 They make heavy use of <a href="https://www.varnish-cache.org/">Varnish</a>, even to the

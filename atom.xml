@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-16T19:43:46-05:00</updated>
+  <updated>2014-01-16T22:16:56-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -345,7 +345,7 @@ settled on a simpler solution &ndash; the combination of a few lines of code and
 <a href="http://en.wikipedia.org/wiki/Environment_variable">ENV variables</a>, which are
 accessible whether you manage your own infrastructure or use a
 <a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> service like
-<a href="http://www.heroku.com">Heroku</a>.</p>
+<a href="https://www.heroku.com">Heroku</a>.</p>
 
 <!--more-->
 
@@ -1158,11 +1158,11 @@ of the week. We&rsquo;ll see!</p>
 <h2>Today&rsquo;s Accomplishments</h2>
 
 <ul>
-<li>I created a <a href="https://github.com/brandonhilkert/so_meta_course">Github project to house the code I&rsquo;ll write</a></li>
+<li>I created a <a href="https://github.com/brandonhilkert/mega_lotto">Github project to house the code I&rsquo;ll write</a></li>
 <li>I wrote this post</li>
 <li>I setup a mail chimp entry form for subscription to my WOH updates</li>
 <li>I created the structure for the email course content</li>
-<li>I searched through <a href="http://reddit.com">Reddit</a> and found a <a href="http://www.reddit.com/r/ruby/comments/1qplmu/tutorial_build_a_gem_from_scratch/">few posts that
+<li>I searched through <a href="http://www.reddit.com/">Reddit</a> and found a <a href="http://www.reddit.com/r/ruby/comments/1qplmu/tutorial_build_a_gem_from_scratch/">few posts that
 express</a>
 a need to <a href="http://www.reddit.com/r/ruby/comments/1qmb29/building_a_gem_from_scratch_google_hangout_today/">learn about about writing Ruby
 gems</a>.
@@ -1213,7 +1213,7 @@ font-related assets.</p>
 <p>Fast-forward a few months and we&rsquo;ve taken the next step in serving assets by
 uploading them to S3. As mentioned in my previous post about <a href="http://brandonhilkert.com/blog/setup-a-cloudfront-cdn-for-rails/">setting up a
 Cloudfront CDN</a>, we&rsquo;ve also started
-using <a href="http://fastly.com">Fastly</a> as our CDN.</p>
+using <a href="http://www.fastly.com">Fastly</a> as our CDN.</p>
 
 <p>Fastly&rsquo;s caching service is really powerful, but can be overwhelming at times.
 They make heavy use of <a href="https://www.varnish-cache.org/">Varnish</a>, even to the
@@ -1477,7 +1477,7 @@ this in the past when I just wanted to get something out the door.</p></li>
 <li><p>Usage of <a href="http://www.mysql.com/">MySQL</a> and
 <a href="http://www.postgresql.org/">Postgres</a> was even. This, to me, is great
 news. The more Postgres is used in the community, the more available it will
-be hosting services (<a href="http://www.heroku.com">Heroku</a> has done a great job
+be hosting services (<a href="https://www.heroku.com/">Heroku</a> has done a great job
 promoting the usage of Postgres).</p></li>
 <li><p>Javascript front-end frameworks were barely used. 7% is a pretty small
 number. Part of me believes this number would&rsquo;ve been larger if the teams had
@@ -1858,7 +1858,7 @@ when you started.</p>
     <updated>2013-09-30T08:34:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/loyalty</id>
     <content type="html"><![CDATA[<p>Last weekend, I finished an
-<a href="http://www.tricolumbia.org/events/chesapeakeman-endurance-festival/">Ironman</a>.
+<a href="http://www.tricolumbia.org/events/?eid=5">Ironman</a>.
 The training consumed valuable time with both family and friends that I&rsquo;ll
 never get back. However, the support and love that I received on the days
 surrounding the race have given me an increased appreciation for the people

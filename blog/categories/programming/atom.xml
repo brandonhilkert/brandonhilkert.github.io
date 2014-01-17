@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-16T19:43:46-05:00</updated>
+  <updated>2014-01-16T22:16:56-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -55,7 +55,7 @@ this in the past when I just wanted to get something out the door.</p></li>
 <li><p>Usage of <a href="http://www.mysql.com/">MySQL</a> and
 <a href="http://www.postgresql.org/">Postgres</a> was even. This, to me, is great
 news. The more Postgres is used in the community, the more available it will
-be hosting services (<a href="http://www.heroku.com">Heroku</a> has done a great job
+be hosting services (<a href="https://www.heroku.com/">Heroku</a> has done a great job
 promoting the usage of Postgres).</p></li>
 <li><p>Javascript front-end frameworks were barely used. 7% is a pretty small
 number. Part of me believes this number would&rsquo;ve been larger if the teams had
