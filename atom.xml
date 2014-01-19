@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-16T22:16:56-05:00</updated>
+  <updated>2014-01-19T08:26:30-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -82,8 +82,7 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
 
 <p> This generates the following HTML tag:</p>
 
-<pre><code> &lt;time class="timeago" datetime="2013-11-08T20:05:37Z"
- title="2013-11-08 20:05:37 UTC"&gt;&lt;/time&gt;
+<pre><code> &lt;time class="timeago" datetime="2013-11-08T20:05:37Z"&gt;&lt;/time&gt;
 </code></pre>
 
 <p> Now that <code>timeago.js</code> is loaded and you have the right HTML tags on the page, you need to invoke the plugin and let it do its thing.</p></li>
