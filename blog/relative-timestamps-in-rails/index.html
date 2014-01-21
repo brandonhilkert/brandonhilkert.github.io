@@ -195,7 +195,7 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
 
 <pre><code> # app/helpers/time.rb
 
- Module TimeHelper
+ module TimeHelper
    def timeago(time, options = {})
      options[:class] ||= "timeago"
      content_tag(
