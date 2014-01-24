@@ -194,7 +194,6 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
 <li><p>Create a helper that you can use from your views that will do the dirty work for you:</p>
 
 <pre><code> # app/helpers/time.rb
-
  module TimeHelper
    def timeago(time, options = {})
      options[:class] ||= "timeago"
@@ -209,7 +208,6 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
 <li><p>Reference the new helper method from your view &ndash; passing in the time attribute of the model:</p>
 
 <pre><code> # app/views/posts/show.html.erb
-
  Posted: &lt;%= timeago(post.created_at) %&gt;
 </code></pre>
 
@@ -222,7 +220,6 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
 <li><p>Add the following to the bottom of your layout and reload the page:</p>
 
 <pre><code> # app/views/layouts/application.html.erb
-
  &lt;body&gt;
    &lt;%= javascript_tag do %&gt;
      $(function() {
