@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-01-24T20:16:14-05:00</updated>
+  <updated>2014-01-25T08:28:09-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -304,7 +304,12 @@ candidate.</p>
     <link href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/"/>
     <updated>2013-10-15T16:30:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source</id>
-    <content type="html"><![CDATA[<p>Towards the end of 2012, I began feeling like a had a good grip on the Ruby
+    <content type="html"><![CDATA[<p><em>I&rsquo;m writing a <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=contribute-post">book on building a Ruby
+gem</a>. If you&rsquo;re interested in sample chapters and a 20% discount code when the book launches, <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=contribute-post">sign up here</a>
+. The book will include tips for managing and contributing to open source
+projects.</em></p>
+
+<p>Towards the end of 2012, I began feeling like a had a good grip on the Ruby
 language. As mentioned in a <a href="/blog/the-technology-hump/">previous
 post</a>, I felt confident enough in my skills that
 I could make a positive contribution to the open source community.</p>
