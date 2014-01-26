@@ -235,7 +235,8 @@ this option generally makes it my preferred option.</p>
 stylesheets, javascripts, fonts&hellip;). Enter the Cloudfront
 distribution URL from above as the Rails <code>asset_host</code>.</p>
 
-<figure class='code'><figcaption><span>config/environments/production.rb</span></figcaption><pre><code>config.action_controller.asset_host = "d24xjtg100euk4.cloudfront.net"</code></pre></figure>
+<figure class='code'><pre><code># config/environments/production.rb
+config.action_controller.asset_host = "d24xjtg100euk4.cloudfront.net"</code></pre></figure>
 
 
 <p>At this point, the domain of all Rails asset helpers <code>image_tag</code>, <code>stylesheet_link_tag</code>, and <code>javascript_include_tag</code>
@@ -243,7 +244,7 @@ will be prefaced with the asset host URL that you configured above.</p>
 
 <p>For example:</p>
 
-<figure class='code'><figcaption><span>config/environments/production.rb</span></figcaption><pre><code>image_tag("shark_teeth.png")
+<figure class='code'><pre><code>image_tag("shark_teeth.png")
 # http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png</code></pre></figure>
 
 
