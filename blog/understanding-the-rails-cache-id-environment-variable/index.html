@@ -162,29 +162,29 @@
 
 <p>The first thing I did was <code>git clone</code> the Rails source code and look for that variable. Outside of the documentation and tests, it showed up in one place, <code>activesupport/lib/active_support/cache.rb</code>:</p>
 
-<pre><code> # Expands out the +key+ argument into a key that can be used for the
- # cache store. Optionally accepts a namespace, and all keys will be
- # scoped within that namespace.
- #
- # If the +key+ argument provided is an array, or responds to +to_a+, then
- # each of elements in the array will be turned into parameters/keys and
- # concatenated into a single key. For example:
- #
- #   expand_cache_key([:foo, :bar])               # =&gt; "foo/bar"
- #   expand_cache_key([:foo, :bar], "namespace")  # =&gt; "namespace/foo/bar"
- #
- # The +key+ argument can also respond to +cache_key+ or +to_param+.
+<pre><code># Expands out the +key+ argument into a key that can be used for the
+# cache store. Optionally accepts a namespace, and all keys will be
+# scoped within that namespace.
+#
+# If the +key+ argument provided is an array, or responds to +to_a+, then
+# each of elements in the array will be turned into parameters/keys and
+# concatenated into a single key. For example:
+#
+#   expand_cache_key([:foo, :bar])               # =&gt; "foo/bar"
+#   expand_cache_key([:foo, :bar], "namespace")  # =&gt; "namespace/foo/bar"
+#
+# The +key+ argument can also respond to +cache_key+ or +to_param+.
 
- def expand_cache_key(key, namespace = nil)
-   expanded_cache_key = namespace ? "#{namespace}/" : ""
+def expand_cache_key(key, namespace = nil)
+  expanded_cache_key = namespace ? "#{namespace}/" : ""
 
-   if prefix = ENV["RAILS_CACHE_ID"] || ENV["RAILS_APP_VERSION"]
-     expanded_cache_key &lt;&lt; "#{prefix}/"
-   end
+  if prefix = ENV["RAILS_CACHE_ID"] || ENV["RAILS_APP_VERSION"]
+    expanded_cache_key &lt;&lt; "#{prefix}/"
+  end
 
-   expanded_cache_key &lt;&lt; retrieve_cache_key(key)
-   expanded_cache_key
- end
+  expanded_cache_key &lt;&lt; retrieve_cache_key(key)
+  expanded_cache_key
+end
 </code></pre>
 
 <p>The comments preceding the method do a good job telling the whole story. The <code>expanded_cache_key</code> variable is an array built up from the <code>key</code> argument. The <code>RAILS_CACHE_ID</code> environment variable is prefaced to this array, operating similar to a namespace.</p>
@@ -290,12 +290,12 @@ Completed 200 OK in 82ms (Views: 62.7ms | ActiveRecord: 0.5ms)
 <p>Jumping in to the <code>PostsController</code>, let’s use the <code>fresh_when</code> method in the <code>show</code> action:</p>
 
 <pre><code>class PostsController &lt; ApplicationController
-  before_action :set_post, only: [:show, :edit, :update, :destroy]
-  …
+
   def show
+    @post = Post.find(params[:id])
     fresh_when(@post)
   end
-  …
+
 end
 </code></pre>
 
@@ -303,7 +303,8 @@ end
 
 <p>It turns out that the Etag is generated using the following method:</p>
 
-<p>Digest::MD5.hexadigest(key)</p>
+<pre><code>Digest::MD5.hexadigest(key)
+</code></pre>
 
 <p>But the key is more than just the <code>cache_key</code> of the <code>@post</code>. If we refer back to where the <code>expand_cache_key</code> method was used, we see that when the <code>etag</code> attribute is set on the response, the key is expanded using the <code>ActiveSupport::Cache#expand_cache_key</code> method we looked at above:</p>
 
@@ -330,7 +331,7 @@ end
 40ad584
 </code></pre>
 
-<p><strong>Combining the git commit SHA gives us the perfect opportunity to invalidate browser cache</strong>. If the Etag is different because a different git commit SHA is the most recent on the server, we know there’s a potential the HTML rendered and cached in the browser could be outdated. We can implement this by setting the ENV variable in <code>config/environments</code>:</p>
+<p><strong>Combining the git commit SHA gives us the perfect opportunity to invalidate browser cache</strong>. If the Etag is different because a different git commit SHA is the most recent on the server, we know there’s a potential the HTML rendered and cached in the browser could be outdated. We can implement this by setting the ENV variable in <code>config/application.rb</code>:</p>
 
 <pre><code>ENV['RAILS_CACHE_ID'] = `git log --pretty=format:%h -n1`.strip
 </code></pre>
