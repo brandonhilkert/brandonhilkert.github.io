@@ -1,0 +1,361 @@
+
+<!DOCTYPE HTML>
+<html xmlns:og="http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+	<meta charset="utf-8">
+	
+	
+	
+  
+  
+  <title>Why I Wrote the Sucker Punch Gem | Brandon Hilkert</title>
+	<meta name="author" content="Brandon Hilkert">
+
+	<meta name="description" content="March 13th, 2014 Why I Wrote the Sucker Punch Gem book, gem, open source, rails, ruby This is one of 3 posts leading up the the launch of my
+Build a Ruby Gem &hellip;">
+	
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content="@brandonhilkert">
+  <meta name="twitter:title" content="Why I Wrote the Sucker Punch Gem">
+  <meta name="twitter:description" content="March 13th, 2014 Why I Wrote the Sucker Punch Gem book, gem, open source, rails, ruby This is one of 3 posts leading up the the launch of my
+Build a Ruby Gem book
+on Thursday, March 27! Sign up &hellip;">
+  <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
+
+  <meta property="og:title" content="Why I Wrote the Sucker Punch Gem | Brandon Hilkert"/>
+  <meta property="og:description" content="March 13th, 2014 Why I Wrote the Sucker Punch Gem book, gem, open source, rails, ruby This is one of 3 posts leading up the the launch of my
+Build a Ruby Gem book
+on Thursday, March 27! Sign up &hellip;">
+  <meta property="og:url" content="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
+  <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
+  <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
+  <meta property="og:type" content="article"/>
+  <meta property="fb:profile_id" content="1472745932"/>
+
+	<link href="/atom.xml" rel="alternate" title="Why I Wrote the Sucker Punch Gem | Brandon Hilkert" type="application/atom+xml">
+	<link rel="canonical" href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
+  <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
+  <script src="/javascripts/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<header id="header"><div class="profilepic">
+  <a href="/">
+    <img src="/images/brandon-hilkert.jpg" width="80" height="80" alt="Brandon Hilkert Profile Picture" />
+  </a>
+</div>
+<hgroup>
+  <h1><a href="/">Brandon Hilkert</a></h1>
+  
+</hgroup>
+
+<nav id="main-nav">
+  <ul class="main-navigation">
+    <li><a href="/about">About</a></li>
+    <li><a href="/">Blog</a></li>
+    <li><a href="/newsletter">Newsletter</a></li>
+    <li>
+      <a href="/courses/build-a-ruby-gem">Courses</a>
+    </li>
+    <li>
+      <div class="new-label">New</div>
+      <a href="/books/build-a-ruby-gem">Books</a>
+    </li>
+  </ul>
+  <section class="aboutme">
+    <p>
+      Hi. I'm Brandon.
+      <br />
+      I'm a technology entrepreneur in PA.
+    </p>
+  </section>
+</nav>
+
+<nav id="sub-nav">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="https://twitter.com/brandonhilkert" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/brandonhilkert" title="GitHub">GitHub</a>
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/brandonhilkert">LinkedIn</a>
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+
+<aside class="popular-posts">
+  <h4>Popular Posts</h4>
+<ul>
+  <li>
+    <a href="/blog/build-a-ruby-gem-woh-day-1/">Build a Ruby Gem email course</a>
+  </li>
+  <li>
+    <a href="/blog/setting-up-a-cloudfront-cdn-for-rails/">Setup a Cloudfront CDN for Rails</a>
+  </li>
+  <li>
+    <a href="/blog/patterns-in-a-rails-gemfile/">Patterns in a Gemfile</a>
+  </li>
+  <li>
+    <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">Get Started with Open Source</a>
+  </li>
+</ul>
+
+
+</aside>
+
+</header>
+		</div>
+		<div class="mid-col">
+			
+				
+
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-13T13:56:00-04:00" data-updated="true" itemprop="datePublished">March 13<span>th</span>, 2014</time></div>
+	<h1 class="title" itemprop="name">Why I Wrote the Sucker Punch Gem</h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/book/'>book</a>, <a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="entry-content" itemprop="articleBody"><p><em>This is one of 3 posts leading up the the launch of my
+<a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem book</strong></a>
+on <strong>Thursday, March 27</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Why I Wrote the Sucker Punch Gem" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
+    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+
+<p>One of the simplest and most common application of background processing is sending emails outside of a web
+request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
+
+<p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>
+
+<!--more-->
+
+
+<h2>Ruby Background Processing Libraries</h2>
+
+<p>Until I had heard of <a href="http://sidekiq.org/">Sidekiq</a>, <a href="https://github.com/collectiveidea/delayed_job/tree/master">delayed_job</a> and <a href="https://github.com/resque/resque">Resque</a> were the standard options for processing background jobs in Ruby. I&rsquo;ve used both and believe each has a great use case.</p>
+
+<p>In my experience, it&rsquo;s easiest to start with delayed_job if you need background processing in your application. If and when the DB becomes your bottleneck, it&rsquo;s time to move on. Redis is a dependency of both Resque and Sidekiq, which increases the complexity and infrastructure maintenance, however, with <a href="https://addons.heroku.com/?q=redis">Heroku&rsquo;s hosted Redis
+Add-ons</a>, this dependency is much less of a pain.</p>
+
+<h2>My work on Sidekiq</h2>
+
+<p>I previously wrote about my my <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">open source contributions</a> and how I got started. I had spent the previous several
+months contributing to Sidekiq and learning more about concurrency patterns in Ruby.</p>
+
+<p>Sidekiq is multi-threaded, which is the reason a single Sidekiq process is <a href="https://github.com/mperham/sidekiq/wiki/Testimonials">more
+efficient</a> than a library like Resque. Although, nothing in life is free &ndash; care must be taken to ensure your jobs are thread-safe. A helpful <a href="https://github.com/mperham/sidekiq/wiki/Best-Practices">guide to writing thread-safe code</a> can be found on the Sidekiq wiki.</p>
+
+<h2>Use Case</h2>
+
+<p>I was working on <a href="http://defriendnotifierapp.com/">Defriend Notifier</a> and needed to notify users via email when their Facebook friend list changed. Using Sidekiq or any of the alternatives mentioned above certainly would’ve worked. In fact, the application originally used Sidekiq and functioned perfectly. However, as time went on, I decided the extra cost of the worker wasn’t justified, especially given that the application didn’t produce any revenue outside of advertising (very little…).</p>
+
+<p>At the time, the only background processing library that didn’t require an additional background process was
+<a href="https://github.com/mperham/girl_friday">girl_friday</a>, also written by <a href="https://twitter.com/mperham">Mike
+Perham</a>, author of Sidekiq. While this solution worked for awhile, I found the syntax to be slightly non-intuitive and it felt a little dirty to pass around a global variable within the application
+to manage a single job queue. I also experienced some memory leaks on Heroku as a result of switching to
+girl_friday, but to be fair, I didn&rsquo;t spend much time determining the root cause. <em>Disclaimer: It very likely could’ve been due to code that I wrote</em>.</p>
+
+<h2>Enter Celluloid</h2>
+
+<p><a href="https://github.com/celluloid/celluloid">Celluloid</a> describes itself as an actor-based concurrent object
+framework for Ruby. Celluloid is the guts behind Sidekiq and the reason why the multi-threaded Sidekiq code is so readable. Celluloid abstracts away the details of concurrency so your code doesn&rsquo;t have to worry about manually managing thread synchronization and object message queuing.</p>
+
+<h2>Sucker Punch is born</h2>
+
+<p>girl_friday was written several years ago — before Celluloid was created. Realizing the power of Celluloid,
+I figured there was an opportunity for a new library that behaved like girl_friday, but utilized
+Celluloid&rsquo;s more reliable multi-threading capabilities. And because Celluloid handles so much of the complexity, the gem itself would be relatively simple — really a DSL around enqueuing jobs to a <a href="https://github.com/celluloid/celluloid/wiki/Pools">Celluloid Pool</a>.</p>
+
+<p>I <a href="https://twitter.com/brandonhilkert/status/292630123981729793">posed the question to Mike Perham</a> and he confirmed my suspicions.</p>
+
+<p><img class="center" src="/images/sucker-punch-tweet.png" title="&#34;Sucker Punch Tweet&#34;" alt="&#34;Sucker Punch Tweet&#34;"></p>
+
+<p>Fortunately, Celluloid had all of the functionality needed for background queues already built-in. While the
+functionality was there, the usage syntax was awkward.</p>
+
+<p>I spent the next few days creating a DSL around the Celluloid internals, thus making it feel more specific to
+background queues.</p>
+
+<p>Here’s the result of a typical job class:</p>
+
+<pre><code>class LogJob
+  include SuckerPunch::Job
+
+  def perform(event)
+    # do some other stuff to
+    # record the event in the background
+    puts "#{event} just happened"
+  end
+end
+</code></pre>
+
+<p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
+
+<p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
+</div>
+  
+
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+
+    
+    <a href="http://bufferapp.com/add" class="buffer-add-button" data-count="horizontal" data-via="brandonhilkert" >Buffer</a>
+    <script type="text/javascript" src="http://static.bufferapp.com/js/button.js"></script>
+    
+
+    
+    <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+
+    
+    <a class="addthis_button_tweet"></a>
+    
+
+    
+    <script type="IN/Share" data-counter="right"></script>
+    
+
+    
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+<section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+</section>
+
+</div>
+			</div>
+      
+        <footer id="footer" class="inner"><ul>
+  <li>
+    <h4>Categories</h4>
+    <ul>
+      <li><a href="/blog/categories/ruby/">Ruby</a></li>
+      <li><a href="/blog/categories/rails/">Rails</a></li>
+      <li><a href="/blog/categories/open-source/">Open Source</a></li>
+      <li><a href="/blog/categories/marketing/">Marketing</a></li>
+      <li><a href="/blog/categories/email-course/">Email Course</a></li>
+      <li><a href="/blog/categories/book/">Book</a></li>
+    </ul>
+  </li>
+  <li>
+    <h4>Popular Posts</h4>
+<ul>
+  <li>
+    <a href="/blog/build-a-ruby-gem-woh-day-1/">Build a Ruby Gem email course</a>
+  </li>
+  <li>
+    <a href="/blog/setting-up-a-cloudfront-cdn-for-rails/">Setup a Cloudfront CDN for Rails</a>
+  </li>
+  <li>
+    <a href="/blog/patterns-in-a-rails-gemfile/">Patterns in a Gemfile</a>
+  </li>
+  <li>
+    <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">Get Started with Open Source</a>
+  </li>
+</ul>
+
+
+  </li>
+</ul>
+<br class="clear" />
+<p>
+  Copyright &copy; 2014 - Brandon Hilkert
+</p>
+</footer>
+        <script src="/javascripts/slash.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'brandonhilkert';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/';
+        var disqus_url = 'http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+      
+		</div>
+	</div>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-24469169-1', 'brandonhilkert.com');
+  ga('require', 'linkid', 'linkid.js');
+  ga('send', 'pageview');
+</script>
+
+</body>
+</html>
