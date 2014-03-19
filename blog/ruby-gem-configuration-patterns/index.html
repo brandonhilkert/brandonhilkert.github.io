@@ -616,7 +616,7 @@ Finished in 0.00167 seconds
 1 example, 1 failure</code></pre></figure>
 
 
-<p>Still failing, but at least we have what seems like the pieces setup to implement the global configuration. The <code>.configure</code> method needs to instantiate a <code>Configuration</code> class object so we can pass user-defined options to it. However, we need to save that instantiation to the accessor, so later when the <code>Drawing</code> class needs to access its properties, they’re available:</p>
+<p>Still failing, but at least we have what seems like the pieces setup to implement the global configuration. The <code>.configure</code> methods needs to yield the configuration block to a new instance of the <code>Configuration</code> class. However, we’ll need to memoize the configuration instance, so when the <code>Drawing</code> class accesses <code>#drawing_count</code>, it returns the initial  configuration value:</p>
 
 <figure class='code'><pre><code>module MegaLotto
   class &lt;&lt; self
@@ -624,8 +624,7 @@ Finished in 0.00167 seconds
   end
 
   def self.configuration
-    return @configuration if @configuration
-    self.configuration = Configuration.new
+    @configuration ||= Configuration.new
   end
 
   def self.configure
