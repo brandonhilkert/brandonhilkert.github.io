@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-17T20:25:32-04:00</updated>
+  <updated>2014-03-19T08:06:45-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,675 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Ruby Gem Configuration Patterns]]></title>
+    <link href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/"/>
+    <updated>2014-03-17T20:26:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
+    <content type="html"><![CDATA[<p>_This is one of 3 posts leading up the the launch of my
+[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: rails" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
+    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+
+
+
+</p>
+
+<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
+
+<p>Fortunately, we can give users the ability to add custom configuration data, allowing them to adapt our code to their own use. In this post, we&rsquo;ll adapt the <a href="https://github.com/brandonhilkert/mega_lotto"><code>mega_lotto</code> gem</a> to take a configuration block that modifies the number of integers returned from the <code>#draw</code> method output.</p>
+
+<!--more-->
+
+
+<h2>Use Case</h2>
+
+<p>Our <code>mega_lotto</code> gem provides the functionality to randomly draw 6 numbers. However, let’s assume that someone else has taken interest in the code for our gem, but needs the code to generate 10 random numbers within the same range.</p>
+
+<p>One option would be for them to fork the code and modify the gem to fit their needs. However, now there’s a randomly forked gem with the same name and it’s unclear why one should be used over the other, especially if no changes to the <code>README</code> were made.</p>
+
+<p>Rather than go down that path, we can make our existing <code>mega_lotto</code> gem more flexible by returning 6 integers by default, while also providing an interface to customize this value for those with the need.</p>
+
+<p>Our goal is to adapt our gem to take a configuration block like this:</p>
+
+<p><code>ruby
+MegaLotto.configure do |config|
+  config.drawing_count = 10
+end
+</code></p>
+
+<h2>Implementation</h2>
+
+<p>Let’s first write some specs for the desired functionality. Because the <code>.configure</code> method above is off the main <code>MegaLotto</code> namespace, we’ll create the spec file <code>spec/mega_lotto_spec.rb</code>. With this spec, we’ll assert that after running the configuration block above, the <code>#drawing</code> method returns an array (like before), but this time with 10 integers instead:</p>
+
+<p>```ruby
+require &ldquo;spec_helper&rdquo;</p>
+
+<p>describe MegaLotto do
+  describe &ldquo;#configure&rdquo; do</p>
+
+<pre><code>before do
+  MegaLotto.configure do |config|
+    config.drawing_count = 10
+  end
+end
+
+it "returns an array with 10 elements" do
+  draw = MegaLotto::Drawing.new.draw
+
+  expect(draw).to be_a(Array)
+  expect(draw.size).to eq(10)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>This spec serves as higher level integration spec because it’s accessing the public API of our gem. Because of this, we can be sure that once this spec passes, our implementation is complete. As expected, when we run this spec, it fails:</p>
+
+<p>```bash
+MegaLotto
+  #configure</p>
+
+<pre><code>returns an array with 10 elements (FAILED - 1)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto#config returns an array with 10 elements</p>
+
+<pre><code> Failure/Error: MegaLotto.configure do |config|
+ NoMethodError:
+   undefined method `configure` for MegaLotto:Module
+ # ./spec/mega_lotto_spec.rb:6
+</code></pre>
+
+<p>Finished in 0.00131 seconds
+1 example, 1 failure
+```</p>
+
+<p>Now that we have a spec to work against, let’s continue our implementation.</p>
+
+<p>The failure above complained that there was no <code>MegaLotto.configure</code> method, so let’s add it:</p>
+
+<p><code>ruby
+module MegaLotto
+  def self.configure
+  end
+end
+</code></p>
+
+<p>Re-running our specs gives us a different failure message this time:</p>
+
+<p>```bash
+MegaLotto
+  #configure</p>
+
+<pre><code>returns an array with 10 elements (FAILED - 1)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto#configure returns an array with 10 elements</p>
+
+<pre><code> Failure/Error: expect(draw.size).to eq(10)
+
+   expected: 10
+        got: 6
+
+   (compared using ==)
+ # ./spec/mega_lotto_spec.rb:15
+</code></pre>
+
+<p>Finished in 0.00246 seconds
+1 example, 1 failure
+```</p>
+
+<p>The output now shows that the code still returned 6 integers, which we expected because our <code>.configure</code> method hasn’t done anything yet.</p>
+
+<p>Because we’re using a object-oriented language like Ruby, we can create a <code>Configuration</code> class whose responsibility will be…(drumroll)….configuration!</p>
+
+<p>Let’s start with some specs:</p>
+
+<p>```ruby</p>
+
+<h1>spec/mega_lotto/configuration_spec.rb</h1>
+
+<p>require &ldquo;spec_helper&rdquo;</p>
+
+<p>module MegaLotto
+  describe Configuration do</p>
+
+<pre><code>describe "#drawing_count" do
+  it "default value is 6" do
+    Configuration.new.drawing_count = 6
+  end
+end
+
+describe "#drawing_count=" do
+  it "can set value" do
+    config = Configuration.new
+    config.drawing_count = 7
+    expect(config.drawing_count).to eq(7)
+  end
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Running the configuration specs produces:</p>
+
+<p><code>bash
+/Users/bhilkert/Dropbox/code/mega_lotto/spec/
+mega_lotto/configuration_spec.rb:4:in `&lt;module:MegaLotto&gt;`:
+uninitialized constant MegaLotto::Configuration (NameError)
+</code></p>
+
+<p>Let’s add the <code>Configuration</code> class:</p>
+
+<p>```ruby</p>
+
+<h1>lib/mega_lotto/configuration.rb</h1>
+
+<p>module MegaLotto
+  class Configuration
+  end
+end
+```</p>
+
+<p>Let’s try again:</p>
+
+<p><code>bash
+/Users/bhilkert/Dropbox/code/mega_lotto/spec/
+mega_lotto/configuration_spec.rb:4:in `&lt;module:MegaLotto&gt;`:
+uninitialized constant MegaLotto::Configuration (NameError)
+</code></p>
+
+<p>What??? Same message…Even though we added the <code>Configuration</code> class above, our gem doesn’t load it. So we can dive in to the entry file <code>lib/mega_lotto.rb</code> and add the appropriate require statement:</p>
+
+<p>```ruby
+require &ldquo;mega_lotto/version&rdquo;
+require &ldquo;mega_lotto/configuration&rdquo;
+require &ldquo;mega_lotto/drawing&rdquo;</p>
+
+<p>begin
+  require &ldquo;pry&rdquo;
+rescue LoadError
+end</p>
+
+<p>module MegaLotto
+  def self.configure
+  end
+end
+```</p>
+
+<p>Now with the <code>Configuration</code> class properly loaded, let’s run our specs again:</p>
+
+<p>```bash
+MegaLotto::Configuration
+  #drawing_count</p>
+
+<pre><code>default value is 6 (FAILED - 1)
+</code></pre>
+
+<p>  #drawing_count=</p>
+
+<pre><code>can set value (FAILED - 2)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto::Configuration#drawing_count default value is 6</p>
+
+<pre><code> Failure/Error: expect(config.drawing_count).to eq(6)
+ NoMethodError:
+   undefined method `drawing_count` for #&lt;MegaLotto::Configuration&gt;
+ # ./spec/mega_lotto/configuration_spec.rb:8
+</code></pre>
+
+<p>  2) MegaLotto::Configuration#drawing_count= can set value</p>
+
+<pre><code> Failure/Error: config.drawing_count = 7
+ NoMethodError:
+   undefined method `drawing_count=` for #&lt;MegaLotto::Configuration&gt;
+ # ./spec/mega_lotto/configuration_spec.rb:15
+</code></pre>
+
+<p>Finished in 0.00175 seconds
+2 examples, 2 failures
+```</p>
+
+<p>Even though we still have failures, we’re making progress. The failures above relate to the lack of a <code>#drawing_count=</code> method, so let’s add an accessor for it:</p>
+
+<p>```ruby
+module MegaLotto
+  class Configuration</p>
+
+<pre><code>attr_accessor :drawing_count
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Note: We could’ve just added an <code>attr_writer</code> to satisfy the spec. However, I know I’m going to need a getter down the road, so I chose to do it at the same time.</em></p>
+
+<p>With our accessor in place, let’s check the specs again:</p>
+
+<p>```bash
+MegaLotto::Configuration
+  #drawing_count=</p>
+
+<pre><code>can set value
+</code></pre>
+
+<p>  #drawing_count</p>
+
+<pre><code>default value is 6 (FAILED - 1)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto::Configuration#drawing_count default value is 6</p>
+
+<pre><code> Failure/Error: expect(config.drawing_count).to eq(6)
+
+   expected: 6
+        got: nil
+
+   (compared using ==)
+ # ./spec/mega_lotto/configuration_spec.rb:8
+</code></pre>
+
+<p>Finished in 0.00239 seconds
+2 examples, 1 failure
+```</p>
+
+<p>Still a failure, but we’re slowly making more progress. The default value isn’t getting set so we’ll change that in the implementation:</p>
+
+<p>```ruby
+module MegaLotto
+  class Configuration</p>
+
+<pre><code>attr_accessor :drawing_count
+
+def initialize
+  @drawing_count = 6
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Running the specs one more time for the <code>Configuration</code> class shows that we’re good:</p>
+
+<p>```bash
+MegaLotto::Configuration
+  #drawing_count</p>
+
+<pre><code>default value is 6
+</code></pre>
+
+<p>  #drawing_count=</p>
+
+<pre><code>can set value
+</code></pre>
+
+<p>Finished in 0.00172 seconds
+2 examples, 0 failures
+```</p>
+
+<p>Running the specs for the main <code>spec/mega_lotto.rb</code> class again:</p>
+
+<p>```bash
+MegaLotto
+  #configure</p>
+
+<pre><code>returns an array with 10 elements (FAILED - 1)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto#configure returns an array with 10 elements</p>
+
+<pre><code> Failure/Error: expect(draw.size).to eq(10)
+
+   expected: 10
+        got: 6
+
+   (compared using ==)
+ # ./spec/mega_lotto_spec.rb:15:in `block (3 levels) in &lt;top (required)&gt;'
+</code></pre>
+
+<p>Finished in 0.00168 seconds
+1 example, 1 failure
+```</p>
+
+<p>We still have the same failures from before, but it’s because we didn’t change the <code>MegaLotto::Drawing</code> to actually <em>use</em> the new configuration class. Since we have this awesome new class, let’s make use of it in <code>MegaLotto::Drawing</code>:</p>
+
+<p>```ruby
+module MegaLotto
+  class Drawing</p>
+
+<pre><code>def draw
+  MegaLotto.configuration.drawing_count.times.map { single_draw }
+end
+
+private
+
+def single_draw
+  rand(0...60)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Running the specs for the drawing class gives us the following output:</p>
+
+<p>```bash
+MegaLotto::Drawing
+  #draw</p>
+
+<pre><code>each element is less than 60 (FAILED - 1)
+each element is an integer (FAILED - 2)
+returns an array (FAILED - 3)
+using the default drawing count
+  returns an array with 6 elements (FAILED - 4)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto::Drawing#draw each element is less than 60</p>
+
+<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `configuration` for MegaLotto:Module
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:19
+</code></pre>
+
+<p>  2) MegaLotto::Drawing#draw each element is an integer</p>
+
+<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `configuration` for MegaLotto:Module
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:13
+</code></pre>
+
+<p>  3) MegaLotto::Drawing#draw returns an array</p>
+
+<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `configuration` for MegaLotto:Module
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:9
+</code></pre>
+
+<p>  4) MegaLotto::Drawing#draw using the default</p>
+
+<pre><code>  drawing count returns an array with 6 elements
+ Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `configuration` for MegaLotto:Module
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:26
+</code></pre>
+
+<p>Finished in 0.00219 seconds
+4 examples, 4 failures
+```</p>
+
+<p>Well…I guess it’s clear that it doesn’t have a <code>configuration</code> accessor, huh? Let’s add it to <code>lib/mega_lotto.rb</code>:</p>
+
+<p>```ruby
+module MegaLotto
+  class &lt;&lt; self</p>
+
+<pre><code>attr_accessor :configuration
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configure
+  end
+end</p>
+
+<p>```</p>
+
+<p>and our specs:</p>
+
+<p>```bash
+MegaLotto::Drawing
+  #draw</p>
+
+<pre><code>each element is less than 60 (FAILED - 1)
+each element is an integer (FAILED - 2)
+returns an array (FAILED - 3)
+using the default drawing count
+  returns an array with 6 elements (FAILED - 4)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto::Drawing#draw each element is less than 60</p>
+
+<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `drawing_count` for nil:NilClass
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:19
+</code></pre>
+
+<p>  2) MegaLotto::Drawing#draw each element is an integer</p>
+
+<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `drawing_count` for nil:NilClass
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:13
+</code></pre>
+
+<p>  3) MegaLotto::Drawing#draw returns an array</p>
+
+<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `drawing_count` for nil:NilClass
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:9
+</code></pre>
+
+<p>  4) MegaLotto::Drawing#draw using the default</p>
+
+<pre><code>  drawing count returns an array with 6 elements
+ Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
+ NoMethodError:
+   undefined method `drawing_count` for nil:NilClass
+ # ./lib/mega_lotto/drawing.rb:4:in `draw'
+ # ./spec/mega_lotto/drawing_spec.rb:6
+ # ./spec/mega_lotto/drawing_spec.rb:26
+</code></pre>
+
+<p>Finished in 0.00146 seconds
+4 examples, 4 failures</p>
+
+<p>```</p>
+
+<p>A different message this time, related to the fact that the configuration accessor has no <code>#drawing_count</code> method. This makes sense because we don’t actually return anything from <code>#configuration</code>. Let’s instantiate a new <code>Configuration</code> object and see where that gets us:</p>
+
+<p>```ruby
+module MegaLotto
+  class &lt;&lt; self</p>
+
+<pre><code>attr_writer :configuration
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configuration</p>
+
+<pre><code>Configuration.new
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configure
+  end
+end
+```</p>
+
+<p>Now, the <code>Drawing</code> class specs are passing:</p>
+
+<p>```bash
+MegaLotto::Drawing
+  #draw</p>
+
+<pre><code>each element is an integer
+each element is less than 60
+returns an array
+using the default drawing count
+  returns an array with 6 elements
+</code></pre>
+
+<p>Finished in 0.01007 seconds
+4 examples, 0 failures
+```</p>
+
+<p>Let’s flip back to the spec file <code>spec/mega_lotto_spec.rb</code> and see where we are:</p>
+
+<p>```bash
+MegaLotto
+  #configure</p>
+
+<pre><code>returns an array with 10 elements (FAILED - 1)
+</code></pre>
+
+<p>Failures:</p>
+
+<p>  1) MegaLotto#configure returns an array with 10 elements</p>
+
+<pre><code> Failure/Error: expect(draw.size).to eq(10)
+
+   expected: 10
+        got: 6
+
+   (compared using ==)
+ # ./spec/mega_lotto_spec.rb:15
+</code></pre>
+
+<p>Finished in 0.00167 seconds
+1 example, 1 failure
+```</p>
+
+<p>Still failing, but at least we have what seems like the pieces setup to implement the global configuration. The <code>.configure</code> method needs to instantiate a <code>Configuration</code> class object so we can pass user-defined options to it. However, we need to save that instantiation to the accessor, so later when the <code>Drawing</code> class needs to access its properties, they’re available:</p>
+
+<p>```ruby
+module MegaLotto
+  class &lt;&lt; self</p>
+
+<pre><code>attr_writer :configuration
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configuration</p>
+
+<pre><code>return @configuration if @configuration
+self.configuration = Configuration.new
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configure</p>
+
+<pre><code>yield(configuration)
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Note: it’s important to return the class instance variable from <code>.configuration</code> and check if that is set rather than the reader method, otherwise it’d get stuck in a loop and never return.</em></p>
+
+<p>Running our specs again, we see that we’re green:</p>
+
+<p>```bash
+MegaLotto
+  #configure</p>
+
+<pre><code>returns an array with 10 elements
+</code></pre>
+
+<p>Finished in 0.00168 seconds
+1 example, 0 failures
+```</p>
+
+<p>For the sake of sanity, let’s run the whole suite to make sure everything is covered:</p>
+
+<p>```bash
+$ rake
+&hellip;&hellip;.</p>
+
+<p>Finished in 0.00688 seconds
+7 examples, 0 failures
+```</p>
+
+<p>…and we’re good!</p>
+
+<h2>Implementations in the Wild</h2>
+
+<p>The <a href="https://github.com/carrierwaveuploader/carrierwave#configuring-carrierwave">CarrierWave gem</a> is a popular choice to support avatar uploading. The author(s) realized that not everyone would want to store upload assets on the local system, so they offered the functionality to support Amazon S3 and other similar block storage services. In order to set this value, you’d use a <a href="https://github.com/carrierwaveuploader/carrierwave#configuring-carrierwave">configure block almost identical to the one we wrote above</a>.</p>
+
+<p>Thoughtbot wrote a <a href="http://robots.thoughtbot.com/mygem-configure-block">great article about the configuration implementation</a> in their <a href="https://github.com/thoughtbot/clearance">Clearance gem</a>. It’s worth reading even if you don’t plan to use Clearance.</p>
+
+<h2>Summary</h2>
+
+<p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
+
+<p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
+
+<p>_This is one of 3 posts leading up the the launch of my
+[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: rails" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
+    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+
+
+
+</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Why I Wrote the Sucker Punch Gem]]></title>
@@ -106,6 +775,24 @@ end
 <p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
 
 <p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
+
+<p>_This is one of 3 posts leading up the the launch of my
+[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: rails" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
+    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+
+
+
+</p>
 ]]></content>
   </entry>
   
@@ -408,108 +1095,6 @@ enter your email below:</p>
 
 <p>Members of this list will also receive a <strong>20% discount coupon</strong> when the book
 launches!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Page Specific Javascript in Rails]]></title>
-    <link href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/"/>
-    <updated>2014-02-04T20:51:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/page-specific-javascript-in-rails</id>
-    <content type="html"><![CDATA[<p>The asset pipeline has made including javascript in Rails applications a breeze. Without any additional changes, the code included in your app is executed on every page. However, with a combination of CSS class scopes and a jQuery plugin, you can isolate certain javascript code to only run on specific pages.</p>
-
-<h2>The Problem</h2>
-
-<p>Imagine you have 2 pages in your application (landing and contact) and need an alert box to show up on the contact page only. How would you do it?</p>
-
-<!--more-->
-
-
-<p>Traditionally, if it&rsquo;s something small, you might bite the bullet and just include it in the view template:</p>
-
-<pre><code>&lt;% # app/views/page/contact.html.erb %&gt;
-
-&lt;h1&gt;Contact&lt;/h1&gt;
-&lt;p&gt;This is the contact page&lt;/p&gt;
-
-&lt;%= javascript_tag do %&gt;
-  alert("My example alert box.");
-&lt;% end %&gt;
-</code></pre>
-
-<p>To me, this always felt dirty. Mixing UI and javascript concerns in an HTML template is easy to forget. Imagine your app has matured and want to change the message of the alert box. Rather than find an associated javascript file (the logical path), you&rsquo;re forced to dig through HTML to find the alert box text.</p>
-
-<p>Another solution is to insert our javascript in to its own file:</p>
-
-<pre><code>// app/assets/javascripts/alert.js
-
-alert("My example alert box.");
-</code></pre>
-
-<p>And including this file only in the view we want it to execute:</p>
-
-<pre><code>&lt;%# app/views/page/contact.html.erb %&gt;
-
-&lt;%= javascript_include_tag "alert" %&gt;
-
-&lt;h1&gt;Contact&lt;/h1&gt;
-&lt;p&gt;This is the contact page&lt;/p&gt;
-</code></pre>
-
-<p>And don&rsquo;t forget to include your new file in the list of files to be compiled:</p>
-
-<pre><code># config/environments/production.rb
-
-config.assets.precompile += %w( alert.js )
-</code></pre>
-
-<p>Like the previous solution, it too, mixes the concerns of HTML and javascript, but introduces a new problem &ndash; this javascript file is included and download separately from the rest of the app&rsquo;s asset. This causes the browser to make another request to the server, thus increasing the page load time and in turn, causing bad bad user pain (Ok, maybe not that bad…). But it’s still not ideal.</p>
-
-<h2>The Solution</h2>
-
-<p>The solution I&rsquo;ve found the most elegant requires adding CSS classes to the layout&rsquo;s body tag and using the <a href="https://github.com/Verba/jquery-readyselector">jquery-readyselector plugin</a>.</p>
-
-<p>First, in order to scope the pages through CSS selectors, let&rsquo;s add some classes to our layout:</p>
-
-<pre><code>&lt;%# app/views/layouts/application.html.erb %&gt;
-
-&lt;body class="&lt;%= controller_name %&gt; &lt;%= action_name %&gt;"&gt;
-  &lt;%= yield %&gt;
-&lt;/body&gt;
-</code></pre>
-
-<p>Assuming your <code>contact</code> page action was inside a controller named <code>PagesController</code>, the rendered result would be the following:</p>
-
-<pre><code>&lt;body class="pages contact"&gt;
-  ...
-&lt;/body&gt;
-</code></pre>
-
-<p>Add <a href="https://raw.github.com/Verba/jquery-readyselector/master/jquery.readyselector.js">this small bit of javavascript code</a> to a new file: <code>vendor/assets/javascripts/jquery-readyselector.js</code>.</p>
-
-<p>Include the new plugin in the <code>application.js</code> manifest file:</p>
-
-<pre><code>...
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-//= require jquery-readyselector
-//= require_tree .
-</code></pre>
-
-<p>Like before, let&rsquo;s put the javascript code in an isolated asset file, but scope it to the page:</p>
-
-<pre><code>// app/assets/javascripts/alert.js.coffee
-
-$(".pages.contact").ready -&gt;
-  alert "My example alert box."
-</code></pre>
-
-<p>Because this file is picked up with the <code>//= require_tree .</code> line in the <code>application.js</code> manifest, there’s no additional step to load the asset. And that&rsquo;s it! Your <em>fancy</em> alert box will now only run on your contact page.</p>
-
-<p>Let me what you think of this solution and if you’ve come across this issue before. I&rsquo;d love to hear about other solutions!</p>
-
-<p><em>Note: In order for this solution to work with Turbolinks in Rails 4, I had to drag in the <a href="https://github.com/kossnocorp/jquery.turbolinks">jquery.turbolinks plugin</a>.</em></p>
 ]]></content>
   </entry>
   
