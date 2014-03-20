@@ -624,7 +624,8 @@ Finished in 0.00167 seconds
   end
 
   def self.configuration
-    @configuration ||= Configuration.new
+    return @configuration if @configuration
+    @configuration = Configuration.new
   end
 
   def self.configure
@@ -725,7 +726,8 @@ Finished in 0.00762 seconds
   end
 
   def self.configuration
-    @configuration ||= Configuration.new
+    return @configuration if @configuration
+    @configuration = Configuration.new
   end
 
   def self.reset
@@ -765,7 +767,7 @@ end</code></pre></figure>
 
 <h2>Local Configuration</h2>
 
-<p>The configuration approach above implements a global configuration object. The downside is that we can’t have multiple instances of our code running with different configurations. To avoid this, we could isolate the configuration class and only pass it to those objects that need it.</p>
+<p>The configuration approach above implements a global configuration object. The downside is that we can’t have multiple instances of our code running with different configurations. To avoid this, we could isolate the configuration class and only pass it to those objects that need it. By doing this, we’d avoid needing the <code>MegaLotto.configure</code> method entirely.</p>
 
 <p>With this in mind, <code>Drawing</code> might look like:</p>
 
