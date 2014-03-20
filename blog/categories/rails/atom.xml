@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-20T08:17:40-04:00</updated>
+  <updated>2014-03-20T08:19:20-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -787,7 +787,7 @@ end
 require &lsquo;ostruct&rsquo;
 config = OpenStruct.new(drawing_count: 10)</p>
 
-<p>MegaLotto::Drawing.new(config).draw #=> [23, 4, 21, 33, 48, 12, 43,13, 2, 5]
+<p>MegaLotto::Drawing.new(config).draw #=> [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
 ```</p>
 
 <p>Both approaches are certainly valid, so I’ll leave it to you to decide which approach is best for your gem.</p>
