@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-20T08:19:20-04:00</updated>
+  <updated>2014-03-20T08:32:03-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -684,10 +684,50 @@ end
 
 <p>Because this configuration is global, if this spec is run before the others in our suite, the remaining specs will use it. So when the specs for <code>MegaLotto::Drawing</code> run, 10 elements are return instead of the 6, the default, and we see the failure.</p>
 
-<p>For global values like this, it’s best to clean up after each spec to ensure the system is back to a default state. In our case, we can implement a <code>.reset</code> method on <code>MegaLotto</code> and set the configuration back to a new instance of the <code>Configuration</code> class:</p>
+<p>For global values like this, it’s best to clean up after each spec to ensure the system is back to a default state. In our case, we can implement a <code>.reset</code> method on <code>MegaLotto</code> and set the configuration back to a new instance of the <code>Configuration</code> class. Let’s start with a spec for this in <code>spec/mega_lotto_spec.rb</code>:</p>
 
-<p>```
- module MegaLotto
+<p>```ruby
+  describe &ldquo;.reset&rdquo; do</p>
+
+<pre><code>before :each do
+  MegaLotto.configure do |config|
+    config.drawing_count = 10
+  end
+end
+
+it "resets the configuration" do
+  MegaLotto.reset
+
+  config = MegaLotto.configuration
+
+  expect(config.drawing_count).to eq(6)
+end
+</code></pre>
+
+<p>  end
+```</p>
+
+<p>As expected, we see failure because we have yet to implement the <code>.reset</code> method:</p>
+
+<p>```bash
+Failures:</p>
+
+<p>  1) MegaLotto.reset resets the configuration</p>
+
+<pre><code> Failure/Error: MegaLotto.reset
+ NoMethodError:
+   undefined method `reset` for MegaLotto:Module
+ # ./spec/mega_lotto_spec.rb:28
+</code></pre>
+
+<p>Finished in 0.00762 seconds
+8 examples, 1 failure
+```</p>
+
+<p>Let’s do that now:</p>
+
+<p>```ruby
+module MegaLotto
   class &lt;&lt; self</p>
 
 <pre><code>attr_writer :configuration
@@ -718,37 +758,40 @@ end
 end
 ```</p>
 
-<p>And now in our spec, we can used the <code>.reset</code> method to properly clean up after each one:</p>
+<p>Our specs for the <code>.reset</code> method pass, so now we need to make use of it to clean up after our <code>.configure</code> spec:</p>
 
 <p>```ruby
-require &ldquo;spec_helper&rdquo;</p>
+describe &ldquo;#configure&rdquo; do</p>
 
-<p>describe MegaLotto do
-  describe &ldquo;#configure&rdquo; do</p>
+<p>  before :each do</p>
 
-<pre><code>before :each do
-  MegaLotto.configure do |config|
-    config.drawing_count = 10
-  end
+<pre><code>MegaLotto.configure do |config|
+  config.drawing_count = 10
 end
+</code></pre>
 
-it "returns an array with 10 elements" do
-  draw = MegaLotto::Drawing.new.draw
+<p>  end</p>
 
-  expect(draw).to be_a(Array)
-  expect(draw.size).to eq(10)
-end
+<p>  it &ldquo;returns an array with 10 elements&rdquo; do</p>
 
-after :each do
-  MegaLotto.reset
-end
+<pre><code>draw = MegaLotto::Drawing.new.draw
+
+expect(draw).to be_a(Array)
+expect(draw.size).to eq(10)
+</code></pre>
+
+<p>  end</p>
+
+<p>  after :each do</p>
+
+<pre><code>MegaLotto.reset
 </code></pre>
 
 <p>  end
 end
 ```</p>
 
-<p>With this, we can be sure that our specs pass no matter the order of execution.</p>
+<p>Now we can be sure that our specs pass no matter the order of execution.</p>
 
 <h2>Local Configuration</h2>
 
