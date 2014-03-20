@@ -624,8 +624,7 @@ Finished in 0.00167 seconds
   end
 
   def self.configuration
-    return @configuration if @configuration
-    @configuration = Configuration.new
+    @configuration ||= Configuration.new
   end
 
   def self.configure
@@ -726,8 +725,7 @@ Finished in 0.00762 seconds
   end
 
   def self.configuration
-    return @configuration if @configuration
-    @configuration = Configuration.new
+    @configuration ||= Configuration.new
   end
 
   def self.reset

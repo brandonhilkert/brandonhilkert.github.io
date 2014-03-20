@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-20T12:12:51-04:00</updated>
+  <updated>2014-03-20T12:56:25-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -491,8 +491,7 @@ Finished in 0.00167 seconds
   end
 
   def self.configuration
-    return @configuration if @configuration
-    @configuration = Configuration.new
+    @configuration ||= Configuration.new
   end
 
   def self.configure
@@ -593,8 +592,7 @@ Finished in 0.00762 seconds
   end
 
   def self.configuration
-    return @configuration if @configuration
-    @configuration = Configuration.new
+    @configuration ||= Configuration.new
   end
 
   def self.reset
