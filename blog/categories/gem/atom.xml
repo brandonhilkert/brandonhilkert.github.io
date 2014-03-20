@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-19T12:21:17-04:00</updated>
+  <updated>2014-03-20T08:17:40-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -647,7 +647,150 @@ $ rake
 7 examples, 0 failures
 ```</p>
 
-<p>…and we’re good!</p>
+<p>…and we’re good! Except, if we run our entire suite a few times in a row, we’ll eventually see a failure:</p>
+
+<p>```bash
+Failures:</p>
+
+<p>  1) MegaLotto::Drawing#draw returns an Array with 6 elements</p>
+
+<pre><code> Failure/Error: expect(drawing.size).to eq(6)
+
+   expected: 6
+        got: 10
+
+   (compared using ==)
+ # ./spec/mega_lotto/drawing_spec.rb:13
+</code></pre>
+
+<p>Finished in 0.00893 seconds
+7 examples, 1 failure
+```</p>
+
+<p>What’s going on???</p>
+
+<p>In the setup of the spec for <code>MegaLotto.configure</code>, we added the following before block:</p>
+
+<p>```ruby</p>
+
+<pre><code>before :each do
+  MegaLotto.configure do |config|
+    config.drawing_count = 10
+  end
+end
+</code></pre>
+
+<p>```</p>
+
+<p>Because this configuration is global, if this spec is run before the others in our suite, the remaining specs will use it. So when the specs for <code>MegaLotto::Drawing</code> run, 10 elements are return instead of the 6, the default, and we see the failure.</p>
+
+<p>For global values like this, it’s best to clean up after each spec to ensure the system is back to a default state. In our case, we can implement a <code>.reset</code> method on <code>MegaLotto</code> and set the configuration back to a new instance of the <code>Configuration</code> class:</p>
+
+<p>```
+ module MegaLotto
+  class &lt;&lt; self</p>
+
+<pre><code>attr_writer :configuration
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configuration</p>
+
+<pre><code>@configuration ||= Configuration.new
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.reset</p>
+
+<pre><code>@configuration = Configuration.new
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.configure</p>
+
+<pre><code>yield(configuration)
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>And now in our spec, we can used the <code>.reset</code> method to properly clean up after each one:</p>
+
+<p>```ruby
+require &ldquo;spec_helper&rdquo;</p>
+
+<p>describe MegaLotto do
+  describe &ldquo;#configure&rdquo; do</p>
+
+<pre><code>before :each do
+  MegaLotto.configure do |config|
+    config.drawing_count = 10
+  end
+end
+
+it "returns an array with 10 elements" do
+  draw = MegaLotto::Drawing.new.draw
+
+  expect(draw).to be_a(Array)
+  expect(draw.size).to eq(10)
+end
+
+after :each do
+  MegaLotto.reset
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>With this, we can be sure that our specs pass no matter the order of execution.</p>
+
+<h2>Local Configuration</h2>
+
+<p>The configuration approach above implements a global configuration object. The downside is that we can’t have multiple instances of our code running with different configurations. To avoid this, we could isolate the configuration class and only pass it to those objects that need it.</p>
+
+<p>With this in mind, <code>Drawing</code> might look like:</p>
+
+<p>```ruby
+module MegaLotto
+  class Drawing</p>
+
+<pre><code>attr_accessor :config
+
+def initialize(config = Configuration.new)
+  @config = config
+end
+
+def draw
+  config.drawing_count.times.map { single_draw }
+end
+
+private
+
+def single_draw
+  rand(0...60)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>We can supply our own configuration object during instantiation if the defaults aren’t appropriate. In this case, as long as the object responds to <code>drawing_count</code>, everything will work.</p>
+
+<p>```ruby
+require &lsquo;ostruct&rsquo;
+config = OpenStruct.new(drawing_count: 10)</p>
+
+<p>MegaLotto::Drawing.new(config).draw #=> [23, 4, 21, 33, 48, 12, 43,13, 2, 5]
+```</p>
+
+<p>Both approaches are certainly valid, so I’ll leave it to you to decide which approach is best for your gem.</p>
 
 <h2>Implementations in the Wild</h2>
 
