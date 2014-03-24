@@ -941,6 +941,7 @@ a#contact_close_counter {
 
 #page_footer {
   color:#999;
+  text-align: center;
 }
 
 #page_footer.row {
@@ -951,10 +952,6 @@ a#contact_close_counter {
   display:inline;
   margin:0;
   padding:0;
-}
-
-#page_footer p {
-  float:right;
 }
 
 #page_footer ul li {
@@ -1244,13 +1241,6 @@ a#contact_close_counter {
     margin:0 10px 0 0;
   }
 
-  /*Footer*/
-
-  #page_footer p {
-    float:none;
-    display:block;
-  }
-
 }
 
 @media screen and (max-width: 760px) {
@@ -1360,13 +1350,6 @@ a#contact_close_counter {
   #newsletter input#submit {
     float:right;
     margin:5px 0 0 0;
-  }
-
-  /*Footer*/
-
-  #page_footer p {
-    float:none;
-    display:block;
   }
 
   .scrollup {
@@ -1481,13 +1464,6 @@ a#contact_close_counter {
 
   #newsletter input#submit {
     float:none;
-  }
-
-  /*Footer*/
-
-  #page_footer p {
-    float:none;
-    display:block;
   }
 
   .scrollup {
