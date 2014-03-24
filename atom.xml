@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-22T13:47:53-04:00</updated>
+  <updated>2014-03-24T05:59:56-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -24,10 +24,10 @@ on <strong>Thursday, March 27</strong>! Sign up below to receive a <strong>20% d
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
     <input type="hidden" name="LOCATION" id="LOCATION" value="Ruby Gem Configuration Patterns" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
 </div>
 
@@ -685,10 +685,10 @@ on <strong>Thursday, March 27</strong>! Sign up below to receive a <strong>20% d
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
     <input type="hidden" name="LOCATION" id="LOCATION" value="Ruby Gem Configuration Patterns" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
 </div>
 
@@ -708,10 +708,10 @@ on <strong>Thursday, March 27</strong>! Sign up below to receive a <strong>20% d
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
     <input type="hidden" name="LOCATION" id="LOCATION" value="Why I Wrote the Sucker Punch Gem" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
 </div>
 
@@ -793,10 +793,10 @@ on <strong>Thursday, March 27</strong>! Sign up below to receive a <strong>20% d
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
     <input type="hidden" name="LOCATION" id="LOCATION" value="Why I Wrote the Sucker Punch Gem" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
 </div>
 
@@ -1093,10 +1093,10 @@ enter your email below:</p>
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
     <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Book Update" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
 </div>
 
@@ -1445,10 +1445,10 @@ below:</p>
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
     <input type="hidden" name="LOCATION" id="LOCATION" value="How I Launched an Email Course to 500+ People" />
     <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Send Me a Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
   </form>
 </div>
 
