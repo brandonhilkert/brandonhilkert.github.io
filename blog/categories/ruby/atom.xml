@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-24T06:16:23-04:00</updated>
+  <updated>2014-03-25T07:04:07-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,13 +14,284 @@
 
   
   <entry>
+    <title type="html"><![CDATA[How to Build a Rails Engine]]></title>
+    <link href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/"/>
+    <updated>2014-03-24T17:26:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/how-to-build-a-rails-engine</id>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: ruby" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+
+
+
+</p>
+
+<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
+
+<p>The <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Rails engine documentation</a> is well written and touches on the many ways to include functionality. I won’t cover every detail of Rails engines in this chapter, just enough to get you started making use of them. It’s possible to make full applications (routes, controllers, models, migrations, etc.) using Rails engines. However, we’re going to focus on some of the simpler the elements of a Rails engine that allow us to integrate functionality where a Railtie won’t suffice. Just know, there is far more you can do with Rails engines than what we’ll cover here. The documentation link above provides examples of many of those use cases.</p>
+
+<!--more-->
+
+
+<h2>Use Case</h2>
+
+<p>I wrote a <a href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">blog post about rendering relatives timestamps in Rails</a> on the client. Using a client-side solution like <a href="http://timeago.yarp.com/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">timeago.js</a> allows timestamps to update in real-time, so when we see “15 minutes ago”, we know the record <em>really</em> is 15 minutes old.</p>
+
+<p>The other benefit to using a client-side library like <code>timeago.js</code> is timezone offsets are handled automatically. All we have to do is render the UTC time in the view and javascript will handle converting it to the relative timezone of the browser, along with keeping it updated as the page becomes stale.</p>
+
+<p>For this example, we’ll make a gem that integrates <code>timeago.js</code> in to a Rails application and provides a simple way to render relative timestamps in a view.</p>
+
+<h2>The Implementation</h2>
+
+<p>The implementation of our gem will require:</p>
+
+<ol>
+<li>Adding the <code>timeago.js</code> javascript asset to the asset pipeline</li>
+<li>Adding a javascript asset to invoke the <code>timeago()</code> plugin</li>
+<li>Adding a view helper to render html in a format the javascript plugin expects</li>
+</ol>
+
+
+<p>The third requirement was covered in a previous chapter on view helpers, so we’ll cruise through that one quickly. However, including assets hasn’t been covered and it’s the perfect segue in to the benefits of using a Rails engine, rather than just a Railtie.</p>
+
+<p>Rails engines allow us create the same directory structure of a Rails application, since a Rails application is just a Rails engine. By indicating our gem is an engine (we’ll see how to do this soon…), Rails will pick up the related files in the Rails-specific directories in our gem. So if we add a file in the <code>app/helpers/</code> directory of our gem, that same file will be available in the host Rails application. The same approach applies for controllers, models, migrations, assets and anything else we would add to a typical Rails application.</p>
+
+<p>To start, let’s create our new gem:</p>
+
+<p>```bash
+$ bundle gem time_ago</p>
+
+<pre><code>  create  time_ago/Gemfile
+  create  time_ago/Rakefile
+  create  time_ago/LICENSE.txt
+  create  time_ago/README.md
+  create  time_ago/.gitignore
+  create  time_ago/time_ago.gemspec
+  create  time_ago/lib/time_ago.rb
+  create  time_ago/lib/time_ago/version.rb
+</code></pre>
+
+<p>Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago
+```</p>
+
+<p>When we include javascript libraries from external sources, the <code>vender/</code> directory is the most appropriate place for them. Let’s create the directory <code>vendor/javascripts/</code> and place the source for the <code>timeago.js</code> plugin there:</p>
+
+<p>```bash
+├── Gemfile
+├── LICENSE.txt
+├── Rakefile
+├── lib
+│   ├── time_ago
+│   │   └── version.rb
+│   └── time_ago.rb
+├── time_ago.gemspec
+└── vendor</p>
+
+<pre><code>└── assets
+    └── jquery.timeago.js
+</code></pre>
+
+<p>```</p>
+
+<p>To create our view helper, we’ll add the <code>/app/helpers/</code> directory:</p>
+
+<p>```bash
+├── Gemfile
+├── LICENSE.txt
+├── Rakefile
+├── app
+│   └── helpers
+│       └── time_ago_helper.rb
+├── lib
+│   ├── time_ago
+│   │   └── version.rb
+│   └── time_ago.rb
+├── time_ago.gemspec
+└── vendor</p>
+
+<pre><code>└── assets
+    └── jquery.timeago.js
+</code></pre>
+
+<p>```</p>
+
+<p>The code for the view helper is shown below:</p>
+
+<p>```ruby
+module TimeAgoHelper
+  def timeago(time, options = {})</p>
+
+<pre><code>options[:class] ||= "timeago"
+content_tag(
+ :time,
+ time.to_s,
+ options.merge(datetime: time.getutc.iso8601)
+) if time
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Lastly, we want to include a javascript asset to invoke the <code>timeago.js</code> plugin on page change (this includes the initial page load). This is almost identical to the first step of including the vendored <code>timeago.js</code> asset, except we’re going to put it in the <code>app/assets/javascripts/</code> directory since it’s not an external library, but rather a javascript include that will invoke the javascript plugin.</p>
+
+<p>Let’s create the directory <code>app/assets/javascripts/</code> and place the following file there:</p>
+
+<p>```javascript
+// app/assets/javascripts/timeago.js
+//
+// jQuery Timeago setup for timeago helper
+//
+//= require jquery.timeago</p>
+
+<p>$(document).on(&lsquo;page:change&rsquo;, function() {
+  $(&ldquo;time.timeago&rdquo;).timeago();
+});
+```</p>
+
+<p>This file serves as both a manifest file for the <code>jquery.timeago.js</code> asset and a function to invoke the plugin whenever the page loads or changes.</p>
+
+<p>Lastly, we need to designate our gem as an engine. The default entry file that was created when we used bundler to bootstrap our gem looked like this:</p>
+
+<p>```ruby
+require &ldquo;time_ago/version&rdquo;</p>
+
+<p>module TimeAgo
+end
+```</p>
+
+<p>All we need to do is add the <code>Engine</code> class and inherit from <code>Rails::Engine</code>, giving us:</p>
+
+<p>```ruby
+require &ldquo;time_ago/version&rdquo;</p>
+
+<p>module TimeAgo
+  class Engine &lt; ::Rails::Engine
+  end
+end
+```</p>
+
+<p>At this point, because our gem is so closely tied to Rails, we should add Rails as a dependency in our gemspec:</p>
+
+<p>```ruby</p>
+
+<h1>coding: utf-8</h1>
+
+<p>lib = File.expand_path(&lsquo;../lib&rsquo;, <strong>FILE</strong>)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require &lsquo;time_ago/version&rsquo;</p>
+
+<p>Gem::Specification.new do |spec|
+  spec.name          = &ldquo;time_ago&rdquo;
+  spec.version       = TimeAgo::VERSION
+  spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
+  spec.email         = [&ldquo;<a href="&#109;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#x62;&#x72;&#x61;&#110;&#100;&#111;&#110;&#x68;&#105;&#x6c;&#107;&#101;&#x72;&#116;&#x40;&#x67;&#109;&#x61;&#105;&#108;&#46;&#99;&#x6f;&#109;">&#98;&#x72;&#x61;&#110;&#x64;&#x6f;&#110;&#104;&#105;&#x6c;&#x6b;&#x65;&#x72;&#x74;&#64;&#x67;&#109;&#97;&#x69;&#108;&#46;&#99;&#x6f;&#109;</a>&rdquo;]
+  spec.summary       = %q{A gem to integrate the timeago.js}
+  spec.description   = %q{A gem to integrate the timeago.js}
+  spec.homepage      = &ldquo;&rdquo;
+  spec.license       = &ldquo;MIT&rdquo;</p>
+
+<p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;)
+  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
+  spec.require_paths = [&ldquo;lib&rdquo;]</p>
+
+<p>  spec.add_dependency &ldquo;rails&rdquo;, &ldquo;>= 3.1&rdquo;</p>
+
+<p>  spec.add_development_dependency &ldquo;bundler&rdquo;, &ldquo;~> 1.5&rdquo;
+  spec.add_development_dependency &ldquo;rake&rdquo;
+end
+```</p>
+
+<p><em>Note: In addition to adding Rails as a dependency, we’ve also specified that it’s only compatible with Rails version <code>3.1</code> or later because of the need for the asset pipeline.</em></p>
+
+<p>Moving to a sample Rails application, we can include the gem in our host application by adding it to the <code>Gemfile</code> using the path option:</p>
+
+<p><code>ruby
+gem "time_ago", path: "../time_ago"
+</code></p>
+
+<p>Since we included an asset that needs to be included in the Rails asset pipeline, we have to take one more step and instruct the user to add the following to their <code>app/assets/javascripts/application.js</code> manifest file:</p>
+
+<p><code>javascript
+//= require timeago
+</code></p>
+
+<p>This directive actually refers to the <code>app/assets/javascripts/timeago.js</code> file we included in our gem to invoke the timeago.js plugin on page change.</p>
+
+<p>Now when we load our Rails application, tags using the <code>timeago</code> view helper get rendered to UI as:</p>
+
+<p>```html
+<time class="timeago" datetime="2014-01-08T14:55:58Z"></p>
+
+<pre><code>2014-01-08 14:55:58 UTC
+</code></pre>
+
+<p></time>
+```</p>
+
+<p>and are updated by the javascript plugin to:</p>
+
+<p>```html
+<time class="timeago" datetime="2014-01-08T15:04:10Z"
+   title="2014-01-08 15:04:10 UTC"></p>
+
+<pre><code> 18 days ago
+</code></pre>
+
+<p></time>
+```</p>
+
+<h2>Implementations in the Wild</h2>
+
+<p>One of the greatest examples of making the most of a Rails engine is <a href="https://github.com/plataformatec/devise?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Devise</a>. Devise is one of the more popular options for adding authentication to a Rails application. Just looking at the <a href="https://github.com/plataformatec/devise/tree/master/app?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">app directory of the gem</a>, we can see Devise adds functionality through controllers, helpers, mailers and views. The structure of Devise is fairly complicated because it is doing so much, but <a href="https://github.com/plataformatec/devise/blob/master/lib/devise/rails.rb?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines#L5">here is where the Rails engine is defined</a> allowing the elements in the <code>/app</code> directory (among other things) to be integrated in to a Rails application.</p>
+
+<p>The <a href="https://github.com/basecamp/local_time?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">local_time gem</a> from Basecamp is a simple example of using the asset includes of a Rails engine to render relative timestamps. It’s similar to the one we created above, but uses the <a href="http://momentjs.com/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">moment.js</a> javascript library instead. Because it’s well tested and likely to be supported long-term, I’d suggest using it instead of the gem we created above.</p>
+
+<h2>Summary</h2>
+
+<p>Prior to Rails 3, Rails integration at this level was not possible. The introduction of Rails engines created a new way to organize micro-applications and integrate them into a host application. Doing so keeps features and otherwise separate logic truly separate.</p>
+
+<p>I’ve only scratched the surface on what a gem can provide through engines. It’s certainly more detailed than just asset and view helper integration, as shown above. If you’re interested in learning more about the other features Rails engine provide, <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">the Rails guides</a> are a great place to start.</p>
+
+<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Category: ruby" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
+    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
+  </form>
+</div>
+
+
+
+
+</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Build a Ruby Gem Ebook Available on Thursday]]></title>
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday/"/>
     <updated>2014-03-24T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday</id>
-    <content type="html"><![CDATA[<p>_This is one of 3 posts leading up the the launch of my
-[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
-on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
@@ -62,9 +333,9 @@ on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** wh
 
 <p>As promised, I will be sending out a <strong>discount code on Tuesday night</strong> for those on the book mailing list, good for <strong>20% off the listed price of any package</strong>. The discount will only be <strong>available for the first 24 hours</strong>. After that, the packages will return to the prices listed above.</p>
 
-<p>_This is one of 3 posts leading up the the launch of my
-[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
-on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
@@ -87,9 +358,9 @@ on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** wh
     <link href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/"/>
     <updated>2014-03-17T20:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
-    <content type="html"><![CDATA[<p>_This is one of 3 posts leading up the the launch of my
-[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
-on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
@@ -916,9 +1187,9 @@ config = OpenStruct.new(drawing_count: 10)</p>
 
 <p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
 
-<p>_This is one of 3 posts leading up the the launch of my
-[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
-on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
@@ -941,9 +1212,9 @@ on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** wh
     <link href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
     <updated>2014-03-13T13:56:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
-    <content type="html"><![CDATA[<p>_This is one of 3 posts leading up the the launch of my
-[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
-on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
@@ -1030,9 +1301,9 @@ end
 
 <p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
 
-<p>_This is one of 3 posts leading up the the launch of my
-[__Build a Ruby Gem book__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
-on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** when the book launches._
+<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=sucker-punch)
+on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% discount coupon** when the book launches._
 
 <div class="inline-newsletter-form">
   <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
@@ -1082,210 +1353,6 @@ on __Thursday, March 27__! Sign up below to receive a **20% discount coupon** wh
 <p>Looking back on the items mentioned above, I’m really excited to be nearing the home stretch and finally get it in to your hands.</p>
 
 <p>Hope you had a great past couple of weeks. Talk to you soon.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Understanding the RAILS_CACHE_ID Environment Variable]]></title>
-    <link href="http://brandonhilkert.com/blog/understanding-the-rails-cache-id-environment-variable/"/>
-    <updated>2014-02-19T07:19:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/understanding-the-rails-cache-id-environment-variable</id>
-    <content type="html"><![CDATA[<p>Last week, I was looking through my Twitter stream and came across a tweet that referenced <code>ENV[“RAILS_CACHE_ID”]</code>. I was unfamiliar with this environment variable and made a note to learn more.</p>
-
-<p>Rails 4 has made a discernible effort to improve view rendering performance by what they’re calling <a href="http://signalvnoise.com/posts/3690-the-performance-impact-of-russian-doll-caching">russian doll caching</a>. Prior to this, view caching was simple in syntax, but realistically more complicated when cached partials needed busting on subsequent releases.</p>
-
-<!--more-->
-
-
-<p>I didn’t know if this environmental variable had anything to do with Rails 4 caching, so I went digging…</p>
-
-<p>The first thing I did was <code>git clone</code> the Rails source code and look for that variable. Outside of the documentation and tests, it showed up in one place, <code>activesupport/lib/active_support/cache.rb</code>:</p>
-
-<pre><code># Expands out the +key+ argument into a key that can be used for the
-# cache store. Optionally accepts a namespace, and all keys will be
-# scoped within that namespace.
-#
-# If the +key+ argument provided is an array, or responds to +to_a+, then
-# each of elements in the array will be turned into parameters/keys and
-# concatenated into a single key. For example:
-#
-#   expand_cache_key([:foo, :bar])               # =&gt; "foo/bar"
-#   expand_cache_key([:foo, :bar], "namespace")  # =&gt; "namespace/foo/bar"
-#
-# The +key+ argument can also respond to +cache_key+ or +to_param+.
-
-def expand_cache_key(key, namespace = nil)
-  expanded_cache_key = namespace ? "#{namespace}/" : ""
-
-  if prefix = ENV["RAILS_CACHE_ID"] || ENV["RAILS_APP_VERSION"]
-    expanded_cache_key &lt;&lt; "#{prefix}/"
-  end
-
-  expanded_cache_key &lt;&lt; retrieve_cache_key(key)
-  expanded_cache_key
-end
-</code></pre>
-
-<p>The comments preceding the method do a good job telling the whole story. The <code>expanded_cache_key</code> variable is an array built up from the <code>key</code> argument. The <code>RAILS_CACHE_ID</code> environment variable is prefaced to this array, operating similar to a namespace.</p>
-
-<p>With these assumptions in mind, let’s see if we prove for sure. I’ll generate a new Rails 4 app:</p>
-
-<pre><code>$ rails new cache_test
-</code></pre>
-
-<p>We’ll be inspecting model objects, so let’s generate a fake blog model:</p>
-
-<pre><code>$ rails g scaffold post title content:text
-</code></pre>
-
-<p>Migrate the database to get current:</p>
-
-<pre><code>$ bin/rake db:migrate
-</code></pre>
-
-<p>I’ll create a new <code>Post</code> and take a look at the default <code>cache_key</code>:</p>
-
-<pre><code>$ rails c
-&gt; p = Post.create
-&gt; p.cache_key # =&gt; "posts/1-20140206201702645196000"
-</code></pre>
-
-<p>Let’s set the <code>RAILS_CACHE_ID</code> and look at the <code>cache_key</code> of this record again:</p>
-
-<pre><code>$ export RAILS_CACHE_ID=octopus
-$ rails c
-&gt; p = Post.create
-&gt; p.cache_key # =&gt; "posts/1-20140206201702645196000"
-</code></pre>
-
-<p>Hmmm…same thing. Referring back to the Rails course code above, it turns out that not all cache writes use the <code>expand_cache_key</code> method. Searching around the Rails code for <code>expand_cache_key</code>, we find the following results:</p>
-
-<pre><code>ActionController::Caching::Fragments#fragment_cache_key
-ActionDispatch::Http::Cache::Response#etag=
-</code></pre>
-
-<p>From the looks of it, it only applies to fragment caching and manually setting ETAG headers for HTTP responses, so let’s dig in to those.</p>
-
-<h2>Fragment Caching</h2>
-
-<p>I can cache the post fragment by wrapping it in a <code>cache</code> block:</p>
-
-<pre><code>&lt;% app/views/posts/show.html.erb %&gt;
-&lt;%= cache(@post) do %&gt;
-  &lt;p&gt;
-    &lt;strong&gt;Title:&lt;/strong&gt;
-    &lt;%= @post.title %&gt;
-  &lt;/p&gt;
-
-  &lt;p&gt;
-    &lt;strong&gt;Content:&lt;/strong&gt;
-    &lt;%= @post.content %&gt;
-  &lt;/p&gt;
-&lt;% end %&gt;
-</code></pre>
-
-<p>Run the server and make a request to <code>http://localhost:3000/posts/1</code>.</p>
-
-<pre><code>Started GET "/posts/1" for 127.0.0.1 at 2014-02-06 16:16:04 -0500
-  ActiveRecord::SchemaMigration Load (0.2ms)  SELECT "schema_migrations".* FROM "schema_migrations"
-Processing by PostsController#show as HTML
-  Parameters: {"id"=&gt;"1"}
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", "1"]]
-Cache digest for posts/show.html: c39e6bde261c006ffe9ddf27fb9d5318
-Read fragment views/octopus/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (0.2ms)
-Write fragment views/octopus/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (1.6ms)
-  Rendered posts/show.html.erb within layouts/application (11.0ms)
-</code></pre>
-
-<p><em>Note: Make sure <code>config.action_controller.perform_caching</code> is set to <code>true</code> in <code>config/environments/development.rb</code> (it’s <code>false</code> by default), otherwise caching is disabled.</em></p>
-
-<p>There it is! It wrote out the key <code>views/octopus/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318</code>. Let’s change the environmental variable and see if it adjusts accordingly:</p>
-
-<pre><code>$ export RAILS_CACHE_ID=shark
-</code></pre>
-
-<p>Restart the Rails server and again, request <code>http://localhost:3000/posts/1</code>:</p>
-
-<pre><code>Started GET "/posts/1" for 127.0.0.1 at 2014-02-06 16:35:33 -0500
-  ActiveRecord::SchemaMigration Load (0.1ms)  SELECT "schema_migrations".* FROM "schema_migrations"
-Processing by PostsController#show as HTML
-  Parameters: {"id"=&gt;"1"}
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", "1"]]
-Cache digest for posts/show.html: c39e6bde261c006ffe9ddf27fb9d5318
-Read fragment views/shark/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (0.3ms)
-Write fragment views/shark/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (1.5ms)
-  Rendered posts/show.html.erb within layouts/application (11.1ms)
-Completed 200 OK in 82ms (Views: 62.7ms | ActiveRecord: 0.5ms)
-</code></pre>
-
-<p>Sure enough…the key <code>views/shark/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318</code> was used this time.</p>
-
-<h2>Etags</h2>
-
-<p>Etags are a value added to the HTTP headers that allow a browser to determine whether the content for a particular piece of content should be refreshed or not. If not, the server returns a <code>304</code> HTTP code and the browser uses the cached response from a previous request.</p>
-
-<p>Rails provides two controller helper methods to help determine whether the content should be refreshed: <code>fresh_when</code> and <code>stale?</code>. The <a href="http://guides.rubyonrails.org/caching_with_rails.html#conditional-get-support">Rails guides</a> provide a decent explanation of these methods and when to use them.</p>
-
-<p>Jumping in to the <code>PostsController</code>, let’s use the <code>fresh_when</code> method in the <code>show</code> action:</p>
-
-<pre><code>class PostsController &lt; ApplicationController
-
-  def show
-    @post = Post.find(params[:id])
-    fresh_when(@post)
-  end
-
-end
-</code></pre>
-
-<p>Now, when we request the <code>show</code> page for that post, we get an Etag back in the header response of <code>9c754ae292618570ec43cae8e03a0b13</code>. That doesn’t look very familiar, huh?</p>
-
-<p>It turns out that the Etag is generated using the following method:</p>
-
-<pre><code>Digest::MD5.hexadigest(key)
-</code></pre>
-
-<p>But the key is more than just the <code>cache_key</code> of the <code>@post</code>. If we refer back to where the <code>expand_cache_key</code> method was used, we see that when the <code>etag</code> attribute is set on the response, the key is expanded using the <code>ActiveSupport::Cache#expand_cache_key</code> method we looked at above:</p>
-
-<pre><code> def etag=(etag)
-   key = ActiveSupport::Cache.expand_cache_key(etag)
-   @etag = self[ETAG] = %("#{Digest::MD5.hexdigest(key)}")
- end
-</code></pre>
-
-<p>Let’s stop the server and reset the <code>ENV[“RAILS_CACHE_ID”]</code>:</p>
-
-<pre><code>$ export RAILS_CACHE_ID=whale
-</code></pre>
-
-<p>Running the same request, we get an Etag of <code>b389da68ca1b25986edecf349fcf63e6</code>. So as you can see, by updating <code>ENV[“RAILS_CACHE_ID”]</code> alone, we get a different Etag in the response without changing the <code>post</code> object itself, which means we can invalidate our browser cache by updating this environmental variable.</p>
-
-<p>I, personally, deploy to Heroku most of the time and it’d be nice to be able take advantage of browser caching in this manner, but also know when a new deploy is released. <a href="http://ninjasandrobots.com/rails-caching-a-problem-with-etags-and-a-solution">This article</a> describes a solution that integrates Heroku’s numbered releases.</p>
-
-<p>However, we know that Heroku uses git to get the source code of the appellation to the application container, so why not leverage git commit IDs for <code>ENV[“RAILS_CACHE_ID”]</code>.</p>
-
-<p><code>git log</code> is a command to look at….well, git logs!. With a few additional options, we can get a shortened version of the commit SHA:</p>
-
-<pre><code>$ git log --pretty=format:%h -n1
-40ad584
-</code></pre>
-
-<p><strong>Combining the git commit SHA gives us the perfect opportunity to invalidate browser cache</strong>. If the Etag is different because a different git commit SHA is the most recent on the server, we know there’s a potential the HTML rendered and cached in the browser could be outdated. We can implement this by setting the ENV variable in <code>config/application.rb</code>:</p>
-
-<pre><code>ENV['RAILS_CACHE_ID'] = `git log --pretty=format:%h -n1`.strip
-</code></pre>
-
-<p>Now, when a request is made we get an Etag of <code>6d80b6397347f8de1b8718e7fd9f90e1</code>. And if we add an empty commit and re-request the post, we get an Etag of <code>6dcc66ddf83613dd0c46406a1e983b38</code>.</p>
-
-<p>Hooray! <strong>A browser caching strategy for HTML content that’s dependent on the git release</strong>.</p>
-
-<h2>Summary</h2>
-
-<p>Before Rails 4, it was common to use a version number in the view <code>cache</code> method so that when you changed a encompassed view template, the cache would bust and the changes would be shown. However, now that <code>cache_digests</code> are part of Rails 4, the contents of the template block is evaluated and an MD5 string is created from the contents (the latter part of the cache key &ndash; <code>c39e6bde261c006ffe9ddf27fb9d5318</code> in the last example). This ensures that whenever the contents of the view template are changed, the cache is busted and the new template is properly stored and rendered.</p>
-
-<p>Given the <code>cache_key</code> of fragment caching is dependent on the contents of the template, I have trouble finding value in setting the <code>RAILS_CACHE_ID</code> environmental variable for fragment caching alone.</p>
-
-<p>Alternatively, the use case for using <code>ENV[“RAILS_CACHE_ID”]</code> to control browser caching can be a tremendous asset when the content of the body response is not considered. Caching strategies can be difficult to reason about and hopefully this gives you another tool in the toolbox to make parts of your Rails applications more performant.</p>
 ]]></content>
   </entry>
   
