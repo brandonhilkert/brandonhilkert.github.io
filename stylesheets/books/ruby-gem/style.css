@@ -291,6 +291,14 @@ h5{font-size: 1.2em;}
   font-size: 1.3rem;
 }
 
+#banner .launch-clock {
+  margin: 40px 0;
+}
+
+#banner .launch-clock .flip-clock-label {
+  color: white;
+}
+
 h2.subheader {
   font-family: 'Open Sans', sans-serif, Arial, Helvetica;
   font-weight:300;

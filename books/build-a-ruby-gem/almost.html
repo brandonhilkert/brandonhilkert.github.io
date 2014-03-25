@@ -35,6 +35,7 @@
 <link rel="canonical" href="http://brandonhilkert.com/books/build-a-ruby-gem/almost.html">
 
 <link href="/stylesheets/books/ruby-gem/style.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/stylesheets/books/ruby-gem/flipclock.css" media="screen" rel="stylesheet" type="text/css">
 
 <!--Fixes for Internet Explorer CSS3 and HTML5-->
 <!--[if gte IE 9]>
@@ -296,7 +297,23 @@
 
 <a href="#" class="scrollup">Scroll up</a>
 
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script src="/javascripts/books/ruby-gem/foundation.min.js"></script>
+<script src="/javascripts/books/ruby-gem/flipclock.min.js"></script>
+<script type="text/javascript">
+  // Grab the current date
+  var currentDate = new Date();
+
+  // Set some date in the future. In this case, it's always Jan 1
+  var futureDate  = new Date("March 27, 2014 00:00:00 EST");
+
+  // Calculate the difference in seconds between the future and current date
+  var diff = futureDate.getTime() / 1000 - currentDate.getTime() / 1000;
+
+  var clock = $('.launch-clock').FlipClock(diff, {
+    countdown: true
+  });
+</script>
 <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
