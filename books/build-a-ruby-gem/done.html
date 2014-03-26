@@ -34,8 +34,8 @@
 <meta property="og:type" content="blog"/>
 <link rel="canonical" href="http://brandonhilkert.com/books/build-a-ruby-gem/done.html">
 
-<link href="/stylesheets/books/ruby-gem/style.css" media="screen, projection" rel="stylesheet" type="text/css">
 <link href="/stylesheets/books/ruby-gem/flipclock.css" media="screen" rel="stylesheet" type="text/css">
+<link href="/stylesheets/books/ruby-gem/style.css" media="screen, projection" rel="stylesheet" type="text/css">
 
 <!--Fixes for Internet Explorer CSS3 and HTML5-->
 <!--[if gte IE 9]>
@@ -310,7 +310,7 @@
   // Calculate the difference in seconds between the future and current date
   var diff = futureDate.getTime() / 1000 - currentDate.getTime() / 1000;
 
-  var clock = $('.launch-clock').FlipClock(diff, {
+  var clock = $('.clock').FlipClock(diff, {
     countdown: true
   });
 </script>

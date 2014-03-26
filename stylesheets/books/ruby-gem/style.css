@@ -291,11 +291,11 @@ h5{font-size: 1.2em;}
   font-size: 1.3rem;
 }
 
-#banner .launch-clock {
-  margin: 40px 0;
+#banner .clock {
+  margin-top: 40px;
 }
 
-#banner .launch-clock .flip-clock-label {
+#banner .clock .flip-clock-label {
   color: white;
 }
 
