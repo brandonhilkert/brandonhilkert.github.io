@@ -99,7 +99,7 @@ a img {
 /* 2.1 Buttons */
 
 .button_buy {
-  padding:40px 0 0 0;
+  padding: 10px 0 20px 0;
 }
 
 .button_buy a {
@@ -495,6 +495,11 @@ h2.subheader {
   padding: 9px 0 0 0;
 }
 
+#testimonials .one_half {
+  margin: 0 auto;
+  float: none;
+}
+
 blockquote img {
   background:#fff;
   margin:-25px 35px 0 15px;
@@ -662,20 +667,25 @@ input[type="submit"]:hover {
 /* 6.7 Pricing Table */
 
 #pricing_table {
-  display: table;
   padding:30px 0 0 0;
-  margin: 0 auto;
   text-align:center;
 }
 
 .pricing_block {
   background:#fff;
+  width: 31%;
+  float: left;
+  margin-left: 20px;
   box-shadow:0 1px 3px #d3d3d3;
   text-align:center;
   -webkit-transition: all 0.3s ease-out;
   -moz-transition: all 0.3s ease-out;
   -o-transition: all 0.3s ease-out;
   transition: all 0.3s ease-out;
+}
+
+.pricing_block:first-child {
+  margin-left: 0;
 }
 
 .pricing_block:hover {
@@ -709,6 +719,22 @@ input[type="submit"]:hover {
   padding:10px 0 10px 0;
   border-bottom:1px solid #e5e5e5;
   list-style:none;
+  text-align: left;
+  padding-left: 10%;
+}
+
+@media screen and (min-width : 461px ) and (max-width: 760px) {
+
+  .pricing_block ul li {
+    padding-left: 25%;
+  }
+}
+
+.pricing_block ul li .icon {
+  color: lightgray;
+  font-size: 1.5rem;
+  vertical-align: middle;
+  padding-right: 10px;
 }
 
 .price {
@@ -1364,6 +1390,16 @@ a#contact_close_counter {
     display: none !important;
   }
 
+  .pricing_block {
+    width: 100%;
+    float: none;
+    margin-left: 0;
+    margin-bottom: 40px;
+  }
+
+  .pricing_block h4 {
+    line-height: 2;
+  }
 }
 
 @media screen and (max-width: 460px) {
