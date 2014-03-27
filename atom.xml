@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-27T12:54:45-04:00</updated>
+  <updated>2014-03-27T12:57:47-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -34,7 +34,7 @@ on it and really look forward to hearing your feedback.</p>
     <id>http://brandonhilkert.com/blog/how-to-build-a-rails-engine</id>
     <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
 <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
 
 <p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
@@ -242,7 +242,7 @@ end</code></pre></figure>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday</id>
     <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
 <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
 
 <p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
@@ -280,7 +280,7 @@ including <strong>14 chapters of code</strong> and over 2 hours of screencasts</
     <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
     <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
 <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
 
 <p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
@@ -939,7 +939,7 @@ MegaLotto::Drawing.new(config).draw #=&gt; [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
     <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
     <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
 <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
 
 <p>One of the simplest and most common application of background processing is sending emails outside of a web
@@ -1022,7 +1022,7 @@ end
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review</id>
     <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
 <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
 
 <p>Greetings from a now less snowy Eastern USA!</p>
@@ -1266,7 +1266,7 @@ end
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-book-update</id>
     <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
 <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
 
 <p><strong>This past weekend I added ~ 6,000 words</strong> to the existing content. I&rsquo;m really excited to be nearing the end of the road. I&rsquo;ve gotten some great feedback since I started and wanted to gather a bit more to finalize the chapter list.</p>
