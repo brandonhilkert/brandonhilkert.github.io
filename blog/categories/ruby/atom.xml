@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-27T00:01:50-04:00</updated>
+  <updated>2014-03-27T12:53:46-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -32,7 +32,15 @@ on it and really look forward to hearing your feedback.</p>
     <link href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/"/>
     <updated>2014-03-24T17:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-build-a-rails-engine</id>
-    <content type="html"><![CDATA[<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
+which is now available for sale in [3 packages]([__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch)),
+including __14 chapters of code__ and over 2 hours of screencasts__.
+
+
+</p>
+
+<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
 
 <p>The <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Rails engine documentation</a> is well written and touches on the many ways to include functionality. I won’t cover every detail of Rails engines in this chapter, just enough to get you started making use of them. It’s possible to make full applications (routes, controllers, models, migrations, etc.) using Rails engines. However, we’re going to focus on some of the simpler the elements of a Rails engine that allow us to integrate functionality where a Railtie won’t suffice. Just know, there is far more you can do with Rails engines than what we’ll cover here. The documentation link above provides examples of many of those use cases.</p>
 
@@ -191,7 +199,7 @@ require &lsquo;time_ago/version&rsquo;</p>
   spec.name          = &ldquo;time_ago&rdquo;
   spec.version       = TimeAgo::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#98;&#x72;&#x61;&#x6e;&#x64;&#x6f;&#110;&#104;&#105;&#x6c;&#107;&#x65;&#114;&#x74;&#64;&#x67;&#x6d;&#x61;&#x69;&#108;&#46;&#99;&#111;&#109;">&#x62;&#x72;&#97;&#110;&#100;&#111;&#110;&#104;&#x69;&#108;&#107;&#101;&#x72;&#116;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#x6d;</a>&rdquo;]
+  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#105;&#108;&#x74;&#111;&#x3a;&#98;&#x72;&#x61;&#110;&#100;&#111;&#x6e;&#104;&#105;&#x6c;&#x6b;&#101;&#114;&#x74;&#64;&#x67;&#x6d;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;">&#98;&#114;&#x61;&#110;&#100;&#111;&#x6e;&#104;&#x69;&#108;&#107;&#x65;&#114;&#x74;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;</a>&rdquo;]
   spec.summary       = %q{A gem to integrate the timeago.js}
   spec.description   = %q{A gem to integrate the timeago.js}
   spec.homepage      = &ldquo;&rdquo;
@@ -267,7 +275,15 @@ gem "time_ago", path: "../time_ago"
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday/"/>
     <updated>2014-03-24T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday</id>
-    <content type="html"><![CDATA[<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
+which is now available for sale in [3 packages]([__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch)),
+including __14 chapters of code__ and over 2 hours of screencasts__.
+
+
+</p>
+
+<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
 
 <p>The book will be available starting at <strong>Midnight (EDT) on Thursday, March 27th</strong> and can be purchased from <strong><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">my website</a></strong>.</p>
 
@@ -300,7 +316,15 @@ gem "time_ago", path: "../time_ago"
     <link href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/"/>
     <updated>2014-03-17T20:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
-    <content type="html"><![CDATA[<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
+which is now available for sale in [3 packages]([__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch)),
+including __14 chapters of code__ and over 2 hours of screencasts__.
+
+
+</p>
+
+<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
 
 <p>Fortunately, we can give users the ability to add custom configuration data, allowing them to adapt our code to their own use. In this post, we&rsquo;ll adapt the <a href="https://github.com/brandonhilkert/mega_lotto"><code>mega_lotto</code> gem</a> to take a configuration block that modifies the number of integers returned from the <code>#draw</code> method output.</p>
 
@@ -1118,7 +1142,15 @@ config = OpenStruct.new(drawing_count: 10)</p>
     <link href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
     <updated>2014-03-13T13:56:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
-    <content type="html"><![CDATA[<p>One of the simplest and most common application of background processing is sending emails outside of a web
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
+which is now available for sale in [3 packages]([__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch)),
+including __14 chapters of code__ and over 2 hours of screencasts__.
+
+
+</p>
+
+<p>One of the simplest and most common application of background processing is sending emails outside of a web
 request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
 
 <p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>

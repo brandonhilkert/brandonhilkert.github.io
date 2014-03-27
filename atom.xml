@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-27T00:01:50-04:00</updated>
+  <updated>2014-03-27T12:53:46-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -32,7 +32,12 @@ on it and really look forward to hearing your feedback.</p>
     <link href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/"/>
     <updated>2014-03-24T17:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-build-a-rails-engine</id>
-    <content type="html"><![CDATA[<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
+which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+including <strong>14 chapters of code</strong> and over 2 hours of screencasts__.</p>
+
+<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
 
 <p>The <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Rails engine documentation</a> is well written and touches on the many ways to include functionality. I won’t cover every detail of Rails engines in this chapter, just enough to get you started making use of them. It’s possible to make full applications (routes, controllers, models, migrations, etc.) using Rails engines. However, we’re going to focus on some of the simpler the elements of a Rails engine that allow us to integrate functionality where a Railtie won’t suffice. Just know, there is far more you can do with Rails engines than what we’ll cover here. The documentation link above provides examples of many of those use cases.</p>
 
@@ -235,7 +240,12 @@ end</code></pre></figure>
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday/"/>
     <updated>2014-03-24T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday</id>
-    <content type="html"><![CDATA[<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
+which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+including <strong>14 chapters of code</strong> and over 2 hours of screencasts__.</p>
+
+<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
 
 <p>The book will be available starting at <strong>Midnight (EDT) on Thursday, March 27th</strong> and can be purchased from <strong><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">my website</a></strong>.</p>
 
@@ -268,7 +278,12 @@ end</code></pre></figure>
     <link href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/"/>
     <updated>2014-03-17T20:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
-    <content type="html"><![CDATA[<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
+which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+including <strong>14 chapters of code</strong> and over 2 hours of screencasts__.</p>
+
+<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
 
 <p>Fortunately, we can give users the ability to add custom configuration data, allowing them to adapt our code to their own use. In this post, we&rsquo;ll adapt the <a href="https://github.com/brandonhilkert/mega_lotto"><code>mega_lotto</code> gem</a> to take a configuration block that modifies the number of integers returned from the <code>#draw</code> method output.</p>
 
@@ -922,7 +937,12 @@ MegaLotto::Drawing.new(config).draw #=&gt; [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
     <link href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
     <updated>2014-03-13T13:56:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
-    <content type="html"><![CDATA[<p>One of the simplest and most common application of background processing is sending emails outside of a web
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
+which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+including <strong>14 chapters of code</strong> and over 2 hours of screencasts__.</p>
+
+<p>One of the simplest and most common application of background processing is sending emails outside of a web
 request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
 
 <p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>
@@ -1000,7 +1020,12 @@ end
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review/"/>
     <updated>2014-03-04T17:43:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review</id>
-    <content type="html"><![CDATA[<p>Greetings from a now less snowy Eastern USA!</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
+which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+including <strong>14 chapters of code</strong> and over 2 hours of screencasts__.</p>
+
+<p>Greetings from a now less snowy Eastern USA!</p>
 
 <p>The past few weeks have seemed like one big snow storm. We haven’t had many days above freezing and spent very little time outside (voluntarily at least). I’m sure those living in colder climates are probably saying “cry me a river…” right now. On the bright side, our extended home stays have given me more time to write.</p>
 
@@ -1239,7 +1264,12 @@ end
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-book-update/"/>
     <updated>2014-02-15T08:19:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-book-update</id>
-    <content type="html"><![CDATA[<p><strong>This past weekend I added ~ 6,000 words</strong> to the existing content. I&rsquo;m really excited to be nearing the end of the road. I&rsquo;ve gotten some great feedback since I started and wanted to gather a bit more to finalize the chapter list.</p>
+    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
+<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
+which is now available for sale in <a href="[__Build%20a%20Ruby%20Gem%20Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>),
+including <strong>14 chapters of code</strong> and over 2 hours of screencasts__.</p>
+
+<p><strong>This past weekend I added ~ 6,000 words</strong> to the existing content. I&rsquo;m really excited to be nearing the end of the road. I&rsquo;ve gotten some great feedback since I started and wanted to gather a bit more to finalize the chapter list.</p>
 
 <p>Here&rsquo;s the chapter list I&rsquo;m working with&nbsp;so far:</p>
 
