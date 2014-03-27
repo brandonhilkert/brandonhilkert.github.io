@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-26T23:44:54-04:00</updated>
+  <updated>2014-03-26T23:56:02-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,20 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem eBook is Live!]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-is-live/"/>
+    <updated>2014-03-26T23:49:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-is-live</id>
+    <content type="html"><![CDATA[<p>After several weeks of <strong>really</strong> early mornings, <a href="http://brandonhilkert.com/books/build-a-ruby-gem?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><em>Build a Ruby Gem</em></a> is finally live:</p>
+
+<p><a href="http://brandonhilkert.com/books/build-a-ruby-gem?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">http://brandonhilkert.com/books/build-a-ruby-gem/</a></p>
+
+<p>Thanks again for all the support and encouragement. I had a great time working
+on it and really look forward to hearing your feedback.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[How to Build a Rails Engine]]></title>
@@ -195,7 +209,7 @@ require &lsquo;time_ago/version&rsquo;</p>
   spec.name          = &ldquo;time_ago&rdquo;
   spec.version       = TimeAgo::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#x3a;&#x62;&#114;&#97;&#x6e;&#x64;&#111;&#110;&#104;&#105;&#108;&#107;&#101;&#x72;&#x74;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;">&#98;&#x72;&#x61;&#x6e;&#x64;&#x6f;&#x6e;&#104;&#x69;&#x6c;&#107;&#x65;&#114;&#116;&#x40;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#109;</a>&rdquo;]
+  spec.email         = [&ldquo;<a href="&#109;&#97;&#105;&#108;&#x74;&#x6f;&#x3a;&#x62;&#x72;&#97;&#110;&#x64;&#111;&#x6e;&#x68;&#105;&#x6c;&#107;&#x65;&#x72;&#x74;&#x40;&#103;&#109;&#97;&#105;&#108;&#x2e;&#99;&#x6f;&#109;">&#98;&#114;&#x61;&#110;&#x64;&#111;&#x6e;&#x68;&#105;&#x6c;&#x6b;&#x65;&#114;&#116;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#111;&#109;</a>&rdquo;]
   spec.summary       = %q{A gem to integrate the timeago.js}
   spec.description   = %q{A gem to integrate the timeago.js}
   spec.homepage      = &ldquo;&rdquo;
@@ -1318,41 +1332,6 @@ on __Thursday, March 27 at Midnight (EDT)__! Sign up below to receive a **20% di
 
 
 </p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Book Technical Review]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review/"/>
-    <updated>2014-03-04T17:43:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review</id>
-    <content type="html"><![CDATA[<p>Greetings from a now less snowy Eastern USA!</p>
-
-<p>The past few weeks have seemed like one big snow storm. We haven’t had many days above freezing and spent very little time outside (voluntarily at least). I’m sure those living in colder climates are probably saying “cry me a river…” right now. On the bright side, our extended home stays have given me more time to write.</p>
-
-<!--more-->
-
-
-<p><img class="center" src="/images/snow.jpg" title="&ldquo;West Chester Snow&rdquo;" ></p>
-
-<p>Since the last time, I made some serious progress…</p>
-
-<ol>
-<li><p><strong>The chapter list is finalized</strong> &ndash; I’m thankful for all the feedback you provided about the chapter list. It really helped me determine the more important topics and make sure they were well covered.</p></li>
-<li><p><strong>Content is done</strong> &ndash; Snow days inside will do that. I made a big push to strengthen the weaker areas where there was overwhelming interest.</p></li>
-<li><p><strong>Grammatical editing is done</strong> &ndash; I’m lucky to be surrounded by really supportive people that have both the skill and interest to help edit. They pitched in and we knocked it out!</p>
-
-<p> <img class="center" src="/images/editing.jpg" title="&ldquo;Build a Ruby Gem Editing&rdquo;" ></p></li>
-<li><p><strong>Technical review is underway</strong> &ndash; Again, I can’t stress how lucky I feel that people I respect and look up to in the Ruby community volunteered their free time to review the book. I suspect it’ll be another week or 2 before the final changes are sorted out, but never the less, technical review is well underway.</p></li>
-<li><p><strong><a href="http://www.mikeperham.com/">Mike Perham</a> is writing a foreword</strong> &ndash; Mike is someone I greatly respect and helped me navigate the open source eco-system when I first started contributing to his <a href="http://sidekiq.org/">Sidekiq</a> project. He’s been contributing to OSS far longer than Sidekiq and the Ruby community is lucky to have him. He’s written a beautifully succinct opening for the book as it relates to developing open source software. If reading his foreword doesn’t motivate to start contributing, I don’t now what will.</p></li>
-</ol>
-
-
-<p>Specifics about the launch date haven’t been determined, but <strong>the book will definitely launch in late March</strong>. I plan to be in touch with a <strong>sample chapter and coupon code</strong>, as promised, when the time gets closer.</p>
-
-<p>Looking back on the items mentioned above, I’m really excited to be nearing the home stretch and finally get it in to your hands.</p>
-
-<p>Hope you had a great past couple of weeks. Talk to you soon.</p>
 ]]></content>
   </entry>
   
