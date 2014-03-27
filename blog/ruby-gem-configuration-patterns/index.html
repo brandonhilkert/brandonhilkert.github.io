@@ -151,21 +151,7 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p><em>This is one of the final post leading up the the launch of the
-<a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Ruby Gem Configuration Patterns" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
+	<div class="entry-content" itemprop="articleBody"><p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
 
 <p>Fortunately, we can give users the ability to add custom configuration data, allowing them to adapt our code to their own use. In this post, we&rsquo;ll adapt the <a href="https://github.com/brandonhilkert/mega_lotto"><code>mega_lotto</code> gem</a> to take a configuration block that modifies the number of integers returned from the <code>#draw</code> method output.</p>
 
@@ -811,22 +797,6 @@ MegaLotto::Drawing.new(config).draw #=&gt; [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
 <p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
 
 <p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
-
-<p><em>This is one of the final post leading up the the launch of the
-<a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Ruby Gem Configuration Patterns" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-
 </div>
   
 

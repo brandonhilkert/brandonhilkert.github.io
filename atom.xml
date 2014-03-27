@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-03-26T23:56:02-04:00</updated>
+  <updated>2014-03-27T00:01:50-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -32,21 +32,7 @@ on it and really look forward to hearing your feedback.</p>
     <link href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/"/>
     <updated>2014-03-24T17:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-build-a-rails-engine</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="How to Build a Rails Engine" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
+    <content type="html"><![CDATA[<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
 
 <p>The <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Rails engine documentation</a> is well written and touches on the many ways to include functionality. I won’t cover every detail of Rails engines in this chapter, just enough to get you started making use of them. It’s possible to make full applications (routes, controllers, models, migrations, etc.) using Rails engines. However, we’re going to focus on some of the simpler the elements of a Rails engine that allow us to integrate functionality where a Railtie won’t suffice. Just know, there is far more you can do with Rails engines than what we’ll cover here. The documentation link above provides examples of many of those use cases.</p>
 
@@ -241,22 +227,6 @@ end</code></pre></figure>
 <p>The introduction of Rails engines created a new way to organize micro-applications and integrate them into a host application. Doing so keeps features and otherwise separate logic truly separate.</p>
 
 <p>I’ve only scratched the surface on what a gem can provide through engines. It’s certainly more detailed than just asset and view helper integration, as shown above. If you’re interested in learning more about the other features Rails engine provide, <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">the Rails guides</a> are a great place to start.</p>
-
-<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="How to Build a Rails Engine" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-
 ]]></content>
   </entry>
   
@@ -265,21 +235,7 @@ on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to recei
     <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday/"/>
     <updated>2014-03-24T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Ebook Available on Thursday" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
+    <content type="html"><![CDATA[<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
 
 <p>The book will be available starting at <strong>Midnight (EDT) on Thursday, March 27th</strong> and can be purchased from <strong><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">my website</a></strong>.</p>
 
@@ -304,22 +260,6 @@ on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to recei
 <p>I can’t tell you how excited I am to finally share this content with you. It’s been a little over 3 months since I announced that I was writing a book on building Ruby gems. To see so much interest has been really gratifying. I really can’t wait to see what you build as a result.</p>
 
 <p>As promised, I will be sending out a <strong>discount code on Tuesday night</strong> for those on the book mailing list, good for <strong>20% off the listed price of any package</strong>. The discount will only be <strong>available for the first 24 hours</strong>. After that, the packages will return to the prices listed above.</p>
-
-<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Ebook Available on Thursday" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-
 ]]></content>
   </entry>
   
@@ -328,21 +268,7 @@ on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to recei
     <link href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/"/>
     <updated>2014-03-17T20:26:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Ruby Gem Configuration Patterns" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
+    <content type="html"><![CDATA[<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
 
 <p>Fortunately, we can give users the ability to add custom configuration data, allowing them to adapt our code to their own use. In this post, we&rsquo;ll adapt the <a href="https://github.com/brandonhilkert/mega_lotto"><code>mega_lotto</code> gem</a> to take a configuration block that modifies the number of integers returned from the <code>#draw</code> method output.</p>
 
@@ -988,22 +914,6 @@ MegaLotto::Drawing.new(config).draw #=&gt; [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
 <p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
 
 <p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
-
-<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Ruby Gem Configuration Patterns" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-
 ]]></content>
   </entry>
   
@@ -1012,21 +922,7 @@ on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to recei
     <link href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
     <updated>2014-03-13T13:56:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Why I Wrote the Sucker Punch Gem" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-<p>One of the simplest and most common application of background processing is sending emails outside of a web
+    <content type="html"><![CDATA[<p>One of the simplest and most common application of background processing is sending emails outside of a web
 request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
 
 <p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>
@@ -1096,22 +992,6 @@ end
 <p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
 
 <p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
-
-<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=sucker-punch"><strong>Build a Ruby Gem Ebook</strong></a>
-on <strong>Thursday, March 27 at Midnight (EDT)</strong>! Sign up below to receive a <strong>20% discount coupon</strong> when the book launches.</em></p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Why I Wrote the Sucker Punch Gem" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-
 ]]></content>
   </entry>
   
@@ -1396,23 +1276,6 @@ end
 <p>One of the things I&rsquo;m most excited about is being able to use real-word examples for each chapter. I learn by reading and writing my own code and really appreciate when a book/post does the same. I&rsquo;ve tried to do that at every step of the way. Hopefully this will make the book more valuable to you.</p>
 
 <p>I will be in touch in the <strong>next few weeks with a sample chapter</strong> or two, along with some feature blog posts.</p>
-
-<p>If you&rsquo;re interested in receiving updates about the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary"><em>Build a Ruby Gem</em>
-book</a>,
-enter your email below:</p>
-
-<div class="inline-newsletter-form">
-  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&id=3c07d60ff7" method="post" target="_blank" novalidate>
-    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="your@email.com" required>
-    <input type="hidden" name="LOCATION" id="LOCATION" value="Build a Ruby Gem Book Update" />
-    <input type="hidden" name="PRODUCT" id="PRODUCT" value="book-gem" />
-    <input type="submit" value="Get Discount Code" name="subscribe" id="mc-embedded-subscribe" class="button">
-  </form>
-</div>
-
-
-<p>Members of this list will also receive a <strong>20% discount coupon</strong> when the book
-launches!</p>
 ]]></content>
   </entry>
   
