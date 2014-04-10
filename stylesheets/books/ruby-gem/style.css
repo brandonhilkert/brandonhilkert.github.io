@@ -777,6 +777,10 @@ input[type="submit"]:hover {
   color:#fff;
 }
 
+#twitter .one_third {
+  margin-left: 5px;
+  margin-right: 5px;
+}
 
 /* 6.8 Video */
 
