@@ -145,6 +145,44 @@
   
 
 
+<time datetime="2014-04-21T19:48:00-04:00" data-updated="true" itemprop="datePublished">April 21<span>st</span>, 2014</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/rails-reloader-a-lesser-known-railtie-hook/" itemprop="url">Rails Reloader: A Lesser Known Railtie Hook</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/sucker-punch/'>sucker punch</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
+
+<p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
+
+
+		
+		<a href="/blog/rails-reloader-a-lesser-known-railtie-hook/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2014-03-26T23:49:00-04:00" data-updated="true" itemprop="datePublished">March 26<span>th</span>, 2014</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-is-live/" itemprop="url">Build a Ruby Gem eBook Is Live!</a></h1>
   <div class="tags">
@@ -505,54 +543,6 @@ including <strong>14 chapters of code</strong> and over 2 hours of screencasts</
 
 		
 		<a href="/blog/page-specific-javascript-in-rails/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-01-13T07:01:00-05:00" data-updated="true" itemprop="datePublished">January 13<span>th</span>, 2014</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/relative-timestamps-in-rails/" itemprop="url">Relative Timestamps in Rails</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/timestamps/'>timestamps</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>Facebook’s news feed popularized the relative timestamp format of &ldquo;X hours ago&rdquo;. For good reason too&hellip;why print an absolute timestamp so that people have to do the relative calculation in their head? It’s one less step for the user, and to be fair, pretty easy to implement.</p>
-
-<h2>Rails helpers to the rescue</h2>
-
-<p>Rails has a view helper aptly named <code>time_ago_in_words</code>. If you use the
-<code>created_at</code> attribute from a record, you could easily reference a relative timestamp from a corresponding view:</p>
-
-<pre><code># app/views/posts/show.html.erb
-
-Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
-</code></pre>
-
-<p>That’s great! But not enough…what happens when a user stays on the page for 10 min. and the latest post was no longer posted &ldquo;1 minute ago”? Asking them to refresh the page every 10 minutes is no longer an acceptable answer.</p>
-
-
-		
-		<a href="/blog/relative-timestamps-in-rails/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

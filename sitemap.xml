@@ -122,11 +122,15 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/how-to-build-a-rails-engine/</loc>
-        <lastmod>2014-04-18T07:19:06-04:00</lastmod>
+        <lastmod>2014-04-21T19:51:26-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-is-live/</loc>
-        <lastmod>2014-04-18T07:18:59-04:00</lastmod>
+        <lastmod>2014-04-21T19:49:37-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/</loc>
+        <lastmod>2014-04-21T19:52:12-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
@@ -134,7 +138,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2014-04-18T07:20:09-04:00</lastmod>
+        <lastmod>2014-04-21T19:52:12-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/almost.html</loc>
@@ -146,7 +150,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2014-04-18T07:20:09-04:00</lastmod>
+        <lastmod>2014-04-21T19:52:12-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -158,11 +162,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2014-04-18T07:20:09-04:00</lastmod>
+        <lastmod>2014-04-21T19:52:12-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2014-04-18T07:20:09-04:00</lastmod>
+        <lastmod>2014-04-21T19:52:12-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -174,7 +178,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2014-04-18T07:20:09-04:00</lastmod>
+        <lastmod>2014-04-21T19:52:12-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>

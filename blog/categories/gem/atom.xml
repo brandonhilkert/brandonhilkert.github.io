@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-04-18T07:20:57-04:00</updated>
+  <updated>2014-04-23T06:49:03-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,136 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
+    <link href="http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/"/>
+    <updated>2014-04-21T19:48:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook</id>
+    <content type="html"><![CDATA[<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
+
+<p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="http://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
+
+<p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
+
+<p><code>
+  config.cache_classes = false
+</code></p>
+
+<p>Without it, we’d be forced to restart the server after almost every request. If that sounds like a giant PITA to you, I whole heartedly agree!</p>
+
+<p>So now you make your awesome job class, do some background work (send an email for example) and reload the page and boom:</p>
+
+<p><code>``
+Celluloid::PoolManager: async call</code>perform` aborted!
+ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!</p>
+
+<pre><code>    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
+    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
+    my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'
+</code></pre>
+
+<p>```</p>
+
+<p>The Celluloid registry still has reference to a the original <code>SendInvitationJob</code> class when it was initialized, however, reloading the code has caused the original reference to disappear and all hell breaks loose when the queue key is fetched to send another job to the class.</p>
+
+<p>In my head, it made sense for the queues to be cleared out upon every request in development. In general, because Sucker Punch doesn’t have persistent queues, the best use case is for quick one-off jobs that aren’t extremely important — email and logging come to mind. Since both of these examples are typically pretty speedy, it’s unlikely there will be a huge job backup upon subsequent requests.</p>
+
+<p>I knew what I wanted, but didn’t know how to accomplish it.</p>
+
+<h2>The Solution</h2>
+
+<p>Knowing the issue was related to the setting <code>config.cache_classes = false</code> in the development environment, I broke open the Rails source code and searched for <code>cache_classes</code>. The first result was the <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/reloader.rb"><code>ActionDispatch</code> reloader middleware</a>. Fortunately, there’s a very descriptive comment at the top of the class:</p>
+
+<p><code>
+  # By default, ActionDispatch::Reloader is included in the middleware stack
+  # only in the development environment; specifically, when +config.cache_classes+
+  # is false. Callbacks may be registered even when it is not included in the
+  # middleware stack, but are executed only when &lt;tt&gt;ActionDispatch::Reloader.prepare!&lt;/tt&gt;
+  # or &lt;tt&gt;ActionDispatch::Reloader.cleanup!&lt;/tt&gt; are called manually.
+</code></p>
+
+<p>This functionality is exactly what I needed!. From here, I just needed to know what callbacks were valid. A few lines in to the class are the following methods:</p>
+
+<p>```</p>
+
+<pre><code># Add a prepare callback. Prepare callbacks are run before each request, prior
+# to ActionDispatch::Callback's before callbacks.
+def self.to_prepare(*args, &amp;block)
+  unless block_given?
+    warn "to_prepare without a block is deprecated. Please use a block"
+  end
+  set_callback(:prepare, *args, &amp;block)
+end
+
+# Add a cleanup callback. Cleanup callbacks are run after each request is
+# complete (after #close is called on the response body).
+def self.to_cleanup(*args, &amp;block)
+  unless block_given?
+    warn "to_cleanup without a block is deprecated. Please use a block"
+  end
+  set_callback(:cleanup, *args, &amp;block)
+end
+</code></pre>
+
+<p>```</p>
+
+<p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
+
+<p>A quick glade over the <a href="http://rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
+
+<p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
+
+<p>```
+module SuckerPunch
+  class Railtie &lt; ::Rails::Railtie</p>
+
+<pre><code>initializer "sucker_punch.logger" do
+  SuckerPunch.logger = Rails.logger
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>All it did was connect the logger to the existing Rails logger. Adding the callback to <code>ActionDispatch</code> looks like:</p>
+
+<p>```
+module SuckerPunch
+  class Railtie &lt; ::Rails::Railtie</p>
+
+<pre><code>initializer "sucker_punch.logger" do
+  SuckerPunch.logger = Rails.logger
+
+  ActionDispatch::Reloader.to_prepare do
+    Celluloid::Actor.clear_registry
+  end
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now when the Railtie is loaded, the <code>Celluloid::Actor.clear_registry</code> method is triggered before the reloading of code in the development environment, clearing out the Celluloid registry and allowing Sucker Punch to instantiate new job queues for each request.</p>
+
+<h2>Summary</h2>
+
+<p>I was unaware of any of these methods when the issue was submitted. Rather than throw my hands up and close the issue because it didn’t affect me, I thought through an approach that could work, and only then started to write code. And in fact, didn’t know what code to write!</p>
+
+<p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
+
+<p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem eBook is Live!]]></title>
@@ -202,7 +332,7 @@ require &lsquo;time_ago/version&rsquo;</p>
   spec.name          = &ldquo;time_ago&rdquo;
   spec.version       = TimeAgo::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#98;&#114;&#x61;&#110;&#x64;&#111;&#110;&#x68;&#x69;&#108;&#x6b;&#x65;&#x72;&#116;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#99;&#x6f;&#109;">&#x62;&#x72;&#x61;&#x6e;&#x64;&#111;&#110;&#x68;&#x69;&#x6c;&#x6b;&#101;&#x72;&#x74;&#x40;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#109;</a>&rdquo;]
+  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#x62;&#114;&#x61;&#x6e;&#x64;&#111;&#x6e;&#104;&#x69;&#x6c;&#x6b;&#101;&#x72;&#116;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#46;&#x63;&#111;&#109;">&#x62;&#114;&#97;&#110;&#100;&#x6f;&#110;&#104;&#x69;&#x6c;&#x6b;&#101;&#x72;&#116;&#x40;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#109;</a>&rdquo;]
   spec.summary       = %q{A gem to integrate the timeago.js}
   spec.description   = %q{A gem to integrate the timeago.js}
   spec.homepage      = &ldquo;&rdquo;
@@ -1137,92 +1267,6 @@ config = OpenStruct.new(drawing_count: 10)</p>
 <p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
 
 <p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Why I Wrote the Sucker Punch Gem]]></title>
-    <link href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
-    <updated>2014-03-13T13:56:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
-    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
-[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
-which is now available for sale in [3 packages](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
-including __14 chapters of code__ and over 2 hours of screencasts_.
-
-
-</p>
-
-<p>One of the simplest and most common application of background processing is sending emails outside of a web
-request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
-
-<p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>
-
-<!--more-->
-
-
-<h2>Ruby Background Processing Libraries</h2>
-
-<p>Until I had heard of <a href="http://sidekiq.org/">Sidekiq</a>, <a href="https://github.com/collectiveidea/delayed_job/tree/master">delayed_job</a> and <a href="https://github.com/resque/resque">Resque</a> were the standard options for processing background jobs in Ruby. I&rsquo;ve used both and believe each has a great use case.</p>
-
-<p>In my experience, it&rsquo;s easiest to start with delayed_job if you need background processing in your application. If and when the DB becomes your bottleneck, it&rsquo;s time to move on. Redis is a dependency of both Resque and Sidekiq, which increases the complexity and infrastructure maintenance, however, with <a href="https://addons.heroku.com/?q=redis">Heroku&rsquo;s hosted Redis
-Add-ons</a>, this dependency is much less of a pain.</p>
-
-<h2>My work on Sidekiq</h2>
-
-<p>I previously wrote about my my <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">open source contributions</a> and how I got started. I had spent the previous several
-months contributing to Sidekiq and learning more about concurrency patterns in Ruby.</p>
-
-<p>Sidekiq is multi-threaded, which is the reason a single Sidekiq process is <a href="https://github.com/mperham/sidekiq/wiki/Testimonials">more
-efficient</a> than a library like Resque. Although, nothing in life is free &ndash; care must be taken to ensure your jobs are thread-safe. A helpful <a href="https://github.com/mperham/sidekiq/wiki/Best-Practices">guide to writing thread-safe code</a> can be found on the Sidekiq wiki.</p>
-
-<h2>Use Case</h2>
-
-<p>I was working on <a href="http://defriendnotifierapp.com/">Defriend Notifier</a> and needed to notify users via email when their Facebook friend list changed. Using Sidekiq or any of the alternatives mentioned above certainly would’ve worked. In fact, the application originally used Sidekiq and functioned perfectly. However, as time went on, I decided the extra cost of the worker wasn’t justified, especially given that the application didn’t produce any revenue outside of advertising (very little…).</p>
-
-<p>At the time, the only background processing library that didn’t require an additional background process was
-<a href="https://github.com/mperham/girl_friday">girl_friday</a>, also written by <a href="https://twitter.com/mperham">Mike
-Perham</a>, author of Sidekiq. While this solution worked for awhile, I found the syntax to be slightly non-intuitive and it felt a little dirty to pass around a global variable within the application
-to manage a single job queue. I also experienced some memory leaks on Heroku as a result of switching to
-girl_friday, but to be fair, I didn&rsquo;t spend much time determining the root cause. <em>Disclaimer: It very likely could’ve been due to code that I wrote</em>.</p>
-
-<h2>Enter Celluloid</h2>
-
-<p><a href="https://github.com/celluloid/celluloid">Celluloid</a> describes itself as an actor-based concurrent object
-framework for Ruby. Celluloid is the guts behind Sidekiq and the reason why the multi-threaded Sidekiq code is so readable. Celluloid abstracts away the details of concurrency so your code doesn&rsquo;t have to worry about manually managing thread synchronization and object message queuing.</p>
-
-<h2>Sucker Punch is born</h2>
-
-<p>girl_friday was written several years ago — before Celluloid was created. Realizing the power of Celluloid,
-I figured there was an opportunity for a new library that behaved like girl_friday, but utilized
-Celluloid&rsquo;s more reliable multi-threading capabilities. And because Celluloid handles so much of the complexity, the gem itself would be relatively simple — really a DSL around enqueuing jobs to a <a href="https://github.com/celluloid/celluloid/wiki/Pools">Celluloid Pool</a>.</p>
-
-<p>I <a href="https://twitter.com/brandonhilkert/status/292630123981729793">posed the question to Mike Perham</a> and he confirmed my suspicions.</p>
-
-<p><img class="center" src="/images/sucker-punch-tweet.png" title="&ldquo;Sucker Punch Tweet&rdquo;" ></p>
-
-<p>Fortunately, Celluloid had all of the functionality needed for background queues already built-in. While the
-functionality was there, the usage syntax was awkward.</p>
-
-<p>I spent the next few days creating a DSL around the Celluloid internals, thus making it feel more specific to
-background queues.</p>
-
-<p>Here’s the result of a typical job class:</p>
-
-<pre><code>class LogJob
-  include SuckerPunch::Job
-
-  def perform(event)
-    # do some other stuff to
-    # record the event in the background
-    puts "#{event} just happened"
-  end
-end
-</code></pre>
-
-<p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
-
-<p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
 ]]></content>
   </entry>
   

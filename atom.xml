@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-04-18T07:20:57-04:00</updated>
+  <updated>2014-04-23T06:49:03-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,118 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
+    <link href="http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/"/>
+    <updated>2014-04-21T19:48:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook</id>
+    <content type="html"><![CDATA[<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
+
+<p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="http://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
+
+<p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
+
+<figure class='code'><pre><code>  config.cache_classes = false</code></pre></figure>
+
+
+<p>Without it, we’d be forced to restart the server after almost every request. If that sounds like a giant PITA to you, I whole heartedly agree!</p>
+
+<p>So now you make your awesome job class, do some background work (send an email for example) and reload the page and boom:</p>
+
+<figure class='code'><pre><code>Celluloid::PoolManager: async call `perform` aborted!
+ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!
+        gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
+        gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
+        my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'</code></pre></figure>
+
+
+<p>The Celluloid registry still has reference to a the original <code>SendInvitationJob</code> class when it was initialized, however, reloading the code has caused the original reference to disappear and all hell breaks loose when the queue key is fetched to send another job to the class.</p>
+
+<p>In my head, it made sense for the queues to be cleared out upon every request in development. In general, because Sucker Punch doesn’t have persistent queues, the best use case is for quick one-off jobs that aren’t extremely important — email and logging come to mind. Since both of these examples are typically pretty speedy, it’s unlikely there will be a huge job backup upon subsequent requests.</p>
+
+<p>I knew what I wanted, but didn’t know how to accomplish it.</p>
+
+<h2>The Solution</h2>
+
+<p>Knowing the issue was related to the setting <code>config.cache_classes = false</code> in the development environment, I broke open the Rails source code and searched for <code>cache_classes</code>. The first result was the <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/reloader.rb"><code>ActionDispatch</code> reloader middleware</a>. Fortunately, there’s a very descriptive comment at the top of the class:</p>
+
+<figure class='code'><pre><code>  # By default, ActionDispatch::Reloader is included in the middleware stack
+  # only in the development environment; specifically, when +config.cache_classes+
+  # is false. Callbacks may be registered even when it is not included in the
+  # middleware stack, but are executed only when &lt;tt&gt;ActionDispatch::Reloader.prepare!&lt;/tt&gt;
+  # or &lt;tt&gt;ActionDispatch::Reloader.cleanup!&lt;/tt&gt; are called manually.</code></pre></figure>
+
+
+<p>This functionality is exactly what I needed!. From here, I just needed to know what callbacks were valid. A few lines in to the class are the following methods:</p>
+
+<figure class='code'><pre><code># Add a prepare callback. Prepare callbacks are run before each request, prior
+# to ActionDispatch::Callback's before callbacks.
+def self.to_prepare(*args, &block)
+  unless block_given?
+    warn "to_prepare without a block is deprecated. Please use a block"
+  end
+  set_callback(:prepare, *args, &block)
+end
+
+# Add a cleanup callback. Cleanup callbacks are run after each request is
+# complete (after #close is called on the response body).
+def self.to_cleanup(*args, &block)
+  unless block_given?
+    warn "to_cleanup without a block is deprecated. Please use a block"
+  end
+  set_callback(:cleanup, *args, &block)
+end</code></pre></figure>
+
+
+<p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
+
+<p>A quick glade over the <a href="http://rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
+
+<p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
+
+<figure class='code'><pre><code>module SuckerPunch
+  class Railtie &lt; ::Rails::Railtie
+    initializer "sucker_punch.logger" do
+      SuckerPunch.logger = Rails.logger
+    end
+  end
+end</code></pre></figure>
+
+
+<p>All it did was connect the logger to the existing Rails logger. Adding the callback to <code>ActionDispatch</code> looks like:</p>
+
+<figure class='code'><pre><code>module SuckerPunch
+  class Railtie &lt; ::Rails::Railtie
+    initializer "sucker_punch.logger" do
+      SuckerPunch.logger = Rails.logger
+
+      ActionDispatch::Reloader.to_prepare do
+        Celluloid::Actor.clear_registry
+      end
+    end
+  end
+end</code></pre></figure>
+
+
+<p>Now when the Railtie is loaded, the <code>Celluloid::Actor.clear_registry</code> method is triggered before the reloading of code in the development environment, clearing out the Celluloid registry and allowing Sucker Punch to instantiate new job queues for each request.</p>
+
+<h2>Summary</h2>
+
+<p>I was unaware of any of these methods when the issue was submitted. Rather than throw my hands up and close the issue because it didn’t affect me, I thought through an approach that could work, and only then started to write code. And in fact, didn’t know what code to write!</p>
+
+<p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
+
+<p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem eBook is Live!]]></title>
@@ -2437,125 +2549,6 @@ to warrant an ebook. So far, so good&hellip;</p>
 <p>Total visits to the site was 337. I&rsquo;ll take a 10% conversion rate any day!</p>
 
 <p><img class="center" src="http://brandonhilkert.com/images/woh/ga-day1.png" title="&#34;Google Analytics from Day 1&#34;" alt="&#34;Google Analytics from Day 1&#34;"></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 1]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/"/>
-    <updated>2013-12-01T05:37:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1</id>
-    <content type="html"><![CDATA[<p>
-  <em>I did an <strong>8-day sprint</strong> to launch my <a
-  href="http://brandonhilkert.com/courses/build-a-ruby-gem/" target="_blank"><strong>Build a Ruby Gem</strong> email course</a>
-  and documented my progress through this series of blog posts.</em>
-</p>
-
-
-
-
-<p><p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/">Weekend Update</a>
-<a href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/">Summary</a></p>
-
-<h2>JFDI</h2>
-
-<p>Living outside a major metropolitan area has made it hard to surround myself
-with other entrepreneurs. Fortunately, the internet has made the world a
-smaller place. Last week I joined <a href="http://jfdi.bz/">JFDI.bz</a>, a community for
-solo-founders launching their own thing.</p>
-
-<p>My goal for joining this community was to have access to other motivated
-entrepreneurs that I could use as a sounding-board. I also figured it&rsquo;d be
-great opportunity to peek in to other solo founders launch process and
-motivation for a particular product.</p>
-
-<h2>Week of Hustle</h2>
-
-<p>Week of Hustle is an 8-day sprint to launch something. Anything really&hellip;could
-be an existing product that you need to put the finishing touches on, or a
-brand new idea. It was one of the things that attracted most to JFDI.</p>
-
-<p>Launching any kind of product is time consuming. And with a family and other
-full-time responsibilities, life can get in the way. I feel like I&rsquo;m pretty
-good at managing my time efficiently, but when accountability is involved, it&rsquo;s
-much harder to put it off.</p>
-
-<p><!--more--></p>
-
-<h2>My Goal</h2>
-
-<p>This week I will be launching a free <strong>5-day email course</strong> focused on
-<strong>Building a Ruby Gem</strong>. My goal for the course is to build my newsletter
-audience and work through the steps of building a smaller info product to
-determine if there&rsquo;s enough interest in the subject to warrant writing an
-ebook.</p>
-
-<p>As part of 8-day process, I will be posting blog entries daily about my
-progress and the challenges I&rsquo;m facing at each step.</p>
-
-<h2>Why an email course on Building a Ruby Gem?</h2>
-
-<p>One of the first blog posts I wrote was about <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">how to get started contributing
-to Open Source</a>. I
-wrote it because I remember being somewhat unsure about the topic early in my
-Ruby career. Additionally, it garnered far more attention than any of my other
-posts, which tells me there&rsquo;s clearly a need for this kind of discussion.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/ga.png" title="&#34;Google Analytics of my first few blog posts.&#34;" alt="&#34;Google Analytics of my first few blog posts.&#34;"></p>
-
-<p>The Ruby gem ecosystem is really powerful, but equally confusing, in my
-opinion. There are <em>strong</em> recommendations about how to structure the
-internals of a gem, which can make writing your first gem pretty frustrating.</p>
-
-<h2>My plan this week</h2>
-
-<p>So getting down to business&hellip;here&rsquo;s my tentative plan this week:</p>
-
-<ul>
-<li><p>Day 1 &ndash; Overall topic and organize what content goes on which days, setup GH
-project and ready tags, write WOH day blog, why gem discussion (ref. open
-source blog &ndash; pics of GA)</p></li>
-<li><p>Day 2 &ndash; Write content and WOH blog (notify subscribers)</p></li>
-<li><p>Day 3 &ndash; Write content and WOH blog (notify subscribers)</p></li>
-<li><p>Day 4 &ndash; Write content and WOH blog (notify subscribers)</p></li>
-<li><p>Day 5 &ndash; Write content and WOH blog (notify subscribers)</p></li>
-<li><p>Day 6 &ndash; Write content and WOH blog (notify subscribers)</p></li>
-<li><p>Day 7 &ndash;  Setup auto responder and way to capture for the course, write emails for each day of sequence</p></li>
-<li><p>Day 8 &ndash; Launch with new landing page and notify subscribers</p></li>
-</ul>
-
-
-<h2>Time Management</h2>
-
-<p>I do have a full-time job and will be working all week. Because I try to spend
-as much time as possible with my daughter, my goal is to accomplish the steps
-above early in the AM. This morning I set my alarm for 6am, but got up 4:30am
-because I was excited to start the week. Today was a relatively easy day in
-terms of time-consuming tasks, so I&rsquo;m guessing I&rsquo;ll shoot for 5am the remainder
-of the week. We&rsquo;ll see!</p>
-
-<h2>Today&rsquo;s Accomplishments</h2>
-
-<ul>
-<li>I created a <a href="https://github.com/brandonhilkert/mega_lotto">Github project to house the code I&rsquo;ll write</a></li>
-<li>I wrote this post</li>
-<li>I setup a mail chimp entry form for subscription to my WOH updates</li>
-<li>I created the structure for the email course content</li>
-<li>I searched through <a href="http://www.reddit.com/">Reddit</a> and found a <a href="http://www.reddit.com/r/ruby/comments/1qplmu/tutorial_build_a_gem_from_scratch/">few posts that
-express</a>
-a need to <a href="http://www.reddit.com/r/ruby/comments/1qmb29/building_a_gem_from_scratch_google_hangout_today/">learn about about writing Ruby
-gems</a>.
-Those interested in these posts would be a great target audience.</li>
-</ul>
-
-
-<p>Until tomorrow!</p>
 ]]></content>
   </entry>
   
