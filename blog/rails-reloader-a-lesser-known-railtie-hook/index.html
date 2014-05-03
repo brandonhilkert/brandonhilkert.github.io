@@ -240,10 +240,10 @@ end</code></pre></figure>
   class Railtie &lt; ::Rails::Railtie
     initializer "sucker_punch.logger" do
       SuckerPunch.logger = Rails.logger
+    end
 
-      ActionDispatch::Reloader.to_prepare do
-        Celluloid::Actor.clear_registry
-      end
+    config.to_prepare do
+      Celluloid::Actor.clear_registry
     end
   end
 end</code></pre></figure>
