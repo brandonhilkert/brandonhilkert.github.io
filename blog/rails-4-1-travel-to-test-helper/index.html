@@ -224,7 +224,6 @@ end
 test "sends reminders on tuesday for those scheduled on wednesday" do
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
-  travel_back
 end
 
 def teardown
