@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-05-03T07:24:53-04:00</updated>
+  <updated>2014-05-14T06:42:54-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[New Rails 4.1 travel_to test helper]]></title>
+    <link href="http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/"/>
+    <updated>2014-05-11T14:08:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
+
+<p>With the release of Rails 4.1, the time stubbing method <code>travel_to</code> was added. This new helper method forces the current time to whatever you specify, allowing you to make asserts against a historical time, or week in my case.</p>
+
+<!--more-->
+
+
+<h2>The Test</h2>
+
+<p><a href="https://github.com/travisjeffery/timecop">Timecop</a> performed valiantly and did more than I ever needed (I generally only used the <code>freeze</code> method). However, dragging in another gem was the last thing I wanted to do for something relatively simple.</p>
+
+<p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
+
+<p>```
+test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
+  Timecop.freeze Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
+
+<pre><code>Reminders::Checkin.new.email
+assert_equal 3, ActionMailer::Base.deliveries.size
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
+
+<h2>Rails 4.1</h2>
+
+<p>I think I first heard about some additional testing methods from my friend <a href="http://iamericsteele.com/">Eric Steele</a>. He mentioned them in one of our various conversations about testing (he’s writing a book titled <em><a href="https://whatdoitest.com/?utm_source=brandonhilkert-com&amp;utm_medium=web&amp;%20utm_campaign=travel-to">What Do I Test?</a></em>).</p>
+
+<p>Like many, I looked over the <a href="http://guides.rubyonrails.org/4_1_release_notes.html">release notes for Rails 4.1</a> and features like <a href="http://guides.rubyonrails.org/4_1_release_notes.html#spring-application-preloader">Spring</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml">secrets</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#action-mailer-previews">ActionMailer previews</a>, and <a href="http://guides.rubyonrails.org/4_1_release_notes.html#active-record-enums">ActiveRecord enums</a> jumped out at me.</p>
+
+<p>Towards the bottom, though, was a feature barely mentioned or written about:</p>
+
+<p>[insert pic]</p>
+
+<p><a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/testing/time_helpers.rb">The <code>TimeHelpers</code> test module</a> adds the <code>travel_to</code> and <code>travel_back</code> methods to assist in stubbing <code>Time.now</code> and <code>Date.today</code>.</p>
+
+<h2>Updated Tests</h2>
+
+<p>Using the <code>travel_to</code> method with the example above results in the following:</p>
+
+<p>```
+test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
+  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
+
+<pre><code>Reminders::Checkin.new.email
+assert_equal 3, ActionMailer::Base.deliveries.size
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
+
+<p>While the change doesn&rsquo;t look significant, it removed my need for the <code>Timecop</code> gem entirely.</p>
+
+<p>Additionally, the same test could be written as:</p>
+
+<p><code>
+test "sends reminders on tuesday for those scheduled on wednesday" do
+  travel_to Chronic.parse("4/15/14")
+  Reminders::Checkin.new.email
+  assert_equal 3, ActionMailer::Base.deliveries.size
+  travel_back
+end
+</code></p>
+
+<p>or with <code>setup</code> and <code>teardown</code>:</p>
+
+<p>```
+def setup
+  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;)
+end</p>
+
+<p>test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
+  Reminders::Checkin.new.email
+  assert_equal 3, ActionMailer::Base.deliveries.size
+  travel_back
+end</p>
+
+<p>def setup
+  travel_back
+end
+```</p>
+
+<h2>Summary</h2>
+
+<p>Rails is well-known for conventions. <code>travel_to</code> is a great addition to the framework that would&rsquo;ve otherwise required dragging in additional dependencies.</p>
+
+<p>Next time you look at the release notes for a project, don&rsquo;t skip over the less featured functionality. For all you know, it could be something that saves you time and frustration that commonly occurs in your projects.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
@@ -332,7 +433,7 @@ require &lsquo;time_ago/version&rsquo;</p>
   spec.name          = &ldquo;time_ago&rdquo;
   spec.version       = TimeAgo::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#x3a;&#98;&#114;&#97;&#x6e;&#100;&#111;&#x6e;&#x68;&#x69;&#108;&#107;&#x65;&#114;&#x74;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#x72;&#x61;&#110;&#x64;&#x6f;&#x6e;&#x68;&#x69;&#x6c;&#107;&#x65;&#x72;&#x74;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#x6d;</a>&rdquo;]
+  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x62;&#x72;&#97;&#x6e;&#x64;&#x6f;&#110;&#x68;&#x69;&#108;&#x6b;&#101;&#x72;&#116;&#64;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#x62;&#x72;&#97;&#x6e;&#100;&#x6f;&#x6e;&#x68;&#105;&#x6c;&#107;&#101;&#114;&#116;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#x6d;</a>&rdquo;]
   spec.summary       = %q{A gem to integrate the timeago.js}
   spec.description   = %q{A gem to integrate the timeago.js}
   spec.homepage      = &ldquo;&rdquo;
@@ -441,832 +542,6 @@ including __14 chapters of code__ and over 2 hours of screencasts_.
 <p>I can’t tell you how excited I am to finally share this content with you. It’s been a little over 3 months since I announced that I was writing a book on building Ruby gems. To see so much interest has been really gratifying. I really can’t wait to see what you build as a result.</p>
 
 <p>As promised, I will be sending out a <strong>discount code on Tuesday night</strong> for those on the book mailing list, good for <strong>20% off the listed price of any package</strong>. The discount will only be <strong>available for the first 24 hours</strong>. After that, the packages will return to the prices listed above.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Ruby Gem Configuration Patterns]]></title>
-    <link href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/"/>
-    <updated>2014-03-17T20:26:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns</id>
-    <content type="html"><![CDATA[<p>_This is one of the final post leading up the the launch of the
-[__Build a Ruby Gem Ebook__](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
-which is now available for sale in [3 packages](/books/build-a-ruby-gem/?utm_source=bh-com&utm_medium=web&utm_campaign=launch),
-including __14 chapters of code__ and over 2 hours of screencasts_.
-
-
-</p>
-
-<p>The world isn’t black and white (as much as we’d like to believe it is). Just because our gem’s functionality may work for us, doesn’t mean it’ll work for everyone.</p>
-
-<p>Fortunately, we can give users the ability to add custom configuration data, allowing them to adapt our code to their own use. In this post, we&rsquo;ll adapt the <a href="https://github.com/brandonhilkert/mega_lotto"><code>mega_lotto</code> gem</a> to take a configuration block that modifies the number of integers returned from the <code>#draw</code> method output.</p>
-
-<!--more-->
-
-
-<h2>Use Case</h2>
-
-<p>Our <code>mega_lotto</code> gem provides the functionality to randomly draw 6 numbers. However, let’s assume that someone else has taken interest in the code for our gem, but needs the code to generate 10 random numbers within the same range.</p>
-
-<p>One option would be for them to fork the code and modify the gem to fit their needs. However, now there’s a randomly forked gem with the same name and it’s unclear why one should be used over the other, especially if no changes to the <code>README</code> were made.</p>
-
-<p>Rather than go down that path, we can make our existing <code>mega_lotto</code> gem more flexible by returning 6 integers by default, while also providing an interface to customize this value for those with the need.</p>
-
-<p>Our goal is to adapt our gem to take a configuration block like this:</p>
-
-<p><code>ruby
-MegaLotto.configure do |config|
-  config.drawing_count = 10
-end
-</code></p>
-
-<h2>Implementation</h2>
-
-<p>Let’s first write some specs for the desired functionality. Because the <code>.configure</code> method above is off the main <code>MegaLotto</code> namespace, we’ll create the spec file <code>spec/mega_lotto_spec.rb</code>. With this spec, we’ll assert that after running the configuration block above, the <code>#drawing</code> method returns an array (like before), but this time with 10 integers instead:</p>
-
-<p>```ruby
-require &ldquo;spec_helper&rdquo;</p>
-
-<p>describe MegaLotto do
-  describe &ldquo;#configure&rdquo; do</p>
-
-<pre><code>before do
-  MegaLotto.configure do |config|
-    config.drawing_count = 10
-  end
-end
-
-it "returns an array with 10 elements" do
-  draw = MegaLotto::Drawing.new.draw
-
-  expect(draw).to be_a(Array)
-  expect(draw.size).to eq(10)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>This spec serves as higher level integration spec because it’s accessing the public API of our gem. Because of this, we can be sure that once this spec passes, our implementation is complete. As expected, when we run this spec, it fails:</p>
-
-<p>```bash
-MegaLotto
-  #configure</p>
-
-<pre><code>returns an array with 10 elements (FAILED - 1)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto#config returns an array with 10 elements</p>
-
-<pre><code> Failure/Error: MegaLotto.configure do |config|
- NoMethodError:
-   undefined method `configure` for MegaLotto:Module
- # ./spec/mega_lotto_spec.rb:6
-</code></pre>
-
-<p>Finished in 0.00131 seconds
-1 example, 1 failure
-```</p>
-
-<p>Now that we have a spec to work against, let’s continue our implementation.</p>
-
-<p>The failure above complained that there was no <code>MegaLotto.configure</code> method, so let’s add it:</p>
-
-<p><code>ruby
-module MegaLotto
-  def self.configure
-  end
-end
-</code></p>
-
-<p>Re-running our specs gives us a different failure message this time:</p>
-
-<p>```bash
-MegaLotto
-  #configure</p>
-
-<pre><code>returns an array with 10 elements (FAILED - 1)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto#configure returns an array with 10 elements</p>
-
-<pre><code> Failure/Error: expect(draw.size).to eq(10)
-
-   expected: 10
-        got: 6
-
-   (compared using ==)
- # ./spec/mega_lotto_spec.rb:15
-</code></pre>
-
-<p>Finished in 0.00246 seconds
-1 example, 1 failure
-```</p>
-
-<p>The output now shows that the code still returned 6 integers, which we expected because our <code>.configure</code> method hasn’t done anything yet.</p>
-
-<p>Because we’re using a object-oriented language like Ruby, we can create a <code>Configuration</code> class whose responsibility will be…(drumroll)….configuration!</p>
-
-<p>Let’s start with some specs:</p>
-
-<p>```ruby</p>
-
-<h1>spec/mega_lotto/configuration_spec.rb</h1>
-
-<p>require &ldquo;spec_helper&rdquo;</p>
-
-<p>module MegaLotto
-  describe Configuration do</p>
-
-<pre><code>describe "#drawing_count" do
-  it "default value is 6" do
-    Configuration.new.drawing_count = 6
-  end
-end
-
-describe "#drawing_count=" do
-  it "can set value" do
-    config = Configuration.new
-    config.drawing_count = 7
-    expect(config.drawing_count).to eq(7)
-  end
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Running the configuration specs produces:</p>
-
-<p><code>bash
-/Users/bhilkert/Dropbox/code/mega_lotto/spec/
-mega_lotto/configuration_spec.rb:4:in `&lt;module:MegaLotto&gt;`:
-uninitialized constant MegaLotto::Configuration (NameError)
-</code></p>
-
-<p>Let’s add the <code>Configuration</code> class:</p>
-
-<p>```ruby</p>
-
-<h1>lib/mega_lotto/configuration.rb</h1>
-
-<p>module MegaLotto
-  class Configuration
-  end
-end
-```</p>
-
-<p>Let’s try again:</p>
-
-<p><code>bash
-/Users/bhilkert/Dropbox/code/mega_lotto/spec/
-mega_lotto/configuration_spec.rb:4:in `&lt;module:MegaLotto&gt;`:
-uninitialized constant MegaLotto::Configuration (NameError)
-</code></p>
-
-<p>What??? Same message…Even though we added the <code>Configuration</code> class above, our gem doesn’t load it. So we can dive in to the entry file <code>lib/mega_lotto.rb</code> and add the appropriate require statement:</p>
-
-<p>```ruby
-require &ldquo;mega_lotto/version&rdquo;
-require &ldquo;mega_lotto/configuration&rdquo;
-require &ldquo;mega_lotto/drawing&rdquo;</p>
-
-<p>begin
-  require &ldquo;pry&rdquo;
-rescue LoadError
-end</p>
-
-<p>module MegaLotto
-  def self.configure
-  end
-end
-```</p>
-
-<p>Now with the <code>Configuration</code> class properly loaded, let’s run our specs again:</p>
-
-<p>```bash
-MegaLotto::Configuration
-  #drawing_count</p>
-
-<pre><code>default value is 6 (FAILED - 1)
-</code></pre>
-
-<p>  #drawing_count=</p>
-
-<pre><code>can set value (FAILED - 2)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto::Configuration#drawing_count default value is 6</p>
-
-<pre><code> Failure/Error: expect(config.drawing_count).to eq(6)
- NoMethodError:
-   undefined method `drawing_count` for #&lt;MegaLotto::Configuration&gt;
- # ./spec/mega_lotto/configuration_spec.rb:8
-</code></pre>
-
-<p>  2) MegaLotto::Configuration#drawing_count= can set value</p>
-
-<pre><code> Failure/Error: config.drawing_count = 7
- NoMethodError:
-   undefined method `drawing_count=` for #&lt;MegaLotto::Configuration&gt;
- # ./spec/mega_lotto/configuration_spec.rb:15
-</code></pre>
-
-<p>Finished in 0.00175 seconds
-2 examples, 2 failures
-```</p>
-
-<p>Even though we still have failures, we’re making progress. The failures above relate to the lack of a <code>#drawing_count=</code> method, so let’s add an accessor for it:</p>
-
-<p>```ruby
-module MegaLotto
-  class Configuration</p>
-
-<pre><code>attr_accessor :drawing_count
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><em>Note: We could’ve just added an <code>attr_writer</code> to satisfy the spec. However, I know I’m going to need a getter down the road, so I chose to do it at the same time.</em></p>
-
-<p>With our accessor in place, let’s check the specs again:</p>
-
-<p>```bash
-MegaLotto::Configuration
-  #drawing_count=</p>
-
-<pre><code>can set value
-</code></pre>
-
-<p>  #drawing_count</p>
-
-<pre><code>default value is 6 (FAILED - 1)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto::Configuration#drawing_count default value is 6</p>
-
-<pre><code> Failure/Error: expect(config.drawing_count).to eq(6)
-
-   expected: 6
-        got: nil
-
-   (compared using ==)
- # ./spec/mega_lotto/configuration_spec.rb:8
-</code></pre>
-
-<p>Finished in 0.00239 seconds
-2 examples, 1 failure
-```</p>
-
-<p>Still a failure, but we’re slowly making more progress. The default value isn’t getting set so we’ll change that in the implementation:</p>
-
-<p>```ruby
-module MegaLotto
-  class Configuration</p>
-
-<pre><code>attr_accessor :drawing_count
-
-def initialize
-  @drawing_count = 6
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Running the specs one more time for the <code>Configuration</code> class shows that we’re good:</p>
-
-<p>```bash
-MegaLotto::Configuration
-  #drawing_count</p>
-
-<pre><code>default value is 6
-</code></pre>
-
-<p>  #drawing_count=</p>
-
-<pre><code>can set value
-</code></pre>
-
-<p>Finished in 0.00172 seconds
-2 examples, 0 failures
-```</p>
-
-<p>Running the specs for the main <code>spec/mega_lotto.rb</code> class again:</p>
-
-<p>```bash
-MegaLotto
-  #configure</p>
-
-<pre><code>returns an array with 10 elements (FAILED - 1)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto#configure returns an array with 10 elements</p>
-
-<pre><code> Failure/Error: expect(draw.size).to eq(10)
-
-   expected: 10
-        got: 6
-
-   (compared using ==)
- # ./spec/mega_lotto_spec.rb:15:in `block (3 levels) in &lt;top (required)&gt;'
-</code></pre>
-
-<p>Finished in 0.00168 seconds
-1 example, 1 failure
-```</p>
-
-<p>We still have the same failures from before, but it’s because we didn’t change the <code>MegaLotto::Drawing</code> to actually <em>use</em> the new configuration class. Since we have this awesome new class, let’s make use of it in <code>MegaLotto::Drawing</code>:</p>
-
-<p>```ruby
-module MegaLotto
-  class Drawing</p>
-
-<pre><code>def draw
-  MegaLotto.configuration.drawing_count.times.map { single_draw }
-end
-
-private
-
-def single_draw
-  rand(0...60)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Running the specs for the drawing class gives us the following output:</p>
-
-<p>```bash
-MegaLotto::Drawing
-  #draw</p>
-
-<pre><code>each element is less than 60 (FAILED - 1)
-each element is an integer (FAILED - 2)
-returns an array (FAILED - 3)
-using the default drawing count
-  returns an array with 6 elements (FAILED - 4)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto::Drawing#draw each element is less than 60</p>
-
-<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `configuration` for MegaLotto:Module
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:19
-</code></pre>
-
-<p>  2) MegaLotto::Drawing#draw each element is an integer</p>
-
-<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `configuration` for MegaLotto:Module
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:13
-</code></pre>
-
-<p>  3) MegaLotto::Drawing#draw returns an array</p>
-
-<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `configuration` for MegaLotto:Module
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:9
-</code></pre>
-
-<p>  4) MegaLotto::Drawing#draw using the default</p>
-
-<pre><code>  drawing count returns an array with 6 elements
- Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `configuration` for MegaLotto:Module
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:26
-</code></pre>
-
-<p>Finished in 0.00219 seconds
-4 examples, 4 failures
-```</p>
-
-<p>Well…I guess it’s clear that it doesn’t have a <code>configuration</code> accessor, huh? Let’s add it to <code>lib/mega_lotto.rb</code>:</p>
-
-<p>```ruby
-module MegaLotto
-  class &lt;&lt; self</p>
-
-<pre><code>attr_accessor :configuration
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configure
-  end
-end</p>
-
-<p>```</p>
-
-<p>and our specs:</p>
-
-<p>```bash
-MegaLotto::Drawing
-  #draw</p>
-
-<pre><code>each element is less than 60 (FAILED - 1)
-each element is an integer (FAILED - 2)
-returns an array (FAILED - 3)
-using the default drawing count
-  returns an array with 6 elements (FAILED - 4)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto::Drawing#draw each element is less than 60</p>
-
-<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `drawing_count` for nil:NilClass
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:19
-</code></pre>
-
-<p>  2) MegaLotto::Drawing#draw each element is an integer</p>
-
-<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `drawing_count` for nil:NilClass
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:13
-</code></pre>
-
-<p>  3) MegaLotto::Drawing#draw returns an array</p>
-
-<pre><code> Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `drawing_count` for nil:NilClass
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:9
-</code></pre>
-
-<p>  4) MegaLotto::Drawing#draw using the default</p>
-
-<pre><code>  drawing count returns an array with 6 elements
- Failure/Error: let(:draw) { MegaLotto::Drawing.new.draw }
- NoMethodError:
-   undefined method `drawing_count` for nil:NilClass
- # ./lib/mega_lotto/drawing.rb:4:in `draw'
- # ./spec/mega_lotto/drawing_spec.rb:6
- # ./spec/mega_lotto/drawing_spec.rb:26
-</code></pre>
-
-<p>Finished in 0.00146 seconds
-4 examples, 4 failures</p>
-
-<p>```</p>
-
-<p>A different message this time, related to the fact that the configuration accessor has no <code>#drawing_count</code> method. This makes sense because we don’t actually return anything from <code>#configuration</code>. Let’s instantiate a new <code>Configuration</code> object and see where that gets us:</p>
-
-<p>```ruby
-module MegaLotto
-  class &lt;&lt; self</p>
-
-<pre><code>attr_writer :configuration
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configuration</p>
-
-<pre><code>Configuration.new
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configure
-  end
-end
-```</p>
-
-<p>Now, the <code>Drawing</code> class specs are passing:</p>
-
-<p>```bash
-MegaLotto::Drawing
-  #draw</p>
-
-<pre><code>each element is an integer
-each element is less than 60
-returns an array
-using the default drawing count
-  returns an array with 6 elements
-</code></pre>
-
-<p>Finished in 0.01007 seconds
-4 examples, 0 failures
-```</p>
-
-<p>Let’s flip back to the spec file <code>spec/mega_lotto_spec.rb</code> and see where we are:</p>
-
-<p>```bash
-MegaLotto
-  #configure</p>
-
-<pre><code>returns an array with 10 elements (FAILED - 1)
-</code></pre>
-
-<p>Failures:</p>
-
-<p>  1) MegaLotto#configure returns an array with 10 elements</p>
-
-<pre><code> Failure/Error: expect(draw.size).to eq(10)
-
-   expected: 10
-        got: 6
-
-   (compared using ==)
- # ./spec/mega_lotto_spec.rb:15
-</code></pre>
-
-<p>Finished in 0.00167 seconds
-1 example, 1 failure
-```</p>
-
-<p>Still failing, but at least we have what seems like the pieces setup to implement the global configuration. The <code>.configure</code> methods needs to yield the configuration block to a new instance of the <code>Configuration</code> class. However, we’ll need to memoize the configuration instance, so when the <code>Drawing</code> class accesses <code>#drawing_count</code>, it returns the initial  configuration value:</p>
-
-<p>```ruby
-module MegaLotto
-  class &lt;&lt; self</p>
-
-<pre><code>attr_writer :configuration
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configuration</p>
-
-<pre><code>@configuration ||= Configuration.new
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configure</p>
-
-<pre><code>yield(configuration)
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><em>Note: it’s important to return the class instance variable from <code>.configuration</code> and check if that is set rather than the reader method, otherwise it’d get stuck in a loop and never return.</em></p>
-
-<p>Running our specs again, we see that we’re green:</p>
-
-<p>```bash
-MegaLotto
-  #configure</p>
-
-<pre><code>returns an array with 10 elements
-</code></pre>
-
-<p>Finished in 0.00168 seconds
-1 example, 0 failures
-```</p>
-
-<p>For the sake of sanity, let’s run the whole suite to make sure everything is covered:</p>
-
-<p>```bash
-$ rake
-&hellip;&hellip;.</p>
-
-<p>Finished in 0.00688 seconds
-7 examples, 0 failures
-```</p>
-
-<p>…and we’re good! Except, if we run our entire suite a few times in a row, we’ll eventually see a failure:</p>
-
-<p>```bash
-Failures:</p>
-
-<p>  1) MegaLotto::Drawing#draw returns an Array with 6 elements</p>
-
-<pre><code> Failure/Error: expect(drawing.size).to eq(6)
-
-   expected: 6
-        got: 10
-
-   (compared using ==)
- # ./spec/mega_lotto/drawing_spec.rb:13
-</code></pre>
-
-<p>Finished in 0.00893 seconds
-7 examples, 1 failure
-```</p>
-
-<p>What’s going on???</p>
-
-<p>In the setup of the spec for <code>MegaLotto.configure</code>, we added the following before block:</p>
-
-<p>```ruby</p>
-
-<pre><code>before :each do
-  MegaLotto.configure do |config|
-    config.drawing_count = 10
-  end
-end
-</code></pre>
-
-<p>```</p>
-
-<p>Because this configuration is global, if this spec is run before the others in our suite, the remaining specs will use it. So when the specs for <code>MegaLotto::Drawing</code> run, 10 elements are return instead of the 6, the default, and we see the failure.</p>
-
-<p>For global values like this, it’s best to clean up after each spec to ensure the system is back to a default state. In our case, we can implement a <code>.reset</code> method on <code>MegaLotto</code> and set the configuration back to a new instance of the <code>Configuration</code> class. Let’s start with a spec for this in <code>spec/mega_lotto_spec.rb</code>:</p>
-
-<p>```ruby
-  describe &ldquo;.reset&rdquo; do</p>
-
-<pre><code>before :each do
-  MegaLotto.configure do |config|
-    config.drawing_count = 10
-  end
-end
-
-it "resets the configuration" do
-  MegaLotto.reset
-
-  config = MegaLotto.configuration
-
-  expect(config.drawing_count).to eq(6)
-end
-</code></pre>
-
-<p>  end
-```</p>
-
-<p>As expected, we see failure because we have yet to implement the <code>.reset</code> method:</p>
-
-<p>```bash
-Failures:</p>
-
-<p>  1) MegaLotto.reset resets the configuration</p>
-
-<pre><code> Failure/Error: MegaLotto.reset
- NoMethodError:
-   undefined method `reset` for MegaLotto:Module
- # ./spec/mega_lotto_spec.rb:28
-</code></pre>
-
-<p>Finished in 0.00762 seconds
-8 examples, 1 failure
-```</p>
-
-<p>Let’s do that now:</p>
-
-<p>```ruby
-module MegaLotto
-  class &lt;&lt; self</p>
-
-<pre><code>attr_writer :configuration
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configuration</p>
-
-<pre><code>@configuration ||= Configuration.new
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.reset</p>
-
-<pre><code>@configuration = Configuration.new
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.configure</p>
-
-<pre><code>yield(configuration)
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Our specs for the <code>.reset</code> method pass, so now we need to make use of it to clean up after our <code>.configure</code> spec:</p>
-
-<p>```ruby
-describe &ldquo;#configure&rdquo; do</p>
-
-<p>  before :each do</p>
-
-<pre><code>MegaLotto.configure do |config|
-  config.drawing_count = 10
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  it &ldquo;returns an array with 10 elements&rdquo; do</p>
-
-<pre><code>draw = MegaLotto::Drawing.new.draw
-
-expect(draw).to be_a(Array)
-expect(draw.size).to eq(10)
-</code></pre>
-
-<p>  end</p>
-
-<p>  after :each do</p>
-
-<pre><code>MegaLotto.reset
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Now we can be sure that our specs pass no matter the order of execution.</p>
-
-<h2>Local Configuration</h2>
-
-<p>The configuration approach above implements a global configuration object. The downside is that we can’t have multiple instances of our code running with different configurations. To avoid this, we could isolate the configuration class and only pass it to those objects that need it. By doing this, we’d avoid needing the <code>MegaLotto.configure</code> method entirely.</p>
-
-<p>With this in mind, <code>Drawing</code> might look like:</p>
-
-<p>```ruby
-module MegaLotto
-  class Drawing</p>
-
-<pre><code>attr_accessor :config
-
-def initialize(config = Configuration.new)
-  @config = config
-end
-
-def draw
-  config.drawing_count.times.map { single_draw }
-end
-
-private
-
-def single_draw
-  rand(0...60)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>We can supply our own configuration object during instantiation if the defaults aren’t appropriate. In this case, as long as the object responds to <code>drawing_count</code>, everything will work.</p>
-
-<p>```ruby
-require &lsquo;ostruct&rsquo;
-config = OpenStruct.new(drawing_count: 10)</p>
-
-<p>MegaLotto::Drawing.new(config).draw #=> [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
-```</p>
-
-<p>Both approaches are certainly valid, so I’ll leave it to you to decide which approach is best for your gem.</p>
-
-<h2>Implementations in the Wild</h2>
-
-<p>The <a href="https://github.com/carrierwaveuploader/carrierwave#configuring-carrierwave">CarrierWave gem</a> is a popular choice to support avatar uploading. The author(s) realized that not everyone would want to store upload assets on the local system, so they offered the functionality to support Amazon S3 and other similar block storage services. In order to set this value, you’d use a <a href="https://github.com/carrierwaveuploader/carrierwave#configuring-carrierwave">configure block almost identical to the one we wrote above</a>.</p>
-
-<p>Thoughtbot wrote a <a href="http://robots.thoughtbot.com/mygem-configure-block">great article about the configuration implementation</a> in their <a href="https://github.com/thoughtbot/clearance">Clearance gem</a>. It’s worth reading even if you don’t plan to use Clearance.</p>
-
-<h2>Summary</h2>
-
-<p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
-
-<p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
 ]]></content>
   </entry>
   
