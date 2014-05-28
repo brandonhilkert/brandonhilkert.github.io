@@ -195,38 +195,34 @@ end</code></pre></figure>
 
 <p>Below is a sample from my <code>users.yml</code> fixture:</p>
 
-<p>  fred:</p>
+<pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  title: CEO
+  password_digest: &lt;%= ActiveRecord::FixtureSet.default_password_digest %&gt;
+  company: flintstone
+  confirmed_at: &lt;%= Chronic.parse("1/1/2014") %&gt;
+  invitation_token: &lt;%= SecureRandom.urlsafe_base64 %&gt;
 
-<pre><code>first_name: Fred
-last_name: Flintstone
-email: fred@flintstone.com
-title: CEO
-password_digest: &lt;%= ActiveRecord::FixtureSet.default_password_digest %&gt;
-company: flintstone
-confirmed_at: &lt;%= Chronic.parse("1/1/2014") %&gt;
-invitation_token: &lt;%= SecureRandom.urlsafe_base64 %&gt;
-</code></pre>
-
-<p>  wilma:</p>
-
-<pre><code>first_name: Wilma
-last_name: Flintstone
-email: wilma@flintstone.com
-title: COO
-password_digest: &lt;%= ActiveRecord::FixtureSet.default_password_digest %&gt;
-company: flintstone
-supervisor: fred
-invitation_token: &lt;%= SecureRandom.urlsafe_base64 %&gt;
+wilma:
+  first_name: Wilma
+  last_name: Flintstone
+  email: wilma@flintstone.com
+  title: COO
+  password_digest: &lt;%= ActiveRecord::FixtureSet.default_password_digest %&gt;
+  company: flintstone
+  supervisor: fred
+  invitation_token: &lt;%= SecureRandom.urlsafe_base64 %&gt;
 </code></pre>
 
 <p>An interesting note is that while associations might have been painful in the past, notice how you can use <code>flintstone</code> as the company name and it will refer to the <code>company</code> fixture of the same name:</p>
 
-<p>  flintstone:</p>
-
-<pre><code>name: Flintstone Inc.
-phone: 888-555-1212
-updated_at: &lt;%= 6.months.ago %&gt;
-created_at: &lt;%= 6.months.ago %&gt;
+<pre><code>flintstone:
+  name: Flintstone Inc.
+  phone: 888-555-1212
+  updated_at: &lt;%= 6.months.ago %&gt;
+  created_at: &lt;%= 6.months.ago %&gt;
 </code></pre>
 
 <p>At every point in the application, I have well-structured data to test against. Using Factory Girl is frustrating if you need to create any kind of complex data structure with associations and seed data. When ActiveRecord associations get complex, I’ve found it frustrating and time consuming to bootstrap the initial data — largely because it’s painful to do in the setup of each test. While there are ways around this using factories with pre-established associations, I believe it pushes you to reach for stubs sooner. I’ve seen this first hand where the stubbing was too closely tied to implementation and tests fails with a single change to query conditions — even though the query returns the same data. The recent <a href="http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html">discussions about TDD</a> have generated more conversation about similar topics. Overall, I’ve felt more confident in my tests when using fewer mocks and stubs, and when using fixtures, I’ve felt that need less frequently. My data is predictable and I’m confident in my tests.</p>
