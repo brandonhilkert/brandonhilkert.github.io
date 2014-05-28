@@ -4,7 +4,7 @@
   <title><![CDATA[Category: testing | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/testing/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-05-28T10:12:34-04:00</updated>
+  <updated>2014-05-28T17:10:59-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -18,7 +18,7 @@
     <link href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/"/>
     <updated>2014-05-27T20:08:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails</id>
-    <content type="html"><![CDATA[<p>I’ve been fortunate to spend the last month as the sole developer of greenfield Rails 4.1 app. As someone who’s spent quite a bit of time maintaining existing code, the freedom to establish patterns and choose tools is a highly welcomed change. One of choices I made was to use <a href="https://github.com/seattlerb/minitest">Minitest</a> and <a href="http://guides.rubyonrails.org/testing.html#the-low-down-on-fixtures">Rails fixtures</a>.</p>
+    <content type="html"><![CDATA[<p>I’ve been fortunate to spend the last month as the sole developer of greenfield Rails 4.1 app. As someone who’s spent quite a bit of time maintaining existing code, the freedom to establish patterns and choose tools is a highly welcomed change. One of the choices I made was to use <a href="https://github.com/seattlerb/minitest">Minitest</a> and <a href="http://guides.rubyonrails.org/testing.html#the-low-down-on-fixtures">Rails fixtures</a>.</p>
 
 <p>The short is…<strong>it’s been great</strong>! So great that I’m having trouble imagining myself using anything else going forward.</p>
 
@@ -239,7 +239,7 @@ end
 
 <h2>7. Deviating from Rails defaults doesn’t always provide value</h2>
 
-<p>Sure, not everything in Rails is ideal. In fact, it’s admirable to think about how many people actually get value from something so opinionated. After relying on the Rails default stack for the last month, I’ve realized how much simplicity I’ve been missing due to my choose of tools. I assumed that because the community was largely using Rspec and Factory Girl (what it seemed like from my perspective), it was a good idea. And while arguments can be made for either side, I wasn’t using Rspec because I was convinced it was better — I just didn’t know any better.</p>
+<p>Sure, not everything in Rails is ideal. In fact, it’s admirable to think about how many people actually get value from something so opinionated. After relying on the Rails default stack for the last month, I’ve realized how much simplicity I’ve been missing due to my choice of tools. I assumed that because the community was largely using Rspec and Factory Girl (what it seemed like from my perspective), it was a good idea. And while arguments can be made for either side, I wasn’t using Rspec because I was convinced it was better — I just didn’t know any better.</p>
 
 <p>The ease at which I was able to get going with the Rails default stack using Minitest and fixtures has made me a convert. There was minimal setup and largely required very little additional configuration.</p>
 
