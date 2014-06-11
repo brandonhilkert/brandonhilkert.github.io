@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-06-10T19:58:12-04:00</updated>
+  <updated>2014-06-11T06:50:28-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,132 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Rails 4.1 Secrets for Configuration]]></title>
+    <link href="http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration/"/>
+    <updated>2014-06-10T20:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration</id>
+    <content type="html"><![CDATA[<p>I previously wrote about how I handle <a href="http://brandonhilkert.com/blog/flexible-rails-environment-configuration/">environment configuration in Rails</a>. Along with solutions like the <a href="https://github.com/bkeepers/dotenv">dotenv gem</a>, it relies on entirely on environment variables.</p>
+
+<p>One of the highlighted features of Rails 4.1 was the <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml"><code>config/secrets.yml</code></a> file. By default, this file contains the <code>secret_key_base</code> and defers to the ENV variable of the same name in the production environment. Even though <code>secret_key_base</code> isn’t typically referenced explicitly in an application, I was curious if I could use the <code>config/secrets.yml</code> file in place of previously documented configuration solution.</p>
+
+<!--more-->
+
+
+<p>After a little digging, it turns out that it works perfectly. A valid question is whether the variables are better referenced through the <code>Rails.application</code> hash, but that’s probably more a preference and use-case dependent decision. Either way, we’ll explore the solution below.</p>
+
+<h2>The Question</h2>
+
+<p>Below is a default <code>config/secrets.yml</code> file generated from a Rails 4.1 app. As you can see, both the development and test environments rely on statically set values, where the production environment relies on environment variables being set on the system. The latter is perfect for platforms like <a href="https://www.heroku.com">Heroku</a>, and just as easy if you manage your own systems on EC2 or similar infrastructure.</p>
+
+<figure class='code'><pre><code>development:
+  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
+
+test:
+  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20
+
+# Do not keep production secrets in the repository,
+# instead read values from the environment.
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;</code></pre></figure>
+
+
+<p>Notice how ERB is processed in the file. This gives us the opportunity to use Ruby to generate random strings, dates, or anything else that can be expressed through code.</p>
+
+<p>So can we use it for other configuration values in the application?</p>
+
+<h2>The Solution</h2>
+
+<p>In order to figure out where the output of the parsed secrets file was stored, I pulled the latest Rails changes and went code diving.</p>
+
+<p>The first thing I did was search “secrets”. The first group of results were mostly comments related to the processing of <code>secret_key_base</code> and where it could be found. After combing through a few more results, I came across the <code>Rails::Application</code> class.</p>
+
+<p>A static array at the top of the file seemed to hold some values for the application as shown below:</p>
+
+<figure class='code'><pre><code>INITIAL_VARIABLES = [:config, :railties, :routes_reloader, :reloaders,
+                        :routes, :helpers, :app_env_config, :secrets] # :nodoc:
+</code></pre></figure>
+
+
+<p>Looks like we’re on the right track. Going further down the file leads us to the getter:</p>
+
+<figure class='code'><pre><code>def secrets #:nodoc:
+  @secrets ||= begin
+    secrets = ActiveSupport::OrderedOptions.new
+    yaml = config.paths["config/secrets"].first
+
+    if File.exist?(yaml)
+      require "erb"
+      all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
+      env_secrets = all_secrets[Rails.env]
+      secrets.merge!(env_secrets.symbolize_keys) if env_secrets
+    end
+
+    # Fallback to config.secret_key_base if secrets.secret_key_base isn't set
+    secrets.secret_key_base ||= config.secret_key_base
+
+    secrets
+  end
+end</code></pre></figure>
+
+
+<p>As you can see, the file path <code>config/secrets</code> is referenced as the <code>yaml</code> source:</p>
+
+<figure class='code'><pre><code>yaml = config.paths["config/secrets"].first</code></pre></figure>
+
+
+<p>and the result of reading the file is sent through ERB and YAML:</p>
+
+<figure class='code'><pre><code>all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}</code></pre></figure>
+
+
+<p>The environment group is parsed:</p>
+
+<figure class='code'><pre><code>env_secrets = all_secrets[Rails.env]</code></pre></figure>
+
+
+<p>The result of the output is returned, leaving us with a hash of options based on the environment group. With a little luck we should be able to query the application from the console and get the configuration values.</p>
+
+<figure class='code'><pre><code>irb(main):001:0&gt; Rails.application.secrets.class
+=&gt; ActiveSupport::OrderedOptions
+irb(main):002:0&gt; Rails.application.secrets
+=&gt; {:secret_key_base=&gt;"9ac2d0ad8ebcc312090e99d745006d3cf8"}
+irb(main):003:0&gt; Rails.application.secrets.secret_key_base
+=&gt; "a1580ad61ccb6ac60f9f256948cf63d6e20"</code></pre></figure>
+
+
+<p>That’s great news because it means we can put other values in this file and reference them throughout our application using the parent hash <code>Rails.application.secrets</code>.</p>
+
+<p>For example, let’s assume we need to configuration Pusher URL again. We could add it to the <code>secrets.yml</code> file like so:</p>
+
+<figure class='code'><pre><code>development:
+  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
+  pusher_url: http://asdfa@api.pusherapp.com
+
+test:
+  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20
+
+# Do not keep production secrets in the repository,
+# instead read values from the environment.
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
+  pusher_url: &lt;%= ENV[“PUSHER_URL] %&gt;</code></pre></figure>
+
+
+<p>Now within our application we can set the Pusher URL within the initializer using the secret value:</p>
+
+<figure class='code'><pre><code># config/initializers/pusher.rb
+Pusher.url = Rails.application.secrets.pusher_url</code></pre></figure>
+
+
+<h2>Summary</h2>
+
+<p>I feel like my previous solution has the potential to be replaced with the secrets file. I plan to try it out in an upcoming application and see if it’s as easy to manage as it seems.</p>
+
+<p>Note that by default, the <code>secrets.yml</code> file is NOT ignored by git. If you plan to include passwords or other sensitive data in the file, be sure to add it to your <code>.gitignore</code>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[7 reasons why I'm sticking with Minitest and Fixtures in Rails]]></title>
@@ -2558,102 +2684,6 @@ page elsewhere. I think these updates may be better suited for a different
 target audience anyway.</p>
 
 <p>The end is near!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 4]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/"/>
-    <updated>2013-12-04T06:15:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4</id>
-    <content type="html"><![CDATA[<p>
-  <em>I did an <strong>8-day sprint</strong> to launch my <a
-  href="http://brandonhilkert.com/courses/build-a-ruby-gem/" target="_blank"><strong>Build a Ruby Gem</strong> email course</a>
-  and documented my progress through this series of blog posts.</em>
-</p>
-
-
-
-
-<p><p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/">Weekend Update</a>
-<a href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/">Summary</a></p>
-
-<p>I let myself sleep in until 5:30am this morning ;) I spent a few very
-unsuccessful hours wrestling with Wordpress last night and didn&rsquo;t get to bed at
-the time I wanted. However, all is well. I was able to push out Day 4 of the
-Build a Ruby Gem Email Course without issue.</p>
-
-<p>One of the things that I&rsquo;m noticing about putting the course posts together is
-how much the content relies on outside resources. Whether it&rsquo;s an external URL,
-the output of a command prompt, or a diff on Github&hellip;getting those together is
-a non-trivial amount of time.</p>
-
-<p><!--more--></p>
-
-<p>A side effect of getting up early is that by 7:30am (when I&rsquo;ve typically finish
-this post), I feel really productive. At this point, I&rsquo;ve worked for 2 straight
-hours, all of which have been highly focused. So at 7:30am, I take a break, get
-some breakfast and take a shower and &ldquo;start&rdquo; the rest of my day. It feels like
-the day starts out on a better foot as a result.</p>
-
-<p>I&rsquo;ve also found that I&rsquo;ve been able to focus better early in the morning vs.
-later at night. I know this is personal thing, some people do their best work
-in the wee hours of the night. Not me, I&rsquo;m a morning person and have embraced
-it. My productivity in the morning is probably 2-3x that of my normal
-productivity during the day. I&rsquo;m not sure if it&rsquo;s because I&rsquo;m refreshed or
-fewer distractions (it&rsquo;s dark, no TV, no social media, no other windows
-open&hellip;).</p>
-
-<h2>What I Accomplished Today</h2>
-
-<p>I pushed out the latest day of the email course. I feel like it&rsquo;s just starting
-to get in to the thick of things. I&rsquo;ve been really sensitive to the fact that
-not every person that takes the course will be a Ruby veteran. Hopefully the
-detailed discussions on load paths and basic installations won&rsquo;t detract from
-the value for those that are.</p>
-
-<p>Yesterday I mentioned the non-optimal formatting of my email campaigns on
-mobile devices. I spent some time with Mailchimp last night and applied a more
-responsive template to the campaign. It&rsquo;s better, but still somewhat finicky in
-the iOS Gmail app. I&rsquo;ve sent a support request and hopefully I&rsquo;ll have that
-ironed out soon. But for those on every other platform, you should&rsquo;ve had a
-much better reading experience!</p>
-
-<h2>Marketing</h2>
-
-<p>As I expected, the growth of both the mailing list and page views slowed down a bit.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/ga-day3.png" title="&#34;Google Analytics day 3 results&#34;" alt="&#34;Google Analytics day 3 results&#34;"></p>
-
-<p>I got a 15% bump in mailing list subscriptions, which is better than nothing!</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/mailchimp-day3.png" title="&#34;Mailchimp day 3 results&#34;" alt="&#34;Mailchimp day 3 results&#34;"></p>
-
-<p>I&rsquo;m sending the daily update campaigns at 8pm. I didn&rsquo;t put much thought in to
-this time, other than the fact that I stumbled on an email marketing post that
-suggested the hours between 8-12am get the best open rates. According to the
-campaign report, the open rate is doing well, as compared with the average.
-However, I have a tendency to believe it&rsquo;s more due to the nature of the
-opted-in target audience. This is a very specific topic that people
-specifically wanted to read about. So it makes sense to me that the open rate
-would be pretty high.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/campaign-day3.png" title="&#34;Mailchimp day 3 campaign report&#34;" alt="&#34;Mailchimp day 3 campaign report&#34;"></p>
-
-<p>Reddit continues to be a positive source of traffic. I had haphazardly posted
-to Reddit in the past, but it&rsquo;s been driving more traffic than any other
-source. Along with views, it&rsquo;s also yielded one of the highest conversion rates
-for the mailing list. So I&rsquo;ll continue to post my updates there.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/sources-day3.png" title="&#34;Google Analytics day 3 traffic sources&#34;" alt="&#34;Google Analytics day 3 traffic sources&#34;"></p>
-
-<p>Until tomorrow&hellip;</p>
 ]]></content>
   </entry>
   
