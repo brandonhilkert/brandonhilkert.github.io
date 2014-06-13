@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-06-12T05:59:12-04:00</updated>
+  <updated>2014-06-12T20:32:31-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -122,7 +122,7 @@ test:
 # instead read values from the environment.
 production:
   secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
-  pusher_url: &lt;%= ENV[“PUSHER_URL] %&gt;</code></pre></figure>
+  pusher_url: &lt;%= ENV["PUSHER_URL"] %&gt;</code></pre></figure>
 
 
 <p>Now within our application we can set the Pusher URL within the initializer using the secret value:</p>
