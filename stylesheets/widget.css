@@ -4,9 +4,9 @@
   font-family: sans-serif;
   color: white;
   padding: 10px 20px;
-  height: 280px;
+  height: 300px;
   width: 300px;
-  bottom: -260px;
+  bottom: -280px;
   right: 40px;
   position: fixed;
   cursor: pointer;
@@ -16,6 +16,12 @@
   -webkit-border-top-right-radius: 2px;
   -moz-border-top-left-radius: 2px;
   -moz-border-top-right-radius: 2px; }
+  @media screen and (max-width: 425px){
+    .subscribe-widget {
+      right: 1%;
+      left: 1%;
+      width: 88%; } }
+
   .subscribe-widget .close,
   .subscribe-widget .open {
     display: none;

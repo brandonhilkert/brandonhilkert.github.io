@@ -14,7 +14,7 @@ window.Widget = {
   },
 
   hide: function(){
-    this.widget.animate({ bottom: "-260px" });
+    this.widget.animate({ bottom: "-280px" });
     this.close.fadeOut();
     this.open.fadeIn();
   }
