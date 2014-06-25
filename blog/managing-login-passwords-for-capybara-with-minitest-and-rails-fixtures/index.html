@@ -1,0 +1,485 @@
+
+<!DOCTYPE HTML>
+<html xmlns:og="http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+	<meta charset="utf-8">
+	
+	
+	
+  
+  
+  <title>Managing Login Passwords for Capybara with Minitest and Rails Fixtures | Brandon Hilkert</title>
+	<meta name="author" content="Brandon Hilkert">
+
+	<meta name="description" content="June 25th, 2014 Managing Login Passwords for Capybara With Minitest and Rails Fixtures capybara, fixtures, minitest, rails, ruby, testing Contuining my love &hellip;">
+	
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content="@brandonhilkert">
+  <meta name="twitter:title" content="Managing Login Passwords for Capybara with Minitest and Rails Fixtures">
+  <meta name="twitter:description" content="June 25th, 2014 Managing Login Passwords for Capybara With Minitest and Rails Fixtures capybara, fixtures, minitest, rails, ruby, testing Contuining my love affair with Minitest and fixtures, I &hellip;">
+  <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
+
+  <meta property="og:title" content="Managing Login Passwords for Capybara with Minitest and Rails Fixtures | Brandon Hilkert"/>
+  <meta property="og:description" content="June 25th, 2014 Managing Login Passwords for Capybara With Minitest and Rails Fixtures capybara, fixtures, minitest, rails, ruby, testing Contuining my love affair with Minitest and fixtures, I &hellip;">
+  <meta property="og:url" content="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/"/>
+  <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
+  <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
+  <meta property="og:type" content="article"/>
+  <meta property="fb:profile_id" content="1472745932"/>
+
+	<link href="/atom.xml" rel="alternate" title="Managing Login Passwords for Capybara with Minitest and Rails Fixtures | Brandon Hilkert" type="application/atom+xml">
+	<link rel="canonical" href="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
+  <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
+  <script src="/javascripts/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<header id="header"><div class="profilepic">
+  <a href="/">
+    <img src="/images/brandon-hilkert.jpg" width="80" height="80" alt="Brandon Hilkert Profile Picture" />
+  </a>
+</div>
+<hgroup>
+  <h1><a href="/">Brandon Hilkert</a></h1>
+  
+</hgroup>
+
+<nav id="main-nav">
+  <ul class="main-navigation">
+    <li><a href="/about">About</a></li>
+    <li><a href="/">Blog</a></li>
+    <li><a href="/newsletter">Newsletter</a></li>
+    <li>
+      <a href="/courses/build-a-ruby-gem">Courses</a>
+    </li>
+    <li>
+      <div class="new-label">New</div>
+      <a href="/books/build-a-ruby-gem">Books</a>
+    </li>
+  </ul>
+  <section class="aboutme">
+    <p>
+      Hi. I'm Brandon.
+      <br />
+      I'm a technology entrepreneur in PA.
+    </p>
+  </section>
+</nav>
+
+<nav id="sub-nav">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="https://twitter.com/brandonhilkert" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/brandonhilkert" title="GitHub">GitHub</a>
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/brandonhilkert">LinkedIn</a>
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+
+<aside class="popular-posts">
+  <h4>Popular Posts</h4>
+<ul>
+  <li>
+    <a href="/blog/how-to-build-a-rails-engine/">How to Build a Rails Engine</a>
+  </li>
+  <li>
+    <a href="/blog/ruby-gem-configuration-patterns/">Ruby Gem Configuration Patterns</a>
+  </li>
+  <li>
+    <a href="/blog/why-i-wrote-the-sucker-punch-gem/">Why I Wrote the Sucker Punch Gem</a>
+  </li>
+  <li>
+    <a href="/blog/setting-up-a-cloudfront-cdn-for-rails/">Setup a Cloudfront CDN for Rails</a>
+  </li>
+  <li>
+    <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">Get Started with Open Source</a>
+  </li>
+</ul>
+
+
+</aside>
+
+</header>
+		</div>
+		<div class="mid-col">
+			
+				
+
+			
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-25T06:10:00-04:00" data-updated="true" itemprop="datePublished">June 25<span>th</span>, 2014</time></div>
+	<h1 class="title" itemprop="name">Managing Login Passwords for Capybara With Minitest and Rails Fixtures</h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/capybara/'>capybara</a>, <a class='category' href='/blog/categories/fixtures/'>fixtures</a>, <a class='category' href='/blog/categories/minitest/'>minitest</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/testing/'>testing</a>
+
+
+</div>
+	<div class="entry-content" itemprop="articleBody"><p>Contuining my <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">love affair with Minitest and fixtures</a>, I wanted to dive in to something deeper this time. Switching tools takes time to get used to and managing passwords was one of the bigger headaches I encountered.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>I wanted to use <a href="https://github.com/jnicklas/capybara">Capybara</a> for integration testing. The application uses the standard email/password combo to authenticate users via <a href="http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password"><code>has_secure_password</code></a>.</p>
+
+<p>Because plain text passwords are not stored in the database, but rather a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L112"><code>password_digest</code></a>, I didn’t have a good way to fill in the login forms using Capybara to test against pages that require authentication.</p>
+
+<h2>The Solution</h2>
+
+<p>I started with a simple <code>users.yml</code> fixture that looked like this:</p>
+
+<figure class='code'><pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  title: CEO
+  company: flintstone
+  admin: true</code></pre></figure>
+
+
+<h3>Bcrypt</h3>
+
+<p>As mentioned above, <code>has_secure_password</code> uses <code>Bcrypt</code> to encrypt the plain text passwords provided. The specific implementation to create the password digest is:</p>
+
+<figure class='code'><pre><code>BCrypt::Password.create("password", cost: 4)</code></pre></figure>
+
+
+<p>This method takes the plain text password (“password”) and encrypts it with what it calls the “cost”. It’s not terribly important for this article, but to save some speed, I’ve specified a cost of 4 — <a href="https://github.com/codahale/bcrypt-ruby/blob/master/lib/bcrypt/engine.rb#L7">the minimum cost support by the <code>Bcrypt</code> algorithm</a>. The default is 10, which will make your production applications safer. However, for testing, we don’t care.</p>
+
+<p>The result of the method above looks like this:</p>
+
+<figure class='code'><pre><code>irb(main):001:0&gt; require "bcrypt"
+=&gt; true
+irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
+=&gt; "$2a$04$gw09FM67MDnzduXmlK46BOsdVTtzWKaSIkAdmnF/sJSLgcQhJBAUe"</code></pre></figure>
+
+
+<p>That output value is what’s being stored in our database when a user inputs and saves a password. From the application’s standpoint, we could print a value like this in to our fixtures, but what’s the fun in that?!?!</p>
+
+<h3>ERB in Fixtures</h3>
+
+<p>Since fixtures allow us to use ERB in them, we could provide the <code>Bcrypt</code> method above to produce the password digest like so:</p>
+
+<figure class='code'><pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  password_digest: &lt;%= BCrypt::Password.create("password", cost: 4) %&gt;
+  title: CEO
+  company: flintstone
+  admin: true</code></pre></figure>
+
+
+<p>The downside is that the actual password (“password”) is here in plain text. To fill in our login form using Capybara, we don’t have a variable to access to the get the password — we literally have to type “password”. So this isn’t the most DRY thing in the world. While it would certainly work, I think we can do better…</p>
+
+<h3>Capybara</h3>
+
+<p>Let’s say I have a test that looks like this:</p>
+
+<figure class='code'><pre><code>visit signin_path
+fill_in "email", with: user.email
+fill_in "password", with: "password"
+click_on "Sign in"</code></pre></figure>
+
+
+<h3>Extract a Module</h3>
+
+<p>Our goal was to not sprinkle these plan text passwords all over the place. So let’s extract a module call <code>TestPasswordHelper</code> and put the plain text password in there:</p>
+
+<figure class='code'><pre><code>require "bcrypt"
+
+module TestPasswordHelper
+  def default_password_digest
+    BCrypt::Password.create(default_password, cost: 4)
+  end
+
+  def default_password
+    "password"
+  end
+end</code></pre></figure>
+
+
+<p>We’ll have our default password accessible via a method named…get this, <code>default_password</code>! The module also contains a method (<code>default_password_digest</code>) that will allow us to send the password digest to the fixture using the Bcrypt algorithm we explored above.</p>
+
+<p>Now that we have a helper module ready all set up, we add the following to our <code>test/test_helper.rb</code> to make these methods accessible in our tests:</p>
+
+<figure class='code'><pre><code>require "support/test_password_helper"
+
+class ActiveSupport::TestCase
+  include TestPasswordHelper
+end</code></pre></figure>
+
+
+<p>With these methods mixed in, we can update our Capybara test to use the <code>default_password</code> method:</p>
+
+<figure class='code'><pre><code>visit signin_path
+fill_in "email", with: user.email
+fill_in "password", with: default_password
+click_on "Sign in"</code></pre></figure>
+
+
+<h3>Helpers in Fixtures</h3>
+
+<p>Unfortunately, those helpers aren’t available in the fixtures.</p>
+
+<p><code>ActiveRecord::FixtureSet</code> is the class that gives our fixtures life. We can use Ruby to include functionality from our test helper, that will give us access to to the <code>default_password_digest</code> method, which reads our <code>default_password</code> so we don’t have to type it out.</p>
+
+<p>The <a href="http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html#method-c-context_class">Rails API guide for fixtures</a> states that helper methods should be added to <code>ActiveRecord::FixtureSet.context_class</code>.</p>
+
+<p>So back in our <code>test_helper.rb</code>, we can mix in our test helpers methods like so:</p>
+
+<figure class='code'><pre><code>ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper</code></pre></figure>
+
+
+<p>Now, back in our <code>users.yml</code> fixture, we can use the new <code>default_password_digest</code> method:</p>
+
+<figure class='code'><pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  password_digest: &lt;%= default_password_digest %&gt;
+  title: CEO
+  company: flintstone
+  admin: true</code></pre></figure>
+
+
+<p>We can now run our tests and verify the fixtures properly insert the digest using the default password and the Capybara tests reference that same default password.</p>
+
+<p>Now, if in the future we wanted use a different password for some reason, we’d only have one place to change it, and the rest of the system would follow along.</p>
+
+<h2>Summary</h2>
+
+<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
+</div>
+  
+    <section class="newsletter-top">
+  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
+</section>
+<section class="newsletter clearfix">
+  <div class="ribbon">
+    <span>
+      Join 2,100+ Rubyists
+    </span>
+  </div>
+  <section class="picture">
+    <img src="/images/newsletter/brandon-hilkert-point-right.png" alt="Brandon Hilkert pointing right">
+  </section>
+  <section class="signup">
+    <h2>Want More?</h2>
+    <h3>Elegant Rails code delivered to <br />your inbox 2 times per month</h3>
+
+    <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=167c8d9713" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+      <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email" required>
+      <br class="clear">
+      <input type="hidden" name="LOCATION" id="LOCATION" value="Managing Login Passwords for Capybara with Minitest and Rails Fixtures" />
+      <input type="hidden" name="PRODUCT" id="PRODUCT" value="newsletter" />
+      <input type="submit" value="Send me Rails tips" name="subscribe" id="mc-embedded-subscribe" class="button">
+      <br class="clear">
+    </form>
+    <aside>
+      I hate spam as much as you do!
+      <br />
+      Unsubscribe at any time.
+    </aside>
+  </section>
+</section>
+
+
+  
+
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+
+    
+    <a href="http://bufferapp.com/add" class="buffer-add-button" data-count="horizontal" data-via="brandonhilkert" >Buffer</a>
+    <script type="text/javascript" src="http://static.bufferapp.com/js/button.js"></script>
+    
+
+    
+    <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+
+    
+    <a class="addthis_button_tweet"></a>
+    
+
+    
+    <script type="IN/Share" data-counter="right"></script>
+    
+
+    
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+  <section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+			</div>
+      
+        <footer id="footer" class="inner"><ul>
+  <li>
+    <h4>Categories</h4>
+    <ul>
+      <li><a href="/blog/categories/ruby/">Ruby</a></li>
+      <li><a href="/blog/categories/rails/">Rails</a></li>
+      <li><a href="/blog/categories/open-source/">Open Source</a></li>
+      <li><a href="/blog/categories/marketing/">Marketing</a></li>
+      <li><a href="/blog/categories/email-course/">Email Course</a></li>
+      <li><a href="/blog/categories/book/">Book</a></li>
+    </ul>
+  </li>
+  <li>
+    <h4>Popular Posts</h4>
+<ul>
+  <li>
+    <a href="/blog/how-to-build-a-rails-engine/">How to Build a Rails Engine</a>
+  </li>
+  <li>
+    <a href="/blog/ruby-gem-configuration-patterns/">Ruby Gem Configuration Patterns</a>
+  </li>
+  <li>
+    <a href="/blog/why-i-wrote-the-sucker-punch-gem/">Why I Wrote the Sucker Punch Gem</a>
+  </li>
+  <li>
+    <a href="/blog/setting-up-a-cloudfront-cdn-for-rails/">Setup a Cloudfront CDN for Rails</a>
+  </li>
+  <li>
+    <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">Get Started with Open Source</a>
+  </li>
+</ul>
+
+
+  </li>
+</ul>
+<br class="clear" />
+<p>
+  &copy; 2014 Big Blue Media, LLC. All rights reserved.
+</p>
+</footer>
+        <script src="/javascripts/slash.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'brandonhilkert';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/';
+        var disqus_url = 'http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+      
+		</div>
+	</div>
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-24469169-1', 'brandonhilkert.com');
+  ga('require', 'linkid', 'linkid.js');
+  ga('send', 'pageview');
+</script>
+
+
+  <link href="/stylesheets/widget.css" media="screen, projection" rel="stylesheet" type="text/css">
+<link href="/stylesheets/animate.min.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+<div class="subscribe-widget animated bounceInUp">
+  <div class="title">
+    Ruby Gem Crash Course - FREE!
+  </div>
+  <div class="description">
+    <p>
+      Join <strong>1,000+</strong> other Rubyists and take your Ruby gem skills to the next level!
+    </p>
+    <p>
+      Whether you're an expert Rubyist, or just starting out,
+      this <strong>FREE 10-day</strong> email course will guide you through
+      the process of creating your own Ruby gems from start to finish.
+    </p>
+
+    <p>
+      Enter your email below to get started today:
+    </p>
+  </div>
+  <div class="close">&#10005;</div>
+  <div class="open">&#8593;</div>
+
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=256d136420" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" placeholder="your@email.com" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="Managing Login Passwords for Capybara with Minitest and Rails Fixtures" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="course-gem" />
+    <input type="submit" value="Send me the FREE course" name="subscribe">
+  </form>
+</div>
+
+<script src="/javascripts/widget.js"></script>
+
+
+</body>
+</html>

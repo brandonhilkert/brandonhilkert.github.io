@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: capybara | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/capybara/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2014-06-25T06:13:34-04:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Managing Login Passwords for Capybara with Minitest and Rails Fixtures]]></title>
+    <link href="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/"/>
+    <updated>2014-06-25T06:10:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures</id>
+    <content type="html"><![CDATA[<p>Contuining my <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">love affair with Minitest and fixtures</a>, I wanted to dive in to something deeper this time. Switching tools takes time to get used to and managing passwords was one of the bigger headaches I encountered.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>I wanted to use <a href="https://github.com/jnicklas/capybara">Capybara</a> for integration testing. The application uses the standard email/password combo to authenticate users via <a href="http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password"><code>has_secure_password</code></a>.</p>
+
+<p>Because plain text passwords are not stored in the database, but rather a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L112"><code>password_digest</code></a>, I didn’t have a good way to fill in the login forms using Capybara to test against pages that require authentication.</p>
+
+<h2>The Solution</h2>
+
+<p>I started with a simple <code>users.yml</code> fixture that looked like this:</p>
+
+<p><code>
+fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  title: CEO
+  company: flintstone
+  admin: true
+</code></p>
+
+<h3>Bcrypt</h3>
+
+<p>As mentioned above, <code>has_secure_password</code> uses <code>Bcrypt</code> to encrypt the plain text passwords provided. The specific implementation to create the password digest is:</p>
+
+<p><code>
+BCrypt::Password.create("password", cost: 4)
+</code></p>
+
+<p>This method takes the plain text password (“password”) and encrypts it with what it calls the “cost”. It’s not terribly important for this article, but to save some speed, I’ve specified a cost of 4 — <a href="https://github.com/codahale/bcrypt-ruby/blob/master/lib/bcrypt/engine.rb#L7">the minimum cost support by the <code>Bcrypt</code> algorithm</a>. The default is 10, which will make your production applications safer. However, for testing, we don’t care.</p>
+
+<p>The result of the method above looks like this:</p>
+
+<p><code>
+irb(main):001:0&gt; require "bcrypt"
+=&gt; true
+irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
+=&gt; "$2a$04$gw09FM67MDnzduXmlK46BOsdVTtzWKaSIkAdmnF/sJSLgcQhJBAUe"
+</code></p>
+
+<p>That output value is what’s being stored in our database when a user inputs and saves a password. From the application’s standpoint, we could print a value like this in to our fixtures, but what’s the fun in that?!?!</p>
+
+<h3>ERB in Fixtures</h3>
+
+<p>Since fixtures allow us to use ERB in them, we could provide the <code>Bcrypt</code> method above to produce the password digest like so:</p>
+
+<p><code>
+fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  password_digest: &lt;%= BCrypt::Password.create("password", cost: 4) %&gt;
+  title: CEO
+  company: flintstone
+  admin: true
+</code></p>
+
+<p>The downside is that the actual password (“password”) is here in plain text. To fill in our login form using Capybara, we don’t have a variable to access to the get the password — we literally have to type “password”. So this isn’t the most DRY thing in the world. While it would certainly work, I think we can do better…</p>
+
+<h3>Capybara</h3>
+
+<p>Let’s say I have a test that looks like this:</p>
+
+<p><code>
+visit signin_path
+fill_in "email", with: user.email
+fill_in "password", with: "password"
+click_on "Sign in"
+</code></p>
+
+<h3>Extract a Module</h3>
+
+<p>Our goal was to not sprinkle these plan text passwords all over the place. So let’s extract a module call <code>TestPasswordHelper</code> and put the plain text password in there:</p>
+
+<p>```
+require &ldquo;bcrypt&rdquo;</p>
+
+<p>module TestPasswordHelper
+  def default_password_digest</p>
+
+<pre><code>BCrypt::Password.create(default_password, cost: 4)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def default_password</p>
+
+<pre><code>"password"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>We’ll have our default password accessible via a method named…get this, <code>default_password</code>! The module also contains a method (<code>default_password_digest</code>) that will allow us to send the password digest to the fixture using the Bcrypt algorithm we explored above.</p>
+
+<p>Now that we have a helper module ready all set up, we add the following to our <code>test/test_helper.rb</code> to make these methods accessible in our tests:</p>
+
+<p>```
+require &ldquo;support/test_password_helper&rdquo;</p>
+
+<p>class ActiveSupport::TestCase
+  include TestPasswordHelper
+end
+```</p>
+
+<p>With these methods mixed in, we can update our Capybara test to use the <code>default_password</code> method:</p>
+
+<p><code>
+visit signin_path
+fill_in "email", with: user.email
+fill_in "password", with: default_password
+click_on "Sign in"
+</code></p>
+
+<h3>Helpers in Fixtures</h3>
+
+<p>Unfortunately, those helpers aren’t available in the fixtures.</p>
+
+<p><code>ActiveRecord::FixtureSet</code> is the class that gives our fixtures life. We can use Ruby to include functionality from our test helper, that will give us access to to the <code>default_password_digest</code> method, which reads our <code>default_password</code> so we don’t have to type it out.</p>
+
+<p>The <a href="http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html#method-c-context_class">Rails API guide for fixtures</a> states that helper methods should be added to <code>ActiveRecord::FixtureSet.context_class</code>.</p>
+
+<p>So back in our <code>test_helper.rb</code>, we can mix in our test helpers methods like so:</p>
+
+<p><code>
+ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper
+</code></p>
+
+<p>Now, back in our <code>users.yml</code> fixture, we can use the new <code>default_password_digest</code> method:</p>
+
+<p><code>
+fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  password_digest: &lt;%= default_password_digest %&gt;
+  title: CEO
+  company: flintstone
+  admin: true
+</code></p>
+
+<p>We can now run our tests and verify the fixtures properly insert the digest using the default password and the Capybara tests reference that same default password.</p>
+
+<p>Now, if in the future we wanted use a different password for some reason, we’d only have one place to change it, and the rest of the system would follow along.</p>
+
+<h2>Summary</h2>
+
+<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-06-17T16:21:00-04:00</updated>
+  <updated>2014-06-25T06:13:34-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,151 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Managing Login Passwords for Capybara with Minitest and Rails Fixtures]]></title>
+    <link href="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/"/>
+    <updated>2014-06-25T06:10:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures</id>
+    <content type="html"><![CDATA[<p>Contuining my <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">love affair with Minitest and fixtures</a>, I wanted to dive in to something deeper this time. Switching tools takes time to get used to and managing passwords was one of the bigger headaches I encountered.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>I wanted to use <a href="https://github.com/jnicklas/capybara">Capybara</a> for integration testing. The application uses the standard email/password combo to authenticate users via <a href="http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password"><code>has_secure_password</code></a>.</p>
+
+<p>Because plain text passwords are not stored in the database, but rather a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L112"><code>password_digest</code></a>, I didn’t have a good way to fill in the login forms using Capybara to test against pages that require authentication.</p>
+
+<h2>The Solution</h2>
+
+<p>I started with a simple <code>users.yml</code> fixture that looked like this:</p>
+
+<figure class='code'><pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  title: CEO
+  company: flintstone
+  admin: true</code></pre></figure>
+
+
+<h3>Bcrypt</h3>
+
+<p>As mentioned above, <code>has_secure_password</code> uses <code>Bcrypt</code> to encrypt the plain text passwords provided. The specific implementation to create the password digest is:</p>
+
+<figure class='code'><pre><code>BCrypt::Password.create("password", cost: 4)</code></pre></figure>
+
+
+<p>This method takes the plain text password (“password”) and encrypts it with what it calls the “cost”. It’s not terribly important for this article, but to save some speed, I’ve specified a cost of 4 — <a href="https://github.com/codahale/bcrypt-ruby/blob/master/lib/bcrypt/engine.rb#L7">the minimum cost support by the <code>Bcrypt</code> algorithm</a>. The default is 10, which will make your production applications safer. However, for testing, we don’t care.</p>
+
+<p>The result of the method above looks like this:</p>
+
+<figure class='code'><pre><code>irb(main):001:0&gt; require "bcrypt"
+=&gt; true
+irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
+=&gt; "$2a$04$gw09FM67MDnzduXmlK46BOsdVTtzWKaSIkAdmnF/sJSLgcQhJBAUe"</code></pre></figure>
+
+
+<p>That output value is what’s being stored in our database when a user inputs and saves a password. From the application’s standpoint, we could print a value like this in to our fixtures, but what’s the fun in that?!?!</p>
+
+<h3>ERB in Fixtures</h3>
+
+<p>Since fixtures allow us to use ERB in them, we could provide the <code>Bcrypt</code> method above to produce the password digest like so:</p>
+
+<figure class='code'><pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  password_digest: &lt;%= BCrypt::Password.create("password", cost: 4) %&gt;
+  title: CEO
+  company: flintstone
+  admin: true</code></pre></figure>
+
+
+<p>The downside is that the actual password (“password”) is here in plain text. To fill in our login form using Capybara, we don’t have a variable to access to the get the password — we literally have to type “password”. So this isn’t the most DRY thing in the world. While it would certainly work, I think we can do better…</p>
+
+<h3>Capybara</h3>
+
+<p>Let’s say I have a test that looks like this:</p>
+
+<figure class='code'><pre><code>visit signin_path
+fill_in "email", with: user.email
+fill_in "password", with: "password"
+click_on "Sign in"</code></pre></figure>
+
+
+<h3>Extract a Module</h3>
+
+<p>Our goal was to not sprinkle these plan text passwords all over the place. So let’s extract a module call <code>TestPasswordHelper</code> and put the plain text password in there:</p>
+
+<figure class='code'><pre><code>require "bcrypt"
+
+module TestPasswordHelper
+  def default_password_digest
+    BCrypt::Password.create(default_password, cost: 4)
+  end
+
+  def default_password
+    "password"
+  end
+end</code></pre></figure>
+
+
+<p>We’ll have our default password accessible via a method named…get this, <code>default_password</code>! The module also contains a method (<code>default_password_digest</code>) that will allow us to send the password digest to the fixture using the Bcrypt algorithm we explored above.</p>
+
+<p>Now that we have a helper module ready all set up, we add the following to our <code>test/test_helper.rb</code> to make these methods accessible in our tests:</p>
+
+<figure class='code'><pre><code>require "support/test_password_helper"
+
+class ActiveSupport::TestCase
+  include TestPasswordHelper
+end</code></pre></figure>
+
+
+<p>With these methods mixed in, we can update our Capybara test to use the <code>default_password</code> method:</p>
+
+<figure class='code'><pre><code>visit signin_path
+fill_in "email", with: user.email
+fill_in "password", with: default_password
+click_on "Sign in"</code></pre></figure>
+
+
+<h3>Helpers in Fixtures</h3>
+
+<p>Unfortunately, those helpers aren’t available in the fixtures.</p>
+
+<p><code>ActiveRecord::FixtureSet</code> is the class that gives our fixtures life. We can use Ruby to include functionality from our test helper, that will give us access to to the <code>default_password_digest</code> method, which reads our <code>default_password</code> so we don’t have to type it out.</p>
+
+<p>The <a href="http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html#method-c-context_class">Rails API guide for fixtures</a> states that helper methods should be added to <code>ActiveRecord::FixtureSet.context_class</code>.</p>
+
+<p>So back in our <code>test_helper.rb</code>, we can mix in our test helpers methods like so:</p>
+
+<figure class='code'><pre><code>ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper</code></pre></figure>
+
+
+<p>Now, back in our <code>users.yml</code> fixture, we can use the new <code>default_password_digest</code> method:</p>
+
+<figure class='code'><pre><code>fred:
+  first_name: Fred
+  last_name: Flintstone
+  email: fred@flintstone.com
+  password_digest: &lt;%= default_password_digest %&gt;
+  title: CEO
+  company: flintstone
+  admin: true</code></pre></figure>
+
+
+<p>We can now run our tests and verify the fixtures properly insert the digest using the default password and the Capybara tests reference that same default password.</p>
+
+<p>Now, if in the future we wanted use a different password for some reason, we’d only have one place to change it, and the rest of the system would follow along.</p>
+
+<h2>Summary</h2>
+
+<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Rails 4.1 Secrets for Configuration]]></title>
@@ -2579,111 +2724,6 @@ person until now. With these quick marketing recaps, I feel like I&rsquo;ve only
 scratched the surface. After the course launches, I plan to spend more time
 with the numbers to get a better feel for what went well, and more so, what I
 should avoid in future launches.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 5]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/"/>
-    <updated>2013-12-05T06:15:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5</id>
-    <content type="html"><![CDATA[<p>
-  <em>I did an <strong>8-day sprint</strong> to launch my <a
-  href="http://brandonhilkert.com/courses/build-a-ruby-gem/" target="_blank"><strong>Build a Ruby Gem</strong> email course</a>
-  and documented my progress through this series of blog posts.</em>
-</p>
-
-
-
-
-<p><p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/">Weekend Update</a>
-<a href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/">Summary</a></p>
-
-<p>I&rsquo;m tired. Getting up around 5am all week has worn on me. Yesterday I felt like
-zombie&hellip;and it was mostly my own fault because I didn&rsquo;t make it a priority to
-get bed a decent hour.</p>
-
-<p>I&rsquo;m not sure about you, but I function best with 7-8 hours of sleep. I
-generally can&rsquo;t sleep longer than 8, and anything less than 7 is OK for a
-day or two, otherwise, it catches up with me. I think that&rsquo;s what&rsquo;s going
-on here&hellip;</p>
-
-<p><!--more--></p>
-
-<p>Having realized this, I got to sleep last night around 9:30pm. I figured I&rsquo;d
-sleep in until 6am or so, but naturally woke up around 5:15am. So while I&rsquo;m
-feeling better this morning, I&rsquo;m still feeling the side effects of not getting
-enough sleep from the first few days of the week.</p>
-
-<p>I&rsquo;ll be more cautious of this for the rest of the week and see if I can get
-back to a normal (whatever that means!).</p>
-
-<h2>What I Accomplished Today</h2>
-
-<p>Like the previous days, I was able to write Day 4 of the Build a Ruby Gem Email
-Course. I had a bit of trouble getting in to the flow of writing this morning.
-I&rsquo;m not sure if it&rsquo;s due to the lack of sleep mentioned above, or just a little
-speed bump in the normal creative process. It took 15 min. or so until I felt
-like words were coming out naturally.</p>
-
-<h2>Changes to the Email Course</h2>
-
-<p>On Day 3, I realized I hadn&rsquo;t gotten to the meat of the Ruby gem and was still
-writing about important, but somewhat theoretical topics. It occurred to me that
-it&rsquo;s probably best not to cut the content, but rather, extend the course. So
-instead of a 5-day course, it might be 6 or 7. My goal is write the best content possible and if after 7 days, I
-feel like I&rsquo;ve covered the topic thoroughly, I&rsquo;ll wrap it up.</p>
-
-<p>One thought that has crossed my mind is removing some of the content for an
-ebook. I could make the course somewhat abbreviated, while offering the book as
-an up-sell to those interested in the details. I&rsquo;ll think about this some more
-and once the course content shakes out.</p>
-
-<p>Additionally , I thinking about spreading the course out. So rather than
-send 1 email a day, shoot for every 2-3 days, so that I can market the course as
-a 14 or 21-day email course. I also feel like the people that will get the most
-value out of the content  would benefit from extra time in between each lesson.</p>
-
-<h2>Marketing</h2>
-
-<p>Visits were slightly down yesterday, and I suspect the allure of the announcement has worn off.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/ga-day4.png" title="&#34;Google Analytics day 4 results&#34;" alt="&#34;Google Analytics day 4 results&#34;"></p>
-
-<p>Thinking more about it, I&rsquo;ve not been great at seeking out marketing channels
-for people that might be a good fit for the course. I&rsquo;ve been posting to the
-same channels, which has produced a decreasing level of interest over the past
-4 days. Truthfully, I&rsquo;m pretty worn out by the time I finish the email course
-lesson and this update post, so it&rsquo;s difficult to get worked up for that. But
-I&rsquo;ll think more about it and report back.</p>
-
-<p>The mailing list is up to 82 subscribers, so while the growth is slowing, it&rsquo;s
-still a 10% lift over the previous day. This, too, probably reiterates my need
-to find users elsewhere.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/mailchimp-day4.png" title="&#34;Mailchimp day 4 results&#34;" alt="&#34;Mailchimp day 4 results&#34;"></p>
-
-<p>I setup the subscription form to track what page the user was on when they
-subscribed. Subscriptions are coming from all over the place. It appears that even after 4 days, people are
-still landing on the first post of the series and converting.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/mailchimp-conversion-sources-day4.png" title="&#34;Mailchimp conversion sources for day 4&#34;" alt="&#34;Mailchimp conversion sources for day 4&#34;"></p>
-
-<p>Again, Reddit appears to be the best source for both traffic and conversions.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/sources-day4.png" title="&#34;Google Analytics day 4 traffic sources&#34;" alt="&#34;Google Analytics day 4 traffic sources&#34;"></p>
-
-<p>Once the email course is live, I&rsquo;ll make a better effort to market the landing
-page elsewhere. I think these updates may be better suited for a different
-target audience anyway.</p>
-
-<p>The end is near!</p>
 ]]></content>
   </entry>
   
