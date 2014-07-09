@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-06-28T15:43:33-04:00</updated>
+  <updated>2014-07-09T06:08:35-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Build a Ruby Gem - Ruby Heroes]]></title>
+    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes/"/>
+    <updated>2014-07-09T06:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes</id>
+    <content type="html"><![CDATA[<p>It’s been 3 months since the release of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a> and I’ve gotten tremendous feedback since the launch.</p>
+
+<p>I’ve love to share some news and an opportunity to win a <strong>FREE</strong> copy of the book. If you’ve already purchased the book, don’t worry, we’ll find a way to make it worth it for you.</p>
+
+<!--more-->
+
+
+<h2>Feedback</h2>
+
+<p>The two questions I’ve heard the most since the release of the <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">email course</a> and <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">book</a> are:</p>
+
+<ol>
+<li><p>Why should I get involved with open source software?</p></li>
+<li><p>How do I get started contributing to an open source project?</p></li>
+</ol>
+
+
+<h2>Benefits of Getting Involved</h2>
+
+<p>Participating in open source projects is an enlightening experience. The benefits are widespread and different for each developer. Speaking personally, I’ve learned a ton from the codebases I’ve gotten involved with. Learning was the primary reason I got involved in the first place.</p>
+
+<p>Going beyond the learning aspect, my open source contributions have resulted in several <strong>jobs offers</strong>, among other things. It’s easy to think that getting involved is only just about doing good for the community — but it’s <strong>bigger than that</strong>.</p>
+
+<p>I could go on and on, but it’s likely you’ve already heard me talk about this through my post on <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">ways to get started contributing to open source</a> or the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">open source chapter in <em>Build a Ruby Gem</em></a>.</p>
+
+<h2>Hear It From Others in the Community</h2>
+
+<p>Hearing other people’s stories has always had a profound effect on my comfort-level when approaching things I’m unfamiliar with. So with that being said, I want you to hear the answers to the questions above from those YOU look up to in the Ruby community.</p>
+
+<p>This person could be the author of your favorite gem or Matz himself (disclaimer: I may or may not be able to make this one happen…). Either way, I’ll do my best to have live interview chats with your favorite Rubyists and dig through their experience and thoughts on the community and software in general.</p>
+
+<h2><a href="https://docs.google.com/forms/d/1dVMKswroOVAtQrjV5z0bGMVo5PU3YPCSiCOtky-3PBo/viewform"><strong>Click here to submit your response</strong></a></h2>
+
+<p>Submissions will be open until <strong>5:00pm EDT on Friday, July 11</strong>. I’ll announcement the winner shortly thereafter.</p>
+
+<p>Even if you don’t win, I’ll send everyone that submits a response a <strong>20% discount code</strong> for any package of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Managing Login Passwords for Capybara with Minitest and Rails Fixtures]]></title>
@@ -2623,107 +2667,6 @@ that level of conversion.</p>
 channels that I thought would be valuable sources of traffic after launch. I
 plan to post to those sites sometime Wednesday and am interested to see how
 they do relative to the sources I&rsquo;ve been using.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Email Course - Week of Hustle - Day 6]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/"/>
-    <updated>2013-12-06T06:15:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6</id>
-    <content type="html"><![CDATA[<p>
-  <em>I did an <strong>8-day sprint</strong> to launch my <a
-  href="http://brandonhilkert.com/courses/build-a-ruby-gem/" target="_blank"><strong>Build a Ruby Gem</strong> email course</a>
-  and documented my progress through this series of blog posts.</em>
-</p>
-
-
-
-
-<p><p><a href="http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/">Weekend Update</a>
-<a href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/">Summary</a></p>
-
-<p>Happy Friday!</p>
-
-<p>This morning I&rsquo;m feeling well rested and finally on the home stretch. In the
-middle of the week, the remaining work felt overwhelming at times and I have a
-feeling that played in to me feeling exhausted.</p>
-
-<p>Part of it was that each lesson has gotten substantially longer than I planned
-for. I think once I get in to the flow of writing, I tend to document
-everything for everyone. I don&rsquo;t think everyone will need this level of detail,
-but I&rsquo;d hate to leave it out, only to find that some users were left confused
-because of the lack thereof.</p>
-
-<p>Here&rsquo;s how the word count of each lesson shakes out so far:</p>
-
-<p><!--more--></p>
-
-<ul>
-<li>Day 1 &ndash; 941</li>
-<li>Day 2 &ndash; 1067</li>
-<li>Day 3 &ndash; 1738</li>
-<li>Day 4 &ndash; 868</li>
-<li>Day 5 &ndash; 1118</li>
-</ul>
-
-
-<p>Looking at this now, I&rsquo;ll probably go back and rework Day 3 to either split out
-some of the content, or remove it during editing depending on its value.</p>
-
-<h2>What I Accomplished Today</h2>
-
-<p>This morning I finished Day 5 of the Build a Ruby Gem Email Course. I&rsquo;m happy
-with where it left off and can now say there&rsquo;s only 1 (2 at most) more to
-write. And even those will be more wrap-up. All the code is finished.</p>
-
-<p>I got in to the flow of writing pretty quickly this morning. I naturally woke
-up around 6am, so I was probably less in a daze when I started.</p>
-
-<h2>Marketing</h2>
-
-<p>I was looking forward to writing this section&hellip;Yesterday, I opened my inbox and saw this:</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/ruby-weekly-link.png" title="&#34;A link to my Build a Ruby Gem email course in Ruby Weekly.&#34;" alt="&#34;A link to my Build a Ruby Gem email course in Ruby Weekly.&#34;"></p>
-
-<p>That&rsquo;s my course link in the <a href="http://rubyweekly.com/">Ruby Weekly</a> newsletter.
-This newsletter is a great weekly summary of the Ruby community and has several
-thousand subscribers. I had a feeling this would yield a significant bump in
-subscriptions and page views and boy was that true.</p>
-
-<p>Page views were up <strong>153%</strong> from the previous day:</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/ga-day5.png" title="&#34;Google Analytics day 5 results&#34;" alt="&#34;Google Analytics day 5 results&#34;"></p>
-
-<p>And subscriptions for course updates were up <strong>130%</strong>:</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/mailchimp-day5.png" title="&#34;Mailchimp day 5 results&#34;" alt="&#34;Mailchimp day 5 results&#34;"></p>
-
-<p>Herein lies the power of reaching your target audience&hellip;</p>
-
-<p>I track conversions to the newsletter in Google Analytics and Ruby Weekly is
-kind enough to send a lot a campaign identifier with the link. Here are the
-channels that have converted the best:</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/woh/ga-conversions-day5.png" title="&#34;Google Analytics traffic conversions from day 5&#34;" alt="&#34;Google Analytics traffic conversions from day 5&#34;"></p>
-
-<p>30% of all newsletter clicks resulted in newsletter subscriptions&hellip;I&rsquo;ll take
-it! Not far behind is the campaign I sent to my personal list announcing the
-email course, and next is links from Twitter. However, what this doesn&rsquo;t show
-is that only 7 visitors arrived from Twitter referral links, so while 14% is
-pretty good, it&rsquo;s a sample size that&rsquo;s probably not worth trusting.</p>
-
-<p>While I&rsquo;ve read plenty about the power of email, I&rsquo;ve not seen this effect in
-person until now. With these quick marketing recaps, I feel like I&rsquo;ve only
-scratched the surface. After the course launches, I plan to spend more time
-with the numbers to get a better feel for what went well, and more so, what I
-should avoid in future launches.</p>
 ]]></content>
   </entry>
   
