@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-07-13T15:09:35-04:00</updated>
+  <updated>2014-07-17T21:36:12-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -58,7 +58,7 @@
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Managing Login Passwords for Capybara with Minitest and Rails Fixtures]]></title>
+    <title type="html"><![CDATA[Minitest Helper Includes and Rails Fixtures]]></title>
     <link href="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/"/>
     <updated>2014-06-25T06:10:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures</id>
