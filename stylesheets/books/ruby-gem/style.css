@@ -494,9 +494,10 @@ h2.subheader {
   margin: 0;
   width: 48%;
   float: left;
+  margin-bottom: 40px;
 }
 
-#testimonials blockquote:first-child {
+#testimonials blockquote.left {
   margin-right: 20px;
 }
 
