@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-07-23T18:19:40-04:00</updated>
+  <updated>2014-07-30T06:13:19-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,209 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
+    <link href="http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/"/>
+    <updated>2014-07-30T06:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view</id>
+    <content type="html"><![CDATA[<p>It’s generally known that leaving any kind of logic in a Rails view is bad news, both for debugging and your own sanity. Rails views can be cumbersome to test and leave a lot to be desired when it comes to debugging.</p>
+
+<!--more-->
+
+
+<p>I recently went through the process of refactoring a Rails view that included logic. The end result was an isolated <a href="http://blog.jayfields.com/2007/10/ruby-poro.html">PORO</a> that was easily integrated with the controller/view.</p>
+
+<h2>Background</h2>
+
+<p>The app I’m currently working on is a greenfield app with vague specs, at best. I don’t mention this to fault anyone, but more to illustrate a point. Not all greenfield projects have well-defined specs.</p>
+
+<p>In this particular case, the stakeholders were somewhat unsure of what the interface should look like. Together, we tossed around a number of ideas, ultimately leading to a few options. Only once an iteration of the UI was available, would we have a clear picture of whether it <em>felt right</em>.</p>
+
+<h2>The Problem</h2>
+
+<p>I implemented the first option in the most crude way I could think of. Unfortunately, that way involved putting logic in the view. I know, I know — I can hear it now, <em>”C’mon Brandon, everyone knows you shouldn’t do this!”</em>. Here’s the thing — I knew it too.</p>
+
+<p>Here’s what I ended up with:</p>
+
+<p>```</p>
+
+<h1>controller</h1>
+
+<p>def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @people = current_user.reports
+end</p>
+
+<h1>view</h1>
+
+<p>&lt;% @people.each do |person| %>
+  &lt;% checkin = person.checkin_for(@week_of) %>
+  <tr></p>
+
+<pre><code>&lt;td&gt;
+  &lt;%= profile_picture person %&gt;
+  &lt;%= person %&gt;
+&lt;/td&gt;
+
+&lt;td&gt;
+  &lt;%= checkin_status(checkin) %&gt;
+&lt;/td&gt;
+</code></pre>
+
+<p>  </tr>
+&lt;% end %>
+```</p>
+
+<p>For each iteration of <code>@people</code>, I looked up the check-in for that particular week from the model:</p>
+
+<p><code>
+def checkin_for(week_of)
+  Checkin.find_by(user_id: id, week_of: week_of)
+end
+</code></p>
+
+<p>This crosses concerns, blurs responsibility — all the things that bad Rails app are made of. But I was doing this knowing it would either be entirely ripped out (we’d change the UI altogether), or refactored to something better.</p>
+
+<p><em>Note: I could’ve just saved myself one step and never made the method in the model. For some reason, that made me feel better about it at the time. *shrugs*</em></p>
+
+<p>So I added a Github issue and went on my way…</p>
+
+<p><img class="center" src="/images/view-refactor/gh-issue.png" title="&ldquo;Github issue to refactor Rails view&rdquo;" ></p>
+
+<h2>The Solution</h2>
+
+<p>With a few minor tweaks, this implementation of the functionality and UI was adequate. So as time allowed, I jumped back in to untangling the mess I created.</p>
+
+<p>The biggest variable in the display of a <code>Checkin</code> was the week (a date field corresponding to the beginning of that particular week). Once the date was known, I could look for a <code>Checkin</code> for each user in my visibility, see if it existed, and if not, return a stand-in object to represent a non-completed check-in.</p>
+
+<p>I removed the model method:</p>
+
+<p><code>
+def checkin_for(week_of)
+  Checkin.find_by(user_id: id, week_of: week_of)
+end
+</code></p>
+
+<p>and the line in the view largely responsible for the mess:</p>
+
+<p><code>
+&lt;% checkin = person.checkin_for(@week_of) %&gt;
+</code></p>
+
+<p>I went back to the controller and initialized a new object that would allow me to iterate over a list of check-ins:</p>
+
+<p><code>
+def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @reports = Checkin::Reports.new(current_user, @week_of)
+end
+</code></p>
+
+<p>Let’s dig in to the new <code>Checkin::Reports</code> class…</p>
+
+<p>```
+class Checkin
+  class Reports</p>
+
+<pre><code>def initialize(user, week_of)
+  @user, @week_of = user, week_of
+end
+
+def checkins
+  reports.map { |person|
+    Checkin.find_or_initialize_by(user_id: person.id, week_of: week_of)
+  }
+end
+
+private
+
+attr_reader :user, :week_of
+
+def reports
+  user.reports
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>I instantiate with the user and week, similar to what the <code>checkin_for</code> model method did above.</p>
+
+<p>The only relatively interesting part of this class is that it’s using <code>find_or_intialize_by</code>. It turns out that the view didn’t care if the object was <code>nil</code>, or just a non-persisted <code>Checkin</code> object. All it did was interrogate certain attributes of the object, and guard against the argument being <code>nil</code>. From that perspective, we’ve improved our code even more because now instead of supplying nil to the helper, we are actually supplying it with a newly instantiated <code>Checkin</code> with some default attributes.</p>
+
+<p>This means that our <code>checkin_status</code> helper, went from:</p>
+
+<p>```
+def checkin_status(checkin)
+  if checkin &amp;&amp; checkin.completed_at?</p>
+
+<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>to:</p>
+
+<p>```
+def checkin_status(checkin)
+  if checkin.completed_at?</p>
+
+<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>It’s a subtle change (removing the check <code>if checkin</code> from the first conditional), but one that’s less susceptible to bizarre edge cases. And clearer — It’s reasonable to expect that by calling the first argument <code>checkin</code>, <strong>the variable should be a <code>Checkin</code></strong>, and not sometimes <code>nil</code>.</p>
+
+<p>Returning back to the view…using the new <code>@reports</code> variable, we no longer have to query during each iteration:</p>
+
+<p>```
+&lt;% @reports.checkins.each do |checkin| %>
+  <tr></p>
+
+<pre><code>&lt;td&gt;
+  &lt;%= profile_picture checkin.user %&gt;
+  &lt;%= checkin.user %&gt;
+&lt;/td&gt;
+
+&lt;td&gt;
+  &lt;%= checkin_status(checkin) %&gt;
+&lt;/td&gt;
+</code></pre>
+
+<p>  </tr>
+&lt;% end %>
+```</p>
+
+<p>Tests pass, and we’re in a much better place than we were before.</p>
+
+<h2>Summary</h2>
+
+<p>I’ve seen a lot of people make notes for themselves to improve areas of their application and either never get the opportunity to go back and do so, or get so far removed from the mess, they forget about how bad it was in the first place. The approach I took above by making a note for myself worked because <strong>I knew</strong> I would go back to it. It’s possible this may not work for everyone.</p>
+
+<p>If it takes more than just making a Github issue for your and your team, find what works. The important part is that the refactor takes place, in whatever way convenient for you.</p>
+
+<p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
+
+<p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Build a Ruby Gem - Ruby Heroes]]></title>
@@ -607,106 +810,6 @@ end
 <p>I’m excited to add Minitest and fixtures to my toolkit. With the benefits I’ve seen so far, it’s hard for me to imagine using anything else going forward — assuming I have the choice.</p>
 
 <p>If you have beef over the default Minitest assertion syntax, you’ll be happy to know that Minitest comes with the option to use a <a href="http://bfts.rubyforge.org/minitest/MiniTest/Expectations.html">spec-style syntax</a>. While it’s not identical to the Rspec syntax, it gets you closer to the natural language syntax, if that’s important to you.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[New Rails 4.1 travel_to test helper]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/"/>
-    <updated>2014-05-11T14:08:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
-
-<p>With the release of Rails 4.1, the time stubbing method <code>travel_to</code> was added. This new helper method forces the current time to whatever you specify, allowing you to make asserts against a historical time, or week in my case.</p>
-
-<!--more-->
-
-
-<h2>The Test</h2>
-
-<p><a href="https://github.com/travisjeffery/timecop">Timecop</a> performed valiantly and did more than I ever needed (I generally only used the <code>freeze</code> method). However, dragging in another gem was the last thing I wanted to do for something relatively simple.</p>
-
-<p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
-
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Timecop.freeze Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
-
-<h2>Rails 4.1</h2>
-
-<p>I think I first heard about some additional testing methods from my friend <a href="http://iamericsteele.com/">Eric Steele</a>. He mentioned them in one of our various conversations about testing (he’s writing a book titled <em><a href="https://whatdoitest.com/?utm_source=brandonhilkert-com&amp;utm_medium=web&amp;%20utm_campaign=travel-to">What Do I Test?</a></em>).</p>
-
-<p>Like many, I looked over the <a href="http://guides.rubyonrails.org/4_1_release_notes.html">release notes for Rails 4.1</a> and features like <a href="http://guides.rubyonrails.org/4_1_release_notes.html#spring-application-preloader">Spring</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml">secrets</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#action-mailer-previews">ActionMailer previews</a>, and <a href="http://guides.rubyonrails.org/4_1_release_notes.html#active-record-enums">ActiveRecord enums</a> jumped out at me.</p>
-
-<p>Towards the bottom, though, was a feature barely mentioned or written about:</p>
-
-<p><img class="center" src="/images/rails-41-travel-to.png" title="&ldquo;Test helper addition in Rails 4.1&rdquo;" ></p>
-
-<p><a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/testing/time_helpers.rb">The <code>TimeHelpers</code> test module</a> adds the <code>travel_to</code> and <code>travel_back</code> methods to assist in stubbing <code>Time.now</code> and <code>Date.today</code>.</p>
-
-<h2>Updated Tests</h2>
-
-<p>Using the <code>travel_to</code> method with the example above results in the following:</p>
-
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
-
-<p>While the change doesn&rsquo;t look significant, it removed my need for the <code>Timecop</code> gem entirely.</p>
-
-<p>Additionally, the same test could be written as:</p>
-
-<p><code>
-test "sends reminders on tuesday for those scheduled on wednesday" do
-  travel_to Chronic.parse("4/15/14")
-  Reminders::Checkin.new.email
-  assert_equal 3, ActionMailer::Base.deliveries.size
-  travel_back
-end
-</code></p>
-
-<p>or with <code>setup</code> and <code>teardown</code>:</p>
-
-<p>```
-def setup
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;)
-end</p>
-
-<p>test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Reminders::Checkin.new.email
-  assert_equal 3, ActionMailer::Base.deliveries.size
-end</p>
-
-<p>def teardown
-  travel_back
-end
-```</p>
-
-<h2>Summary</h2>
-
-<p>Rails is well-known for conventions. <code>travel_to</code> is a great addition to the framework that would&rsquo;ve otherwise required dragging in additional dependencies.</p>
-
-<p>Next time you look at the release notes for a project, don&rsquo;t skip over the less featured functionality. For all you know, it could be something that saves you time and frustration that commonly occurs in your projects.</p>
 ]]></content>
   </entry>
   

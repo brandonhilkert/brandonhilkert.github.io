@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: view | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/view/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2014-07-30T06:13:19-04:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
+    <link href="http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/"/>
+    <updated>2014-07-30T06:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view</id>
+    <content type="html"><![CDATA[<p>It’s generally known that leaving any kind of logic in a Rails view is bad news, both for debugging and your own sanity. Rails views can be cumbersome to test and leave a lot to be desired when it comes to debugging.</p>
+
+<!--more-->
+
+
+<p>I recently went through the process of refactoring a Rails view that included logic. The end result was an isolated <a href="http://blog.jayfields.com/2007/10/ruby-poro.html">PORO</a> that was easily integrated with the controller/view.</p>
+
+<h2>Background</h2>
+
+<p>The app I’m currently working on is a greenfield app with vague specs, at best. I don’t mention this to fault anyone, but more to illustrate a point. Not all greenfield projects have well-defined specs.</p>
+
+<p>In this particular case, the stakeholders were somewhat unsure of what the interface should look like. Together, we tossed around a number of ideas, ultimately leading to a few options. Only once an iteration of the UI was available, would we have a clear picture of whether it <em>felt right</em>.</p>
+
+<h2>The Problem</h2>
+
+<p>I implemented the first option in the most crude way I could think of. Unfortunately, that way involved putting logic in the view. I know, I know — I can hear it now, <em>”C’mon Brandon, everyone knows you shouldn’t do this!”</em>. Here’s the thing — I knew it too.</p>
+
+<p>Here’s what I ended up with:</p>
+
+<p>```</p>
+
+<h1>controller</h1>
+
+<p>def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @people = current_user.reports
+end</p>
+
+<h1>view</h1>
+
+<p>&lt;% @people.each do |person| %>
+  &lt;% checkin = person.checkin_for(@week_of) %>
+  <tr></p>
+
+<pre><code>&lt;td&gt;
+  &lt;%= profile_picture person %&gt;
+  &lt;%= person %&gt;
+&lt;/td&gt;
+
+&lt;td&gt;
+  &lt;%= checkin_status(checkin) %&gt;
+&lt;/td&gt;
+</code></pre>
+
+<p>  </tr>
+&lt;% end %>
+```</p>
+
+<p>For each iteration of <code>@people</code>, I looked up the check-in for that particular week from the model:</p>
+
+<p><code>
+def checkin_for(week_of)
+  Checkin.find_by(user_id: id, week_of: week_of)
+end
+</code></p>
+
+<p>This crosses concerns, blurs responsibility — all the things that bad Rails app are made of. But I was doing this knowing it would either be entirely ripped out (we’d change the UI altogether), or refactored to something better.</p>
+
+<p><em>Note: I could’ve just saved myself one step and never made the method in the model. For some reason, that made me feel better about it at the time. *shrugs*</em></p>
+
+<p>So I added a Github issue and went on my way…</p>
+
+<p><img class="center" src="/images/view-refactor/gh-issue.png" title="&ldquo;Github issue to refactor Rails view&rdquo;" ></p>
+
+<h2>The Solution</h2>
+
+<p>With a few minor tweaks, this implementation of the functionality and UI was adequate. So as time allowed, I jumped back in to untangling the mess I created.</p>
+
+<p>The biggest variable in the display of a <code>Checkin</code> was the week (a date field corresponding to the beginning of that particular week). Once the date was known, I could look for a <code>Checkin</code> for each user in my visibility, see if it existed, and if not, return a stand-in object to represent a non-completed check-in.</p>
+
+<p>I removed the model method:</p>
+
+<p><code>
+def checkin_for(week_of)
+  Checkin.find_by(user_id: id, week_of: week_of)
+end
+</code></p>
+
+<p>and the line in the view largely responsible for the mess:</p>
+
+<p><code>
+&lt;% checkin = person.checkin_for(@week_of) %&gt;
+</code></p>
+
+<p>I went back to the controller and initialized a new object that would allow me to iterate over a list of check-ins:</p>
+
+<p><code>
+def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @reports = Checkin::Reports.new(current_user, @week_of)
+end
+</code></p>
+
+<p>Let’s dig in to the new <code>Checkin::Reports</code> class…</p>
+
+<p>```
+class Checkin
+  class Reports</p>
+
+<pre><code>def initialize(user, week_of)
+  @user, @week_of = user, week_of
+end
+
+def checkins
+  reports.map { |person|
+    Checkin.find_or_initialize_by(user_id: person.id, week_of: week_of)
+  }
+end
+
+private
+
+attr_reader :user, :week_of
+
+def reports
+  user.reports
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>I instantiate with the user and week, similar to what the <code>checkin_for</code> model method did above.</p>
+
+<p>The only relatively interesting part of this class is that it’s using <code>find_or_intialize_by</code>. It turns out that the view didn’t care if the object was <code>nil</code>, or just a non-persisted <code>Checkin</code> object. All it did was interrogate certain attributes of the object, and guard against the argument being <code>nil</code>. From that perspective, we’ve improved our code even more because now instead of supplying nil to the helper, we are actually supplying it with a newly instantiated <code>Checkin</code> with some default attributes.</p>
+
+<p>This means that our <code>checkin_status</code> helper, went from:</p>
+
+<p>```
+def checkin_status(checkin)
+  if checkin &amp;&amp; checkin.completed_at?</p>
+
+<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>to:</p>
+
+<p>```
+def checkin_status(checkin)
+  if checkin.completed_at?</p>
+
+<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>It’s a subtle change (removing the check <code>if checkin</code> from the first conditional), but one that’s less susceptible to bizarre edge cases. And clearer — It’s reasonable to expect that by calling the first argument <code>checkin</code>, <strong>the variable should be a <code>Checkin</code></strong>, and not sometimes <code>nil</code>.</p>
+
+<p>Returning back to the view…using the new <code>@reports</code> variable, we no longer have to query during each iteration:</p>
+
+<p>```
+&lt;% @reports.checkins.each do |checkin| %>
+  <tr></p>
+
+<pre><code>&lt;td&gt;
+  &lt;%= profile_picture checkin.user %&gt;
+  &lt;%= checkin.user %&gt;
+&lt;/td&gt;
+
+&lt;td&gt;
+  &lt;%= checkin_status(checkin) %&gt;
+&lt;/td&gt;
+</code></pre>
+
+<p>  </tr>
+&lt;% end %>
+```</p>
+
+<p>Tests pass, and we’re in a much better place than we were before.</p>
+
+<h2>Summary</h2>
+
+<p>I’ve seen a lot of people make notes for themselves to improve areas of their application and either never get the opportunity to go back and do so, or get so far removed from the mess, they forget about how bad it was in the first place. The approach I took above by making a note for myself worked because <strong>I knew</strong> I would go back to it. It’s possible this may not work for everyone.</p>
+
+<p>If it takes more than just making a Github issue for your and your team, find what works. The important part is that the refactor takes place, in whatever way convenient for you.</p>
+
+<p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
+
+<p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
+]]></content>
+  </entry>
+  
+</feed>
