@@ -509,7 +509,8 @@ blockquote img {
   box-shadow:0 1px 3px #d3d3d3;
 }
 
-#testimonials footer {
+#testimonials footer,
+#testimonials-long footer{
   background:url(/images/books/ruby-gem/sprite.png) no-repeat 90px 0;
   padding:10px 0 0 0;
 }
