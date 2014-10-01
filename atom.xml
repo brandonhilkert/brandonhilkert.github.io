@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-09-27T13:57:49-04:00</updated>
+  <updated>2014-10-01T06:51:36-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Absolutes as an AntiPattern]]></title>
+    <link href="http://brandonhilkert.com/blog/absolutes-as-an-antipattern/"/>
+    <updated>2014-09-28T22:35:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/absolutes-as-an-antipattern</id>
+    <content type="html"><![CDATA[<p>It’s been awhile since my last post — almost 2 months to be specific. A trip to Portugal, getting sick and a minor run-in with a table saw made it challenging to post anything for the last couple weeks. But I’d be lying if I said I was itching to write.</p>
+
+<p>During that time, I didn’t have anything screaming to be talked about. I have a long list of “decent post” topics, but none of them got me particularly excited. Until today…</p>
+
+<!--more-->
+
+
+<p>I stumbled on a blog post related to Rails’s upcoming <a href="http://edgeguides.rubyonrails.org/active_job_basics.html">Active Job feature</a>. While demonstrating the syntax for specifying the adapter, there was comment in the code snippet that said <em>“inline and other worse options”</em>. This caught me by surprise and bummed me out at the same time. Not only because I’m the author of <a href="https://github.com/brandonhilkert/sucker_punch">one of them</a>, but because there are a handful of background processing libraries in Ruby that are really good.</p>
+
+<p>So, naturally, I pinged the author and mentioned the comment might be sending the wrong message. He responded with “I consider sidekiq to be the best background processing tool available for Ruby.” And then later, <em>“sidekiq is significantly better that delayed_job and resque. You’re welcome to disagree”</em>.</p>
+
+<p><em>Note: The responses above illustrate a general sentiment. By no means is this post focused on the individual that said them.</em></p>
+
+<p>The thing is, I don’t completely disagree. As you probably already know, I’m a huge fan of of <a href="http://sidekiq.org/">Sidekiq</a>. I’ve contributed to the project and believe Sidekiq’s author, <a href="https://www.mikeperham.com/">Mike Perham</a> is not only a great leader in the Ruby community, but a great example of how to manage and lead open source projects well.</p>
+
+<p>However, those responses reminded me how damaging absolutes can be. You’ve probably heard it before:</p>
+
+<blockquote><p>“we can <strong>ABSOLUTELY NOT</strong> do x, y and z”</p></blockquote>
+
+<p><em>Why not? Will the world end? How do I know?</em></p>
+
+<p>or, what about:</p>
+
+<blockquote><p>“this feature needs to go out tomorrow, no excuses”</p></blockquote>
+
+<p><em>What if there is an excuse? What if it’s not ready? Will I be fired? Will our company go under?</em></p>
+
+<p>There are trade-offs to every decision made. While some options may not be ideal, they may still work, perhaps just not as well.</p>
+
+<p>Absolutes beg the toddler question, <em>”why?”</em>. <em>Why won’t that language X work?</em> <em>Why can’t we use Y?</em>. If you don’t know the answer to those questions, you’re doing yourself a disservice by not asking. Maybe the person has thoroughly researched the topic to come up with those conclusions. But, maybe, they haven’t.</p>
+
+<p>I’ve noticed those who do exhaustive research on a topic tend to present the information in a different manner. They’re confident the facts they found will prove their case and seem to present their findings less defensively. No, <em>”it has to be done like this”</em>. More like, <em>“I found a few ways to fix the problem and here’s why I think option 1 might be the best solution. What do you think?”</em>.</p>
+
+<p>Whether you follow agile or any other methodology, predictions and absolutes have no place in conversations. There are plenty of examples of failed software projects. I’m pretty sure all of them featured people promising the work would be done in time and under budget. Buuuuuuut, it wasn’t.</p>
+
+<h2>Background Jobs for the Big Boys</h2>
+
+<p>Delayed Job was the first Ruby background processing library I used. I remember feeling badass that I was doing all this complicated stuff in the background. But at some point, there we so many jobs and so much activity that pushing and pulling jobs out of the primary data store wasn’t efficient. Reads from the web UI would slow down (and ultimately stop) and users would bail. Unfortunately, I couldn’t pop up a message and say, <em>”hey, hope you don’t mind, but I’m doing some pretty crucial shit in the background here, so you’re experience is gonna be sucky for a bit! sorry :(”</em>.</p>
+
+<p>So, at the time, Resque was the next logical transition. I migrated the previously written jobs from Delayed Job to Resque and experienced a new level of <em>bad ass</em>. Fast forward 4 years — I still work on projects using Resque. Needless to say, it’s a pretty awesome piece of open source software.</p>
+
+<p>A few years ago, Sidekiq came along. While I didn’t know much about multi-threading code in Ruby, I tried it on a side project and was floored at the results. Those 6 Heroku workers that I’d been paying for could be compacted in to 1?!?! And on top of that, I only needed 1 worker that had 25 workers working against the queue?!?!</p>
+
+<p>But then one day, I dropped it in to a project that was using MongoDB and MongoMapper as ORM and things didn’t go so well. In the end, MongoMapper wasn’t thread-safe, which is a requirement of Sidekiq worker code. So in that case, was Sidekiq the best tool for the job? While I would’ve loved to use Sidekiq on that project, it certainly (like the absolute there…) wasn’t the right tool for <em>that</em> job.</p>
+
+<p>And what about when I first started with Delayed Job…we were a small startup with limited cash. While it seems silly to balk over an extra $35 Heorku dyno, it was $35 that could’ve gone towards something else. Not to mention the extra Redis instance, along with the expertise to make sure the thing didn’t fall over and die. Was Sidekiq (or Resque for that matter) the best tool for that job? Nope!</p>
+
+<p>Fast forward a few years, I had the need for an in-process background processing library, so <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">I wrote one</a>. That need was driven off the motivation above — needing to minimize cost and complexity. Would Sidekiq have worked for that project? Of course! In fact, it was using Sidekiq for a year or so before I transitioned the jobs to use Sucker Punch.</p>
+
+<h2>Use Cases</h2>
+
+<p>At this point, you should be noticing a trend, right? The examples above were unique use cases with a unique set of requirements and limitations. Sure, if every project I worked on had unlimited resources (both time and money), Sidekiq would be probably be my go-to the majority of time (even when writing that sentence I hesitated and almost wrote “all the time”).</p>
+
+<p>But I hesitate now. Because I remember learning about the new cool things and thinking, <em>”This is the best! There’s no way I’ll never not use it”</em>. And when I would talk to other developers, I would rave about how <em>X</em> is the best for <em>Y</em>. And now I realize I was a dummy for doing that. There’s no way I could’ve made that judgement for someone else and their work. What I really should’ve said was, <em>”I tried [insert fancy new gem/technique] for the first time the other day. It worked really well for doing X in my project that does Y”</em>. That definitely doesn’t sound as exciting, but it was the truth.</p>
+
+<p>I feel fortunate to get to write Ruby everyday. It’s incredibly expressive, which is why the debate over the countless ways to do something is great. Does the code express the right intent? For your method, it might. But for mine, it might express the complete opposite. The good news is, that’s OK. Both versions will work and the fact that we can have conversations like that is a praise for the language itself. I prefer to have the opportunity to have that conversation about style, rather than a language more black and white. Maybe it’s the creative in me, but it seems like no 2 Ruby solutions will be identical and that’s one of the things I love most about writing Ruby.</p>
+
+<p>We often joke about the stack overflow post that starts with <em>“I’m thinking about learning Rails…is it better than PHP?”</em>. Or even more relevant today, <em>”Which javascript framework should I use?”</em>.</p>
+
+<p>And then there’s the guy who comes along and is all like, <em>”Let’s back up, what are you doing and why do you absolutely need a FRAMEWORK????”</em>. While I used to ignore those types of comments, they’re the kind that I think about now and find myself typing. And that has me wondering…why the change?</p>
+
+<h2>Experience, Experience, Experience</h2>
+
+<p>I got to thinking about how I felt when I was first learning to program. When I started to feel comfortable with Rails, my confidence was through the roof. But at the same time, my naivety was at an all time high. I had had minimal experiences with software systems that were either critical or heavily-loaded. But having found Resque, I felt like I could solve the world’s problems. This is somewhat of an exaggeration, but not too far off. I realized that, as it relates to my technical career, my naivety is doing this related to time:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/absolutes/naivety-graph.png" title="&#34;Graph of Naivety over Time&#34;" alt="&#34;Graph of Naivety over Time&#34;"></p>
+
+<p>The less naivety, the more options and, naturally, certainty takes a nose dive:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/absolutes/certainty-graph.png" title="&#34;Graph of Certainty over Time&#34;" alt="&#34;Graph of Certainty over Time&#34;"></p>
+
+<p>The more I learn about programming in general, the more questions I have. Fortunately, experiences have brought me to a point where I can fairly weigh the use of Sucker Punch or Delayed Job for a particular use case. I’m not sure projecting absolutes from up high does anyone any good. Beginners will take it as the word and spread the message to others they come across.</p>
+
+<p>Use cases are real. And the less we force our own biases on people, the faster they’ll realize experience is key and the random guy behind the cat avatar on Stack Overflow might actually be asking the right questions — even if they are convoluted.</p>
+
+<p>Next time you hear an absolute, ask <em>”Why?”</em>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
@@ -2617,135 +2701,6 @@ language, launching a new product, or finding your dream job. <strong>Tell someo
 about it</strong>. I promise you&rsquo;ll second guess quitting.</p>
 
 <p><em>Leave a comment with your ambitious goals for 2014.</em></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Flexible Rails Environment Configuration]]></title>
-    <link href="http://brandonhilkert.com/blog/flexible-rails-environment-configuration/"/>
-    <updated>2013-12-19T18:44:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/flexible-rails-environment-configuration</id>
-    <content type="html"><![CDATA[<p>It&rsquo;s hard to write a Rails app without interfacing with an external service or
-API. In most cases, these services require a secret token or password. Since
-checking passwords in to source control is generally a bad practice, we need a
-good way to safely and reliably access these values in code.</p>
-
-<p>I&rsquo;ve tried a few gems that attempt to make this process easier and ultimately
-settled on a simpler solution &ndash; the combination of a few lines of code and
-<a href="http://en.wikipedia.org/wiki/Environment_variable">ENV variables</a>, which are
-accessible whether you manage your own infrastructure or use a
-<a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> service like
-<a href="https://www.heroku.com">Heroku</a>.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p>In a recent Rails app, I used <a href="http://pusher.com/">Pusher</a> and it requires the
-unique URL to be setup in an initializer:</p>
-
-<figure class='code'><pre><code># config/initializers/pusher.rb
-
-Pusher.url = "http://asdfa@api.pusherapp.com"</code></pre></figure>
-
-
-<p>If I need to set this URL in multiple place &ndash; copying/pasting is not a great
-solution because it sets me up for copy/paste errors. It&rsquo;s also a headache to
-find all occurrences of the URL when it changes.</p>
-
-<h2>The Solution</h2>
-
-<p>Setup a <a href="http://en.wikipedia.org/wiki/YAML">yaml</a> file similar to this:</p>
-
-<figure class='code'><pre><code># config/application.yml
-
-defaults: &defaults
-  PUSHER_URL: http://asdfa@api.pusherapp.com
-
-development:
-  &lt;&lt;: *defaults
-
-test:
-  &lt;&lt;: *defaults</code></pre></figure>
-
-
-<p>Add the following to <code>config/application.rb</code> before the Rails application class
-is defined:</p>
-
-<figure class='code'><pre><code>if File.exists?(File.expand_path('../application.yml', __FILE__))
-  config = YAML.load(File.read(File.expand_path('../application.yml', __FILE__)))
-  config.merge! config.fetch(Rails.env, {})
-  config.each do |key, value|
-    ENV[key] ||= value.to_s unless value.kind_of? Hash
-  end
-end</code></pre></figure>
-
-
-<p>Resulting in a <code>config/application.rb</code> that looks something like this:</p>
-
-<figure class='code'><pre><code># config/application.rb
-
-require File.expand_path('../boot', __FILE__)
-
-require 'rails/all'
-
-# Require the gems listed in Gemfile, including any gems
-# you've limited to :test, :development, or :production.
-Bundler.require(:default, Rails.env)
-
-if File.exists?(File.expand_path('../application.yml', __FILE__))
-  config = YAML.load(File.read(File.expand_path('../application.yml', __FILE__)))
-  config.merge! config.fetch(Rails.env, {})
-  config.each do |key, value|
-    ENV[key] ||= value.to_s unless value.kind_of? Hash
-  end
-end
-
-module NewApp
-  class Application &lt; Rails::Application
-    # ...
-  end
-end</code></pre></figure>
-
-
-<p>The added code first looks for an <code>application.yml</code> file. If it finds one, it
-reads in the values for that environment (development, test, production, etc.)
-and merges them in to the existing Ruby ENV hash.</p>
-
-<p><em>Note: Since <code>application.yml</code> will typically hold passwords and other secret
-keys, it should be added to <code>.gitignore</code> so they don&rsquo;t end up in source
-control.</em></p>
-
-<p>Now, when the application is initialized, <code>PUSHER_URL</code> is
-available in the ENV hash. This allows me to the update the pusher initializer to:</p>
-
-<figure class='code'><pre><code># config/initializers/pusher.rb
-
-Pusher.url = ENV["PUSHER_URL"]</code></pre></figure>
-
-
-<p>If I&rsquo;m deploying to Heroku, I need to set the config value using the following
-command:</p>
-
-<p><code>heroku config:set PUSHER_URL=http://asdfa@api.pusherapp.com</code></p>
-
-<p>Or if I&rsquo;m deploying to Ubuntu, I can set the ENV variable for all users on the system:</p>
-
-<figure class='code'><pre><code># /etc/environment
-
-...
-export PUSHER_URL=http://asdfa@api.pusherapp.com</code></pre></figure>
-
-
-<p><em>Note: If you choose not to set ENV variables on the host system, you can
-easily mimic the development environment and drop the <code>config/application.yml</code>
-file on to the system. This is no different than using a <code>database.yml</code> that
-most Rails developers are used to.</em></p>
-
-<p>That&rsquo;s it! So with 7 lines of code and a configuration file, you have yourself
-an environment configuration setup that&rsquo;s flexible for most deployment
-solutions.</p>
 ]]></content>
   </entry>
   
