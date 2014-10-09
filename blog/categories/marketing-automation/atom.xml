@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: marketing automation | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/marketing-automation/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2014-10-09T07:30:45-04:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Introducing FunnelOptimizer.io]]></title>
+    <link href="http://brandonhilkert.com/blog/introducing-funneloptimizer-dot-io/"/>
+    <updated>2014-10-06T21:21:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/introducing-funneloptimizer-dot-io</id>
+    <content type="html"><![CDATA[<p>Last month marks the 6 month anniversary of the release of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">Build a Ruby Gem</a>. Thinking back to this time last year, I would’ve never guessed that I would launch a product to the tune of $10k+ sales. Thanks to the help of experts like <a href="http://nathanbarry.com/">Nathan Barry</a> and his book <a href="http://nathanbarry.com/authority/">Authority</a>, I was able to quickly get over my fear of marketing and put my technical knowledge to good use.</p>
+
+<p>The weeks leading up to the launch seem like a blur now. At the time, I had a perfectly crafted schedule of marketing material and approaches that, as far as I can tell, were the difference between no sales and quite a few.</p>
+
+<!--more-->
+
+
+<p>One of the biggest lessons learned was capturing emails on my <a href="http://brandonhilkert.com">blog posts</a>. Newsletter opt-ins are fantastic way to gather interest and offer subscribers additional incentives like discounts or other non-public postings. I, like many, made use of related blog posts to capture emails with a form like this:</p>
+
+<p><img class="center" src="/images/funnel_optimizer/newsletter-form.png" title="&ldquo;BrandonHilkert.com newsletter form&rdquo;" ></p>
+
+<p>One of the benefits of serving a niche like Ruby programmers is there are quite a few repeat visitors. Around the new year, I was posting twice a month, and then every week leading up to the launch. The posts were naturally related to the content of building a Ruby gem and gave some teasers to what readers could expect in the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">book</a>.</p>
+
+<p>But one of the things that always bummed me out was how previously subscribed readers to my newsletter <strong>STILL saw the same newsletter opt-in form shown above</strong>. <em>Why on Earth would that be helpful to the them???</em></p>
+
+<p>They can’t sign up twice, so why would I show them the form again? It turns out there’s no good answer for this. In general, the quickest way to solve this problem is to purchase a fancy marketing automation system and pay potentially 4 figures a month. There was no room for this with my little budget.</p>
+
+<p>Ideally, what I wanted was to show my first visitor the opt-in form above, and then if they signed up, promote my book. Regardless of what I show, I could be using the real estate to show something that was more beneficial to the reader. And that’s the thing, it’s all about them. Anything I showed them beyond the form they already subscribed with would be more beneficial.</p>
+
+<h2>I’m excited to tell you about <a href="http://www.funneloptimizer.io/">Funnel Optimizer</a>!</h2>
+
+<p>I built Funnel Optimizer for people like me, and you. I want to help you sell more products, and provide even more value than you’re already providing. Funnel Optimizer offers you the opportunity to tailor your CTAs based on actions your audience have previously taken.</p>
+
+<p><img class="center" src="/images/funnel_optimizer/screenshots.png" title="&ldquo;Screenshots of FunnelOptimizer.io&rdquo;" ></p>
+
+<p>I’d love to offer the service to everyone immediately, but I’m focused on making sure you get the most out of the service, no matter what platform and where your site is hosted, so new users be on-boarded in batches of 5. There will be a monthly subscription cost beyond the initial on-boarding period.</p>
+
+<p>To get started today, enter your email below:</p>
+
+<p><div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=592d5fa71d" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" placeholder="your@email.com" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="fo-introduction-blog" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="fo" />
+    <input type="submit" class="button" value="I'd like to get started" name="subscribe">
+    <br class="clear">
+  </form>
+</div>
+</p>
+]]></content>
+  </entry>
+  
+</feed>

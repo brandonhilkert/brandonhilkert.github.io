@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-10-01T11:40:32-04:00</updated>
+  <updated>2014-10-09T07:30:45-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Introducing FunnelOptimizer.io]]></title>
+    <link href="http://brandonhilkert.com/blog/introducing-funneloptimizer-dot-io/"/>
+    <updated>2014-10-06T21:21:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/introducing-funneloptimizer-dot-io</id>
+    <content type="html"><![CDATA[<p>Last month marks the 6 month anniversary of the release of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">Build a Ruby Gem</a>. Thinking back to this time last year, I would’ve never guessed that I would launch a product to the tune of $10k+ sales. Thanks to the help of experts like <a href="http://nathanbarry.com/">Nathan Barry</a> and his book <a href="http://nathanbarry.com/authority/">Authority</a>, I was able to quickly get over my fear of marketing and put my technical knowledge to good use.</p>
+
+<p>The weeks leading up to the launch seem like a blur now. At the time, I had a perfectly crafted schedule of marketing material and approaches that, as far as I can tell, were the difference between no sales and quite a few.</p>
+
+<!--more-->
+
+
+<p>One of the biggest lessons learned was capturing emails on my <a href="http://brandonhilkert.com">blog posts</a>. Newsletter opt-ins are fantastic way to gather interest and offer subscribers additional incentives like discounts or other non-public postings. I, like many, made use of related blog posts to capture emails with a form like this:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/funnel_optimizer/newsletter-form.png" title="&#34;BrandonHilkert.com newsletter form&#34;" alt="&#34;BrandonHilkert.com newsletter form&#34;"></p>
+
+<p>One of the benefits of serving a niche like Ruby programmers is there are quite a few repeat visitors. Around the new year, I was posting twice a month, and then every week leading up to the launch. The posts were naturally related to the content of building a Ruby gem and gave some teasers to what readers could expect in the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">book</a>.</p>
+
+<p>But one of the things that always bummed me out was how previously subscribed readers to my newsletter <strong>STILL saw the same newsletter opt-in form shown above</strong>. <em>Why on Earth would that be helpful to the them???</em></p>
+
+<p>They can’t sign up twice, so why would I show them the form again? It turns out there’s no good answer for this. In general, the quickest way to solve this problem is to purchase a fancy marketing automation system and pay potentially 4 figures a month. There was no room for this with my little budget.</p>
+
+<p>Ideally, what I wanted was to show my first visitor the opt-in form above, and then if they signed up, promote my book. Regardless of what I show, I could be using the real estate to show something that was more beneficial to the reader. And that’s the thing, it’s all about them. Anything I showed them beyond the form they already subscribed with would be more beneficial.</p>
+
+<h2>I’m excited to tell you about <a href="http://www.funneloptimizer.io/">Funnel Optimizer</a>!</h2>
+
+<p>I built Funnel Optimizer for people like me, and you. I want to help you sell more products, and provide even more value than you’re already providing. Funnel Optimizer offers you the opportunity to tailor your CTAs based on actions your audience have previously taken.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/funnel_optimizer/screenshots.png" title="&#34;Screenshots of FunnelOptimizer.io&#34;" alt="&#34;Screenshots of FunnelOptimizer.io&#34;"></p>
+
+<p>I’d love to offer the service to everyone immediately, but I’m focused on making sure you get the most out of the service, no matter what platform and where your site is hosted, so new users be on-boarded in batches of 5. There will be a monthly subscription cost beyond the initial on-boarding period.</p>
+
+<p>To get started today, enter your email below:</p>
+
+<div class="inline-newsletter-form">
+  <form action="http://brandonhilkert.us7.list-manage2.com/subscribe/post?u=34ccc3aa2135746d0231c9420&amp;id=592d5fa71d" method="post" target="_blank" novalidate>
+    <input type="email" value="" name="EMAIL" class="email" placeholder="your@email.com" required>
+    <input type="hidden" name="LOCATION" id="LOCATION" value="fo-introduction-blog" />
+    <input type="hidden" name="PRODUCT" id="PRODUCT" value="fo" />
+    <input type="submit" class="button" value="I'd like to get started" name="subscribe">
+    <br class="clear">
+  </form>
+</div>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Absolutes as an AntiPattern]]></title>
@@ -2638,69 +2687,6 @@ click-through.</p>
 course, which has since <strong>validated the need for a book</strong>. While interest
 in a free email course doesn&rsquo;t guarantee a book on the same subject will sell, it was
 the closet thing I could think to do outside of taking pre-orders.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Be Ambitious]]></title>
-    <link href="http://brandonhilkert.com/blog/be-ambitious/"/>
-    <updated>2013-12-31T13:04:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/be-ambitious</id>
-    <content type="html"><![CDATA[<h2>2013</h2>
-
-<p>On Dec. 31, 2012, I sat around a dinner table with my wife and 4 of our
-friends.  Discussing the upcoming New Year, we went around the table and shared
-our resolutions. My turn came and I said, &ldquo;<em>I&rsquo;m going to finish an
-<a href="http://en.wikipedia.org/wiki/Ironman_Triathlon">Ironman</a></em>&rdquo;.</p>
-
-<p>Up until that point, my longest race of any kind was a half marathon &ndash;
-certainly no triathlons. So for me, this was biiiiiiig time. I honestly don&rsquo;t
-know if anyone believed what I said that night. I&rsquo;m not even sure I did. But
-nonetheless, I had said it out loud in the presence of friends. The same
-friends I&rsquo;d later have to explain why I bailed &ndash; <em>if I bailed</em>.</p>
-
-<!--more-->
-
-
-<p>But I didn&rsquo;t bail. On Sept. 21, I finished the
-<a href="http://www.tricolumbia.org/events/?eid=5">ChesapeakeMan</a> in 12 hours and 54
-minutes. I spent 3 hours/day, 6 days/week for the prior 30 weeks preparing for
-that day. It was easily the longest 30 weeks of my life.</p>
-
-<h2>Accountability</h2>
-
-<p>During the training, there were a few times I seriously considered quitting. In
-every one of those moments, I thought back to the scene around that dinner
-table on New Year&rsquo;s Eve. I had confidently told 5 other people I was going to
-finish an Ironman and I didn&rsquo;t want to have to explain that I quit.</p>
-
-<p>This is accountability&hellip;had I not mentioned by goal that night, the only
-person I would&rsquo;ve let down is myself &ndash; that&rsquo;s easy to stomach. But knowing
-others had expectations made it close to impossible for me to quit.</p>
-
-<h2>2014</h2>
-
-<p>With an Ironman crossed off my list, here we are, one year later. And rather
-than rely on another dinner party resolution sharing session, I&rsquo;m documenting my resolution
-here. So here goes&hellip;</p>
-
-<h2>This year I&rsquo;m going to write to <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">write a book</a>.</h2>
-
-<p>I never would&rsquo;ve thought a book would be in my future, but that&rsquo;s what
-resolutions are for, right?!?! I also never would&rsquo;ve guessed I&rsquo;d finish an
-Ironman, so why not keep the ball rollin&#8217;.</p>
-
-<h2>In Summary</h2>
-
-<p>Do something <strong>ambitious</strong> this year. Don&rsquo;t be the person that plan to lose 20
-lbs. and quits going to the gym a week in to it. After my experience this year,
-I believe <strong>everyone</strong> is capable of far more than they think.</p>
-
-<p>This could be the year you take that next big step. Whether it&rsquo;s learning a new
-language, launching a new product, or finding your dream job. <strong>Tell someone
-about it</strong>. I promise you&rsquo;ll second guess quitting.</p>
-
-<p><em>Leave a comment with your ambitious goals for 2014.</em></p>
 ]]></content>
   </entry>
   
