@@ -215,7 +215,7 @@ including <strong>14 chapters of code</strong> and over 2 hours of screencasts</
 Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago</code></pre></figure>
 
 
-<p>When we include javascript libraries from external sources, the <code>vender/</code> directory is the most appropriate place for them. Let’s create the directory <code>vendor/javascripts/</code> and place the source for the <code>timeago.js</code> plugin there:</p>
+<p>When we include javascript libraries from external sources, the <code>vender/</code> directory is the most appropriate place for them. Let’s create the directory <code>vendor/assets/javascripts/</code> and place the source for the <code>timeago.js</code> plugin there:</p>
 
 <figure class='code'><pre><code>├── Gemfile
 ├── LICENSE.txt
@@ -227,7 +227,8 @@ Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago</code></pre></fig
 ├── time_ago.gemspec
 └── vendor
     └── assets
-        └── jquery.timeago.js</code></pre></figure>
+        └── javascripts
+            └── jquery.timeago.js</code></pre></figure>
 
 
 <p>To create our view helper, we’ll add the <code>/app/helpers/</code> directory:</p>
@@ -245,7 +246,8 @@ Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago</code></pre></fig
 ├── time_ago.gemspec
 └── vendor
     └── assets
-        └── jquery.timeago.js</code></pre></figure>
+        └── javascripts
+            └── jquery.timeago.js</code></pre></figure>
 
 
 <p>The code for the view helper is shown below:</p>
