@@ -98,108 +98,21 @@ a img {
 
 /* 2.1 Buttons */
 
-.button_buy {
-  padding: 10px 0 20px 0;
-}
-
-.button_buy a {
-  background: #97bf0f; /* Old browsers */
-  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk3YmYwZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3M2E3MjYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-  background: -moz-linear-gradient(top,  #97bf0f 0%, #73a726 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#97bf0f), color-stop(100%,#73a726)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #97bf0f 0%,#73a726 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #97bf0f 0%,#73a726 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #97bf0f 0%,#73a726 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #97bf0f 0%,#73a726 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#97bf0f', endColorstr='#73a726',GradientType=0 ); /* IE6-8 */
+.button {
   font-family: 'Bree Serif', serif;
-  color:#fff;
-  font-size:2.0em;
-  text-shadow:0 -1px #35490e;
-  display:inline-block;
-  border-radius:5px;
-  -webkit-border-radius:5px;
-  -moz-border-radius:5px;
-  box-shadow:0 1px 3px #181818;
-}
-
-#author .button_buy {
-  clear:both;
-  padding:0;
-  margin:0 0 0 135px;
-}
-
-#author .button_buy a {
-  box-shadow:0 1px 2px #818181;
-}
-
-.button_buy a:hover,  a.button_buy_table:hover {
-  background: #73a726; /* Old browsers */
-  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzczYTcyNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5N2JmMGYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-  background: -moz-linear-gradient(top,  #73a726 0%, #97bf0f 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#73a726), color-stop(100%,#97bf0f)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #73a726 0%,#97bf0f 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #73a726 0%,#97bf0f 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #73a726 0%,#97bf0f 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #73a726 0%,#97bf0f 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#73a726', endColorstr='#97bf0f',GradientType=0 ); /* IE6-8 */
-}
-
-.button_buy span {
-  display:block;
-  float:left;
-}
-
-.button_price {
-  background:url(/images/books/ruby-gem/bg_button_green.png) no-repeat right -5px;
-  padding:6px 15px 6px 15px;
-  border-top-left-radius:5px;
-  -moz-border-radius-topleft:5px;
-  -webkit-border-top-left-radius:5px;
-  border-bottom-left-radius:5px;
-  -moz-border-radius-bottomleft:5px;
-  -webkit-border-bottom-left-radius:5px;
-  box-shadow:inset 0 1px #9cc015;
-}
-
-.button_buy a:hover .button_price {
-  background:url(/images/books/ruby-gem/bg_button_green.png) no-repeat right -71px;
-}
-
-.button_text {
-  box-shadow:inset 0 1px #9cc015;
-  padding:6px 15px 6px 10px;
-  border-top-right-radius:5px;
-  -moz-border-radius-topright:5px;
-  -webkit-border-top-right-radius:5px;
-  border-bottom-right-radius:5px;
-  -moz-border-radius-bottomright:5px;
-  -webkit-border-bottom-right-radius:5px;
-}
-
-a.button_buy_table {
-  background: #97bf0f; /* Old browsers */
-  /* IE9 SVG, needs conditional override of 'filter' to 'none' */
-  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk3YmYwZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM3M2E3MjYiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
-  background: -moz-linear-gradient(top,  #97bf0f 0%, #73a726 100%); /* FF3.6+ */
-  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#97bf0f), color-stop(100%,#73a726)); /* Chrome,Safari4+ */
-  background: -webkit-linear-gradient(top,  #97bf0f 0%,#73a726 100%); /* Chrome10+,Safari5.1+ */
-  background: -o-linear-gradient(top,  #97bf0f 0%,#73a726 100%); /* Opera 11.10+ */
-  background: -ms-linear-gradient(top,  #97bf0f 0%,#73a726 100%); /* IE10+ */
-  background: linear-gradient(to bottom,  #97bf0f 0%,#73a726 100%); /* W3C */
-  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#97bf0f', endColorstr='#73a726',GradientType=0 ); /* IE6-8 */
-  font-family: 'Bree Serif', serif;
-  color:#fff;
-  font-size:1.4em;
-  text-shadow:0 -1px #35490e;
-  display:inline-block;
-  margin:20px 0 20px 0;
-  padding:7px 25px 7px 25px;
-  border-radius:5px;
-  -webkit-border-radius:5px;
-  -moz-border-radius:5px;
+  background: #439fe0;
+  color: white;
+  font-weight: 700;
+  padding: .75rem 2rem !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
+  border-bottom: 2px solid #194ba3;
+  cursor: pointer;
+  display: inline-block;
+  margin: 15px 0;
+  font-weight: 700;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
 }
 
 
@@ -524,10 +437,10 @@ blockquote, blockquote p { line-height: 1.5; color: #6f6f6f; }
 
 q {
   background:#fff;
-  display:block;
-  font-style:italic;
-  padding:15px 15px 35px 15px;
-  box-shadow:0 1px 3px #d3d3d3;
+  display: block;
+  font-style: italic;
+  padding: 15px 15px 35px 15px;
+  box-shadow: 0 1px 3px #d3d3d3;
 }
 
 blockquote cite { display: block; font-size: 12px; color: #555555; }
@@ -538,6 +451,11 @@ abbr, acronym { text-transform: uppercase; font-size: 90%; color: #222222; borde
 
 abbr { text-transform: none; }
 
+@media screen and (max-width: 460px) {
+  #testimonials blockquote {
+    width: 100%;
+  }
+}
 
 /* 6.4 Screenshots */
 
@@ -631,9 +549,9 @@ input[type="submit"] {
   width: 280px;
   padding: 10px;
   border: 0;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
   margin: 0 .25rem;
   font-size: 1.1rem;
   -webkit-appearance: none;
@@ -642,18 +560,14 @@ input[type="submit"] {
   -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
   -moz-box-sizing: border-box;    /* Firefox, other Gecko */
   box-sizing: border-box;         /* Opera/IE 8+ */
-  background: #97bf0f; /* Old browsers */
+  background: #439fe0;
 
   color: white;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
-  border-bottom: 2px solid #6f8d0b;
+  border-bottom: 2px solid #194ba3;
   cursor: pointer;
   height: 50px;
   font-family: 'Bree Serif', serif;
-}
-
-input[type="submit"]:hover {
-  background: #8baf0e; /* Old browsers */
+  text-shadow: 0 1px 1px rgba(0,0,0,0.5);
 }
 
 @media screen and (max-width: 1005px) {
@@ -678,43 +592,19 @@ input[type="submit"]:hover {
   width: 31%;
   float: left;
   margin-left: 20px;
-  box-shadow:0 1px 3px #d3d3d3;
-  text-align:center;
-  -webkit-transition: all 0.3s ease-out;
-  -moz-transition: all 0.3s ease-out;
-  -o-transition: all 0.3s ease-out;
-  transition: all 0.3s ease-out;
+  text-align: center;
+  border: 1px solid #e5e5e5;
 }
 
 .pricing_block:first-child {
   margin-left: 0;
 }
 
-.pricing_block:hover {
-  box-shadow:0 1px 5px #a9a9a9;
-}
-
-.pricing_block:hover .pricing {
-  background:#e2e2e2;
-}
-
-#favorite.pricing_block:hover {
-  box-shadow:0 1px 8px #8c8c8c;
-}
-
-#favorite.pricing_block:hover .pricing {
-  background:#73a826;
-}
-
 .pricing {
   background:#f8f8f8;
-  padding:10px 0 10px 0;
-  border-top:1px solid #e5e5e5;
-  border-bottom:1px solid #e5e5e5;
-  -webkit-transition: all 0.3s ease-out;
-  -moz-transition: all 0.3s ease-out;
-  -o-transition: all 0.3s ease-out;
-  transition: all 0.3s ease-out;
+  padding: 10px 0 10px 0;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
 }
 
 .pricing_block ul li {
@@ -725,8 +615,14 @@ input[type="submit"]:hover {
   padding-left: 10%;
 }
 
-@media screen and (min-width : 461px ) and (max-width: 760px) {
+@media screen and (max-width: 760px) {
+  .pricing_block .button {
+    width: 90%;
+  }
 
+}
+
+@media screen and (min-width : 461px ) and (max-width: 760px) {
   .pricing_block ul li {
     padding-left: 25%;
   }
@@ -765,13 +661,13 @@ input[type="submit"]:hover {
 /*Favorite*/
 
 #favorite.pricing_block {
-  box-shadow:0 1px 5px #b2b2b2;
-  padding:10px 0 15px 0;
-  margin-top:-10px;
+  box-shadow: 1px 1px 4px #b2b2b2;
+  padding-top: 10px;
+  margin-top: -10px;
 }
 
 #favorite .pricing {
-  background:#90ba14;
+  background: #439fe0;
   color:#fff;
 }
 
@@ -1020,97 +916,6 @@ a#contact_close_counter {
   text-indent: -9999px;
 }
 
-
-/*------------------------------------------------------------------------------------------*/
-/* 9. Additional styles for jQuery/Foundation Framework plug-ins and other plug-in classes  */
-/*------------------------------------------------------------------------------------------*/
-
-.reveal-modal-bg { position: fixed; height: 100%; width: 100%; background: #000; opacity: 0.85; filter: alpha(opacity=85); z-index: 999; display: none; top: 0; left: 0; }
-
-.reveal-modal { background: #fff; visibility: hidden; display: none; top: 100px; left: 50%; margin-left: -260px; width: 520px; position: absolute; z-index: 41; padding: 30px; -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); -moz-box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); box-shadow: 0 0 10px rgba(0, 0, 0, 0.4); }
-.reveal-modal .close-reveal-modal:not(.button) { font-size: 22px; font-size: 2.2rem; line-height: .5; position: absolute; top: 8px; right: 11px; color: #aaa; text-shadow: 0 -1px 1px rgba(0, 0, 0, 0.6); font-weight: bold; cursor: pointer; }
-.reveal-modal.small { width: 30%; margin-left: -15%; }
-.reveal-modal.medium { width: 40%; margin-left: -20%; }
-.reveal-modal.large { width: 60%; margin-left: -30%; }
-.reveal-modal.xlarge { width: 70%; margin-left: -35%; }
-.reveal-modal.expand { width: 90%; margin-left: -45%; }
-.reveal-modal .row { min-width: 0; margin-bottom: 10px; }
-.reveal-modal > :first-child { margin-top: 0; }
-.reveal-modal > :last-child { margin-bottom: 0; }
-
-/* The gallery overlay */
-
-#galleryOverlay{
-  width:100%;
-  height:100%;
-  position:fixed;
-  top:0;
-  left:0;
-  opacity:0;
-  z-index:99;
-  background-color:#222;
-  background-color:rgba(0,0,0,0.8);
-  overflow:hidden;
-  display:none;
-  -moz-transition:opacity 0.4s ease;
-  -webkit-transition:opacity 0.4s ease;
-  transition:opacity 0.4s ease;
-}
-
-/* This class will trigger the animation */
-
-#galleryOverlay.visible{
-  opacity:1;
-}
-
-#gallerySlider{
-  height:100%;
-  left:0;
-  top:0;
-  width:100%;
-  white-space: nowrap;
-  position:absolute;
-  -moz-transition:left 0.4s ease;
-  -webkit-transition:left 0.4s ease;
-  transition:left 0.4s ease;
-}
-
-#gallerySlider .placeholder{
-  background: url(/images/books/ruby-gem/controls/loading.gif) no-repeat center center;
-  height: 100%;
-  line-height: 1px;
-  text-align: center;
-  width:100%;
-  display:inline-block;
-}
-
-/* The before element moves the
- * image halfway from the top */
-
-#gallerySlider .placeholder:before{
-  content: "";
-  display: inline-block;
-  height: 50%;
-  width: 1px;
-  margin-right:-1px;
-}
-
-#gallerySlider .placeholder img{
-  display: inline-block;
-  max-height: 100%;
-  max-width: 100%;
-  vertical-align: middle;
-}
-
-#gallerySlider.rightSpring{
-  -moz-animation: rightSpring 0.3s;
-  -webkit-animation: rightSpring 0.3s;
-}
-
-#gallerySlider.leftSpring{
-  -moz-animation: leftSpring 0.3s;
-  -webkit-animation: leftSpring 0.3s;
-}
 
 /* Firefox Keyframe Animations */
 
@@ -1361,8 +1166,8 @@ a#contact_close_counter {
   }
 
   #screenshots a, #screenshots a img  {
-    height:auto!important;
-    max-width:200px!important;
+    height: auto!important;
+    max-width: 200px!important;
   }
 
   /*Testimonials*/
@@ -1413,7 +1218,6 @@ a#contact_close_counter {
 }
 
 @media screen and (max-width: 460px) {
-
 
   /*Global*/
 
