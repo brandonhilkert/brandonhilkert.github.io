@@ -212,6 +212,15 @@ h5{font-size: 1.2em;}
   color: white;
 }
 
+#banner .announcement {
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+#banner .announcement .title {
+  color: red;
+}
+
 h2.subheader {
   font-family: 'Open Sans', sans-serif, Arial, Helvetica;
   font-weight:300;
@@ -407,6 +416,10 @@ h2.subheader {
   margin: 0;
   width: 48%;
   float: left;
+}
+
+#testimonials blockquote,
+#testimonials-long blockquote {
   margin-bottom: 40px;
 }
 
@@ -645,11 +658,20 @@ input[type="submit"] {
   margin:0;
 }
 
-.price span {
+.price .currency {
   font-size:0.5em;
   position: relative;
   top: -30px;
   left: -5px;
+}
+
+.price .strikethrough {
+  text-decoration: line-through;
+}
+
+.price .discount {
+  font-size: 0.7em;
+  color: red;
 }
 
 .price_sub {
