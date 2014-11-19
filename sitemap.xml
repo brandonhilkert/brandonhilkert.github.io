@@ -170,9 +170,9 @@
     </url>
     <url>
         <loc>
-            http://brandonhilkert.com/blog/creating-active-record-validation-contexts-with-inheritance/
+            http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/
         </loc>
-        <lastmod>2014-11-19T06:48:54-05:00</lastmod>
+        <lastmod>2014-11-19T06:54:37-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
@@ -180,11 +180,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2014-11-19T06:48:54-05:00</lastmod>
+        <lastmod>2014-11-19T06:54:37-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2014-11-19T06:48:54-05:00</lastmod>
+        <lastmod>2014-11-19T06:54:37-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -196,11 +196,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2014-11-19T06:48:54-05:00</lastmod>
+        <lastmod>2014-11-19T06:54:37-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2014-11-19T06:48:54-05:00</lastmod>
+        <lastmod>2014-11-19T06:54:37-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -212,7 +212,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2014-11-19T06:48:54-05:00</lastmod>
+        <lastmod>2014-11-19T06:54:37-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
