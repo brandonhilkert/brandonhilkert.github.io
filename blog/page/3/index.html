@@ -160,6 +160,46 @@
   
 
 
+<time datetime="2014-01-06T06:15:00-05:00" data-updated="true" itemprop="datePublished">January 6<span>th</span>, 2014</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/how-i-launched-an-email-course/" itemprop="url">How I Launched an Email Course to 500+ People</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/book/'>book</a>, <a class='category' href='/blog/categories/email-course/'>email course</a>, <a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/marketing/'>marketing</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>About a month ago, I joined <a href="http://jfdi.bz/">JFDI.bz</a> &ndash; a community for
+solo-founders launching their own thing. Once a month, the group engages in a
+<em>Week of Hustle</em> &ndash; a week long sprint to launch something.
+I chose to launch an email course on the topic of <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary">building a Ruby
+gem</a>.</p>
+
+
+		
+		<a href="/blog/how-i-launched-an-email-course/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2013-12-31T13:04:00-05:00" data-updated="true" itemprop="datePublished">December 31<span>st</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/be-ambitious/" itemprop="url">Be Ambitious</a></h1>
   <div class="tags">
@@ -692,63 +732,6 @@ much harder to put it off.</p>
 <p>
 		
 		<a href="/blog/build-a-ruby-gem-woh-day-1/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-20T09:57:00-05:00" data-updated="true" itemprop="datePublished">November 20<span>th</span>, 2013</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/serving-fonts-for-firefox-with-fastly/" itemprop="url">Serving Fonts for Firefox With Fastly</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/cdn/'>cdn</a>, <a class='category' href='/blog/categories/fastly/'>fastly</a>, <a class='category' href='/blog/categories/firefox/'>firefox</a>, <a class='category' href='/blog/categories/nginx/'>nginx</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p><a href="/blog/setting-up-a-cloudfront-cdn-for-rails/">Setting up a CDN to host assets</a> is
-one of the first performance improvements I make to a production Rails
-application. The first time I attempted to host assets from a different domain,
-I quickly realized that <a href="http://davidwalsh.name/cdn-fonts">Firefox won&rsquo;t download fonts from a different
-domain</a> without specific headers.</p>
-
-<h2>Nginx Fix</h2>
-
-<p>At the time, our system was using <a href="http://wiki.nginx.org/Main">Nginx</a> to serve
-assets that were fronted by a <a href="http://aws.amazon.com/cloudfront/">Amazon
-Cloudfront</a> CDN. In order to make it work
-with this setup, I had to add to the following to our Nginx configuration:</p>
-
-<figure class='code'><pre><code>location ~* \.(ttf|ttc|otf|eot|woff|svg|font.css)$ {
-    add_header Access-Control-Allow-Origin *;
-    expires 1M;
-    access_log off;
-    add_header Cache-Control "public";
-}</code></pre></figure>
-
-
-
-
-
-		
-		<a href="/blog/serving-fonts-for-firefox-with-fastly/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

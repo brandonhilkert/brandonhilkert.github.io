@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-11-16T20:46:46-05:00</updated>
+  <updated>2014-11-19T06:53:46-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,215 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Creating Active Record Validation Contexts with Inheritance]]></title>
+    <link href="http://brandonhilkert.com/blog/creating-active-record-validation-contexts-with-inheritance/"/>
+    <updated>2014-11-18T17:20:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/creating-active-record-validation-contexts-with-inheritance</id>
+    <content type="html"><![CDATA[<p>If you’ve used <code>validates</code> in a Rails Active Record model, you know they work great -- at least until the first bit of complexity arises. At that point, they can quickly morph in to a ball of conditional spaghetti convoluting the initial reason the validation was added in the first place.</p>
+
+
+
+
+<p>I recently had an experience using <code>has_secure_password</code> where I wanted control the length of the user-supplied password. Adding a length validation to the password accessor invalidated existing records, so I was in a bit of a bind. In the end, I sub-classed the Active Record model to create a unique model made specifically for that context. This allowed me to inherit the core functionality from the model and sprinkle on existing validations for specific use cases. This was a new tactic for me and I’m still now sure how I feel about it. I like the fact that it removed complexity from the <code>User</code> model. This, in hopes, will keep the minimize the likelihood of it becoming a God object.</p>
+
+
+
+
+<!--more-->
+
+
+
+
+<h2>The Problem</h2>
+
+
+
+
+<p>Using <code>has_secure_password</code> is a relatively easy way to add authentication to a Rails app. In order to disguise the plain text passwords, an <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L106">accessor for the plain <code>password</code></a> is added that encrypts it before saving.</p>
+
+
+
+
+<p>The only true Active Record validation <code>has_secure_password</code> adds is a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L68">confirmation of the password</a> — and only when the password is present. This allows us to create a user object without supplying a password, or maybe saving straight to the <code>password_digest</code> field, which is used to store the encrypted password in the database.</p>
+
+
+
+
+<p>I wanted to enforce a minimum password length, because what good is a 1 character password (or 0 for that matter) ?!?!</p>
+
+
+
+
+<p>The first thing I did was add this to the <code>User</code> model:</p>
+
+
+
+
+<pre><code>validates :password, length: { minimum: 8 }
+</code></pre>
+
+
+
+
+<p>This works for new users, but not for those with a <code>password_digest</code> already. Attempting to updated an existing user produces the following error:</p>
+
+
+
+
+<pre><code>ActiveRecord::RecordInvalid: Validation failed: Password is too short (minimum is 8 characters)
+</code></pre>
+
+
+
+
+<p>The next step was to conditionalize only on create:</p>
+
+
+
+
+<pre><code>validates :password, length: { minimum: 8 }, on: :create
+</code></pre>
+
+
+
+
+<p>Except, that wasn’t right either because I’d definitely want to allow users to update their password, in which case, the length validation wouldn’t be enforced.</p>
+
+
+
+
+<p>I found another <a href="http://quickleft.com/blog/rails-tip-validating-users-with-has_secure_password">post suggesting to allow <code>nil</code></a> using:</p>
+
+
+
+
+<pre><code>validates :password, length: { minimum: 8 }, allow_nil: true
+</code></pre>
+
+
+
+
+<p>But, again, that felt weird and doesn’t read particularly well when you’re looking through the source trying to understand what condition would generate a <code>nil</code> password.</p>
+
+
+
+
+<p>Other solutions included <a href="http://stackoverflow.com/a/6486345/2261909">mixing conditionals and checking model dirty state</a> and <a href="http://urgetopunt.com/rails/2012/11/12/validate-password-presence-has-secure-password.html">some combination of all of the above</a>.</p>
+
+
+
+
+<p>I’m guessing some combination of the above would’ve worked, but something didn’t feel quite right. A quick glance over any of those solutions left me wanting something cleaner and more approachable. Because it’s a complex and tremendously important part of the app, I wanted to feel comfortable with the solution.</p>
+
+
+
+
+<h2>The Solution</h2>
+
+
+
+
+<p>I recently read <a href="https://leanpub.com/growing-rails"><em>Growing Rails Application in Practice</em></a>. The most interesting takeaway for me was the idea of sub-classing an Active Record object to exactly the problem described above.</p>
+
+
+
+
+<p>Consider this…we have our <code>User</code> model with <code>has_secure_password</code>:</p>
+
+
+
+
+<pre><code>class User &lt; ActiveRecord::Base
+  has_secure_password
+end
+</code></pre>
+
+
+
+
+<p>As we saw above, the variety of validation contexts made the standard ActiveModel validation awkward. What if we sub-class <code>User</code> and add the validation contexts for a specific use case? In our case, minimum length:</p>
+
+
+
+
+<pre><code>class User::AsSignUp &lt; User
+  validates :password, length: { minimum: 8 }
+end
+</code></pre>
+
+
+
+
+<p>In this case, we’re create a separate model, for the purpose of signing up, and perhaps other user-related attribute management (profile, password reset, etc.).</p>
+
+
+
+
+<p>Now, instead of passing the <code>User</code> model to the view from the controller, we pass an instantiated version of the new context-specific model class:</p>
+
+
+
+
+<pre><code>def create
+  @user = User::AsSignUp.find(current_user.id)
+  …
+end
+</code></pre>
+
+
+
+
+<p>Lastly, because the sub-class name is inferred within the form, we have to do one more thing to make the params are accessible on the <code>create</code> action using <code>params[:user]</code>. We’ll change the form from:</p>
+
+
+
+
+<pre><code>&lt;%= form_for @user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
+</code></pre>
+
+
+
+
+<p>to:</p>
+
+
+
+
+<pre><code>&lt;%= form_for @user, as: :user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
+</code></pre>
+
+
+
+
+<p>Because the remainder of the app operates fine without any need for the password validation, the <code>User</code> can be used where necessary and without worry of it becoming invalid because the password accessor isn’t present.</p>
+
+
+
+
+<h2>Summary</h2>
+
+
+
+
+<p>While sub-classing models in Rails is generally frowned upon, this use case is one of the few that felt reasonable. It feels relatively low cost and stays in isolation. I’d love to hear how you might have solved this problem. I looked and explored a handful of solutions. While others worked, none seems as expressive as the one above.</p>
+
+
+<p>A form object using
+<a href="http://api.rubyonrails.org/classes/ActiveModel/Model.html">ActiveModel</a> or
+similar could&rsquo;ve been an alternative option. I didn&rsquo;t explore it for this
+particular use case, mostly because I wanted to give this one a shot. However,
+I have no doubt it would&rsquo;ve at least worked equally as well.</p>
+
+<p>I should also point out that I&rsquo;m familiar with the built-in <a href="https://github.com/rails/rails/blob/master/activemodel/lib/active_model/validations.rb#L73">validation
+contexts in ActiveModel</a>.
+And for whatever reason, I&rsquo;ve not used them before. I&rsquo;ll probably give it a
+shot on another occasion for comparison.</p>
+
+<p>What are your thoughts on this technique?</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
@@ -766,106 +975,6 @@ end
 <p>I’m excited to add Minitest and fixtures to my toolkit. With the benefits I’ve seen so far, it’s hard for me to imagine using anything else going forward — assuming I have the choice.</p>
 
 <p>If you have beef over the default Minitest assertion syntax, you’ll be happy to know that Minitest comes with the option to use a <a href="http://bfts.rubyforge.org/minitest/MiniTest/Expectations.html">spec-style syntax</a>. While it’s not identical to the Rspec syntax, it gets you closer to the natural language syntax, if that’s important to you.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[New Rails 4.1 travel_to test helper]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/"/>
-    <updated>2014-05-11T14:08:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
-
-<p>With the release of Rails 4.1, the time stubbing method <code>travel_to</code> was added. This new helper method forces the current time to whatever you specify, allowing you to make asserts against a historical time, or week in my case.</p>
-
-<!--more-->
-
-
-<h2>The Test</h2>
-
-<p><a href="https://github.com/travisjeffery/timecop">Timecop</a> performed valiantly and did more than I ever needed (I generally only used the <code>freeze</code> method). However, dragging in another gem was the last thing I wanted to do for something relatively simple.</p>
-
-<p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
-
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Timecop.freeze Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
-
-<h2>Rails 4.1</h2>
-
-<p>I think I first heard about some additional testing methods from my friend <a href="http://iamericsteele.com/">Eric Steele</a>. He mentioned them in one of our various conversations about testing (he’s writing a book titled <em><a href="https://whatdoitest.com/?utm_source=brandonhilkert-com&amp;utm_medium=web&amp;%20utm_campaign=travel-to">What Do I Test?</a></em>).</p>
-
-<p>Like many, I looked over the <a href="http://guides.rubyonrails.org/4_1_release_notes.html">release notes for Rails 4.1</a> and features like <a href="http://guides.rubyonrails.org/4_1_release_notes.html#spring-application-preloader">Spring</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml">secrets</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#action-mailer-previews">ActionMailer previews</a>, and <a href="http://guides.rubyonrails.org/4_1_release_notes.html#active-record-enums">ActiveRecord enums</a> jumped out at me.</p>
-
-<p>Towards the bottom, though, was a feature barely mentioned or written about:</p>
-
-<p><img class="center" src="/images/rails-41-travel-to.png" title="&ldquo;Test helper addition in Rails 4.1&rdquo;" ></p>
-
-<p><a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/testing/time_helpers.rb">The <code>TimeHelpers</code> test module</a> adds the <code>travel_to</code> and <code>travel_back</code> methods to assist in stubbing <code>Time.now</code> and <code>Date.today</code>.</p>
-
-<h2>Updated Tests</h2>
-
-<p>Using the <code>travel_to</code> method with the example above results in the following:</p>
-
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
-
-<p>While the change doesn&rsquo;t look significant, it removed my need for the <code>Timecop</code> gem entirely.</p>
-
-<p>Additionally, the same test could be written as:</p>
-
-<p><code>
-test "sends reminders on tuesday for those scheduled on wednesday" do
-  travel_to Chronic.parse("4/15/14")
-  Reminders::Checkin.new.email
-  assert_equal 3, ActionMailer::Base.deliveries.size
-  travel_back
-end
-</code></p>
-
-<p>or with <code>setup</code> and <code>teardown</code>:</p>
-
-<p>```
-def setup
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;)
-end</p>
-
-<p>test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Reminders::Checkin.new.email
-  assert_equal 3, ActionMailer::Base.deliveries.size
-end</p>
-
-<p>def teardown
-  travel_back
-end
-```</p>
-
-<h2>Summary</h2>
-
-<p>Rails is well-known for conventions. <code>travel_to</code> is a great addition to the framework that would&rsquo;ve otherwise required dragging in additional dependencies.</p>
-
-<p>Next time you look at the release notes for a project, don&rsquo;t skip over the less featured functionality. For all you know, it could be something that saves you time and frustration that commonly occurs in your projects.</p>
 ]]></content>
   </entry>
   
