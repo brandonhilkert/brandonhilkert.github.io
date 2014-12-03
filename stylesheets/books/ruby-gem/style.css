@@ -669,6 +669,10 @@ input[type="submit"] {
   text-decoration: line-through;
 }
 
+.sale {
+  display: none;
+}
+
 .price .discount {
   font-size: 0.7em;
   color: red;
