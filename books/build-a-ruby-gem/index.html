@@ -334,7 +334,7 @@
                 139-page Book w/ updates
               </li>
             </ul>
-            <a href="https://gum.co/build-a-ruby-gem/?wanted=true&locale=true" class="button">Buy now</a>
+            <a href="https://gum.co/build-a-ruby-gem?wanted=true&locale=true" class="button">Buy now</a>
           </div>
           <!--End Pricing Block-->
 
@@ -579,9 +579,21 @@
     return null;
   }
 
+  function updateGumroadLinkWithCoupon(el) {
+    var href = el.attr('href');
+    var parts = href.split('?');
+    el.attr('href', parts[0] + '/' + getQueryVariable('c') + '?' + parts[1]);
+  }
+
   if (getQueryVariable("c")) {
     $(".no-sale").hide();
     $(".sale").fadeIn();
+
+    $(".pricing_block a").each(function(i) {
+        updateGumroadLinkWithCoupon($(this));
+    });
+
+    updateGumroadLinkWithCoupon($("#shelf a"));
   }
 </script>
 </body>
