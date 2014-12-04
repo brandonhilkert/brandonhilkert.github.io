@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-02T21:35:47-05:00</updated>
+  <updated>2014-12-04T06:50:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,154 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
+    <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
+    <updated>2014-12-03T13:14:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
+    <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
+
+<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
+
+<!--more-->
+
+
+<p>A <code>Gemfile</code> also includes hints about preference and style. And style is something most Ruby developers are very passionate about. It doesn’t take long to find the story of a Rubyist describing their “love at first sight” experience with the language. It’s hard to find another file in a Rails project that’s so telling.</p>
+
+<p>A year ago, I wrote about the <a href="/blog/patterns-in-a-rails-gemfile/">Ruby gems I regularly use in my Rails applications</a>. Because technology and the tools we use change so fast, I thought it’d be interesting to take a look at one of my more recent Gemfiles to see what’s changed.</p>
+
+<h2>Rails Templates</h2>
+
+<p>As I mentioned in the last <a href="/blog/patterns-in-a-rails-gemfile/">Gemfile post</a>, I tend to write a bunch of small applications sprinkled around some larger ones. Despite the size of the project, I feel like I’ve honed in a set of Ruby gems that feel comfortable and productive for me and my workflow.</p>
+
+<p>Knowing the act of bootstrapping a Rails project is sometimes tedious, I took some time to build a <a href="https://github.com/brandonhilkert/rails_templates">Rails template</a> around the gems and patterns I commonly use. I’ll definitely be writing about this experience in the future since there seems to be very little discussion about it.</p>
+
+<p>In short, extracting my preferences to a template has been a HUGE time saver. It no longer feels like a burden to run <code>rails new</code>. I can jump right in and have a consistent set of tools that enable me to be productive within a few minutes.</p>
+
+<h2>My 2014 Gemfile</h2>
+
+<p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
+
+<p>```
+source &lsquo;<a href="https://rubygems.org">https://rubygems.org</a>&rsquo;</p>
+
+<p>ruby &ldquo;2.1.4&rdquo;</p>
+
+<p>gem &lsquo;rails&rsquo;, &lsquo;4.1.8&rsquo;
+gem &lsquo;pg&rsquo;
+gem &lsquo;sass-rails&rsquo;, &lsquo;~> 4.0.3&rsquo;
+gem &lsquo;uglifier&rsquo;, &lsquo;>= 1.3.0&rsquo;
+gem &lsquo;coffee-rails&rsquo;, &lsquo;~> 4.0.0&rsquo;
+gem &lsquo;jquery-rails&rsquo;
+gem &lsquo;turbolinks&rsquo;</p>
+
+<p>gem &lsquo;bcrypt-ruby&rsquo;, &lsquo;~> 3.1.2&rsquo;</p>
+
+<p>group :development, :test do
+  gem &ldquo;pry&rdquo;
+end</p>
+
+<p>group :test do
+  gem &ldquo;selenium-webdriver&rdquo;
+  gem &ldquo;capybara&rdquo;
+  gem &ldquo;timecop&rdquo;
+  gem &ldquo;mocha&rdquo;
+end</p>
+
+<p>group :development do
+  gem &ldquo;quiet_assets&rdquo;
+  gem &ldquo;spring&rdquo;
+  gem &ldquo;bullet&rdquo;
+  gem &lsquo;stripe_tester&rsquo;, &ldquo;~> 0.1.0&rdquo;
+end</p>
+
+<p>group :production, :demo do
+  gem &ldquo;rails_12factor&rdquo;
+  gem &ldquo;heroku-deflater&rdquo;
+end</p>
+
+<p>gem &ldquo;font-awesome-rails&rdquo;
+gem &ldquo;unicorn&rdquo;
+gem &ldquo;bootstrap-sass&rdquo;
+gem &ldquo;sidekiq&rdquo;, require: &ldquo;sidekiq/web&rdquo;
+gem &ldquo;sinatra&rdquo;
+gem &ldquo;local_time&rdquo;
+gem &ldquo;gravatar_image_tag&rdquo;
+gem &ldquo;so_meta&rdquo;
+gem &ldquo;chronic&rdquo;
+gem &ldquo;recurrence&rdquo;</p>
+
+<p>gem &ldquo;premailer-rails&rdquo;</p>
+
+<p>gem &ldquo;momentjs-rails&rdquo;
+gem &ldquo;bootstrap3-datetimepicker-rails&rdquo;
+gem &ldquo;bootstrap-switch-rails&rdquo;
+gem &ldquo;bootstrap-wysihtml5-rails&rdquo;
+gem &ldquo;bootstrap-select-rails&rdquo;
+gem &ldquo;autosize-rails&rdquo;</p>
+
+<p>gem &ldquo;aws-sdk&rdquo;</p>
+
+<p>gem &ldquo;html-pipeline&rdquo;
+gem &ldquo;rinku&rdquo;</p>
+
+<p>gem &ldquo;newrelic_rpm&rdquo;
+gem &lsquo;doc_raptor&rsquo;
+gem &ldquo;stripe&rdquo;
+gem &ldquo;jquery-ui-rails&rdquo;
+gem &ldquo;active_model_serializers&rdquo;
+gem &ldquo;rubyzip&rdquo;
+gem &ldquo;render_anywhere&rdquo;, require: false
+gem &ldquo;pusher&rdquo;
+gem &lsquo;filepicker-rails&rsquo;
+gem &lsquo;memcachier&rsquo;
+gem &lsquo;dalli&rsquo;
+gem &ldquo;intercom-rails&rdquo;
+```</p>
+
+<p>A few comments:</p>
+
+<ul>
+<li><p>I’ve standardized on <a href="http://www.postgresql.org/">Postgres</a> as the database for my apps, even in development. It’s reliable and allows me to be sure that the code I write will work the same way in production, since I tend to deploy most of my apps to <a href="https://www.heroku.com/">Heroku</a>.</p></li>
+<li><p>I leave <code>turbolinks</code> on. Judging from recent posts and comments within the community, this will probably one of the more controversial decisions.</p>
+
+<p>  If I’m being honest, my first experience with Turbolinks wasn’t great. And by “wasn’t great”, I mean — it broke <strong>EVERYTHING</strong>! But the good news was that it brought to light the fact that I sucked at javascript. At the time, I was capable of writing <em>just</em> enough to modify form behavior or fade in an DOM element.</p>
+
+<p>  The time had come to level up on my javascript skills. I was able to improve my javascript and also do it in a way that can took full advantage of the benefits that Turbolinks offers. Since that time, I’ve left Turbolinks on and no longer had to worry that my client-side code will stop working after clicking through a few application links.</p></li>
+<li><p>I’ve standardized on using <code>has_secure_password</code> for authentication. I previously used <a href="https://github.com/plataformatec/devise">devise</a>, but found the extra features are no longer worth the additional complexity. <code>has_secure_password</code> provides me reliable authentication patterns that are simple to understand and maintain. Hence the need for <code>bcrypt</code> in the <code>Gemfile</code> above.</p></li>
+<li><p>As for my test environment, I’ve written about <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">my switch to Minitest and fixtures</a>. I’m still just as happy with that decision as the time I wrote about it. I’ve seen Rspec go through a variety of API changes since then, and thankful I no longer have to worry about updating my test suite every couple months. I continue to find value in <code>capybara</code> and include <code>mocha</code> for the times <code>Minitest</code>’s stubbing and mocking isn’t enough (I’ve been meaning to dig in to the places I use <code>mocha</code>. I’m guessing if the code was better, I probably wouldn’t need it at all).</p></li>
+<li><p><code>bullet</code> is a killer gem for tracking down performances issues. It’s saved me countless hours of debugging.</p></li>
+<li><p>The inclusion of <code>spring</code> in Rails 4.1 is great. I realize it’s a bandaid in some respects, but waiting for the environment to load on every test run is a drag. I’ve found that because my tests are so responsive when <code>spring</code> is working properly, it encourages me to run my tests more often. Once setup, it works well and only in rare cases has not reloaded when it should have.</p></li>
+<li><p>I generally always include <code>bootstrap</code> and <code>font-awesome</code> in my projects. Being a non-designer, it helps me get something on the screen faster, even if it’s not the final design.</p></li>
+<li><p>I continue to use <code>unicorn</code>. It’s been around for so long and continues to be competitive in benchmarks against other Ruby web servers. I tested Passenger in a few applications, but got scared off when it printed the entire environment to the screen in production on Heroku on an exception. I’m told there are ways around this with some non-trivial configuration, but I think it’s a bizarre default and isn’t conducive to my workflow.</p></li>
+<li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
+<li><p>I’ve written about putting together <a href="/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
+<li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
+<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
+<li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
+<li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
+<li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
+</ul>
+
+
+<p>The rest are very use case-specific. And in general, the defacto solution for each (<code>pusher</code> for real-time features, <code>dalli</code> for memcached, etc.).</p>
+
+<h2>Summary</h2>
+
+<p>I’m happy with my current toolkit. This doesn’t mean I’m not on the lookout for shiny new things, but I’m generally a little more cautious about replacing something reliable, even if it doesn’t do everything under the sun.</p>
+
+<p>Even though Ruby makes it easy to include third party libraries, it doesn’t mean we always should. As developers, we inherit the stability of the dependencies we include. Even though a gem’s code might be locked away behind a separate git repository, it likely has the same holes and complexities that we’re worried about in our applications. And perhaps, even more…</p>
+
+<p><a href="https://www.ruby-toolbox.com/">Ruby toolbox</a> is a great resource when searching for a gem. I generally consider the number of downloads, age of the project and development activity when deciding which one to go with.</p>
+
+<p>What have your favorite gems been this year?</p>
+
+<h2>Build a Ruby Gem</h2>
+
+<p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating Rails Active Record Validation Contexts with Inheritance]]></title>
@@ -729,252 +877,6 @@ development:
 <p>I feel like my previous solution has the potential to be replaced with the secrets file. I plan to try it out in an upcoming application and see if it’s as easy to manage as it seems.</p>
 
 <p>Note that by default, the <code>secrets.yml</code> file is NOT ignored by git. If you plan to include passwords or other sensitive data in the file, be sure to add it to your <code>.gitignore</code>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[7 reasons why I'm sticking with Minitest and Fixtures in Rails]]></title>
-    <link href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/"/>
-    <updated>2014-05-27T20:08:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails</id>
-    <content type="html"><![CDATA[<p>I’ve been fortunate to spend the last month as the sole developer of greenfield Rails 4.1 app. As someone who’s spent quite a bit of time maintaining existing code, the freedom to establish patterns and choose tools is a highly welcomed change. One of the choices I made was to use <a href="https://github.com/seattlerb/minitest">Minitest</a> and <a href="http://guides.rubyonrails.org/testing.html#the-low-down-on-fixtures">Rails fixtures</a>.</p>
-
-<p>The short is…<strong>it’s been great</strong>! So great that I’m having trouble imagining myself using anything else going forward.</p>
-
-<!--more-->
-
-
-<h2>Background</h2>
-
-<p>I got started with Rails in 2009. At the time, it felt like no one but the Rails-core team used <a href="http://test-unit.rubyforge.org/"><code>test_unit</code></a>. While I know this isn’t true, <a href="https://github.com/rspec/rspec">Rspec</a> felt like the overwhelmingly popular testing framework from my perspective. As someone who didn’t have experience with testing prior to learning Ruby/Rails, I was looking for as much educational material as possible to learn <strong>what to test</strong> and <strong>how to test</strong>.</p>
-
-<p>At the time (…and even now), there weren’t many books focused on Ruby testing techniques and specifically what and how to test a Rails application. So when I came across <a href="http://pragprog.com/book/achbd/the-rspec-book"><em>The Rspec Book</em></a> I was excited there was finally some formal writing that would help me understand the best practices and concepts around testing with Ruby. Additionally, it seemed like the first steps of just about every Rails tutorial started with installing Rspec. Because I didn’t have an opinion about why or how, I went with the flow and forged ahead with Rspec at the center of my testing toolbox.</p>
-
-<p>I admit, though, I never gave Test::Unit, or Minitest a fair shot. I immediately gravitated towards Rspec, for whatever reason, and didn’t consider doing otherwise until recently. Fortunately, it seems that more people are aware of Minitest and considering it a <a href="http://www.reddit.com/r/ruby/comments/23nxb2/starting_out_with__rspec_or_minitest_or/">worthy option when starting out</a>.</p>
-
-<h2>My Previous Setup</h2>
-
-<p>Here’s what a typical <code>Gemfile</code> looked like in one of my previous projects:</p>
-
-<p><code>
-group :test do
-  gem "rspec-rails"
-  gem "factory_girl_rails"
-  gem "capybara"
-  gem "selenium-webdriver"
-  gem "database_cleaner"
-  gem "shoulda-matchers"
-end
-</code></p>
-
-<p>Aside from the additional gems, my <code>spec_helper.rb</code> had a number of settings like turning off transactions (in favor of <code>database_cleaner</code>) that went against the standard Rails testing conventions.</p>
-
-<p>This setup can get so complicated, there’s even <a href="https://github.com/RailsApps/rails_apps_testing/">gems to manage the complication</a>. For a framework that has so many conventions, this never felt right to me.</p>
-
-<p>Below are my observations (in no particular order) after having spent 1 month using Minitest and fixtures in a Rails 4.1 application:</p>
-
-<h2>1. Fixtures force you to test against “real” data</h2>
-
-<p>Fixture data isn’t real. It’s staged, however, you have control over what and how much you add. I’ve found that creating structures around common subjects like familiar TV shows or movies allows you to move faster inside the app as the characters involved already have a preconceived hierarchy in your head.</p>
-
-<p>Below is a sample from my <code>users.yml</code> fixture:</p>
-
-<pre><code>fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  title: CEO
-  password_digest: &lt;%= ActiveRecord::FixtureSet.default_password_digest %&gt;
-  company: flintstone
-  confirmed_at: &lt;%= Chronic.parse("1/1/2014") %&gt;
-  invitation_token: &lt;%= SecureRandom.urlsafe_base64 %&gt;
-
-wilma:
-  first_name: Wilma
-  last_name: Flintstone
-  email: wilma@flintstone.com
-  title: COO
-  password_digest: &lt;%= ActiveRecord::FixtureSet.default_password_digest %&gt;
-  company: flintstone
-  supervisor: fred
-  invitation_token: &lt;%= SecureRandom.urlsafe_base64 %&gt;
-</code></pre>
-
-<p>An interesting note is that while associations might have been painful in the past, notice how you can use <code>flintstone</code> as the company name and it will refer to the <code>company</code> fixture of the same name:</p>
-
-<pre><code>flintstone:
-  name: Flintstone Inc.
-  phone: 888-555-1212
-  updated_at: &lt;%= 6.months.ago %&gt;
-  created_at: &lt;%= 6.months.ago %&gt;
-</code></pre>
-
-<p>At every point in the application, I have well-structured data to test against. Using Factory Girl is frustrating if you need to create any kind of complex data structure with associations and seed data. When ActiveRecord associations get complex, I’ve found it frustrating and time consuming to bootstrap the initial data — largely because it’s painful to do in the setup of each test. While there are ways around this using factories with pre-established associations, I believe it pushes you to reach for stubs sooner. I’ve seen this first hand where the stubbing was too closely tied to implementation and tests fails with a single change to query conditions — even though the query returns the same data. The recent <a href="http://david.heinemeierhansson.com/2014/tdd-is-dead-long-live-testing.html">discussions about TDD</a> have generated more conversation about similar topics. Overall, I’ve felt more confident in my tests when using fewer mocks and stubs, and when using fixtures, I’ve felt that need less frequently. My data is predictable and I’m confident in my tests.</p>
-
-<p>Lastly, when Factory Girl inserts data before each test, there’s a cost associated with communicating with the database. Multiply that cost by many thousands and you have a slower test suite. Fixtures are inserted before the test suite runs, so outside of any test-specific mutation, typically no additional inserts are necessary. While this many seem trivial at first, the benefits will multiply over time and you’ll be left with a more performant test suite — and higher likelihood to run the tests more frequently.</p>
-
-<p><em>Note: I’m aware of methods like <code>build_model</code> and others that create AR objects without touching the database, but there are times when testing using data from the database is necessary (ie. scopes, mutation methods, etc.)</em></p>
-
-<p>Not to mention, you use easily <a href="http://rtmatheson.com/2009/07/loading-a-single-fixture-in-rails/">load your fixture data in to your development environment</a>.</p>
-
-<h2>2. Rspec provides more than one way to do something</h2>
-
-<p>Rspec provides a number of ways to do the same thing. This leads to confusion around supposedly-simple topics like how to assert two things are equal. Do you I use <code>eq()</code> or <code>==</code>, or perhaps <code>eql()</code>? Who knows???</p>
-
-<p>What about the fancy syntax around methods ending with &ldquo;?&rdquo;.</p>
-
-<p><code>
-post.should be_active
-</code></p>
-
-<p>Wait, so where’s the <code>be_active</code> method? Nope! Rspec parses the method due to the fact that <code>active?</code> is a legitimate method in the application under test. At first, I was enamored with the magic. However, later, I found thinking too much about how and what to write, when I should’ve just been typing out <code>active?</code> and asserting it’s <code>false</code> or <code>true</code> (which of course is an entirely other way to write it):</p>
-
-<p><code>
-post.active?.should be_true
-</code></p>
-
-<p>&hellip;or what about:</p>
-
-<p><code>
-post.active?.should == true
-</code></p>
-
-<p>Does that even work? I’ve learned to appreciate simplicity and knowing that there’s generally only one way to write an assertion:</p>
-
-<p><code>
-assert post.active?
-</code></p>
-
-<p>Aside from not floundering over the right assertion to make, I’ve found it leads to less syntax errors in my tests. Going through 2 or 3 iterations of test errors before the test actually gets to the application code is frustrating and a waste of time. Having fewer ways to do the same thing has led me to make fewer syntax errors when writing tests.</p>
-
-<h2>3. Setting up Capybara is trivial</h2>
-
-<p>If you’ve used Capybara in the past, you know that using it in conjunction with FactoryGirl is….<em>interesting</em>.</p>
-
-<p><a href="http://devblog.avdi.org/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/">Avdi’s post on configuring database_cleaner</a> has been my goto configuration:</p>
-
-<p>```
-RSpec.configure do |config|</p>
-
-<p>  config.before(:suite) do</p>
-
-<pre><code>DatabaseCleaner.clean_with(:truncation)
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each) do</p>
-
-<pre><code>DatabaseCleaner.strategy = :transaction
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each, :js => true) do</p>
-
-<pre><code>DatabaseCleaner.strategy = :truncation
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each) do</p>
-
-<pre><code>DatabaseCleaner.start
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.after(:each) do</p>
-
-<pre><code>DatabaseCleaner.clean
-</code></pre>
-
-<p>  end</p>
-
-<p>end
-```</p>
-
-<p>This is after you first disable transactions in the <code>spec_helper.rb</code>, of course:</p>
-
-<p><code>
-config.use_transactional_fixtures = false
-</code></p>
-
-<p><em>Why is all this necessary?</em></p>
-
-<p>When you use Factory Girl and you insert data in to the database during a test, it’s done so in a transaction. At the end of the test, the transaction is rolled back so the data doesn’t persist and the next test begins with a clean slate. All is well right? Not entirely…</p>
-
-<p>When you use a javascript-enabled driver like selenium to run integration tests, browser actions run in a different thread. This removes the ability to see data setup within another thread/transaction. Because of this, you have to resort to a truncation strategy instead. Hence the following config option shown above:</p>
-
-<p><code>
-config.before(:each, js: true) do
-  DatabaseCleaner.strategy = :truncation
-end
-</code></p>
-
-<p>This is complex and not obvious for newcomers. Not to mention the complexity that arises if you actually use <a href="https://github.com/brandonhilkert/sucker_punch#cleaning-test-data-transactions">multi-threaded code or gems</a>.</p>
-
-<p>If you choose to use fixtures instead, the data is inserted at the beginning of each test run (not in an isolated transaction), so it’s available to any subsequent thread — browser action or not.</p>
-
-<p>Using fixtures instead of factories removes the need for <code>database_cleaner</code> entirely under normal circumstances. Additionally, the only change that’s necessary to setup <code>Capybara</code> is the following addition to <code>test_helper.rb</code>:</p>
-
-<p>```
-require &ldquo;capybara/rails&rdquo;</p>
-
-<p>class ActionDispatch::IntegrationTest
-  include Capybara::DSL
-end
-```</p>
-
-<p>That’s it&hellip;seriously…the crazy part to me is this configuration is largely commonplace in Rails test suites that use Capybara and Rspec. We’ve been largely spoiled by Rails in that the framework provides a solution for just about every common problem we encounter. The fact that a complex setup with database cleaner and deciding on truncating vs. transactions ever seemed reasonable seems counter-intuitive to the Rails experience. I’m, frankly, surprised that it’s seemed reasonable for so long.</p>
-
-<p>Is it possible that practices/tools like Factory Girl are hurting the community more than they’re helping?</p>
-
-<h2>4. Lack of complex stubbing/mocking constructs simplifies code</h2>
-
-<p>Rspec makes it easy to drop in a stub or mock wherever/whenever (see #1 above). While there is some value in this, it makes it easy to abuse.</p>
-
-<p>In fact, I’ve found that using fixtures has caused me to less frequently reach for stubs at all. When a customer comes to the application and has a good experience, the last thing they’re going to care about is whether boundary data was stubbed out. The fact that my tests are running against data the application will see on a daily basis gives me the confidence that all will be well when new code is sent to production.</p>
-
-<p>Minitest does have a <a href="https://github.com/seattlerb/minitest/blob/master/lib/minitest/mock.rb">mocking library</a> that’s easy to use and read. It’s not as extensive as what you get from Rspec out of the box, but nothing is stopping you from including the <a href="http://gofreerange.com/mocha/docs/"><code>mocha</code> gem</a> or some other equivalent, if you need additional functionality (I haven’t had the need).</p>
-
-<h2>5. Snippets can help the uncertainty about Minitest assertion order</h2>
-
-<p>When I first approached Minitest, one of the long-standing questions in my head was the order in which the expected and actual value appear. At this point, I think it’s familiar enough to know without assistance, but why type more if you don’t have to.</p>
-
-<p>I rely heavily on these <a href="https://github.com/honza/vim-snippets/blob/master/snippets/ruby.snippets">Ruby snippets for vim</a>, which takes away the pain of knowing the order of arguments.</p>
-
-<p><img class="center" src="/images/syntax.gif" title="&ldquo;Minitest snippet completion&rdquo;" ></p>
-
-<h2>6. Minitest is just Ruby</h2>
-
-<p>To be fair, Rspec is just Ruby too. But generally Rspec seems to have magic ways to do just about everything &ndash; shared examples, test setup, configuration. All these things have an “Rspec way”.</p>
-
-<p>Minitest deals with this by just using Ruby. If you need shared examples, why not <a href="http://ntl.ghost.io/how-i-use-test-unit-syntax/">include a module that includes the shared tests</a>?</p>
-
-<p>I noticed during the first few days of my Minitest experience, I was looking for the “right” way to do something. With some urging from people I respect in the community, I realized it was just Ruby. That mindset allowed me to do just about anything I wanted using the language itself, rather than some magic from the Rspec DSL.</p>
-
-<p>In some ways, I think too much magic gives us tunnel vision. After a few niceties are used (and abused), we start to believe that whatever tool we’re using will solve ALL our problems. Using Minitest has allowed me break out of this mindset and rely on the Ruby skills that I’ve developed to solve my testing challenges.</p>
-
-<h2>7. Deviating from Rails defaults doesn’t always provide value</h2>
-
-<p>Sure, not everything in Rails is ideal. In fact, it’s admirable to think about how many people actually get value from something so opinionated. After relying on the Rails default stack for the last month, I’ve realized how much simplicity I’ve been missing due to my choice of tools. I assumed that because the community was largely using Rspec and Factory Girl (what it seemed like from my perspective), it was a good idea. And while arguments can be made for either side, I wasn’t using Rspec because I was convinced it was better — I just didn’t know any better.</p>
-
-<p>The ease at which I was able to get going with the Rails default stack using Minitest and fixtures has made me a convert. There was minimal setup and largely required very little additional configuration.</p>
-
-<p>I have yet to feel the pains from using fixtures that some talk about. But I’ve been careful not to introduce large scale changes in the data without thinking through them before-hand.</p>
-
-<p>Perhaps the app isn’t big enough yet? Maybe my data isn’t complicated enough? Or maybe I’m paying close enough attention to the effects that changes in data will have?</p>
-
-<p>Whatever it is, it’s working for me right now. Part me feels like I’m going to have a moment where I say, “<em>OHHHHH! This is why everyone uses Rspec and Factory Girl.</em>” Although, it’s hard for me to imagine at this point. The default stack is working for me and staying out of the way, which is what I prefer.</p>
-
-<h2>Summary</h2>
-
-<p>I intentionally chose to leave out comments about performance of one framework vs the other. However, <a href="https://speakerdeck.com/ahawkins/bow-before-minitest">this deck provide great benchmarks</a> on the topic.</p>
-
-<p>I’m excited to add Minitest and fixtures to my toolkit. With the benefits I’ve seen so far, it’s hard for me to imagine using anything else going forward — assuming I have the choice.</p>
-
-<p>If you have beef over the default Minitest assertion syntax, you’ll be happy to know that Minitest comes with the option to use a <a href="http://bfts.rubyforge.org/minitest/MiniTest/Expectations.html">spec-style syntax</a>. While it’s not identical to the Rspec syntax, it gets you closer to the natural language syntax, if that’s important to you.</p>
 ]]></content>
   </entry>
   

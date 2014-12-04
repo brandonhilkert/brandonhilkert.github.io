@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-02T21:35:47-05:00</updated>
+  <updated>2014-12-04T06:50:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,153 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
+    <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
+    <updated>2014-12-03T13:14:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
+    <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
+
+<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
+
+<!--more-->
+
+
+<p>A <code>Gemfile</code> also includes hints about preference and style. And style is something most Ruby developers are very passionate about. It doesn’t take long to find the story of a Rubyist describing their “love at first sight” experience with the language. It’s hard to find another file in a Rails project that’s so telling.</p>
+
+<p>A year ago, I wrote about the <a href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/">Ruby gems I regularly use in my Rails applications</a>. Because technology and the tools we use change so fast, I thought it’d be interesting to take a look at one of my more recent Gemfiles to see what’s changed.</p>
+
+<h2>Rails Templates</h2>
+
+<p>As I mentioned in the last <a href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/">Gemfile post</a>, I tend to write a bunch of small applications sprinkled around some larger ones. Despite the size of the project, I feel like I’ve honed in a set of Ruby gems that feel comfortable and productive for me and my workflow.</p>
+
+<p>Knowing the act of bootstrapping a Rails project is sometimes tedious, I took some time to build a <a href="https://github.com/brandonhilkert/rails_templates">Rails template</a> around the gems and patterns I commonly use. I’ll definitely be writing about this experience in the future since there seems to be very little discussion about it.</p>
+
+<p>In short, extracting my preferences to a template has been a HUGE time saver. It no longer feels like a burden to run <code>rails new</code>. I can jump right in and have a consistent set of tools that enable me to be productive within a few minutes.</p>
+
+<h2>My 2014 Gemfile</h2>
+
+<p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
+
+<figure class='code'><pre><code>source 'https://rubygems.org'
+
+ruby "2.1.4"
+
+gem 'rails', '4.1.8'
+gem 'pg'
+gem 'sass-rails', '~&gt; 4.0.3'
+gem 'uglifier', '&gt;= 1.3.0'
+gem 'coffee-rails', '~&gt; 4.0.0'
+gem 'jquery-rails'
+gem 'turbolinks'
+
+gem 'bcrypt-ruby', '~&gt; 3.1.2'
+
+group :development, :test do
+  gem "pry"
+end
+
+group :test do
+  gem "selenium-webdriver"
+  gem "capybara"
+  gem "timecop"
+  gem "mocha"
+end
+
+group :development do
+  gem "quiet_assets"
+  gem "spring"
+  gem "bullet"
+  gem 'stripe_tester', "~&gt; 0.1.0"
+end
+
+group :production, :demo do
+  gem "rails_12factor"
+  gem "heroku-deflater"
+end
+
+gem "font-awesome-rails"
+gem "unicorn"
+gem "bootstrap-sass"
+gem "sidekiq", require: "sidekiq/web"
+gem "sinatra"
+gem "local_time"
+gem "gravatar_image_tag"
+gem "so_meta"
+gem "chronic"
+gem "recurrence"
+
+gem "premailer-rails"
+
+gem "momentjs-rails"
+gem "bootstrap3-datetimepicker-rails"
+gem "bootstrap-switch-rails"
+gem "bootstrap-wysihtml5-rails"
+gem "bootstrap-select-rails"
+gem "autosize-rails"
+
+gem "aws-sdk"
+
+gem "html-pipeline"
+gem "rinku"
+
+gem "newrelic_rpm"
+gem 'doc_raptor'
+gem "stripe"
+gem "jquery-ui-rails"
+gem "active_model_serializers"
+gem "rubyzip"
+gem "render_anywhere", require: false
+gem "pusher"
+gem 'filepicker-rails'
+gem 'memcachier'
+gem 'dalli'
+gem "intercom-rails"</code></pre></figure>
+
+
+<p>A few comments:</p>
+
+<ul>
+<li><p>I’ve standardized on <a href="http://www.postgresql.org/">Postgres</a> as the database for my apps, even in development. It’s reliable and allows me to be sure that the code I write will work the same way in production, since I tend to deploy most of my apps to <a href="https://www.heroku.com/">Heroku</a>.</p></li>
+<li><p>I leave <code>turbolinks</code> on. Judging from recent posts and comments within the community, this will probably one of the more controversial decisions.</p>
+
+<p>  If I’m being honest, my first experience with Turbolinks wasn’t great. And by “wasn’t great”, I mean — it broke <strong>EVERYTHING</strong>! But the good news was that it brought to light the fact that I sucked at javascript. At the time, I was capable of writing <em>just</em> enough to modify form behavior or fade in an DOM element.</p>
+
+<p>  The time had come to level up on my javascript skills. I was able to improve my javascript and also do it in a way that can took full advantage of the benefits that Turbolinks offers. Since that time, I’ve left Turbolinks on and no longer had to worry that my client-side code will stop working after clicking through a few application links.</p></li>
+<li><p>I’ve standardized on using <code>has_secure_password</code> for authentication. I previously used <a href="https://github.com/plataformatec/devise">devise</a>, but found the extra features are no longer worth the additional complexity. <code>has_secure_password</code> provides me reliable authentication patterns that are simple to understand and maintain. Hence the need for <code>bcrypt</code> in the <code>Gemfile</code> above.</p></li>
+<li><p>As for my test environment, I’ve written about <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">my switch to Minitest and fixtures</a>. I’m still just as happy with that decision as the time I wrote about it. I’ve seen Rspec go through a variety of API changes since then, and thankful I no longer have to worry about updating my test suite every couple months. I continue to find value in <code>capybara</code> and include <code>mocha</code> for the times <code>Minitest</code>’s stubbing and mocking isn’t enough (I’ve been meaning to dig in to the places I use <code>mocha</code>. I’m guessing if the code was better, I probably wouldn’t need it at all).</p></li>
+<li><p><code>bullet</code> is a killer gem for tracking down performances issues. It’s saved me countless hours of debugging.</p></li>
+<li><p>The inclusion of <code>spring</code> in Rails 4.1 is great. I realize it’s a bandaid in some respects, but waiting for the environment to load on every test run is a drag. I’ve found that because my tests are so responsive when <code>spring</code> is working properly, it encourages me to run my tests more often. Once setup, it works well and only in rare cases has not reloaded when it should have.</p></li>
+<li><p>I generally always include <code>bootstrap</code> and <code>font-awesome</code> in my projects. Being a non-designer, it helps me get something on the screen faster, even if it’s not the final design.</p></li>
+<li><p>I continue to use <code>unicorn</code>. It’s been around for so long and continues to be competitive in benchmarks against other Ruby web servers. I tested Passenger in a few applications, but got scared off when it printed the entire environment to the screen in production on Heroku on an exception. I’m told there are ways around this with some non-trivial configuration, but I think it’s a bizarre default and isn’t conducive to my workflow.</p></li>
+<li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
+<li><p>I’ve written about putting together <a href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
+<li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
+<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
+<li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
+<li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
+<li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
+</ul>
+
+
+<p>The rest are very use case-specific. And in general, the defacto solution for each (<code>pusher</code> for real-time features, <code>dalli</code> for memcached, etc.).</p>
+
+<h2>Summary</h2>
+
+<p>I’m happy with my current toolkit. This doesn’t mean I’m not on the lookout for shiny new things, but I’m generally a little more cautious about replacing something reliable, even if it doesn’t do everything under the sun.</p>
+
+<p>Even though Ruby makes it easy to include third party libraries, it doesn’t mean we always should. As developers, we inherit the stability of the dependencies we include. Even though a gem’s code might be locked away behind a separate git repository, it likely has the same holes and complexities that we’re worried about in our applications. And perhaps, even more…</p>
+
+<p><a href="https://www.ruby-toolbox.com/">Ruby toolbox</a> is a great resource when searching for a gem. I generally consider the number of downloads, age of the project and development activity when deciding which one to go with.</p>
+
+<p>What have your favorite gems been this year?</p>
+
+<h2>Build a Ruby Gem</h2>
+
+<p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating Rails Active Record Validation Contexts with Inheritance]]></title>
@@ -2649,113 +2796,6 @@ $(".pages.contact").ready -&gt;
 <p>Let me what you think of this solution and if you’ve come across this issue before. I&rsquo;d love to hear about other solutions!</p>
 
 <p><em>Note: In order for this solution to work with Turbolinks in Rails 4, I had to drag in the <a href="https://github.com/kossnocorp/jquery.turbolinks">jquery.turbolinks plugin</a>.</em></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Relative Timestamps in Rails]]></title>
-    <link href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/"/>
-    <updated>2014-01-13T07:01:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/relative-timestamps-in-rails</id>
-    <content type="html"><![CDATA[<p>Facebook’s news feed popularized the relative timestamp format of &ldquo;X hours ago&rdquo;. For good reason too&hellip;why print an absolute timestamp so that people have to do the relative calculation in their head? It’s one less step for the user, and to be fair, pretty easy to implement.</p>
-
-<h2>Rails helpers to the rescue</h2>
-
-<p>Rails has a view helper aptly named <code>time_ago_in_words</code>. If you use the
-<code>created_at</code> attribute from a record, you could easily reference a relative timestamp from a corresponding view:</p>
-
-<pre><code># app/views/posts/show.html.erb
-
-Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
-</code></pre>
-
-<p>That’s great! But not enough…what happens when a user stays on the page for 10 min. and the latest post was no longer posted &ldquo;1 minute ago”? Asking them to refresh the page every 10 minutes is no longer an acceptable answer.</p>
-
-<!--more-->
-
-
-<p>Additionally, Rails 4 encourages the use of <a href="http://edgeguides.rubyonrails.org/caching_with_rails.html">Russian doll caching</a>, so if you cached record and use <code>time_ago_in_words</code>, the relative time of the post would never change. No bueno!</p>
-
-<p>Fortunately, we can do better…</p>
-
-<h2>The Solution</h2>
-
-<p><a href="http://timeago.yarp.com/">Timeago.js</a> is a <a href="http://jquery.com/">jQuery</a> plugin that converts timestamps to a relative format. They also boast the following on their website:</p>
-
-<ul>
-<li><p>Avoid timestamps dated &ldquo;1 minute ago&rdquo; even though the page was opened 10 minutes ago; timeago refreshes automatically</p></li>
-<li><p>You can take full advantage of page caching in your web applications, because the timestamps aren&rsquo;t calculated on the server</p></li>
-<li><p>You get to use microformats like the cool kids</p></li>
-</ul>
-
-
-<h2>The Implementation</h2>
-
-<ol>
-<li><p>Download the plugin and place it in <code>vendor/javascripts/timeago.jquery.js</code></p></li>
-<li><p>Add the following line to your <code>application.js</code> manifest file, so it&rsquo;s picked up by the <a href="http://guides.rubyonrails.org/asset_pipeline.html">asset pipeline</a>:</p>
-
-<pre><code> //= require jquery.timeago
-</code></pre></li>
-<li><p>Create a helper that you can use from your views that will do the dirty work for you:</p>
-
-<pre><code> # app/helpers/time.rb
- module TimeHelper
-   def timeago(time, options = {})
-     options[:class] ||= "timeago"
-     content_tag(
-       :time,
-       time.to_s,
-       options.merge(datetime: time.getutc.iso8601)
-     ) if time
-   end
- end
-</code></pre></li>
-<li><p>Reference the new helper method from your view &ndash; passing in the time attribute of the model:</p>
-
-<pre><code> # app/views/posts/show.html.erb
- Posted: &lt;%= timeago(post.created_at) %&gt;
-</code></pre>
-
-<p> This generates the following HTML tag:</p>
-
-<pre><code> &lt;time class="timeago" datetime="2013-11-08T20:05:37Z"&gt;&lt;/time&gt;
-</code></pre>
-
-<p> Now that <code>timeago.js</code> is loaded and you have the right HTML tags on the page, you need to invoke the plugin and let it do its thing.</p></li>
-<li><p>Add the following to the bottom of your layout and reload the page:</p>
-
-<pre><code> # app/views/layouts/application.html.erb
- &lt;body&gt;
-   &lt;%= javascript_tag do %&gt;
-     $(function() {
-       $("time.timeago").timeago();
-     });
-   &lt;% end %&gt;
- &lt;/body&gt;
-</code></pre>
-
-<p> Once the <code>timeago()</code> function is called, the timestamp above will look like:</p>
-
-<pre><code> &lt;time class="timeago" datetime="2013-11-08T20:05:37Z"
- title="2013-11-08 20:05:37 UTC"&gt;2 days ago&lt;/time&gt;
-</code></pre></li>
-</ol>
-
-
-<p>And that&rsquo;s it&hellip;sit on the page long enough and watch the timestamps increment. You&rsquo;ve now got yourself a solution that is dynamic and allows you to cache the views until the cows come home!</p>
-
-<h2>Summary</h2>
-
-<p>Even though Rails has a simple mechanism for displaying relative timestamps in views, moving this functionality to the client side makes sense.</p>
-
-<p>Another benefit you get is timezone interpretation. Even though we print the UTC time in the HTML tag, the plugin will detect the local timezone from the browser and adjust accordingly. In my experience, timezones are a huge pain and the more you can offload them to a solution like this, the better.</p>
-
-<p>Happy time-stamping!</p>
-
-<p><em>Note: Since writing this, I discovered the <a href="https://github.com/37signals/local_time">local_time gem</a> from 37Signals. They’ve been a big advocate of moving relative timestamp calculation to the client-side. Their gem uses <a href="http://momentjs.com/">moment.js</a> instead of timago.js and it includes <a href="https://github.com/37signals/local_time/blob/master/app/assets/javascripts/local_time.js.coffee#L157">code to update the timestamps if Turbolinks is being used</a>. It’s worth checking out if you do this on a regular basis or use the moment.js library for other reasons.</em></p>
-
-<p>P.S. In my book, <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=relative-timestamps-post">Build a Ruby Gem</a>, I cover how to create a Rails engine gem with the above functionality.</p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-02T21:35:47-05:00</updated>
+  <updated>2014-12-04T06:50:43-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,154 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
+    <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
+    <updated>2014-12-03T13:14:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
+    <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
+
+<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
+
+<!--more-->
+
+
+<p>A <code>Gemfile</code> also includes hints about preference and style. And style is something most Ruby developers are very passionate about. It doesn’t take long to find the story of a Rubyist describing their “love at first sight” experience with the language. It’s hard to find another file in a Rails project that’s so telling.</p>
+
+<p>A year ago, I wrote about the <a href="/blog/patterns-in-a-rails-gemfile/">Ruby gems I regularly use in my Rails applications</a>. Because technology and the tools we use change so fast, I thought it’d be interesting to take a look at one of my more recent Gemfiles to see what’s changed.</p>
+
+<h2>Rails Templates</h2>
+
+<p>As I mentioned in the last <a href="/blog/patterns-in-a-rails-gemfile/">Gemfile post</a>, I tend to write a bunch of small applications sprinkled around some larger ones. Despite the size of the project, I feel like I’ve honed in a set of Ruby gems that feel comfortable and productive for me and my workflow.</p>
+
+<p>Knowing the act of bootstrapping a Rails project is sometimes tedious, I took some time to build a <a href="https://github.com/brandonhilkert/rails_templates">Rails template</a> around the gems and patterns I commonly use. I’ll definitely be writing about this experience in the future since there seems to be very little discussion about it.</p>
+
+<p>In short, extracting my preferences to a template has been a HUGE time saver. It no longer feels like a burden to run <code>rails new</code>. I can jump right in and have a consistent set of tools that enable me to be productive within a few minutes.</p>
+
+<h2>My 2014 Gemfile</h2>
+
+<p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
+
+<p>```
+source &lsquo;<a href="https://rubygems.org">https://rubygems.org</a>&rsquo;</p>
+
+<p>ruby &ldquo;2.1.4&rdquo;</p>
+
+<p>gem &lsquo;rails&rsquo;, &lsquo;4.1.8&rsquo;
+gem &lsquo;pg&rsquo;
+gem &lsquo;sass-rails&rsquo;, &lsquo;~> 4.0.3&rsquo;
+gem &lsquo;uglifier&rsquo;, &lsquo;>= 1.3.0&rsquo;
+gem &lsquo;coffee-rails&rsquo;, &lsquo;~> 4.0.0&rsquo;
+gem &lsquo;jquery-rails&rsquo;
+gem &lsquo;turbolinks&rsquo;</p>
+
+<p>gem &lsquo;bcrypt-ruby&rsquo;, &lsquo;~> 3.1.2&rsquo;</p>
+
+<p>group :development, :test do
+  gem &ldquo;pry&rdquo;
+end</p>
+
+<p>group :test do
+  gem &ldquo;selenium-webdriver&rdquo;
+  gem &ldquo;capybara&rdquo;
+  gem &ldquo;timecop&rdquo;
+  gem &ldquo;mocha&rdquo;
+end</p>
+
+<p>group :development do
+  gem &ldquo;quiet_assets&rdquo;
+  gem &ldquo;spring&rdquo;
+  gem &ldquo;bullet&rdquo;
+  gem &lsquo;stripe_tester&rsquo;, &ldquo;~> 0.1.0&rdquo;
+end</p>
+
+<p>group :production, :demo do
+  gem &ldquo;rails_12factor&rdquo;
+  gem &ldquo;heroku-deflater&rdquo;
+end</p>
+
+<p>gem &ldquo;font-awesome-rails&rdquo;
+gem &ldquo;unicorn&rdquo;
+gem &ldquo;bootstrap-sass&rdquo;
+gem &ldquo;sidekiq&rdquo;, require: &ldquo;sidekiq/web&rdquo;
+gem &ldquo;sinatra&rdquo;
+gem &ldquo;local_time&rdquo;
+gem &ldquo;gravatar_image_tag&rdquo;
+gem &ldquo;so_meta&rdquo;
+gem &ldquo;chronic&rdquo;
+gem &ldquo;recurrence&rdquo;</p>
+
+<p>gem &ldquo;premailer-rails&rdquo;</p>
+
+<p>gem &ldquo;momentjs-rails&rdquo;
+gem &ldquo;bootstrap3-datetimepicker-rails&rdquo;
+gem &ldquo;bootstrap-switch-rails&rdquo;
+gem &ldquo;bootstrap-wysihtml5-rails&rdquo;
+gem &ldquo;bootstrap-select-rails&rdquo;
+gem &ldquo;autosize-rails&rdquo;</p>
+
+<p>gem &ldquo;aws-sdk&rdquo;</p>
+
+<p>gem &ldquo;html-pipeline&rdquo;
+gem &ldquo;rinku&rdquo;</p>
+
+<p>gem &ldquo;newrelic_rpm&rdquo;
+gem &lsquo;doc_raptor&rsquo;
+gem &ldquo;stripe&rdquo;
+gem &ldquo;jquery-ui-rails&rdquo;
+gem &ldquo;active_model_serializers&rdquo;
+gem &ldquo;rubyzip&rdquo;
+gem &ldquo;render_anywhere&rdquo;, require: false
+gem &ldquo;pusher&rdquo;
+gem &lsquo;filepicker-rails&rsquo;
+gem &lsquo;memcachier&rsquo;
+gem &lsquo;dalli&rsquo;
+gem &ldquo;intercom-rails&rdquo;
+```</p>
+
+<p>A few comments:</p>
+
+<ul>
+<li><p>I’ve standardized on <a href="http://www.postgresql.org/">Postgres</a> as the database for my apps, even in development. It’s reliable and allows me to be sure that the code I write will work the same way in production, since I tend to deploy most of my apps to <a href="https://www.heroku.com/">Heroku</a>.</p></li>
+<li><p>I leave <code>turbolinks</code> on. Judging from recent posts and comments within the community, this will probably one of the more controversial decisions.</p>
+
+<p>  If I’m being honest, my first experience with Turbolinks wasn’t great. And by “wasn’t great”, I mean — it broke <strong>EVERYTHING</strong>! But the good news was that it brought to light the fact that I sucked at javascript. At the time, I was capable of writing <em>just</em> enough to modify form behavior or fade in an DOM element.</p>
+
+<p>  The time had come to level up on my javascript skills. I was able to improve my javascript and also do it in a way that can took full advantage of the benefits that Turbolinks offers. Since that time, I’ve left Turbolinks on and no longer had to worry that my client-side code will stop working after clicking through a few application links.</p></li>
+<li><p>I’ve standardized on using <code>has_secure_password</code> for authentication. I previously used <a href="https://github.com/plataformatec/devise">devise</a>, but found the extra features are no longer worth the additional complexity. <code>has_secure_password</code> provides me reliable authentication patterns that are simple to understand and maintain. Hence the need for <code>bcrypt</code> in the <code>Gemfile</code> above.</p></li>
+<li><p>As for my test environment, I’ve written about <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">my switch to Minitest and fixtures</a>. I’m still just as happy with that decision as the time I wrote about it. I’ve seen Rspec go through a variety of API changes since then, and thankful I no longer have to worry about updating my test suite every couple months. I continue to find value in <code>capybara</code> and include <code>mocha</code> for the times <code>Minitest</code>’s stubbing and mocking isn’t enough (I’ve been meaning to dig in to the places I use <code>mocha</code>. I’m guessing if the code was better, I probably wouldn’t need it at all).</p></li>
+<li><p><code>bullet</code> is a killer gem for tracking down performances issues. It’s saved me countless hours of debugging.</p></li>
+<li><p>The inclusion of <code>spring</code> in Rails 4.1 is great. I realize it’s a bandaid in some respects, but waiting for the environment to load on every test run is a drag. I’ve found that because my tests are so responsive when <code>spring</code> is working properly, it encourages me to run my tests more often. Once setup, it works well and only in rare cases has not reloaded when it should have.</p></li>
+<li><p>I generally always include <code>bootstrap</code> and <code>font-awesome</code> in my projects. Being a non-designer, it helps me get something on the screen faster, even if it’s not the final design.</p></li>
+<li><p>I continue to use <code>unicorn</code>. It’s been around for so long and continues to be competitive in benchmarks against other Ruby web servers. I tested Passenger in a few applications, but got scared off when it printed the entire environment to the screen in production on Heroku on an exception. I’m told there are ways around this with some non-trivial configuration, but I think it’s a bizarre default and isn’t conducive to my workflow.</p></li>
+<li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
+<li><p>I’ve written about putting together <a href="/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
+<li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
+<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
+<li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
+<li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
+<li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
+</ul>
+
+
+<p>The rest are very use case-specific. And in general, the defacto solution for each (<code>pusher</code> for real-time features, <code>dalli</code> for memcached, etc.).</p>
+
+<h2>Summary</h2>
+
+<p>I’m happy with my current toolkit. This doesn’t mean I’m not on the lookout for shiny new things, but I’m generally a little more cautious about replacing something reliable, even if it doesn’t do everything under the sun.</p>
+
+<p>Even though Ruby makes it easy to include third party libraries, it doesn’t mean we always should. As developers, we inherit the stability of the dependencies we include. Even though a gem’s code might be locked away behind a separate git repository, it likely has the same holes and complexities that we’re worried about in our applications. And perhaps, even more…</p>
+
+<p><a href="https://www.ruby-toolbox.com/">Ruby toolbox</a> is a great resource when searching for a gem. I generally consider the number of downloads, age of the project and development activity when deciding which one to go with.</p>
+
+<p>What have your favorite gems been this year?</p>
+
+<h2>Build a Ruby Gem</h2>
+
+<p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Creating Rails Active Record Validation Contexts with Inheritance]]></title>
@@ -550,167 +698,6 @@ end
 <p>Submissions will be open until <strong>5:00pm EDT on Friday, July 11</strong>. I’ll announcement the winner shortly thereafter.</p>
 
 <p>Even if you don’t win, I’ll send everyone that submits a response a <strong>20% discount code</strong> for any package of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Minitest Helper Includes and Rails Fixtures]]></title>
-    <link href="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/"/>
-    <updated>2014-06-25T06:10:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures</id>
-    <content type="html"><![CDATA[<p>Contuining my <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">love affair with Minitest and fixtures</a>, I wanted to dive in to something deeper this time. Switching tools takes time to get used to and managing passwords was one of the bigger headaches I encountered.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p>I wanted to use <a href="https://github.com/jnicklas/capybara">Capybara</a> for integration testing. The application uses the standard email/password combo to authenticate users via <a href="http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password"><code>has_secure_password</code></a>.</p>
-
-<p>Because plain text passwords are not stored in the database, but rather a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L112"><code>password_digest</code></a>, I didn’t have a good way to fill in the login forms using Capybara to test against pages that require authentication.</p>
-
-<h2>The Solution</h2>
-
-<p>I started with a simple <code>users.yml</code> fixture that looked like this:</p>
-
-<p><code>
-fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  title: CEO
-  company: flintstone
-  admin: true
-</code></p>
-
-<h3>Bcrypt</h3>
-
-<p>As mentioned above, <code>has_secure_password</code> uses <code>Bcrypt</code> to encrypt the plain text passwords provided. The specific implementation to create the password digest is:</p>
-
-<p><code>
-BCrypt::Password.create("password", cost: 4)
-</code></p>
-
-<p>This method takes the plain text password (“password”) and encrypts it with what it calls the “cost”. It’s not terribly important for this article, but to save some speed, I’ve specified a cost of 4 — <a href="https://github.com/codahale/bcrypt-ruby/blob/master/lib/bcrypt/engine.rb#L7">the minimum cost support by the <code>Bcrypt</code> algorithm</a>. The default is 10, which will make your production applications safer. However, for testing, we don’t care.</p>
-
-<p>The result of the method above looks like this:</p>
-
-<p><code>
-irb(main):001:0&gt; require "bcrypt"
-=&gt; true
-irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
-=&gt; "$2a$04$gw09FM67MDnzduXmlK46BOsdVTtzWKaSIkAdmnF/sJSLgcQhJBAUe"
-</code></p>
-
-<p>That output value is what’s being stored in our database when a user inputs and saves a password. From the application’s standpoint, we could print a value like this in to our fixtures, but what’s the fun in that?!?!</p>
-
-<h3>ERB in Fixtures</h3>
-
-<p>Since fixtures allow us to use ERB in them, we could provide the <code>Bcrypt</code> method above to produce the password digest like so:</p>
-
-<p><code>
-fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  password_digest: &lt;%= BCrypt::Password.create("password", cost: 4) %&gt;
-  title: CEO
-  company: flintstone
-  admin: true
-</code></p>
-
-<p>The downside is that the actual password (“password”) is here in plain text. To fill in our login form using Capybara, we don’t have a variable to access to the get the password — we literally have to type “password”. So this isn’t the most DRY thing in the world. While it would certainly work, I think we can do better…</p>
-
-<h3>Capybara</h3>
-
-<p>Let’s say I have a test that looks like this:</p>
-
-<p><code>
-visit signin_path
-fill_in "email", with: user.email
-fill_in "password", with: "password"
-click_on "Sign in"
-</code></p>
-
-<h3>Extract a Module</h3>
-
-<p>Our goal was to not sprinkle these plan text passwords all over the place. So let’s extract a module call <code>TestPasswordHelper</code> and put the plain text password in there:</p>
-
-<p>```
-require &ldquo;bcrypt&rdquo;</p>
-
-<p>module TestPasswordHelper
-  def default_password_digest</p>
-
-<pre><code>BCrypt::Password.create(default_password, cost: 4)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def default_password</p>
-
-<pre><code>"password"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>We’ll have our default password accessible via a method named…get this, <code>default_password</code>! The module also contains a method (<code>default_password_digest</code>) that will allow us to send the password digest to the fixture using the Bcrypt algorithm we explored above.</p>
-
-<p>Now that we have a helper module ready all set up, we add the following to our <code>test/test_helper.rb</code> to make these methods accessible in our tests:</p>
-
-<p>```
-require &ldquo;support/test_password_helper&rdquo;</p>
-
-<p>class ActiveSupport::TestCase
-  include TestPasswordHelper
-end
-```</p>
-
-<p>With these methods mixed in, we can update our Capybara test to use the <code>default_password</code> method:</p>
-
-<p><code>
-visit signin_path
-fill_in "email", with: user.email
-fill_in "password", with: default_password
-click_on "Sign in"
-</code></p>
-
-<h3>Helpers in Fixtures</h3>
-
-<p>Unfortunately, those helpers aren’t available in the fixtures.</p>
-
-<p><code>ActiveRecord::FixtureSet</code> is the class that gives our fixtures life. We can use Ruby to include functionality from our test helper, that will give us access to to the <code>default_password_digest</code> method, which reads our <code>default_password</code> so we don’t have to type it out.</p>
-
-<p>The <a href="http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html#method-c-context_class">Rails API guide for fixtures</a> states that helper methods should be added to <code>ActiveRecord::FixtureSet.context_class</code>.</p>
-
-<p>So back in our <code>test_helper.rb</code>, we can mix in our test helpers methods like so:</p>
-
-<p><code>
-ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper
-</code></p>
-
-<p>Now, back in our <code>users.yml</code> fixture, we can use the new <code>default_password_digest</code> method:</p>
-
-<p><code>
-fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  password_digest: &lt;%= default_password_digest %&gt;
-  title: CEO
-  company: flintstone
-  admin: true
-</code></p>
-
-<p>We can now run our tests and verify the fixtures properly insert the digest using the default password and the Capybara tests reference that same default password.</p>
-
-<p>Now, if in the future we wanted use a different password for some reason, we’d only have one place to change it, and the rest of the system would follow along.</p>
-
-<h2>Summary</h2>
-
-<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
 ]]></content>
   </entry>
   
