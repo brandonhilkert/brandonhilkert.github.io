@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-07T19:32:34-05:00</updated>
+  <updated>2014-12-12T06:52:04-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -44,7 +44,7 @@
 <p>```
 source &lsquo;<a href="https://rubygems.org">https://rubygems.org</a>&rsquo;</p>
 
-<p>ruby &ldquo;2.1.4&rdquo;</p>
+<p>ruby &lsquo;2.1.4&rsquo;</p>
 
 <p>gem &lsquo;rails&rsquo;, &lsquo;4.1.8&rsquo;
 gem &lsquo;pg&rsquo;
@@ -57,65 +57,65 @@ gem &lsquo;turbolinks&rsquo;</p>
 <p>gem &lsquo;bcrypt-ruby&rsquo;, &lsquo;~> 3.1.2&rsquo;</p>
 
 <p>group :development, :test do
-  gem &ldquo;pry&rdquo;
+  gem &lsquo;pry&rsquo;
 end</p>
 
 <p>group :test do
-  gem &ldquo;selenium-webdriver&rdquo;
-  gem &ldquo;capybara&rdquo;
-  gem &ldquo;timecop&rdquo;
-  gem &ldquo;mocha&rdquo;
+  gem &lsquo;selenium-webdriver&rsquo;
+  gem &lsquo;capybara&rsquo;
+  gem &lsquo;timecop&rsquo;
+  gem &lsquo;mocha&rsquo;
 end</p>
 
 <p>group :development do
-  gem &ldquo;quiet_assets&rdquo;
-  gem &ldquo;spring&rdquo;
-  gem &ldquo;bullet&rdquo;
-  gem &lsquo;stripe_tester&rsquo;, &ldquo;~> 0.1.0&rdquo;
+  gem &lsquo;quiet_assets&rsquo;
+  gem &lsquo;spring&rsquo;
+  gem &lsquo;bullet&rsquo;
+  gem &lsquo;stripe_tester&rsquo;, &lsquo;~> 0.1.0&rsquo;
 end</p>
 
 <p>group :production, :demo do
-  gem &ldquo;rails_12factor&rdquo;
-  gem &ldquo;heroku-deflater&rdquo;
+  gem &lsquo;rails_12factor&rsquo;
+  gem &lsquo;heroku-deflater&rsquo;
 end</p>
 
-<p>gem &ldquo;font-awesome-rails&rdquo;
-gem &ldquo;unicorn&rdquo;
-gem &ldquo;bootstrap-sass&rdquo;
-gem &ldquo;sidekiq&rdquo;, require: &ldquo;sidekiq/web&rdquo;
-gem &ldquo;sinatra&rdquo;
-gem &ldquo;local_time&rdquo;
-gem &ldquo;gravatar_image_tag&rdquo;
-gem &ldquo;so_meta&rdquo;
-gem &ldquo;chronic&rdquo;
-gem &ldquo;recurrence&rdquo;</p>
+<p>gem &lsquo;font-awesome-rails&rsquo;
+gem &lsquo;unicorn&rsquo;
+gem &lsquo;bootstrap-sass&rsquo;
+gem &lsquo;sidekiq&rsquo;, require: &lsquo;sidekiq/web&rsquo;
+gem &lsquo;sinatra&rsquo;
+gem &lsquo;local_time&rsquo;
+gem &lsquo;gravatar_image_tag&rsquo;
+gem &lsquo;so_meta&rsquo;
+gem &lsquo;chronic&rsquo;
+gem &lsquo;recurrence&rsquo;</p>
 
-<p>gem &ldquo;premailer-rails&rdquo;</p>
+<p>gem &lsquo;premailer-rails&rsquo;</p>
 
-<p>gem &ldquo;momentjs-rails&rdquo;
-gem &ldquo;bootstrap3-datetimepicker-rails&rdquo;
-gem &ldquo;bootstrap-switch-rails&rdquo;
-gem &ldquo;bootstrap-wysihtml5-rails&rdquo;
-gem &ldquo;bootstrap-select-rails&rdquo;
-gem &ldquo;autosize-rails&rdquo;</p>
+<p>gem &lsquo;momentjs-rails&rsquo;
+gem &lsquo;bootstrap3-datetimepicker-rails&rsquo;
+gem &lsquo;bootstrap-switch-rails&rsquo;
+gem &lsquo;bootstrap-wysihtml5-rails&rsquo;
+gem &lsquo;bootstrap-select-rails&rsquo;
+gem &lsquo;autosize-rails&rsquo;</p>
 
-<p>gem &ldquo;aws-sdk&rdquo;</p>
+<p>gem &lsquo;aws-sdk&rsquo;</p>
 
-<p>gem &ldquo;html-pipeline&rdquo;
-gem &ldquo;rinku&rdquo;</p>
+<p>gem &lsquo;html-pipeline&rsquo;
+gem &lsquo;rinku&rsquo;</p>
 
-<p>gem &ldquo;newrelic_rpm&rdquo;
+<p>gem &lsquo;newrelic_rpm&rsquo;
 gem &lsquo;doc_raptor&rsquo;
-gem &ldquo;stripe&rdquo;
-gem &ldquo;jquery-ui-rails&rdquo;
-gem &ldquo;active_model_serializers&rdquo;
-gem &ldquo;rubyzip&rdquo;
-gem &ldquo;render_anywhere&rdquo;, require: false
-gem &ldquo;pusher&rdquo;
+gem &lsquo;stripe&rsquo;
+gem &lsquo;jquery-ui-rails&rsquo;
+gem &lsquo;active_model_serializers&rsquo;
+gem &lsquo;rubyzip&rsquo;
+gem &lsquo;render_anywhere&rsquo;, require: false
+gem &lsquo;pusher&rsquo;
 gem &lsquo;filepicker-rails&rsquo;
 gem &lsquo;memcachier&rsquo;
 gem &lsquo;dalli&rsquo;
-gem &ldquo;intercom-rails&rdquo;
+gem &lsquo;intercom-rails&rsquo;
 ```</p>
 
 <p>A few comments:</p>

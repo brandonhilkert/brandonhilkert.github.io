@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-07T19:32:34-05:00</updated>
+  <updated>2014-12-12T06:52:04-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -43,7 +43,7 @@
 
 <figure class='code'><pre><code>source 'https://rubygems.org'
 
-ruby "2.1.4"
+ruby '2.1.4'
 
 gem 'rails', '4.1.8'
 gem 'pg'
@@ -56,65 +56,65 @@ gem 'turbolinks'
 gem 'bcrypt-ruby', '~&gt; 3.1.2'
 
 group :development, :test do
-  gem "pry"
+  gem 'pry'
 end
 
 group :test do
-  gem "selenium-webdriver"
-  gem "capybara"
-  gem "timecop"
-  gem "mocha"
+  gem 'selenium-webdriver'
+  gem 'capybara'
+  gem 'timecop'
+  gem 'mocha'
 end
 
 group :development do
-  gem "quiet_assets"
-  gem "spring"
-  gem "bullet"
-  gem 'stripe_tester', "~&gt; 0.1.0"
+  gem 'quiet_assets'
+  gem 'spring'
+  gem 'bullet'
+  gem 'stripe_tester', '~&gt; 0.1.0'
 end
 
 group :production, :demo do
-  gem "rails_12factor"
-  gem "heroku-deflater"
+  gem 'rails_12factor'
+  gem 'heroku-deflater'
 end
 
-gem "font-awesome-rails"
-gem "unicorn"
-gem "bootstrap-sass"
-gem "sidekiq", require: "sidekiq/web"
-gem "sinatra"
-gem "local_time"
-gem "gravatar_image_tag"
-gem "so_meta"
-gem "chronic"
-gem "recurrence"
+gem 'font-awesome-rails'
+gem 'unicorn'
+gem 'bootstrap-sass'
+gem 'sidekiq', require: 'sidekiq/web'
+gem 'sinatra'
+gem 'local_time'
+gem 'gravatar_image_tag'
+gem 'so_meta'
+gem 'chronic'
+gem 'recurrence'
 
-gem "premailer-rails"
+gem 'premailer-rails'
 
-gem "momentjs-rails"
-gem "bootstrap3-datetimepicker-rails"
-gem "bootstrap-switch-rails"
-gem "bootstrap-wysihtml5-rails"
-gem "bootstrap-select-rails"
-gem "autosize-rails"
+gem 'momentjs-rails'
+gem 'bootstrap3-datetimepicker-rails'
+gem 'bootstrap-switch-rails'
+gem 'bootstrap-wysihtml5-rails'
+gem 'bootstrap-select-rails'
+gem 'autosize-rails'
 
-gem "aws-sdk"
+gem 'aws-sdk'
 
-gem "html-pipeline"
-gem "rinku"
+gem 'html-pipeline'
+gem 'rinku'
 
-gem "newrelic_rpm"
+gem 'newrelic_rpm'
 gem 'doc_raptor'
-gem "stripe"
-gem "jquery-ui-rails"
-gem "active_model_serializers"
-gem "rubyzip"
-gem "render_anywhere", require: false
-gem "pusher"
+gem 'stripe'
+gem 'jquery-ui-rails'
+gem 'active_model_serializers'
+gem 'rubyzip'
+gem 'render_anywhere', require: false
+gem 'pusher'
 gem 'filepicker-rails'
 gem 'memcachier'
 gem 'dalli'
-gem "intercom-rails"</code></pre></figure>
+gem 'intercom-rails'</code></pre></figure>
 
 
 <p>A few comments:</p>
