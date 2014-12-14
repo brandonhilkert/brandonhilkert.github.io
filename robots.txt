@@ -8,4 +8,6 @@ Disallow: /courses/build-a-ruby-gem/done.html
 
 Disallow: /books/build-a-ruby-gem/almost.html
 Disallow: /books/build-a-ruby-gem/done.html
+
+Disallow: /tools/_default.html
 Sitemap: http://brandonhilkert.com/sitemap.xml
