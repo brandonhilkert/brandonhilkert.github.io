@@ -160,6 +160,44 @@
   
 
 
+<time datetime="2014-12-17T07:07:00-05:00" data-updated="true" itemprop="datePublished">December 17<span>th</span>, 2014</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/a-ruby-refactor-exploring-dependency-injection-options/" itemprop="url">A Ruby Refactor: Exploring Dependency Injection Options</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/dependency-injection/'>dependency injection</a>, <a class='category' href='/blog/categories/refactor/'>refactor</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
+
+<p><a href="http://en.m.wikipedia.org/wiki/Dependency_injection">Dependency injection</a> was a necessary piece of that puzzle. I’ve always been curious about the various forms of dependency injection and the effects each would have on the code. Below I explore 2 options (constructor injection and setter injection).</p>
+
+
+		
+		<a href="/blog/a-ruby-refactor-exploring-dependency-injection-options/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2014-12-03T13:14:00-05:00" data-updated="true" itemprop="datePublished">December 3<span>rd</span>, 2014</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/rails-gemfile-teardown-2014/" itemprop="url">Rails Gemfile Teardown - 2014</a></h1>
   <div class="tags">
@@ -486,44 +524,6 @@
 
 		
 		<a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-05-11T14:08:00-04:00" data-updated="true" itemprop="datePublished">May 11<span>th</span>, 2014</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/rails-4-1-travel-to-test-helper/" itemprop="url">New Rails 4.1 Travel_to Test Helper</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/testing/'>testing</a>, <a class='category' href='/blog/categories/time/'>time</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
-
-<p>With the release of Rails 4.1, the time stubbing method <code>travel_to</code> was added. This new helper method forces the current time to whatever you specify, allowing you to make asserts against a historical time, or week in my case.</p>
-
-
-		
-		<a href="/blog/rails-4-1-travel-to-test-helper/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

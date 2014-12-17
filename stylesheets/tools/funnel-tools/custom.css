@@ -7,6 +7,11 @@ h2 {
   font-size: 2.3rem;
 }
 
+.capture {
+  background-color: #4baf95 !important;
+  border-color: #4baf95 !important;
+}
+
 /* Sections
 –––––––––e–––––––––––––––––––––––––––––––––––––––– */
 .section {
@@ -20,29 +25,19 @@ h2 {
 
 /* Hero
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
-.phones {
-  position: relative;
-}
 .phone {
   position: relative;
   max-width: 80%;
   margin: 3rem auto -12rem;
 }
-.phone + .phone {
-  display: none;
-}
 
 /* Values
 –––––––––––––––––––––––––––––––––––––––––––––––––– */
 .values {
-  background-image: url('../../../images/tools/sign-me-up-widget/values-bg.jpg');
+  background-image: url('../../../images/tools/funnel-tools/capture-bg.jpg');
   background-size: cover;
   color: #fff;
   padding-bottom: 5rem;
-}
-.value-multiplier {
-  margin-bottom: .5rem;
-  color: #11DFC7;
 }
 .value-heading {
   margin-bottom: .3rem;
@@ -52,21 +47,26 @@ h2 {
   font-weight: 300;
 }
 
-/* Help
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-.get-help {
-  border-bottom: 1px solid #ddd;
+.pricing .column {
+  border: 1px solid lightgray;
+  border-radius: 4px;
+}
+.pricing h5 {
+  color: white;
+  padding: 1rem 0;
+  margin-bottom: 0;
+}
+.pricing .price {
+  font-size: 6rem;
+}
+.pricing li {
+  list-style-type: none;
 }
 
-/* Categories
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
-.categories {
-  background-image: url('../../../images/tools/sign-me-up-widget/values-bg.jpg');
-  background-size: cover;
-  color: #fff;
-}
-.categories .section-description {
-  margin-bottom: 4rem;
+@media (max-width: 550px) {
+  .pricing .column {
+    margin-bottom: 4rem;
+  }
 }
 
 /* Bigger than 550 */
@@ -78,21 +78,6 @@ h2 {
   }
   .section {
     padding: 12rem 0 11rem;
-  }
-  .phone {
-    position: absolute;
-    top: -7rem;
-    right: 3rem;
-    max-height: 362px;
-    z-index: 3;
-  }
-  .phone + .phone {
-    top: -6rem;
-    display: block;
-    max-width: 73.8%;
-    right: 0;
-    z-index: 2;
-    max-height: 338px;
   }
   .hero-heading {
     font-size: 2.4rem;
@@ -118,18 +103,6 @@ h2 {
     margin-left: auto;
     margin-right: auto;
   }
-  .phone {
-    top: -14rem;
-    right: 5rem;
-    max-height: 510px;
-  }
-  .phone + .phone {
-    top: -12rem;
-    max-height: 472px;
-  }
-  .categories {
-    padding: 15rem 0 8rem;
-  }
 }
 
 /* Bigger than 1000 */
@@ -142,14 +115,6 @@ h2 {
   }
   .hero-heading {
     font-size: 3.0rem;
-  }
-  .phone {
-    top: -16rem;
-    max-height: 615px;
-  }
-  .phone + .phone {
-    top: -14rem;
-    max-height: 570px;
   }
 }
 
