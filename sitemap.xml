@@ -205,6 +205,10 @@
         <lastmod>2014-12-17T07:09:47-05:00</lastmod>
     </url>
     <url>
+        <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
+        <lastmod>2014-12-20T09:18:05-05:00</lastmod>
+    </url>
+    <url>
         <loc>http://brandonhilkert.com/</loc>
         <lastmod>2014-12-17T07:09:47-05:00</lastmod>
     </url>
@@ -223,9 +227,5 @@
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
         <lastmod>2014-12-14T07:41:58-05:00</lastmod>
-    </url>
-    <url>
-        <loc>http://brandonhilkert.com/tools/funnel-tools/capture/</loc>
-        <lastmod>2014-12-19T21:35:45-05:00</lastmod>
     </url>
 </urlset>
