@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-20T09:18:47-05:00</updated>
+  <updated>2014-12-30T13:30:23-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,69 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[2014 In Review]]></title>
+    <link href="http://brandonhilkert.com/blog/2014-in-review/"/>
+    <updated>2014-12-29T14:57:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/2014-in-review</id>
+    <content type="html"><![CDATA[<p>For the past 2 years, I’ve committed myself to <a href="http://brandonhilkert.com/blog/be-ambitious/">specific
+goals</a> for the year to come. Most
+people call them New Year’s Resolutions. Heck, I probably even referred to them
+as “resolutions” too. But the more I thought about it, the more it dawned on me
+that a “resolution” felt more like a fix for something — something that didn&rsquo;t
+go well in the previous year. Think weight loss (everyone makes this resolution at least once in their life) or a dedication to be more focused.</p>
+
+<!--more-->
+
+
+<p>Mine have been more of the bucket list variety. The first was <a href="http://brandonhilkert.com/blog/loyalty/">completing an Ironman</a>. The second, <a href="http://brandonhilkert.com/blog/be-ambitious/">writing a book</a>.</p>
+
+<p>Both felt almost too big initially, but ultimately led to opportunities and
+lifestyle changes I would’ve never expected once finished. So naturally, with
+2014 winding down, the question becomes <strong>&ldquo;what’s the goal for 2015?&rdquo;</strong>.</p>
+
+<p>And the answer is&hellip;<em>I don’t know</em>.</p>
+
+<p>It doesn’t mean I’m not going to do anything. In fact, it probably means the
+opposite. I’m just not going to set out with a specific goal in mind. If
+halfway through something, I want to stop and do something else, so be it.</p>
+
+<p>I remember during my training for the Ironman (9 months total), I constantly thought about what I would do with my free time when it was over. Every time my alarm went off at 5am, I thought about what it would feel like to get another 2 hours of sleep. It was endless. Nine months was a long time to have those thoughts and, perhaps, why I was so well positioned to write and launch the book (I had 9 months to think about what was next and how to accomplish it).</p>
+
+<p>Always having your sights set on the future can wear on you though.</p>
+
+<p>Without those feelings now, I’m going to let 2015 take me wherever it does. I don’t have any expectations financially or professionally. I’m going to do my best to make the most out of every moment and appreciate more of the small things. It’s so easy to skip over the small things and in many cases, the small things are actually the best things. And we don’t realize it until they’re gone.</p>
+
+<p>2014 was a great year in all. Here are a few of the events that stand out the most:</p>
+
+<ul>
+<li>my wife and I <a href="http://brandonhilkert.com/about/">welcomed our son, Cruz</a></li>
+<li>my wife and I celebrated our 4 year anniversary</li>
+<li>wrote a book, <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">Build a Ruby Gem</a></li>
+<li>provided a <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/">free email course on building a Ruby gem</a> to 1,218 people</li>
+<li>connected with 2,645 people through my <a href="http://brandonhilkert.com/newsletter/">newsletter</a></li>
+<li>built a <a href="https://www.funneloptimizer.io/">funnel optimization service for bloggers selling products</a></li>
+<li>published 24 [articles] (including this one)</li>
+<li>saw <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> <a href="https://rubygems.org/gems/sucker_punch">downloaded over 225k times</a></li>
+<li>celebrated <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> being <a href="http://guides.rubyonrails.org/active_job_basics.html">integrated in to Rails</a></li>
+<li>made my <a href="https://github.com/rails/rails/pull/16898">first commit to Rails</a> (even if it was small!)</li>
+<li>traveled to Jackson Hole, WY</li>
+<li>built a <a href="https://vuier.com/">pay-to-view video platform</a> with a few friends</li>
+<li>built a <a href="https://perform.io/">performance management system</a></li>
+<li>built a deployment system for <a href="https://www.pipelinedeals.com/">PipelineDeals</a> and supporting services that I’m very proud of</li>
+<li>built a staging server management application</li>
+<li>built <a href="https://chrome.google.com/webstore/detail/how-to-win-friends-and-in/cbmeigkjdnilgodhnhagokhoehbpkdcc?hl=en-US">3</a> <a href="https://chrome.google.com/webstore/detail/pipelinedeals-crm-contact/ieaafnaonfabpgpkkeglkeodkpiijjdd?hl=en-US">chrome</a> <a href="https://chrome.google.com/webstore/detail/pipelinedeals-gmail/fdfifknmbmalmgdjmnhkcfholdgacikl?hl=en-US">extensions</a>, the latter being my first <a href="http://facebook.github.io/react/">React</a> app</li>
+<li>started a <a href="http://walnutstlabs.com/event/walnut-st-labs-night-owls/">weekly tech gathering</a> at a <a href="http://walnutstlabs.com">local co-working space</a></li>
+<li>stopped push email notifications on all my devices (strongly recommended)</li>
+<li>saw <a href="http://defriendnotifierapp.com/">Defriend Notifier</a> be used by 30,128 people</li>
+<li>started exploring other programming languages, specifically <a href="https://golang.org/">Go</a> and <a href="http://elixir-lang.org/">Elixir</a></li>
+</ul>
+
+
+<p>I’m excited for 2015!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Ruby Refactor: Exploring Dependency Injection Options]]></title>
@@ -3077,56 +3140,6 @@ end
 <p>Given the <code>cache_key</code> of fragment caching is dependent on the contents of the template, I have trouble finding value in setting the <code>RAILS_CACHE_ID</code> environmental variable for fragment caching alone.</p>
 
 <p>Alternatively, the use case for using <code>ENV[“RAILS_CACHE_ID”]</code> to control browser caching can be a tremendous asset when the content of the body response is not considered. Caching strategies can be difficult to reason about and hopefully this gives you another tool in the toolbox to make parts of your Rails applications more performant.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Book Update]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-book-update/"/>
-    <updated>2014-02-15T08:19:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-book-update</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
-including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
-
-<p><strong>This past weekend I added ~ 6,000 words</strong> to the existing content. I&rsquo;m really excited to be nearing the end of the road. I&rsquo;ve gotten some great feedback since I started and wanted to gather a bit more to finalize the chapter list.</p>
-
-<p>Here&rsquo;s the chapter list I&rsquo;m working with&nbsp;so far:</p>
-
-<!--more-->
-
-
-<ol>
-<li>Introduction What is a gem? Why build a gem?)</li>
-<li>File structure of a gem</li>
-<li>Testing/debugging setup</li>
-<li>Code implementation of of example gem</li>
-<li>Versioning</li>
-<li>Release (how to release? and when to release?)</li>
-<li>Changelog (What is it? and what to include?)</li>
-<li>Responsibility of a gem author</li>
-<li>Loading additional libraries within a gem</li>
-<li>Command-line utilities</li>
-<li>Configuration patterns</li>
-<li>Rails hooks</li>
-<li>Rails view helpers</li>
-<li>Rails controller includes</li>
-<li>Rails Model Includes</li>
-<li>Rails rake tasks</li>
-<li>Rails engines (when/why to use?)</li>
-<li>Open source management</li>
-<li>Summary</li>
-</ol>
-
-
-<p>Phew! That&rsquo;s a lot&hellip;so with that in mind, <strong>have I covered everything?</strong></p>
-
-<p>Please <strong>leave a comment</strong> if you&rsquo;re interested in reading about something I haven&rsquo;t mentioned.</p>
-
-<p>One of the things I&rsquo;m most excited about is being able to use real-word examples for each chapter. I learn by reading and writing my own code and really appreciate when a book/post does the same. I&rsquo;ve tried to do that at every step of the way. Hopefully this will make the book more valuable to you.</p>
-
-<p>I will be in touch in the <strong>next few weeks with a sample chapter</strong> or two, along with some feature blog posts.</p>
 ]]></content>
   </entry>
   
