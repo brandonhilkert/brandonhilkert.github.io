@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-30T14:30:56-05:00</updated>
+  <updated>2014-12-30T14:52:44-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -55,7 +55,7 @@ halfway through something, I want to stop and do something else, so be it.</p>
 <li>provided a <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/">free email course on building a Ruby gem</a> to 1,218 people</li>
 <li>connected with 2,645 people through my <a href="http://brandonhilkert.com/newsletter/">newsletter</a></li>
 <li>built a <a href="https://www.funneloptimizer.io/">funnel optimization service for bloggers selling products</a></li>
-<li>published 24 [articles] (including this one)</li>
+<li>published 24 <a href="http://brandonhilkert.com/blog/archives/">articles</a></li>
 <li>saw <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> <a href="https://rubygems.org/gems/sucker_punch">downloaded over 225k times</a></li>
 <li>celebrated <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> being <a href="http://guides.rubyonrails.org/active_job_basics.html">integrated in to Rails</a></li>
 <li>made my <a href="https://github.com/rails/rails/pull/16898">first commit to Rails</a> (even if it was small!)</li>
