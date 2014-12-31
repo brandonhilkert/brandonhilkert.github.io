@@ -41,10 +41,10 @@ h2 {
   padding-bottom: 5rem;
 }
 .values-capture {
-  background-image: url('../img/capture-bg.jpg');
+  background-image: url('../capture/img/capture-bg.jpg');
 }
 .values-target {
-  background-image: url('../img/target-bg.jpg');
+  background-image: url('../target/img/target-bg.jpg');
 }
 .value .heading {
   margin-bottom: .3rem;
