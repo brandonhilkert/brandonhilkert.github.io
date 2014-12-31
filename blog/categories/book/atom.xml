@@ -4,7 +4,7 @@
   <title><![CDATA[Category: book | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/book/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2014-12-31T16:05:34-05:00</updated>
+  <updated>2014-12-31T16:11:07-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -314,7 +314,7 @@ require &lsquo;time_ago/version&rsquo;</p>
   spec.name          = &ldquo;time_ago&rdquo;
   spec.version       = TimeAgo::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#x62;&#x72;&#97;&#110;&#x64;&#x6f;&#x6e;&#x68;&#x69;&#108;&#107;&#101;&#x72;&#x74;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#111;&#x6d;">&#x62;&#114;&#x61;&#110;&#100;&#x6f;&#110;&#x68;&#x69;&#x6c;&#x6b;&#101;&#114;&#x74;&#x40;&#x67;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#x6f;&#109;</a>&rdquo;]
+  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#x6f;&#58;&#98;&#114;&#97;&#110;&#x64;&#111;&#110;&#x68;&#x69;&#x6c;&#107;&#101;&#114;&#116;&#x40;&#x67;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#x6d;">&#98;&#x72;&#x61;&#x6e;&#x64;&#111;&#110;&#x68;&#105;&#108;&#107;&#x65;&#114;&#116;&#x40;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;</a>&rdquo;]
   spec.summary       = %q{A gem to integrate the timeago.js}
   spec.description   = %q{A gem to integrate the timeago.js}
   spec.homepage      = &ldquo;&rdquo;

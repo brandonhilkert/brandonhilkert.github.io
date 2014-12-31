@@ -8,8 +8,8 @@ h2 {
 }
 
 .target {
-  background-color: #4baf95 !important;
-  border-color: #4baf95 !important;
+  background-color: #3753AB !important;
+  border-color: #3753AB !important;
 }
 
 .striped {
@@ -31,7 +31,7 @@ h2 {
 /* Values */
 .values {
   padding: 8rem 0 7rem;
-  background-image: url('../img/capture-bg.jpg');
+  background-image: url('../img/target-bg.jpg');
   background-size: cover;
   color: #fff;
   padding-bottom: 5rem;
