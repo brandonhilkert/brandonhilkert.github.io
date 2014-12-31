@@ -18,15 +18,17 @@ h2 {
   background-color: #fbfaf8;
 }
 
-/* Sections
-–––––––––e–––––––––––––––––––––––––––––––––––––––– */
+/* Sections */
 .section {
   padding: 4rem 0 2rem;
   text-align: center;
 }
 
-/* Values
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
+.hero h5 {
+  color: #bbb !important;
+}
+
+/* Values */
 .values {
   padding: 8rem 0 7rem;
   background-image: url('../img/capture-bg.jpg');
@@ -42,8 +44,7 @@ h2 {
   font-weight: 300;
 }
 
-/* Pricing
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
+/* Pricing */
 .pricing .column {
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -60,8 +61,7 @@ h2 {
   list-style-type: none;
 }
 
-/* About
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
+/* About */
 .about h4 {
   text-transform: uppercase;
   margin-bottom: 6rem;
@@ -75,8 +75,7 @@ h2 {
   border-radius: 50%;
 }
 
-/* Questions
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
+/* Questions */
 .questions h4 {
   text-transform: uppercase;
   margin-bottom: 6rem;
@@ -85,8 +84,8 @@ h2 {
 .questions .columns {
   text-align: left;
 }
-/* Footer
-–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+/* Footer */
 .footer {
   border-top: 1px solid #eee;
   text-align: center;
