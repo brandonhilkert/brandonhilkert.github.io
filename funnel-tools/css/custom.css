@@ -7,14 +7,24 @@ h2 {
   font-size: 2.3rem;
 }
 
-.capture {
+.capture .button,
+.capture .pricing h5 {
   background-color: #4baf95 !important;
   border-color: #4baf95 !important;
 }
 
-.target {
+.capture .values {
+  background-image: url('../capture/img/capture-bg.jpg');
+}
+
+.target .button,
+.capture .pricing h5 {
   background-color: #3753AB !important;
   border-color: #3753AB !important;
+}
+
+.target .values {
+  background-image: url('../target/img/target-bg.jpg');
 }
 
 .striped {
@@ -39,12 +49,6 @@ h2 {
   background-size: cover;
   color: #fff;
   padding-bottom: 5rem;
-}
-.values-capture {
-  background-image: url('../capture/img/capture-bg.jpg');
-}
-.values-target {
-  background-image: url('../target/img/target-bg.jpg');
 }
 .value .heading {
   margin-bottom: .3rem;
