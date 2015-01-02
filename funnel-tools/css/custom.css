@@ -9,7 +9,7 @@ h2 {
 
 .capture .button,
 .capture .pricing h5,
-.capture .headshot {
+.capture .headshot img {
   background-color: #4baf95 !important;
   border-color: #4baf95 !important;
 }
@@ -20,7 +20,7 @@ h2 {
 
 .target .button,
 .target .pricing h5,
-.capture .headshot {
+.capture .headshot img {
   background-color: #3753AB !important;
   border-color: #3753AB !important;
 }
@@ -36,7 +36,6 @@ h2 {
 }
 
 .headshot {
-  border-radius: 50%;
   position: absolute;
   left: 1rem;
   top: 1rem;
@@ -44,6 +43,8 @@ h2 {
 
 .headshot img {
   border-radius: 50%;
+  border-width: 3px;
+  border-style: solid;
 }
 
 /* Sections */
