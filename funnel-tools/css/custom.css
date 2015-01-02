@@ -33,6 +33,14 @@ h2 {
   background-color: #fbfaf8;
 }
 
+.headshot {
+  border-radius: 50%;
+  border: 3px solid white;
+  position: absolute;
+  left: 1rem;
+  top: 1rem;
+}
+
 /* Sections */
 .section {
   padding: 4rem 0 2rem;
