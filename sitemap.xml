@@ -236,4 +236,8 @@
         <loc>http://brandonhilkert.com/robots.txt</loc>
         <lastmod>2014-12-14T07:41:58-05:00</lastmod>
     </url>
+    <url>
+        <loc>http://brandonhilkert.com/tools/</loc>
+        <lastmod>2015-01-07T16:49:52-05:00</lastmod>
+    </url>
 </urlset>
