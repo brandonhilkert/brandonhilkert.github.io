@@ -36,11 +36,11 @@ $(document).on("click", ".subscribe-widget .close", function(e){
 
 var subscribeButton = document.getElementById('widget-subscribe-button');
 addListener(subscribeButton, 'click', function() {
-  ga('send', 'event', 'widget-course', 'subscribed');
+  ga('send', 'event', 'widget-newsletter', 'subscribed');
 })
 
 $(document).ready(function(){
   Widget.init();
-  ga('send', 'event', 'widget-course', 'viewed');
+  ga('send', 'event', 'widget-newsletter', 'viewed');
 });
 
