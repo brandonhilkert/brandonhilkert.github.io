@@ -12,7 +12,7 @@
         <loc>
             http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/
         </loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T11:00:23-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-something/</loc>
@@ -28,7 +28,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/serving-fonts-for-firefox-with-fastly/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T10:50:32-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/</loc>
@@ -44,7 +44,7 @@
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/
         </loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T10:52:19-05:00</lastmod>
     </url>
     <url>
         <loc>
@@ -88,7 +88,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/page-specific-javascript-in-rails/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T11:03:19-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-book-update/</loc>
@@ -98,7 +98,7 @@
         <loc>
             http://brandonhilkert.com/blog/understanding-the-rails-cache-id-environment-variable/
         </loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T10:57:07-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review/</loc>
@@ -106,7 +106,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T11:02:04-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/</loc>
@@ -136,7 +136,7 @@
         <loc>
             http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/
         </loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration/</loc>
@@ -168,7 +168,7 @@
         <loc>
             http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/
         </loc>
-        <lastmod>2014-12-03T20:03:40-05:00</lastmod>
+        <lastmod>2015-01-17T10:57:40-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/</loc>
@@ -178,7 +178,7 @@
         <loc>
             http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/
         </loc>
-        <lastmod>2014-12-17T07:09:47-05:00</lastmod>
+        <lastmod>2015-01-17T10:59:14-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/2014-in-review/</loc>
@@ -186,15 +186,15 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
-        <lastmod>2014-12-13T21:14:32-05:00</lastmod>
+        <lastmod>2015-01-17T11:10:03-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2014-12-30T14:52:29-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2014-12-30T14:52:29-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -206,19 +206,19 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2014-12-30T14:52:29-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2015-01-02T10:05:24-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2015-01-02T10:05:13-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2014-12-30T14:52:29-05:00</lastmod>
+        <lastmod>2015-01-17T11:11:32-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -230,7 +230,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2014-12-30T14:52:29-05:00</lastmod>
+        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -238,6 +238,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2015-01-07T16:49:52-05:00</lastmod>
+        <lastmod>2015-01-17T11:12:02-05:00</lastmod>
     </url>
 </urlset>

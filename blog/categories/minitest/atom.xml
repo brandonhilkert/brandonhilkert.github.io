@@ -4,7 +4,7 @@
   <title><![CDATA[Category: minitest | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/minitest/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-01-08T17:25:08-05:00</updated>
+  <updated>2015-01-17T11:13:44-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -175,7 +175,7 @@ fred:
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[7 reasons why I'm sticking with Minitest and Fixtures in Rails]]></title>
+    <title type="html"><![CDATA[7 Reasons I'm Sticking With Minitest and Fixtures in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/"/>
     <updated>2014-05-27T20:08:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails</id>
