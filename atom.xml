@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-01-17T11:13:44-05:00</updated>
+  <updated>2015-01-17T12:10:13-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -892,7 +892,7 @@ shot on another occasion for comparison.</p>
 
 <p>Ideally, what I wanted was to show my first visitor the opt-in form above, and then if they signed up, promote my book. Regardless of what I show, I could be using the real estate to show something that was more beneficial to the reader. And that’s the thing, it’s all about them. Anything I showed them beyond the form they already subscribed with would be more beneficial.</p>
 
-<h2>I’m excited to tell you about <a href="http://www.funneloptimizer.io/">Funnel Optimizer</a>!</h2>
+<h2>I’m excited to tell you about <a href="https://www.funneloptimizer.io/">Funnel Optimizer</a>!</h2>
 
 <p>I built Funnel Optimizer for people like me, and you. I want to help you sell more products, and provide even more value than you’re already providing. Funnel Optimizer offers you the opportunity to tailor your CTAs based on actions your audience have previously taken.</p>
 
@@ -1152,7 +1152,7 @@ end</code></pre></figure>
 
 <p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
 
-<p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
+<p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://www.sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
 ]]></content>
   </entry>
   
@@ -1689,7 +1689,7 @@ end</code></pre></figure>
 
 <p>I’m excited to add Minitest and fixtures to my toolkit. With the benefits I’ve seen so far, it’s hard for me to imagine using anything else going forward — assuming I have the choice.</p>
 
-<p>If you have beef over the default Minitest assertion syntax, you’ll be happy to know that Minitest comes with the option to use a <a href="http://bfts.rubyforge.org/minitest/MiniTest/Expectations.html">spec-style syntax</a>. While it’s not identical to the Rspec syntax, it gets you closer to the natural language syntax, if that’s important to you.</p>
+<p>If you have beef over the default Minitest assertion syntax, you’ll be happy to know that Minitest comes with the option to use a <a href="http://ruby-doc.org/stdlib-2.1.0/libdoc/minitest/rdoc/MiniTest/Expectations.html">spec-style syntax</a>. While it’s not identical to the Rspec syntax, it gets you closer to the natural language syntax, if that’s important to you.</p>
 ]]></content>
   </entry>
   
@@ -1797,7 +1797,7 @@ end</code></pre></figure>
 
 <h2>The Problem</h2>
 
-<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="http://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
+<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="https://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
 
 <p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
 
@@ -1855,7 +1855,7 @@ end</code></pre></figure>
 
 <p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
 
-<p>A quick glade over the <a href="http://rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
+<p>A quick glade over the <a href="http://www.rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
 
 <p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
 

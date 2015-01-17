@@ -2,7 +2,7 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://brandonhilkert.com/blog/the-technology-hump/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:05:23-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/loyalty/</loc>
@@ -16,7 +16,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-something/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:05:32-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/</loc>
@@ -80,7 +80,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/how-i-launched-an-email-course/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:03:20-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/relative-timestamps-in-rails/</loc>
@@ -102,7 +102,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:02:33-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/</loc>
@@ -126,7 +126,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:04:51-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/</loc>
@@ -136,7 +136,7 @@
         <loc>
             http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/
         </loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:07:43-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration/</loc>
@@ -154,7 +154,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/absolutes-as-an-antipattern/</loc>
@@ -162,7 +162,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/introducing-funneloptimizer-dot-io/</loc>
-        <lastmod>2014-11-16T06:36:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:03:46-05:00</lastmod>
     </url>
     <url>
         <loc>
@@ -190,11 +190,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -206,19 +206,19 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2015-01-17T11:11:32-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -230,7 +230,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2015-01-17T11:08:35-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -238,6 +238,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2015-01-17T11:12:02-05:00</lastmod>
+        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
     </url>
 </urlset>
