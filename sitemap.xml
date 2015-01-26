@@ -168,7 +168,7 @@
         <loc>
             http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/
         </loc>
-        <lastmod>2015-01-17T10:57:40-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/</loc>
@@ -190,11 +190,11 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -206,19 +206,19 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -230,7 +230,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -238,6 +238,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2015-01-17T12:08:10-05:00</lastmod>
+        <lastmod>2015-01-26T09:30:15-05:00</lastmod>
     </url>
 </urlset>

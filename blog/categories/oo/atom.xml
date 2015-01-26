@@ -4,7 +4,7 @@
   <title><![CDATA[Category: oo | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/oo/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-01-17T12:10:13-05:00</updated>
+  <updated>2015-01-26T09:30:57-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -23,7 +23,7 @@
 
 
 
-<p>I recently had an experience using <code>has_secure_password</code> where I wanted control the length of the user-supplied password. Adding a length validation to the password accessor invalidated existing records, so I was in a bit of a bind. In the end, I sub-classed the Active Record model to create a unique model made specifically for that context. This allowed me to inherit the core functionality from the model and sprinkle on existing validations for specific use cases. This was a new tactic for me and I’m still now sure how I feel about it. I like the fact that it removed complexity from the <code>User</code> model. This, in hopes, will keep the minimize the likelihood of it becoming a God object.</p>
+<p>I recently had an experience using <code>has_secure_password</code> where I wanted control the length of the user-supplied password. Adding a length validation to the password accessor invalidated existing records, so I was in a bit of a bind. In the end, I sub-classed the Active Record model to create a unique model made specifically for that context. This allowed me to inherit the core functionality from the model and sprinkle on existing validations for specific use cases. This was a new tactic for me and I’m still not sure how I feel about it. I like the fact that it removed complexity from the <code>User</code> model. This, in hopes, will keep the minimize the likelihood of it becoming a God object.</p>
 
 
 
