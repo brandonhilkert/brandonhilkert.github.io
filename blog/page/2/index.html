@@ -156,6 +156,44 @@
   
 
 
+<time datetime="2014-06-10T20:03:00-04:00" data-updated="true" itemprop="datePublished">June 10<span>th</span>, 2014</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/using-rails-4-dot-1-secrets-for-configuration/" itemprop="url">Using Rails 4.1 Secrets for Configuration</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/config/'>config</a>, <a class='category' href='/blog/categories/env/'>env</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>I previously wrote about how I handle <a href="/blog/flexible-rails-environment-configuration/">environment configuration in Rails</a>. Along with solutions like the <a href="https://github.com/bkeepers/dotenv">dotenv gem</a>, it relies on entirely on environment variables.</p>
+
+<p>One of the highlighted features of Rails 4.1 was the <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml"><code>config/secrets.yml</code></a> file. By default, this file contains the <code>secret_key_base</code> and defers to the ENV variable of the same name in the production environment. Even though <code>secret_key_base</code> isn’t typically referenced explicitly in an application, I was curious if I could use the <code>config/secrets.yml</code> file in place of previously documented configuration solution.</p>
+
+
+		
+		<a href="/blog/using-rails-4-dot-1-secrets-for-configuration/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2014-05-27T20:08:00-04:00" data-updated="true" itemprop="datePublished">May 27<span>th</span>, 2014</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/" itemprop="url">7 Reasons I&#8217;m Sticking With Minitest and Fixtures in Rails</a></h1>
   <div class="tags">
@@ -509,44 +547,6 @@ including <strong>14 chapters of code</strong> and over 2 hours of screencasts</
 
 		
 		<a href="/blog/build-a-ruby-gem-technical-review/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-02-19T07:19:00-05:00" data-updated="true" itemprop="datePublished">February 19<span>th</span>, 2014</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/understanding-the-rails-cache-id-environment-variable/" itemprop="url">RAILS_CACHE_ID Rails Environment Variable</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/config/'>config</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>Last week, I was looking through my Twitter stream and came across a tweet that referenced <code>ENV[“RAILS_CACHE_ID”]</code>. I was unfamiliar with this environment variable and made a note to learn more.</p>
-
-<p>Rails 4 has made a discernible effort to improve view rendering performance by what they’re calling <a href="http://signalvnoise.com/posts/3690-the-performance-impact-of-russian-doll-caching">russian doll caching</a>. Prior to this, view caching was simple in syntax, but realistically more complicated when cached partials needed busting on subsequent releases.</p>
-
-
-		
-		<a href="/blog/understanding-the-rails-cache-id-environment-variable/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

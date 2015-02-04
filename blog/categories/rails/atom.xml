@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-01-26T09:30:57-05:00</updated>
+  <updated>2015-02-04T06:15:48-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,112 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
+    <link href="http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database/"/>
+    <updated>2015-02-04T06:13:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database</id>
+    <content type="html"><![CDATA[<p>It’s no mystery that <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
+
+<p>Most applications have ancillary data that’s required to support the main function of the application — think drop-downs with states for shipping or credit card type.</p>
+
+<!--more-->
+
+
+<p>This data is almost always never interesting, but completely necessary for the application to work as expected. So when it comes to time send your little baby to production, only to find your users can’t pay because they can’t pick their credit card type, your world comes crashing down.</p>
+
+<p>If you have those credit card types in fixtures from the start, loading them in to your development of production database is just a <code>rake</code> task away.</p>
+
+<h2>The Problem</h2>
+
+<p>Let’s assume our application requires us have a list of supported credit card types, and the user is required to pick from the list to pay for the awesome stuff we sell. A sample fixture might look like:</p>
+
+<p>```
+visa:
+  name: Visa</p>
+
+<p>mastercard:
+  name: Mastercard</p>
+
+<p>amex:
+  name: American Express
+```</p>
+
+<p>This is a somewhat trivial example because the <code>name</code> matches what one might expect in a potential transaction record if we had a <code>credit_card_type</code> field or something similar if we denormalized.</p>
+
+<p>Perhaps we have a field <code>credit_card_type_id</code> in a <code>transactions</code> table that references the foreign key of the related <code>CreditCardType</code> record.</p>
+
+<p>So how do we get these records in to our development and production databases?</p>
+
+<h2>The Solution</h2>
+
+<p>Fortunately, Rails has our backs. The following rake test is available from a default Rails application:</p>
+
+<p><code>
+$ bin/rake -T
+...
+rake db:fixtures:load # Load fixtures into the current environment's database
+</code></p>
+
+<p>The <code>db:fixtures:load</code> task is an interesting start, but quickly we realize it might be a little heavy-handed. If this application has users, we probably wouldn&rsquo;t want to copy them to production. They might, however, be a great starting pointing for development.</p>
+
+<p>So how do we handle getting trivial model data in to production for only specific models?</p>
+
+<p>It turns out that we can specify <strong>ONLY</strong> the models we want to load by using the <code>FIXTURES</code> environment variable:</p>
+
+<p><code>
+rake db:fixtures:load FIXTURES=credit_card_types
+</code></p>
+
+<p><em>Note: The name of the fixture file (usually the database table name) should be used as the value for <code>FIXTURES</code>, not the model name.</em></p>
+
+<p>With that single command, any environment we specify will immediately get the data for our 3 credit card types.</p>
+
+<p>A word of warning, if we run this command multiple times, it will seed the table multiple times. It&rsquo;s not idempotent.</p>
+
+<p>Additionally, if we wanted to load more than just a single fixture, we can specify the names of the files separated by commas:</p>
+
+<p><code>
+rake db:fixtures:load FIXTURES=credit_card_types,states,cities
+</code></p>
+
+<p>Let&rsquo;s take a quick look at how Rails implements this functionality, specifically the determination of single models:</p>
+
+<p>```
+fixtures_dir = if ENV[&lsquo;FIXTURES_DIR&rsquo;]</p>
+
+<pre><code>             File.join base_dir, ENV['FIXTURES_DIR']
+           else
+             base_dir
+           end
+</code></pre>
+
+<p>fixture_files = if ENV[&lsquo;FIXTURES&rsquo;]</p>
+
+<pre><code>              ENV['FIXTURES'].split(',')
+            else
+              # The use of String#[] here is to support namespaced fixtures
+              Dir["#{fixtures_dir}/**/*.yml"].map {|f| f[(fixtures_dir.size + 1)..-5] }
+            end
+</code></pre>
+
+<p>ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)
+```</p>
+
+<p>If the <code>FIXTURES</code> variable is present, code teases appart the model names and looks in the fixtures directory and loads the YAML fixture file for that table name.</p>
+
+<p>An interesting side note, it&rsquo;s possible to specify alternate directories for fixture using the <code>FIXTURES_DIR</code> variable. I personally haven taken advantage of this, but could be useful if you want to keep specific fixture files for production that might be different than those that reside in <code>test/fixtures/*</code>.</p>
+
+<p>I wouldn&rsquo;t suggesting using this approach for anything that needs to reference other foreign keys. When you&rsquo;re transferring to a different database, foreign keys will not match and your application will likely not work as expected.</p>
+
+<h2>Summary</h2>
+
+<p>This approach has saved me quite a bit of time in my last few applications. Build it once, use it everywhere. As mentioned above, using this approach to seed database records  with a foreign key should be avoided.</p>
+
+<p>Most applications have a number of tasks needed for a developer to get up and running. Combining fixture data with additional seed data placed in <code>db/seeds.rb</code> can give you the best of both worlds, while still ensuring you have robust data to test against.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
@@ -731,152 +837,6 @@ fred:
 <h2>Summary</h2>
 
 <p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Rails 4.1 Secrets for Configuration]]></title>
-    <link href="http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration/"/>
-    <updated>2014-06-10T20:03:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration</id>
-    <content type="html"><![CDATA[<p>I previously wrote about how I handle <a href="/blog/flexible-rails-environment-configuration/">environment configuration in Rails</a>. Along with solutions like the <a href="https://github.com/bkeepers/dotenv">dotenv gem</a>, it relies on entirely on environment variables.</p>
-
-<p>One of the highlighted features of Rails 4.1 was the <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml"><code>config/secrets.yml</code></a> file. By default, this file contains the <code>secret_key_base</code> and defers to the ENV variable of the same name in the production environment. Even though <code>secret_key_base</code> isn’t typically referenced explicitly in an application, I was curious if I could use the <code>config/secrets.yml</code> file in place of previously documented configuration solution.</p>
-
-<!--more-->
-
-
-<p>After a little digging, it turns out that it works perfectly. A valid question is whether the variables are better referenced through the <code>Rails.application</code> hash, but that’s probably more a preference and use-case dependent decision. Either way, we’ll explore the solution below.</p>
-
-<h2>The Question</h2>
-
-<p>Below is a default <code>config/secrets.yml</code> file generated from a Rails 4.1 app. As you can see, both the development and test environments rely on statically set values, where the production environment relies on environment variables being set on the system. The latter is perfect for platforms like <a href="https://www.heroku.com">Heroku</a>, and just as easy if you manage your own systems on EC2 or similar infrastructure.</p>
-
-<p>```
-development:
-  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8</p>
-
-<p>test:
-  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20</p>
-
-<h1>Do not keep production secrets in the repository,</h1>
-
-<h1>instead read values from the environment.</h1>
-
-<p>production:
-  secret_key_base: &lt;%= ENV[&ldquo;SECRET_KEY_BASE&rdquo;] %>
-```</p>
-
-<p>Notice how ERB is processed in the file. This gives us the opportunity to use Ruby to generate random strings, dates, or anything else that can be expressed through code.</p>
-
-<p>So can we use it for other configuration values in the application?</p>
-
-<h2>The Solution</h2>
-
-<p>In order to figure out where the output of the parsed secrets file was stored, I pulled the latest Rails changes and went code diving.</p>
-
-<p>The first thing I did was search “secrets”. The first group of results were mostly comments related to the processing of <code>secret_key_base</code> and where it could be found. After combing through a few more results, I came across the <code>Rails::Application</code> class.</p>
-
-<p>A static array at the top of the file seemed to hold some values for the application as shown below:</p>
-
-<p>```
-INITIAL_VARIABLES = [:config, :railties, :routes_reloader, :reloaders,</p>
-
-<pre><code>                    :routes, :helpers, :app_env_config, :secrets] # :nodoc:
-</code></pre>
-
-<p>```</p>
-
-<p>Looks like we’re on the right track. Going further down the file leads us to the getter:</p>
-
-<p>```
-def secrets #:nodoc:
-  @secrets ||= begin</p>
-
-<pre><code>secrets = ActiveSupport::OrderedOptions.new
-yaml = config.paths["config/secrets"].first
-
-if File.exist?(yaml)
-  require "erb"
-  all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
-  env_secrets = all_secrets[Rails.env]
-  secrets.merge!(env_secrets.symbolize_keys) if env_secrets
-end
-
-# Fallback to config.secret_key_base if secrets.secret_key_base isn't set
-secrets.secret_key_base ||= config.secret_key_base
-
-secrets
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>As you can see, the file path <code>config/secrets</code> is referenced as the <code>yaml</code> source:</p>
-
-<p><code>
-yaml = config.paths["config/secrets"].first
-</code></p>
-
-<p>and the result of reading the file is sent through ERB and YAML:</p>
-
-<p><code>
-all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
-</code></p>
-
-<p>The environment group is parsed:</p>
-
-<p><code>
-env_secrets = all_secrets[Rails.env]
-</code></p>
-
-<p>The result of the output is returned, leaving us with a hash of options based on the environment group. With a little luck we should be able to query the application from the console and get the configuration values.</p>
-
-<p><code>
-irb(main):001:0&gt; Rails.application.secrets.class
-=&gt; ActiveSupport::OrderedOptions
-irb(main):002:0&gt; Rails.application.secrets
-=&gt; {:secret_key_base=&gt;"9ac2d0ad8ebcc312090e99d745006d3cf8"}
-irb(main):003:0&gt; Rails.application.secrets.secret_key_base
-=&gt; "a1580ad61ccb6ac60f9f256948cf63d6e20"
-</code></p>
-
-<p>That’s great news because it means we can put other values in this file and reference them throughout our application using the parent hash <code>Rails.application.secrets</code>.</p>
-
-<p>For example, let’s assume we need to configuration Pusher URL again. We could add it to the <code>secrets.yml</code> file like so:</p>
-
-<p>```
-development:
-  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
-  pusher_url: <a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a></p>
-
-<p>test:
-  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20</p>
-
-<h1>Do not keep production secrets in the repository,</h1>
-
-<h1>instead read values from the environment.</h1>
-
-<p>production:
-  secret_key_base: &lt;%= ENV[&ldquo;SECRET_KEY_BASE&rdquo;] %>
-  pusher_url: &lt;%= ENV[&ldquo;PUSHER_URL&rdquo;] %>
-```</p>
-
-<p>Now within our application we can set the Pusher URL within the initializer using the secret value:</p>
-
-<p>```</p>
-
-<h1>config/initializers/pusher.rb</h1>
-
-<p>Pusher.url = Rails.application.secrets.pusher_url
-```</p>
-
-<h2>Summary</h2>
-
-<p>I feel like my previous solution has the potential to be replaced with the secrets file. I plan to try it out in an upcoming application and see if it’s as easy to manage as it seems.</p>
-
-<p>Note that by default, the <code>secrets.yml</code> file is NOT ignored by git. If you plan to include passwords or other sensitive data in the file, be sure to add it to your <code>.gitignore</code>.</p>
 ]]></content>
   </entry>
   

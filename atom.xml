@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-01-26T09:30:57-05:00</updated>
+  <updated>2015-02-04T06:15:48-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,103 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
+    <link href="http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database/"/>
+    <updated>2015-02-04T06:13:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database</id>
+    <content type="html"><![CDATA[<p>It’s no mystery that <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
+
+<p>Most applications have ancillary data that’s required to support the main function of the application — think drop-downs with states for shipping or credit card type.</p>
+
+<!--more-->
+
+
+<p>This data is almost always never interesting, but completely necessary for the application to work as expected. So when it comes to time send your little baby to production, only to find your users can’t pay because they can’t pick their credit card type, your world comes crashing down.</p>
+
+<p>If you have those credit card types in fixtures from the start, loading them in to your development of production database is just a <code>rake</code> task away.</p>
+
+<h2>The Problem</h2>
+
+<p>Let’s assume our application requires us have a list of supported credit card types, and the user is required to pick from the list to pay for the awesome stuff we sell. A sample fixture might look like:</p>
+
+<figure class='code'><pre><code>visa:
+  name: Visa
+
+mastercard:
+  name: Mastercard
+
+amex:
+  name: American Express</code></pre></figure>
+
+
+<p>This is a somewhat trivial example because the <code>name</code> matches what one might expect in a potential transaction record if we had a <code>credit_card_type</code> field or something similar if we denormalized.</p>
+
+<p>Perhaps we have a field <code>credit_card_type_id</code> in a <code>transactions</code> table that references the foreign key of the related <code>CreditCardType</code> record.</p>
+
+<p>So how do we get these records in to our development and production databases?</p>
+
+<h2>The Solution</h2>
+
+<p>Fortunately, Rails has our backs. The following rake test is available from a default Rails application:</p>
+
+<figure class='code'><pre><code>$ bin/rake -T
+...
+rake db:fixtures:load # Load fixtures into the current environment's database</code></pre></figure>
+
+
+<p>The <code>db:fixtures:load</code> task is an interesting start, but quickly we realize it might be a little heavy-handed. If this application has users, we probably wouldn&rsquo;t want to copy them to production. They might, however, be a great starting pointing for development.</p>
+
+<p>So how do we handle getting trivial model data in to production for only specific models?</p>
+
+<p>It turns out that we can specify <strong>ONLY</strong> the models we want to load by using the <code>FIXTURES</code> environment variable:</p>
+
+<figure class='code'><pre><code>rake db:fixtures:load FIXTURES=credit_card_types</code></pre></figure>
+
+
+<p><em>Note: The name of the fixture file (usually the database table name) should be used as the value for <code>FIXTURES</code>, not the model name.</em></p>
+
+<p>With that single command, any environment we specify will immediately get the data for our 3 credit card types.</p>
+
+<p>A word of warning, if we run this command multiple times, it will seed the table multiple times. It&rsquo;s not idempotent.</p>
+
+<p>Additionally, if we wanted to load more than just a single fixture, we can specify the names of the files separated by commas:</p>
+
+<figure class='code'><pre><code>rake db:fixtures:load FIXTURES=credit_card_types,states,cities</code></pre></figure>
+
+
+<p>Let&rsquo;s take a quick look at how Rails implements this functionality, specifically the determination of single models:</p>
+
+<figure class='code'><pre><code>fixtures_dir = if ENV['FIXTURES_DIR']
+                 File.join base_dir, ENV['FIXTURES_DIR']
+               else
+                 base_dir
+               end
+
+fixture_files = if ENV['FIXTURES']
+                  ENV['FIXTURES'].split(',')
+                else
+                  # The use of String#[] here is to support namespaced fixtures
+                  Dir["#{fixtures_dir}/**/*.yml"].map {|f| f[(fixtures_dir.size + 1)..-5] }
+                end
+
+ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)</code></pre></figure>
+
+
+<p>If the <code>FIXTURES</code> variable is present, code teases appart the model names and looks in the fixtures directory and loads the YAML fixture file for that table name.</p>
+
+<p>An interesting side note, it&rsquo;s possible to specify alternate directories for fixture using the <code>FIXTURES_DIR</code> variable. I personally haven taken advantage of this, but could be useful if you want to keep specific fixture files for production that might be different than those that reside in <code>test/fixtures/*</code>.</p>
+
+<p>I wouldn&rsquo;t suggesting using this approach for anything that needs to reference other foreign keys. When you&rsquo;re transferring to a different database, foreign keys will not match and your application will likely not work as expected.</p>
+
+<h2>Summary</h2>
+
+<p>This approach has saved me quite a bit of time in my last few applications. Build it once, use it everywhere. As mentioned above, using this approach to seed database records  with a foreign key should be avoided.</p>
+
+<p>Most applications have a number of tasks needed for a developer to get up and running. Combining fixture data with additional seed data placed in <code>db/seeds.rb</code> can give you the best of both worlds, while still ensuring you have robust data to test against.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[2014 In Review]]></title>
@@ -2939,210 +3036,6 @@ including <strong>14 chapters of code</strong> and over 2 hours of screencasts</
 <p>Looking back on the items mentioned above, I’m really excited to be nearing the home stretch and finally get it in to your hands.</p>
 
 <p>Hope you had a great past couple of weeks. Talk to you soon.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[RAILS_CACHE_ID Rails Environment Variable]]></title>
-    <link href="http://brandonhilkert.com/blog/understanding-the-rails-cache-id-environment-variable/"/>
-    <updated>2014-02-19T07:19:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/understanding-the-rails-cache-id-environment-variable</id>
-    <content type="html"><![CDATA[<p>Last week, I was looking through my Twitter stream and came across a tweet that referenced <code>ENV[“RAILS_CACHE_ID”]</code>. I was unfamiliar with this environment variable and made a note to learn more.</p>
-
-<p>Rails 4 has made a discernible effort to improve view rendering performance by what they’re calling <a href="http://signalvnoise.com/posts/3690-the-performance-impact-of-russian-doll-caching">russian doll caching</a>. Prior to this, view caching was simple in syntax, but realistically more complicated when cached partials needed busting on subsequent releases.</p>
-
-<!--more-->
-
-
-<p>I didn’t know if this environmental variable had anything to do with Rails 4 caching, so I went digging…</p>
-
-<p>The first thing I did was <code>git clone</code> the Rails source code and look for that variable. Outside of the documentation and tests, it showed up in one place, <code>activesupport/lib/active_support/cache.rb</code>:</p>
-
-<pre><code># Expands out the +key+ argument into a key that can be used for the
-# cache store. Optionally accepts a namespace, and all keys will be
-# scoped within that namespace.
-#
-# If the +key+ argument provided is an array, or responds to +to_a+, then
-# each of elements in the array will be turned into parameters/keys and
-# concatenated into a single key. For example:
-#
-#   expand_cache_key([:foo, :bar])               # =&gt; "foo/bar"
-#   expand_cache_key([:foo, :bar], "namespace")  # =&gt; "namespace/foo/bar"
-#
-# The +key+ argument can also respond to +cache_key+ or +to_param+.
-
-def expand_cache_key(key, namespace = nil)
-  expanded_cache_key = namespace ? "#{namespace}/" : ""
-
-  if prefix = ENV["RAILS_CACHE_ID"] || ENV["RAILS_APP_VERSION"]
-    expanded_cache_key &lt;&lt; "#{prefix}/"
-  end
-
-  expanded_cache_key &lt;&lt; retrieve_cache_key(key)
-  expanded_cache_key
-end
-</code></pre>
-
-<p>The comments preceding the method do a good job telling the whole story. The <code>expanded_cache_key</code> variable is an array built up from the <code>key</code> argument. The <code>RAILS_CACHE_ID</code> environment variable is prefaced to this array, operating similar to a namespace.</p>
-
-<p>With these assumptions in mind, let’s see if we prove for sure. I’ll generate a new Rails 4 app:</p>
-
-<pre><code>$ rails new cache_test
-</code></pre>
-
-<p>We’ll be inspecting model objects, so let’s generate a fake blog model:</p>
-
-<pre><code>$ rails g scaffold post title content:text
-</code></pre>
-
-<p>Migrate the database to get current:</p>
-
-<pre><code>$ bin/rake db:migrate
-</code></pre>
-
-<p>I’ll create a new <code>Post</code> and take a look at the default <code>cache_key</code>:</p>
-
-<pre><code>$ rails c
-&gt; p = Post.create
-&gt; p.cache_key # =&gt; "posts/1-20140206201702645196000"
-</code></pre>
-
-<p>Let’s set the <code>RAILS_CACHE_ID</code> and look at the <code>cache_key</code> of this record again:</p>
-
-<pre><code>$ export RAILS_CACHE_ID=octopus
-$ rails c
-&gt; p = Post.create
-&gt; p.cache_key # =&gt; "posts/1-20140206201702645196000"
-</code></pre>
-
-<p>Hmmm…same thing. Referring back to the Rails course code above, it turns out that not all cache writes use the <code>expand_cache_key</code> method. Searching around the Rails code for <code>expand_cache_key</code>, we find the following results:</p>
-
-<pre><code>ActionController::Caching::Fragments#fragment_cache_key
-ActionDispatch::Http::Cache::Response#etag=
-</code></pre>
-
-<p>From the looks of it, it only applies to fragment caching and manually setting ETAG headers for HTTP responses, so let’s dig in to those.</p>
-
-<h2>Fragment Caching</h2>
-
-<p>I can cache the post fragment by wrapping it in a <code>cache</code> block:</p>
-
-<pre><code>&lt;% app/views/posts/show.html.erb %&gt;
-&lt;%= cache(@post) do %&gt;
-  &lt;p&gt;
-    &lt;strong&gt;Title:&lt;/strong&gt;
-    &lt;%= @post.title %&gt;
-  &lt;/p&gt;
-
-  &lt;p&gt;
-    &lt;strong&gt;Content:&lt;/strong&gt;
-    &lt;%= @post.content %&gt;
-  &lt;/p&gt;
-&lt;% end %&gt;
-</code></pre>
-
-<p>Run the server and make a request to <code>http://localhost:3000/posts/1</code>.</p>
-
-<pre><code>Started GET "/posts/1" for 127.0.0.1 at 2014-02-06 16:16:04 -0500
-  ActiveRecord::SchemaMigration Load (0.2ms)  SELECT "schema_migrations".* FROM "schema_migrations"
-Processing by PostsController#show as HTML
-  Parameters: {"id"=&gt;"1"}
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", "1"]]
-Cache digest for posts/show.html: c39e6bde261c006ffe9ddf27fb9d5318
-Read fragment views/octopus/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (0.2ms)
-Write fragment views/octopus/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (1.6ms)
-  Rendered posts/show.html.erb within layouts/application (11.0ms)
-</code></pre>
-
-<p><em>Note: Make sure <code>config.action_controller.perform_caching</code> is set to <code>true</code> in <code>config/environments/development.rb</code> (it’s <code>false</code> by default), otherwise caching is disabled.</em></p>
-
-<p>There it is! It wrote out the key <code>views/octopus/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318</code>. Let’s change the environmental variable and see if it adjusts accordingly:</p>
-
-<pre><code>$ export RAILS_CACHE_ID=shark
-</code></pre>
-
-<p>Restart the Rails server and again, request <code>http://localhost:3000/posts/1</code>:</p>
-
-<pre><code>Started GET "/posts/1" for 127.0.0.1 at 2014-02-06 16:35:33 -0500
-  ActiveRecord::SchemaMigration Load (0.1ms)  SELECT "schema_migrations".* FROM "schema_migrations"
-Processing by PostsController#show as HTML
-  Parameters: {"id"=&gt;"1"}
-  Post Load (0.2ms)  SELECT "posts".* FROM "posts" WHERE "posts"."id" = ? LIMIT 1  [["id", "1"]]
-Cache digest for posts/show.html: c39e6bde261c006ffe9ddf27fb9d5318
-Read fragment views/shark/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (0.3ms)
-Write fragment views/shark/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318 (1.5ms)
-  Rendered posts/show.html.erb within layouts/application (11.1ms)
-Completed 200 OK in 82ms (Views: 62.7ms | ActiveRecord: 0.5ms)
-</code></pre>
-
-<p>Sure enough…the key <code>views/shark/posts/1-20140206210721854446000/c39e6bde261c006ffe9ddf27fb9d5318</code> was used this time.</p>
-
-<h2>Etags</h2>
-
-<p>Etags are a value added to the HTTP headers that allow a browser to determine whether the content for a particular piece of content should be refreshed or not. If not, the server returns a <code>304</code> HTTP code and the browser uses the cached response from a previous request.</p>
-
-<p>Rails provides two controller helper methods to help determine whether the content should be refreshed: <code>fresh_when</code> and <code>stale?</code>. The <a href="http://guides.rubyonrails.org/caching_with_rails.html#conditional-get-support">Rails guides</a> provide a decent explanation of these methods and when to use them.</p>
-
-<p>Jumping in to the <code>PostsController</code>, let’s use the <code>fresh_when</code> method in the <code>show</code> action:</p>
-
-<pre><code>class PostsController &lt; ApplicationController
-
-  def show
-    @post = Post.find(params[:id])
-    fresh_when(@post)
-  end
-
-end
-</code></pre>
-
-<p>Now, when we request the <code>show</code> page for that post, we get an Etag back in the header response of <code>9c754ae292618570ec43cae8e03a0b13</code>. That doesn’t look very familiar, huh?</p>
-
-<p>It turns out that the Etag is generated using the following method:</p>
-
-<pre><code>Digest::MD5.hexadigest(key)
-</code></pre>
-
-<p>But the key is more than just the <code>cache_key</code> of the <code>@post</code>. If we refer back to where the <code>expand_cache_key</code> method was used, we see that when the <code>etag</code> attribute is set on the response, the key is expanded using the <code>ActiveSupport::Cache#expand_cache_key</code> method we looked at above:</p>
-
-<pre><code> def etag=(etag)
-   key = ActiveSupport::Cache.expand_cache_key(etag)
-   @etag = self[ETAG] = %("#{Digest::MD5.hexdigest(key)}")
- end
-</code></pre>
-
-<p>Let’s stop the server and reset the <code>ENV[“RAILS_CACHE_ID”]</code>:</p>
-
-<pre><code>$ export RAILS_CACHE_ID=whale
-</code></pre>
-
-<p>Running the same request, we get an Etag of <code>b389da68ca1b25986edecf349fcf63e6</code>. So as you can see, by updating <code>ENV[“RAILS_CACHE_ID”]</code> alone, we get a different Etag in the response without changing the <code>post</code> object itself, which means we can invalidate our browser cache by updating this environmental variable.</p>
-
-<p>I, personally, deploy to Heroku most of the time and it’d be nice to be able take advantage of browser caching in this manner, but also know when a new deploy is released. <a href="http://ninjasandrobots.com/rails-caching-a-problem-with-etags-and-a-solution">This article</a> describes a solution that integrates Heroku’s numbered releases.</p>
-
-<p>However, we know that Heroku uses git to get the source code of the appellation to the application container, so why not leverage git commit IDs for <code>ENV[“RAILS_CACHE_ID”]</code>.</p>
-
-<p><code>git log</code> is a command to look at….well, git logs!. With a few additional options, we can get a shortened version of the commit SHA:</p>
-
-<pre><code>$ git log --pretty=format:%h -n1
-40ad584
-</code></pre>
-
-<p><strong>Combining the git commit SHA gives us the perfect opportunity to invalidate browser cache</strong>. If the Etag is different because a different git commit SHA is the most recent on the server, we know there’s a potential the HTML rendered and cached in the browser could be outdated. We can implement this by setting the ENV variable in <code>config/application.rb</code>:</p>
-
-<pre><code>ENV['RAILS_CACHE_ID'] = `git log --pretty=format:%h -n1`.strip
-</code></pre>
-
-<p>Now, when a request is made we get an Etag of <code>6d80b6397347f8de1b8718e7fd9f90e1</code>. And if we add an empty commit and re-request the post, we get an Etag of <code>6dcc66ddf83613dd0c46406a1e983b38</code>.</p>
-
-<p>Hooray! <strong>A browser caching strategy for HTML content that’s dependent on the git release</strong>.</p>
-
-<h2>Summary</h2>
-
-<p>Before Rails 4, it was common to use a version number in the view <code>cache</code> method so that when you changed a encompassed view template, the cache would bust and the changes would be shown. However, now that <code>cache_digests</code> are part of Rails 4, the contents of the template block is evaluated and an MD5 string is created from the contents (the latter part of the cache key &ndash; <code>c39e6bde261c006ffe9ddf27fb9d5318</code> in the last example). This ensures that whenever the contents of the view template are changed, the cache is busted and the new template is properly stored and rendered.</p>
-
-<p>Given the <code>cache_key</code> of fragment caching is dependent on the contents of the template, I have trouble finding value in setting the <code>RAILS_CACHE_ID</code> environmental variable for fragment caching alone.</p>
-
-<p>Alternatively, the use case for using <code>ENV[“RAILS_CACHE_ID”]</code> to control browser caching can be a tremendous asset when the content of the body response is not considered. Caching strategies can be difficult to reason about and hopefully this gives you another tool in the toolbox to make parts of your Rails applications more performant.</p>
 ]]></content>
   </entry>
   

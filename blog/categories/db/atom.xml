@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: db | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/db/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2015-02-04T06:15:48-05:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
+    <link href="http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database/"/>
+    <updated>2015-02-04T06:13:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database</id>
+    <content type="html"><![CDATA[<p>It’s no mystery that <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
+
+<p>Most applications have ancillary data that’s required to support the main function of the application — think drop-downs with states for shipping or credit card type.</p>
+
+<!--more-->
+
+
+<p>This data is almost always never interesting, but completely necessary for the application to work as expected. So when it comes to time send your little baby to production, only to find your users can’t pay because they can’t pick their credit card type, your world comes crashing down.</p>
+
+<p>If you have those credit card types in fixtures from the start, loading them in to your development of production database is just a <code>rake</code> task away.</p>
+
+<h2>The Problem</h2>
+
+<p>Let’s assume our application requires us have a list of supported credit card types, and the user is required to pick from the list to pay for the awesome stuff we sell. A sample fixture might look like:</p>
+
+<p>```
+visa:
+  name: Visa</p>
+
+<p>mastercard:
+  name: Mastercard</p>
+
+<p>amex:
+  name: American Express
+```</p>
+
+<p>This is a somewhat trivial example because the <code>name</code> matches what one might expect in a potential transaction record if we had a <code>credit_card_type</code> field or something similar if we denormalized.</p>
+
+<p>Perhaps we have a field <code>credit_card_type_id</code> in a <code>transactions</code> table that references the foreign key of the related <code>CreditCardType</code> record.</p>
+
+<p>So how do we get these records in to our development and production databases?</p>
+
+<h2>The Solution</h2>
+
+<p>Fortunately, Rails has our backs. The following rake test is available from a default Rails application:</p>
+
+<p><code>
+$ bin/rake -T
+...
+rake db:fixtures:load # Load fixtures into the current environment's database
+</code></p>
+
+<p>The <code>db:fixtures:load</code> task is an interesting start, but quickly we realize it might be a little heavy-handed. If this application has users, we probably wouldn&rsquo;t want to copy them to production. They might, however, be a great starting pointing for development.</p>
+
+<p>So how do we handle getting trivial model data in to production for only specific models?</p>
+
+<p>It turns out that we can specify <strong>ONLY</strong> the models we want to load by using the <code>FIXTURES</code> environment variable:</p>
+
+<p><code>
+rake db:fixtures:load FIXTURES=credit_card_types
+</code></p>
+
+<p><em>Note: The name of the fixture file (usually the database table name) should be used as the value for <code>FIXTURES</code>, not the model name.</em></p>
+
+<p>With that single command, any environment we specify will immediately get the data for our 3 credit card types.</p>
+
+<p>A word of warning, if we run this command multiple times, it will seed the table multiple times. It&rsquo;s not idempotent.</p>
+
+<p>Additionally, if we wanted to load more than just a single fixture, we can specify the names of the files separated by commas:</p>
+
+<p><code>
+rake db:fixtures:load FIXTURES=credit_card_types,states,cities
+</code></p>
+
+<p>Let&rsquo;s take a quick look at how Rails implements this functionality, specifically the determination of single models:</p>
+
+<p>```
+fixtures_dir = if ENV[&lsquo;FIXTURES_DIR&rsquo;]</p>
+
+<pre><code>             File.join base_dir, ENV['FIXTURES_DIR']
+           else
+             base_dir
+           end
+</code></pre>
+
+<p>fixture_files = if ENV[&lsquo;FIXTURES&rsquo;]</p>
+
+<pre><code>              ENV['FIXTURES'].split(',')
+            else
+              # The use of String#[] here is to support namespaced fixtures
+              Dir["#{fixtures_dir}/**/*.yml"].map {|f| f[(fixtures_dir.size + 1)..-5] }
+            end
+</code></pre>
+
+<p>ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)
+```</p>
+
+<p>If the <code>FIXTURES</code> variable is present, code teases appart the model names and looks in the fixtures directory and loads the YAML fixture file for that table name.</p>
+
+<p>An interesting side note, it&rsquo;s possible to specify alternate directories for fixture using the <code>FIXTURES_DIR</code> variable. I personally haven taken advantage of this, but could be useful if you want to keep specific fixture files for production that might be different than those that reside in <code>test/fixtures/*</code>.</p>
+
+<p>I wouldn&rsquo;t suggesting using this approach for anything that needs to reference other foreign keys. When you&rsquo;re transferring to a different database, foreign keys will not match and your application will likely not work as expected.</p>
+
+<h2>Summary</h2>
+
+<p>This approach has saved me quite a bit of time in my last few applications. Build it once, use it everywhere. As mentioned above, using this approach to seed database records  with a foreign key should be avoided.</p>
+
+<p>Most applications have a number of tasks needed for a developer to get up and running. Combining fixture data with additional seed data placed in <code>db/seeds.rb</code> can give you the best of both worlds, while still ensuring you have robust data to test against.</p>
+]]></content>
+  </entry>
+  
+</feed>
