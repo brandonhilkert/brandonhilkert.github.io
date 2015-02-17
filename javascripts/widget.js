@@ -43,4 +43,3 @@ $(document).ready(function(){
   Widget.init();
   ga('send', 'event', 'widget-newsletter', 'viewed');
 });
-
