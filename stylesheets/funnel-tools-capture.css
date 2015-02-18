@@ -1,0 +1,159 @@
+#funnel-tools-capture {
+  background-color: rgba(0, 0, 0, 0.9);
+  font-size: 16px;
+  font-family: sans-serif;
+  color: white;
+  padding: 10px 20px;
+  width: 300px;
+  right: 40px;
+  position: fixed;
+  z-index: 1001;
+  cursor: pointer;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+  -webkit-border-top-left-radius: 2px;
+  -webkit-border-top-right-radius: 2px;
+  -moz-border-top-left-radius: 2px;
+  -moz-border-top-right-radius: 2px;
+  -webkit-animation-duration: 1s;
+  animation-duration: 1s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+@media screen and (max-width: 425px){
+  #funnel-tools-capture {
+    right: 1%;
+    left: 1%;
+    width: 88%;
+  }
+}
+
+#funnel-tools-capture .close,
+#funnel-tools-capture .open {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+#funnel-tools-capture .open {
+  display: block;
+}
+#funnel-tools-capture .title {
+  margin-bottom: 20px;
+}
+#funnel-tools-capture .description {
+  font-size: 14px;
+  color: lightgrey;
+}
+#funnel-tools-capture p {
+  margin-bottom: 10px;
+}
+#funnel-tools-capture input[type="email"],
+#funnel-tools-capture input[type="submit"] {
+  width: 100%;
+  margin: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+#funnel-tools-capture input[type="email"] {
+  color: #999;
+  border: 0;
+  border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  padding: 10px;
+  font-size: 14px;
+}
+#funnel-tools-capture input[type="submit"] {
+  margin: 10px 0;
+  padding: 10px;
+  border: 0;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  font-size: 16px;
+  -webkit-appearance: none;
+  vertical-align: bottom;
+  background: #439fe0;
+  color: white;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+  border-bottom: 2px solid #194ba3;
+  cursor: pointer;
+}
+#funnel-tools-capture input[type="submit"]:hover {
+  background: #2690db;
+}
+@-webkit-keyframes bounceInUp {
+  0%, 60%, 75%, 90%, 100% {
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  }
+
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 3000px, 0);
+    transform: translate3d(0, 3000px, 0);
+  }
+
+  60% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, -20px, 0);
+  }
+
+  75% {
+    -webkit-transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 10px, 0);
+  }
+
+  90% {
+    -webkit-transform: translate3d(0, -5px, 0);
+    transform: translate3d(0, -5px, 0);
+  }
+
+  100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes bounceInUp {
+  0%, 60%, 75%, 90%, 100% {
+    -webkit-transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  }
+
+  0% {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 3000px, 0);
+    transform: translate3d(0, 3000px, 0);
+  }
+
+  60% {
+    opacity: 1;
+    -webkit-transform: translate3d(0, -20px, 0);
+    transform: translate3d(0, -20px, 0);
+  }
+
+  75% {
+    -webkit-transform: translate3d(0, 10px, 0);
+    transform: translate3d(0, 10px, 0);
+  }
+
+  90% {
+    -webkit-transform: translate3d(0, -5px, 0);
+    transform: translate3d(0, -5px, 0);
+  }
+
+  100% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.bounceInUp {
+  -webkit-animation-name: bounceInUp;
+  animation-name: bounceInUp;
+}
+
