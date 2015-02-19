@@ -15,7 +15,7 @@ h2 {
 }
 
 .capture .values {
-  background-image: url('../capture/img/capture-bg.jpg');
+  background-image: url('../capture/img/bg.jpg');
 }
 
 .target .button,
@@ -26,7 +26,18 @@ h2 {
 }
 
 .target .values {
-  background-image: url('../target/img/target-bg.jpg');
+  background-image: url('../target/img/bg.jpg');
+}
+
+.funnel .button,
+.funnel .pricing h5,
+.funnel .headshot img {
+  background-color: rgb(213, 134, 42) !important;
+  border-color: rgb(213, 134, 42) !important;
+}
+
+.funnel .values {
+  background-image: url('../funnel/img/bg.jpg');
 }
 
 .striped {

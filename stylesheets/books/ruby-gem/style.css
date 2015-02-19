@@ -542,8 +542,13 @@ abbr { text-transform: none; }
   color:#737373;
 }
 
-#newsletter input[type="email"] {
+#newsletter .email-input-container {
+  display: inline-block;
   width: 50%;
+}
+
+#newsletter input[type="email"] {
+  width: 100%;
 }
 
 input[type="email"] {
@@ -584,6 +589,10 @@ input[type="submit"] {
 }
 
 @media screen and (max-width: 1005px) {
+  .email-input-container {
+    width: 100% !important;
+  }
+
   input {
     width: 100% !important;
     margin-left: 0 !important;
