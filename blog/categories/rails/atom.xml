@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-02-24T20:43:31-05:00</updated>
+  <updated>2015-02-26T06:19:27-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,200 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
+    <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
+    <updated>2015-02-24T20:46:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
+    <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
+
+<p>While Stripe does provide a number of features and plugins that make updating a credit card or signing up for a service simple, there are occasions when data needs to be fetched from Stripe in real-time. For these cases, it&rsquo;s great to be able to fetch and cache this data before-hand, and only expire if you know there&rsquo;s been a change.</p>
+
+<!--more-->
+
+
+<p>Combining <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> with Rails cache allows you to cache Stripe customer data so that billing pages are just as snappy as the rest of the application.</p>
+
+<h2>The Pain</h2>
+
+<p>Even though Stripe is generally pretty fast, retrieving customer data on the fly can be expensive. In order to optimize page load times, we can look to cache this data before it&rsquo;s actually used.</p>
+
+<p>If you&rsquo;re familiary with the Stripe gem, you&rsquo;ve probably seen something like this:</p>
+
+<p><code>
+customer = Stripe::Customer.retrieve(user.stripe_id)
+</code></p>
+
+<p>With the response of <code>customer</code>, we can further query customer data with the following methods:</p>
+
+<p><code>
+invoices = customer.invoices
+upcoming_invoices = customer.upcoming_invoices
+</code></p>
+
+<p>If we make all 3 of these method calls on page load, we&rsquo;d have 3 separate lookups from Stripe. This is pretty common for the typical billing page where you might want to show the customer&rsquo;s current credit card on file, their past invoices, and charges they can expect for the next invoice.</p>
+
+<p>Three lookups like this could potentially add another second or so to page load, which is not ideal.</p>
+
+<p>So how can we improve this?</p>
+
+<h2>The Solution</h2>
+
+<p>First, we can move the code to fetch the relevant stripe data in to a class of it&rsquo;s own, which wraps the notion of caching around the data retrieval.</p>
+
+<p>```
+class StripeCache
+  def initialize(user)</p>
+
+<pre><code>@user = user
+</code></pre>
+
+<p>  end</p>
+
+<p>  def refresh</p>
+
+<pre><code>purge_all
+cache_all
+self
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>return @customer if @customer
+
+@customer = Rails.cache.fetch(cache_key("customer"), expires: 15.minutes) do
+  Stripe::Customer.retrieve(user.stripe_id)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>Rails.cache.fetch(cache_key("invoices"), expires: 15.minutes) do
+  customer.invoices
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>Rails.cache.fetch(cache_key("upcoming_invoice"), expires: 15.minutes) do
+  customer.upcoming_invoice
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :user</p>
+
+<p>  def cache_all</p>
+
+<pre><code>customer
+invoices
+upcoming_invoice
+</code></pre>
+
+<p>  end</p>
+
+<p>  def purge_all</p>
+
+<pre><code>Rails.cache.delete_matched("stripe")
+</code></pre>
+
+<p>  end</p>
+
+<p>  def cache_key(item)</p>
+
+<pre><code>"user/#{user.id}/stripe/#{item}"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To use this on a billing page, we could do:</p>
+
+<p><code>
+stripe = StripeCache.new(current_user).refresh
+</code></p>
+
+<p>And from the response of that class, we could access the <code>customer</code>, <code>invoices</code>, and <code>upcoming_invoice</code> respectively:</p>
+
+<p><code>
+@customer = stripe.customer
+@invoices = stripe.invoices
+@upcoming_invoice = stripe.invoices
+</code></p>
+
+<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
+
+<p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
+
+<p>But let&rsquo;s be honest, what users are going to the billing page multiple times during a session? Probably not many. So we still need to fix the initial load somehow.</p>
+
+<p>This is where <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> comes in. Like other Ruby background processing libraries, Sucker Punch allows you to move the processing of code to the background. However, unlike the others, Sucker Punch doesn&rsquo;t require additional infrastructure like Redis, and doesn&rsquo;t require a separate worker process to monitor and execute enqueued jobs. Because of this, the time it takes to extract code to a Sucker Punch job and have it incorporated with your application code is much lower.</p>
+
+<p>In this case, rather than send a transactional email or perform some database calculation, we can write a job thats only responsibility is to run the Stripe caching code.</p>
+
+<p>```
+class StripeCacheJob
+  include SuckerPunch::Job</p>
+
+<p>  def perform(user)</p>
+
+<pre><code>StripeCache.new(user).refresh
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The next question is, when do you run this?</p>
+
+<p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
+
+<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
+
+<p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
+
+<p>```
+module Accounts
+  class CardsController &lt; ApplicationController</p>
+
+<pre><code>before_action :require_authentication
+
+def create
+  cust = StripeCache.new(current_user).customer
+  cust.save(card: params[:stripeToken])
+
+  StripeCacheJob.new.async.perform(current_user)
+
+  redirect_to account_path, notice: t("card.update.success")
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>Summary</h2>
+
+<p>Using Sucker Punch in combination with Rails cache feels like a great way make optimizations to third-party data requests. This article focused on using it to fetch Stripe data, but it could be used with another service just as easily.</p>
+
+<p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
+
+<p>Sucker Punch excels at background jobs that are relatively fast and if missed, wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost, it&rsquo;s not the end of the world. At worse, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
+
+<p>What other jobs have you used Sucker Punch for?</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
@@ -676,167 +870,6 @@ end
 <p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
 
 <p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://www.sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Minitest Helper Includes and Rails Fixtures]]></title>
-    <link href="http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/"/>
-    <updated>2014-06-25T06:10:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures</id>
-    <content type="html"><![CDATA[<p>Contuining my <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">love affair with Minitest and fixtures</a>, I wanted to dive in to something deeper this time. Switching tools takes time to get used to and managing passwords was one of the bigger headaches I encountered.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p>I wanted to use <a href="https://github.com/jnicklas/capybara">Capybara</a> for integration testing. The application uses the standard email/password combo to authenticate users via <a href="http://api.rubyonrails.org/classes/ActiveModel/SecurePassword/ClassMethods.html#method-i-has_secure_password"><code>has_secure_password</code></a>.</p>
-
-<p>Because plain text passwords are not stored in the database, but rather a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L112"><code>password_digest</code></a>, I didn’t have a good way to fill in the login forms using Capybara to test against pages that require authentication.</p>
-
-<h2>The Solution</h2>
-
-<p>I started with a simple <code>users.yml</code> fixture that looked like this:</p>
-
-<p><code>
-fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  title: CEO
-  company: flintstone
-  admin: true
-</code></p>
-
-<h3>Bcrypt</h3>
-
-<p>As mentioned above, <code>has_secure_password</code> uses <code>Bcrypt</code> to encrypt the plain text passwords provided. The specific implementation to create the password digest is:</p>
-
-<p><code>
-BCrypt::Password.create("password", cost: 4)
-</code></p>
-
-<p>This method takes the plain text password (“password”) and encrypts it with what it calls the “cost”. It’s not terribly important for this article, but to save some speed, I’ve specified a cost of 4 — <a href="https://github.com/codahale/bcrypt-ruby/blob/master/lib/bcrypt/engine.rb#L7">the minimum cost support by the <code>Bcrypt</code> algorithm</a>. The default is 10, which will make your production applications safer. However, for testing, we don’t care.</p>
-
-<p>The result of the method above looks like this:</p>
-
-<p><code>
-irb(main):001:0&gt; require "bcrypt"
-=&gt; true
-irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
-=&gt; "$2a$04$gw09FM67MDnzduXmlK46BOsdVTtzWKaSIkAdmnF/sJSLgcQhJBAUe"
-</code></p>
-
-<p>That output value is what’s being stored in our database when a user inputs and saves a password. From the application’s standpoint, we could print a value like this in to our fixtures, but what’s the fun in that?!?!</p>
-
-<h3>ERB in Fixtures</h3>
-
-<p>Since fixtures allow us to use ERB in them, we could provide the <code>Bcrypt</code> method above to produce the password digest like so:</p>
-
-<p><code>
-fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  password_digest: &lt;%= BCrypt::Password.create("password", cost: 4) %&gt;
-  title: CEO
-  company: flintstone
-  admin: true
-</code></p>
-
-<p>The downside is that the actual password (“password”) is here in plain text. To fill in our login form using Capybara, we don’t have a variable to access to the get the password — we literally have to type “password”. So this isn’t the most DRY thing in the world. While it would certainly work, I think we can do better…</p>
-
-<h3>Capybara</h3>
-
-<p>Let’s say I have a test that looks like this:</p>
-
-<p><code>
-visit signin_path
-fill_in "email", with: user.email
-fill_in "password", with: "password"
-click_on "Sign in"
-</code></p>
-
-<h3>Extract a Module</h3>
-
-<p>Our goal was to not sprinkle these plan text passwords all over the place. So let’s extract a module call <code>TestPasswordHelper</code> and put the plain text password in there:</p>
-
-<p>```
-require &ldquo;bcrypt&rdquo;</p>
-
-<p>module TestPasswordHelper
-  def default_password_digest</p>
-
-<pre><code>BCrypt::Password.create(default_password, cost: 4)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def default_password</p>
-
-<pre><code>"password"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>We’ll have our default password accessible via a method named…get this, <code>default_password</code>! The module also contains a method (<code>default_password_digest</code>) that will allow us to send the password digest to the fixture using the Bcrypt algorithm we explored above.</p>
-
-<p>Now that we have a helper module ready all set up, we add the following to our <code>test/test_helper.rb</code> to make these methods accessible in our tests:</p>
-
-<p>```
-require &ldquo;support/test_password_helper&rdquo;</p>
-
-<p>class ActiveSupport::TestCase
-  include TestPasswordHelper
-end
-```</p>
-
-<p>With these methods mixed in, we can update our Capybara test to use the <code>default_password</code> method:</p>
-
-<p><code>
-visit signin_path
-fill_in "email", with: user.email
-fill_in "password", with: default_password
-click_on "Sign in"
-</code></p>
-
-<h3>Helpers in Fixtures</h3>
-
-<p>Unfortunately, those helpers aren’t available in the fixtures.</p>
-
-<p><code>ActiveRecord::FixtureSet</code> is the class that gives our fixtures life. We can use Ruby to include functionality from our test helper, that will give us access to to the <code>default_password_digest</code> method, which reads our <code>default_password</code> so we don’t have to type it out.</p>
-
-<p>The <a href="http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html#method-c-context_class">Rails API guide for fixtures</a> states that helper methods should be added to <code>ActiveRecord::FixtureSet.context_class</code>.</p>
-
-<p>So back in our <code>test_helper.rb</code>, we can mix in our test helpers methods like so:</p>
-
-<p><code>
-ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper
-</code></p>
-
-<p>Now, back in our <code>users.yml</code> fixture, we can use the new <code>default_password_digest</code> method:</p>
-
-<p><code>
-fred:
-  first_name: Fred
-  last_name: Flintstone
-  email: fred@flintstone.com
-  password_digest: &lt;%= default_password_digest %&gt;
-  title: CEO
-  company: flintstone
-  admin: true
-</code></p>
-
-<p>We can now run our tests and verify the fixtures properly insert the digest using the default password and the Capybara tests reference that same default password.</p>
-
-<p>Now, if in the future we wanted use a different password for some reason, we’d only have one place to change it, and the rest of the system would follow along.</p>
-
-<h2>Summary</h2>
-
-<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
 ]]></content>
   </entry>
   

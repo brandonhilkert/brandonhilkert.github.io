@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-02-24T20:43:31-05:00</updated>
+  <updated>2015-02-26T06:19:27-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,164 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
+    <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
+    <updated>2015-02-24T20:46:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
+    <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
+
+<p>While Stripe does provide a number of features and plugins that make updating a credit card or signing up for a service simple, there are occasions when data needs to be fetched from Stripe in real-time. For these cases, it&rsquo;s great to be able to fetch and cache this data before-hand, and only expire if you know there&rsquo;s been a change.</p>
+
+<!--more-->
+
+
+<p>Combining <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> with Rails cache allows you to cache Stripe customer data so that billing pages are just as snappy as the rest of the application.</p>
+
+<h2>The Pain</h2>
+
+<p>Even though Stripe is generally pretty fast, retrieving customer data on the fly can be expensive. In order to optimize page load times, we can look to cache this data before it&rsquo;s actually used.</p>
+
+<p>If you&rsquo;re familiary with the Stripe gem, you&rsquo;ve probably seen something like this:</p>
+
+<figure class='code'><pre><code>customer = Stripe::Customer.retrieve(user.stripe_id)</code></pre></figure>
+
+
+<p>With the response of <code>customer</code>, we can further query customer data with the following methods:</p>
+
+<figure class='code'><pre><code>invoices = customer.invoices
+upcoming_invoices = customer.upcoming_invoices</code></pre></figure>
+
+
+<p>If we make all 3 of these method calls on page load, we&rsquo;d have 3 separate lookups from Stripe. This is pretty common for the typical billing page where you might want to show the customer&rsquo;s current credit card on file, their past invoices, and charges they can expect for the next invoice.</p>
+
+<p>Three lookups like this could potentially add another second or so to page load, which is not ideal.</p>
+
+<p>So how can we improve this?</p>
+
+<h2>The Solution</h2>
+
+<p>First, we can move the code to fetch the relevant stripe data in to a class of it&rsquo;s own, which wraps the notion of caching around the data retrieval.</p>
+
+<figure class='code'><pre><code>class StripeCache
+  def initialize(user)
+    @user = user
+  end
+
+  def refresh
+    purge_all
+    cache_all
+    self
+  end
+
+  def customer
+    return @customer if @customer
+
+    @customer = Rails.cache.fetch(cache_key("customer"), expires: 15.minutes) do
+      Stripe::Customer.retrieve(user.stripe_id)
+    end
+  end
+
+  def invoices
+    Rails.cache.fetch(cache_key("invoices"), expires: 15.minutes) do
+      customer.invoices
+    end
+  end
+
+  def upcoming_invoice
+    Rails.cache.fetch(cache_key("upcoming_invoice"), expires: 15.minutes) do
+      customer.upcoming_invoice
+    end
+  end
+
+  private
+
+  attr_reader :user
+
+  def cache_all
+    customer
+    invoices
+    upcoming_invoice
+  end
+
+  def purge_all
+    Rails.cache.delete_matched("stripe")
+  end
+
+
+  def cache_key(item)
+    "user/#{user.id}/stripe/#{item}"
+  end
+end</code></pre></figure>
+
+
+<p>To use this on a billing page, we could do:</p>
+
+<figure class='code'><pre><code>stripe = StripeCache.new(current_user).refresh</code></pre></figure>
+
+
+<p>And from the response of that class, we could access the <code>customer</code>, <code>invoices</code>, and <code>upcoming_invoice</code> respectively:</p>
+
+<figure class='code'><pre><code>@customer = stripe.customer
+@invoices = stripe.invoices
+@upcoming_invoice = stripe.invoices</code></pre></figure>
+
+
+<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
+
+<p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
+
+<p>But let&rsquo;s be honest, what users are going to the billing page multiple times during a session? Probably not many. So we still need to fix the initial load somehow.</p>
+
+<p>This is where <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> comes in. Like other Ruby background processing libraries, Sucker Punch allows you to move the processing of code to the background. However, unlike the others, Sucker Punch doesn&rsquo;t require additional infrastructure like Redis, and doesn&rsquo;t require a separate worker process to monitor and execute enqueued jobs. Because of this, the time it takes to extract code to a Sucker Punch job and have it incorporated with your application code is much lower.</p>
+
+<p>In this case, rather than send a transactional email or perform some database calculation, we can write a job thats only responsibility is to run the Stripe caching code.</p>
+
+<figure class='code'><pre><code>class StripeCacheJob
+  include SuckerPunch::Job
+
+  def perform(user)
+    StripeCache.new(user).refresh
+  end
+end</code></pre></figure>
+
+
+<p>The next question is, when do you run this?</p>
+
+<p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
+
+<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
+
+<p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
+
+<figure class='code'><pre><code>module Accounts
+  class CardsController &lt; ApplicationController
+    before_action :require_authentication
+
+    def create
+      cust = StripeCache.new(current_user).customer
+      cust.save(card: params[:stripeToken])
+
+      StripeCacheJob.new.async.perform(current_user)
+
+      redirect_to account_path, notice: t("card.update.success")
+    end
+  end
+end</code></pre></figure>
+
+
+<h2>Summary</h2>
+
+<p>Using Sucker Punch in combination with Rails cache feels like a great way make optimizations to third-party data requests. This article focused on using it to fetch Stripe data, but it could be used with another service just as easily.</p>
+
+<p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
+
+<p>Sucker Punch excels at background jobs that are relatively fast and if missed, wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost, it&rsquo;s not the end of the world. At worse, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
+
+<p>What other jobs have you used Sucker Punch for?</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
@@ -2999,46 +3157,6 @@ end
 <p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
 
 <p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Book Technical Review]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review/"/>
-    <updated>2014-03-04T17:43:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
-including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
-
-<p>Greetings from a now less snowy Eastern USA!</p>
-
-<p>The past few weeks have seemed like one big snow storm. We haven’t had many days above freezing and spent very little time outside (voluntarily at least). I’m sure those living in colder climates are probably saying “cry me a river…” right now. On the bright side, our extended home stays have given me more time to write.</p>
-
-<!--more-->
-
-
-<p><img class="center" src="http://brandonhilkert.com/images/snow.jpg" title="&#34;West Chester Snow&#34;" alt="&#34;West Chester Snow&#34;"></p>
-
-<p>Since the last time, I made some serious progress…</p>
-
-<ol>
-<li><p><strong>The chapter list is finalized</strong> &ndash; I’m thankful for all the feedback you provided about the chapter list. It really helped me determine the more important topics and make sure they were well covered.</p></li>
-<li><p><strong>Content is done</strong> &ndash; Snow days inside will do that. I made a big push to strengthen the weaker areas where there was overwhelming interest.</p></li>
-<li><p><strong>Grammatical editing is done</strong> &ndash; I’m lucky to be surrounded by really supportive people that have both the skill and interest to help edit. They pitched in and we knocked it out!</p>
-
-<p> <img class="center" src="http://brandonhilkert.com/images/editing.jpg" title="&#34;Build a Ruby Gem Editing&#34;" alt="&#34;Build a Ruby Gem Editing&#34;"></p></li>
-<li><p><strong>Technical review is underway</strong> &ndash; Again, I can’t stress how lucky I feel that people I respect and look up to in the Ruby community volunteered their free time to review the book. I suspect it’ll be another week or 2 before the final changes are sorted out, but never the less, technical review is well underway.</p></li>
-<li><p><strong><a href="http://www.mikeperham.com/">Mike Perham</a> is writing a foreword</strong> &ndash; Mike is someone I greatly respect and helped me navigate the open source eco-system when I first started contributing to his <a href="http://sidekiq.org/">Sidekiq</a> project. He’s been contributing to OSS far longer than Sidekiq and the Ruby community is lucky to have him. He’s written a beautifully succinct opening for the book as it relates to developing open source software. If reading his foreword doesn’t motivate to start contributing, I don’t now what will.</p></li>
-</ol>
-
-
-<p>Specifics about the launch date haven’t been determined, but <strong>the book will definitely launch in late March</strong>. I plan to be in touch with a <strong>sample chapter and coupon code</strong>, as promised, when the time gets closer.</p>
-
-<p>Looking back on the items mentioned above, I’m really excited to be nearing the home stretch and finally get it in to your hands.</p>
-
-<p>Hope you had a great past couple of weeks. Talk to you soon.</p>
 ]]></content>
   </entry>
   

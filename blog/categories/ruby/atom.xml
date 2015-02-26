@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-02-24T20:43:31-05:00</updated>
+  <updated>2015-02-26T06:19:27-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,200 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
+    <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
+    <updated>2015-02-24T20:46:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
+    <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
+
+<p>While Stripe does provide a number of features and plugins that make updating a credit card or signing up for a service simple, there are occasions when data needs to be fetched from Stripe in real-time. For these cases, it&rsquo;s great to be able to fetch and cache this data before-hand, and only expire if you know there&rsquo;s been a change.</p>
+
+<!--more-->
+
+
+<p>Combining <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> with Rails cache allows you to cache Stripe customer data so that billing pages are just as snappy as the rest of the application.</p>
+
+<h2>The Pain</h2>
+
+<p>Even though Stripe is generally pretty fast, retrieving customer data on the fly can be expensive. In order to optimize page load times, we can look to cache this data before it&rsquo;s actually used.</p>
+
+<p>If you&rsquo;re familiary with the Stripe gem, you&rsquo;ve probably seen something like this:</p>
+
+<p><code>
+customer = Stripe::Customer.retrieve(user.stripe_id)
+</code></p>
+
+<p>With the response of <code>customer</code>, we can further query customer data with the following methods:</p>
+
+<p><code>
+invoices = customer.invoices
+upcoming_invoices = customer.upcoming_invoices
+</code></p>
+
+<p>If we make all 3 of these method calls on page load, we&rsquo;d have 3 separate lookups from Stripe. This is pretty common for the typical billing page where you might want to show the customer&rsquo;s current credit card on file, their past invoices, and charges they can expect for the next invoice.</p>
+
+<p>Three lookups like this could potentially add another second or so to page load, which is not ideal.</p>
+
+<p>So how can we improve this?</p>
+
+<h2>The Solution</h2>
+
+<p>First, we can move the code to fetch the relevant stripe data in to a class of it&rsquo;s own, which wraps the notion of caching around the data retrieval.</p>
+
+<p>```
+class StripeCache
+  def initialize(user)</p>
+
+<pre><code>@user = user
+</code></pre>
+
+<p>  end</p>
+
+<p>  def refresh</p>
+
+<pre><code>purge_all
+cache_all
+self
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>return @customer if @customer
+
+@customer = Rails.cache.fetch(cache_key("customer"), expires: 15.minutes) do
+  Stripe::Customer.retrieve(user.stripe_id)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>Rails.cache.fetch(cache_key("invoices"), expires: 15.minutes) do
+  customer.invoices
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>Rails.cache.fetch(cache_key("upcoming_invoice"), expires: 15.minutes) do
+  customer.upcoming_invoice
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :user</p>
+
+<p>  def cache_all</p>
+
+<pre><code>customer
+invoices
+upcoming_invoice
+</code></pre>
+
+<p>  end</p>
+
+<p>  def purge_all</p>
+
+<pre><code>Rails.cache.delete_matched("stripe")
+</code></pre>
+
+<p>  end</p>
+
+<p>  def cache_key(item)</p>
+
+<pre><code>"user/#{user.id}/stripe/#{item}"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To use this on a billing page, we could do:</p>
+
+<p><code>
+stripe = StripeCache.new(current_user).refresh
+</code></p>
+
+<p>And from the response of that class, we could access the <code>customer</code>, <code>invoices</code>, and <code>upcoming_invoice</code> respectively:</p>
+
+<p><code>
+@customer = stripe.customer
+@invoices = stripe.invoices
+@upcoming_invoice = stripe.invoices
+</code></p>
+
+<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
+
+<p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
+
+<p>But let&rsquo;s be honest, what users are going to the billing page multiple times during a session? Probably not many. So we still need to fix the initial load somehow.</p>
+
+<p>This is where <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> comes in. Like other Ruby background processing libraries, Sucker Punch allows you to move the processing of code to the background. However, unlike the others, Sucker Punch doesn&rsquo;t require additional infrastructure like Redis, and doesn&rsquo;t require a separate worker process to monitor and execute enqueued jobs. Because of this, the time it takes to extract code to a Sucker Punch job and have it incorporated with your application code is much lower.</p>
+
+<p>In this case, rather than send a transactional email or perform some database calculation, we can write a job thats only responsibility is to run the Stripe caching code.</p>
+
+<p>```
+class StripeCacheJob
+  include SuckerPunch::Job</p>
+
+<p>  def perform(user)</p>
+
+<pre><code>StripeCache.new(user).refresh
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The next question is, when do you run this?</p>
+
+<p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
+
+<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
+
+<p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
+
+<p>```
+module Accounts
+  class CardsController &lt; ApplicationController</p>
+
+<pre><code>before_action :require_authentication
+
+def create
+  cust = StripeCache.new(current_user).customer
+  cust.save(card: params[:stripeToken])
+
+  StripeCacheJob.new.async.perform(current_user)
+
+  redirect_to account_path, notice: t("card.update.success")
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>Summary</h2>
+
+<p>Using Sucker Punch in combination with Rails cache feels like a great way make optimizations to third-party data requests. This article focused on using it to fetch Stripe data, but it could be used with another service just as easily.</p>
+
+<p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
+
+<p>Sucker Punch excels at background jobs that are relatively fast and if missed, wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost, it&rsquo;s not the end of the world. At worse, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
+
+<p>What other jobs have you used Sucker Punch for?</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
@@ -838,215 +1032,6 @@ gem &lsquo;intercom-rails&rsquo;
 <h2>Build a Ruby Gem</h2>
 
 <p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Active Record Validation Contexts with Inheritance]]></title>
-    <link href="http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/"/>
-    <updated>2014-11-18T17:20:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance</id>
-    <content type="html"><![CDATA[<p>If you’ve used <code>validates</code> in a Rails Active Record model, you know they work great -- at least until the first bit of complexity arises. At that point, they can quickly morph in to a ball of conditional spaghetti convoluting the initial reason the validation was added in the first place.</p>
-
-
-
-
-<p>I recently had an experience using <code>has_secure_password</code> where I wanted control the length of the user-supplied password. Adding a length validation to the password accessor invalidated existing records, so I was in a bit of a bind. In the end, I sub-classed the Active Record model to create a unique model made specifically for that context. This allowed me to inherit the core functionality from the model and sprinkle on existing validations for specific use cases. This was a new tactic for me and I’m still not sure how I feel about it. I like the fact that it removed complexity from the <code>User</code> model. This, in hopes, will keep the minimize the likelihood of it becoming a God object.</p>
-
-
-
-
-<!--more-->
-
-
-
-
-<h2>The Problem</h2>
-
-
-
-
-<p>Using <code>has_secure_password</code> is a relatively easy way to add authentication to a Rails app. In order to disguise the plain text passwords, an <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L106">accessor for the plain <code>password</code></a> is added that encrypts it before saving.</p>
-
-
-
-
-<p>The only true Active Record validation <code>has_secure_password</code> adds is a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L68">confirmation of the password</a> — and only when the password is present. This allows us to create a user object without supplying a password, or maybe saving straight to the <code>password_digest</code> field, which is used to store the encrypted password in the database.</p>
-
-
-
-
-<p>I wanted to enforce a minimum password length, because what good is a 1 character password (or 0 for that matter) ?!?!</p>
-
-
-
-
-<p>The first thing I did was add this to the <code>User</code> model:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }
-</code></pre>
-
-
-
-
-<p>This works for new users, but not for those with a <code>password_digest</code> already. Attempting to updated an existing user produces the following error:</p>
-
-
-
-
-<pre><code>ActiveRecord::RecordInvalid: Validation failed: Password is too short (minimum is 8 characters)
-</code></pre>
-
-
-
-
-<p>The next step was to conditionalize only on create:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }, on: :create
-</code></pre>
-
-
-
-
-<p>Except, that wasn’t right either because I’d definitely want to allow users to update their password, in which case, the length validation wouldn’t be enforced.</p>
-
-
-
-
-<p>I found another <a href="http://quickleft.com/blog/rails-tip-validating-users-with-has_secure_password">post suggesting to allow <code>nil</code></a> using:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }, allow_nil: true
-</code></pre>
-
-
-
-
-<p>But, again, that felt weird and doesn’t read particularly well when you’re looking through the source trying to understand what condition would generate a <code>nil</code> password.</p>
-
-
-
-
-<p>Other solutions included <a href="http://stackoverflow.com/a/6486345/2261909">mixing conditionals and checking model dirty state</a> and <a href="http://urgetopunt.com/rails/2012/11/12/validate-password-presence-has-secure-password.html">some combination of all of the above</a>.</p>
-
-
-
-
-<p>I’m guessing some combination of the above would’ve worked, but something didn’t feel quite right. A quick glance over any of those solutions left me wanting something cleaner and more approachable. Because it’s a complex and tremendously important part of the app, I wanted to feel comfortable with the solution.</p>
-
-
-
-
-<h2>The Solution</h2>
-
-
-
-
-<p>I recently read <a href="https://leanpub.com/growing-rails"><em>Growing Rails Application in Practice</em></a>. The most interesting takeaway for me was the idea of sub-classing an Active Record object to exactly the problem described above.</p>
-
-
-
-
-<p>Consider this…we have our <code>User</code> model with <code>has_secure_password</code>:</p>
-
-
-
-
-<pre><code>class User &lt; ActiveRecord::Base
-  has_secure_password
-end
-</code></pre>
-
-
-
-
-<p>As we saw above, the variety of validation contexts made the standard ActiveModel validation awkward. What if we sub-class <code>User</code> and add the validation contexts for a specific use case? In our case, minimum length:</p>
-
-
-
-
-<pre><code>class User::AsSignUp &lt; User
-  validates :password, length: { minimum: 8 }
-end
-</code></pre>
-
-
-
-
-<p>In this case, we’re create a separate model, for the purpose of signing up, and perhaps other user-related attribute management (profile, password reset, etc.).</p>
-
-
-
-
-<p>Now, instead of passing the <code>User</code> model to the view from the controller, we pass an instantiated version of the new context-specific model class:</p>
-
-
-
-
-<pre><code>def create
-  @user = User::AsSignUp.find(current_user.id)
-  …
-end
-</code></pre>
-
-
-
-
-<p>Lastly, because the sub-class name is inferred within the form, we have to do one more thing to make the params are accessible on the <code>create</code> action using <code>params[:user]</code>. We’ll change the form from:</p>
-
-
-
-
-<pre><code>&lt;%= form_for @user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
-</code></pre>
-
-
-
-
-<p>to:</p>
-
-
-
-
-<pre><code>&lt;%= form_for @user, as: :user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
-</code></pre>
-
-
-
-
-<p>Because the remainder of the app operates fine without any need for the password validation, the <code>User</code> can be used where necessary and without worry of it becoming invalid because the password accessor isn’t present.</p>
-
-
-
-
-<h2>Summary</h2>
-
-
-
-
-<p>While sub-classing models in Rails is generally frowned upon, this use case is one of the few that felt reasonable. It feels relatively low cost and stays in isolation. I’d love to hear how you might have solved this problem. I looked and explored a handful of solutions. While others worked, none seems as expressive as the one above.</p>
-
-
-<p>A form object using
-<a href="http://api.rubyonrails.org/classes/ActiveModel/Model.html">ActiveModel</a> or
-similar could&rsquo;ve been an alternative option. I didn&rsquo;t explore it for this
-particular use case, mostly because I wanted to give this one a shot. However,
-I have no doubt it would&rsquo;ve at least worked equally as well.</p>
-
-<p>I should also point out that I&rsquo;m familiar with the built-in <a href="https://github.com/rails/rails/blob/master/activemodel/lib/active_model/validations.rb#L73">validation
-contexts in ActiveModel</a>.
-And for whatever reason, I&rsquo;ve not used them before. I&rsquo;ll probably give it a
-shot on another occasion for comparison.</p>
-
-<p>What are your thoughts on this technique?</p>
 ]]></content>
   </entry>
   
