@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-02-26T06:19:27-05:00</updated>
+  <updated>2015-02-26T06:21:52-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
-    <updated>2015-02-24T20:46:00-05:00</updated>
+    <updated>2015-02-26T20:46:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
     <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
 
@@ -201,7 +201,9 @@ end
 
 <p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
 
-<p>Sucker Punch excels at background jobs that are relatively fast and if missed, wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost, it&rsquo;s not the end of the world. At worse, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
+<p>Sucker Punch excels at background jobs that are relatively fast and if missed,
+wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost,
+it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
 
 <p>What other jobs have you used Sucker Punch for?</p>
 ]]></content>

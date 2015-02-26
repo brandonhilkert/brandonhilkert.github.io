@@ -192,7 +192,7 @@
         <loc>
             http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/
         </loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
@@ -200,7 +200,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/bonus/sucker-punch.html</loc>
@@ -208,7 +208,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -220,23 +220,23 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/funnel/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -248,7 +248,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -256,6 +256,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2015-02-24T20:50:05-05:00</lastmod>
+        <lastmod>2015-02-26T06:21:22-05:00</lastmod>
     </url>
 </urlset>

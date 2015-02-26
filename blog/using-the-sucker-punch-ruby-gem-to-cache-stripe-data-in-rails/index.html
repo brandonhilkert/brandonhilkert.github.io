@@ -11,7 +11,7 @@
   <title>Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails | Brandon Hilkert</title>
 	<meta name="author" content="Brandon Hilkert">
 
-	<meta name="description" content="February 24th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these &hellip;">
+	<meta name="description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these &hellip;">
 	
 
   <meta name="HandheldFriendly" content="True">
@@ -21,11 +21,11 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content="@brandonhilkert">
   <meta name="twitter:title" content="Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails">
-  <meta name="twitter:description" content="February 24th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these days, it&rsquo;s almost impossible to &hellip;">
+  <meta name="twitter:description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these days, it&rsquo;s almost impossible to &hellip;">
   <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
 
   <meta property="og:title" content="Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails | Brandon Hilkert"/>
-  <meta property="og:description" content="February 24th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these days, it&rsquo;s almost impossible to &hellip;">
+  <meta property="og:description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these days, it&rsquo;s almost impossible to &hellip;">
   <meta property="og:url" content="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
   <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
   <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
@@ -162,7 +162,7 @@
   
 
 
-<time datetime="2015-02-24T20:46:00-05:00" data-updated="true" itemprop="datePublished">February 24<span>th</span>, 2015</time></div>
+<time datetime="2015-02-26T20:46:00-05:00" data-updated="true" itemprop="datePublished">February 26<span>th</span>, 2015</time></div>
 	<h1 class="title" itemprop="name">Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails</h1>
   <div class="tags">
 
@@ -318,7 +318,9 @@ end</code></pre></figure>
 
 <p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
 
-<p>Sucker Punch excels at background jobs that are relatively fast and if missed, wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost, it&rsquo;s not the end of the world. At worse, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
+<p>Sucker Punch excels at background jobs that are relatively fast and if missed,
+wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost,
+it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
 
 <p>What other jobs have you used Sucker Punch for?</p>
 </div>
