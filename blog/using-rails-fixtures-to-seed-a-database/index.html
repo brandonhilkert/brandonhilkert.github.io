@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>It’s no mystery that <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>It’s no mystery that <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
 
 <p>Most applications have ancillary data that’s required to support the main function of the application — think drop-downs with states for shipping or credit card type.</p>
 
@@ -260,7 +263,8 @@ ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)</code></pr
 <p>This approach has saved me quite a bit of time in my last few applications. Build it once, use it everywhere. As mentioned above, using this approach to seed database records  with a foreign key should be avoided.</p>
 
 <p>Most applications have a number of tasks needed for a developer to get up and running. Combining fixture data with additional seed data placed in <code>db/seeds.rb</code> can give you the best of both worlds, while still ensuring you have robust data to test against.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

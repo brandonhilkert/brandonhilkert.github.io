@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p><em>This is one of the final post leading up the the launch of the
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p><em>This is one of the final post leading up the the launch of the
 <a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
 which is now available for sale in <a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
 including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
@@ -822,7 +825,8 @@ MegaLotto::Drawing.new(config).draw #=&gt; [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
 <p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
 
 <p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

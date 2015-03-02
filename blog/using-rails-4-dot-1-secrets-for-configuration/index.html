@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>I previously wrote about how I handle <a href="/blog/flexible-rails-environment-configuration/">environment configuration in Rails</a>. Along with solutions like the <a href="https://github.com/bkeepers/dotenv">dotenv gem</a>, it relies on entirely on environment variables.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>I previously wrote about how I handle <a href="/blog/flexible-rails-environment-configuration/">environment configuration in Rails</a>. Along with solutions like the <a href="https://github.com/bkeepers/dotenv">dotenv gem</a>, it relies on entirely on environment variables.</p>
 
 <p>One of the highlighted features of Rails 4.1 was the <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml"><code>config/secrets.yml</code></a> file. By default, this file contains the <code>secret_key_base</code> and defers to the ENV variable of the same name in the production environment. Even though <code>secret_key_base</code> isn’t typically referenced explicitly in an application, I was curious if I could use the <code>config/secrets.yml</code> file in place of previously documented configuration solution.</p>
 
@@ -289,7 +292,8 @@ Pusher.url = Rails.application.secrets.pusher_url</code></pre></figure>
 <p>I feel like my previous solution has the potential to be replaced with the secrets file. I plan to try it out in an upcoming application and see if it’s as easy to manage as it seems.</p>
 
 <p>Note that by default, the <code>secrets.yml</code> file is NOT ignored by git. If you plan to include passwords or other sensitive data in the file, be sure to add it to your <code>.gitignore</code>.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

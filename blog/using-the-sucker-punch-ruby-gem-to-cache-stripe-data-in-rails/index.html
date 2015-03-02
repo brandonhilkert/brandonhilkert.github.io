@@ -11,7 +11,7 @@
   <title>Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails | Brandon Hilkert</title>
 	<meta name="author" content="Brandon Hilkert">
 
-	<meta name="description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these &hellip;">
+	<meta name="description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch *** Free screencast below *** With so &hellip;">
 	
 
   <meta name="HandheldFriendly" content="True">
@@ -21,11 +21,11 @@
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content="@brandonhilkert">
   <meta name="twitter:title" content="Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails">
-  <meta name="twitter:description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these days, it&rsquo;s almost impossible to &hellip;">
+  <meta name="twitter:description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch *** Free screencast below *** With so many services available these days, it& &hellip;">
   <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
 
   <meta property="og:title" content="Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails | Brandon Hilkert"/>
-  <meta property="og:description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch With so many services available these days, it&rsquo;s almost impossible to &hellip;">
+  <meta property="og:description" content="February 26th, 2015 Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails open source, rails, ruby, sucker punch *** Free screencast below *** With so many services available these days, it& &hellip;">
   <meta property="og:url" content="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
   <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
   <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
@@ -171,7 +171,12 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+      <p><strong><a href="#bonus">*** Free screencast below ***</a></strong></p>
+    
+
+    <p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
 
 <p>While Stripe does provide a number of features and plugins that make updating a credit card or signing up for a service simple, there are occasions when data needs to be fetched from Stripe in real-time. For these cases, it&rsquo;s great to be able to fetch and cache this data before-hand, and only expire if you know there&rsquo;s been a change.</p>
 
@@ -323,7 +328,8 @@ wouldn&rsquo;t be critical to the operation. In this case, if a cache job is los
 it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
 
 <p>What other jobs have you used Sucker Punch for?</p>
-</div>
+
+  </div>
 
   
 
@@ -331,7 +337,7 @@ it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data woul
     <section class="newsletter-top">
   <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
 </section>
-<section class="newsletter clearfix">
+<section class="newsletter clearfix" id="bonus">
   <div class="ribbon">
     <span>
       Join 3,000+ Rubyists

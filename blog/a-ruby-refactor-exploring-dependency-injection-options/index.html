@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
 
 <p><a href="http://en.m.wikipedia.org/wiki/Dependency_injection">Dependency injection</a> was a necessary piece of that puzzle. I’ve always been curious about the various forms of dependency injection and the effects each would have on the code. Below I explore 2 options (constructor injection and setter injection).</p>
 
@@ -596,7 +599,8 @@ end</code></pre></figure>
 <p>An accessor (or writer…), in this case, provided the same flexibility without changing the signature. I like being able to quickly look at the argument list of <code>initialize</code> and clearly understand its roles and responsibilities within the system.</p>
 
 <p>Which do you prefer?</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
 
 <p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
 
@@ -275,7 +278,8 @@ end</code></pre></figure>
 <p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
 
 <p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

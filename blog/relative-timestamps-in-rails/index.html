@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>Facebook’s news feed popularized the relative timestamp format of &ldquo;X hours ago&rdquo;. For good reason too&hellip;why print an absolute timestamp so that people have to do the relative calculation in their head? It’s one less step for the user, and to be fair, pretty easy to implement.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>Facebook’s news feed popularized the relative timestamp format of &ldquo;X hours ago&rdquo;. For good reason too&hellip;why print an absolute timestamp so that people have to do the relative calculation in their head? It’s one less step for the user, and to be fair, pretty easy to implement.</p>
 
 <h2>Rails helpers to the rescue</h2>
 
@@ -270,7 +273,8 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
 <p><em>Note: Since writing this, I discovered the <a href="https://github.com/37signals/local_time">local_time gem</a> from 37Signals. They’ve been a big advocate of moving relative timestamp calculation to the client-side. Their gem uses <a href="http://momentjs.com/">moment.js</a> instead of timago.js and it includes <a href="https://github.com/37signals/local_time/blob/master/app/assets/javascripts/local_time.js.coffee#L157">code to update the timestamps if Turbolinks is being used</a>. It’s worth checking out if you do this on a regular basis or use the moment.js library for other reasons.</em></p>
 
 <p>P.S. In my book, <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=relative-timestamps-post">Build a Ruby Gem</a>, I cover how to create a Rails engine gem with the above functionality.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

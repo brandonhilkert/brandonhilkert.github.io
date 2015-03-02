@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>Last week, I was looking through my Twitter stream and came across a tweet that referenced <code>ENV[“RAILS_CACHE_ID”]</code>. I was unfamiliar with this environment variable and made a note to learn more.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>Last week, I was looking through my Twitter stream and came across a tweet that referenced <code>ENV[“RAILS_CACHE_ID”]</code>. I was unfamiliar with this environment variable and made a note to learn more.</p>
 
 <p>Rails 4 has made a discernible effort to improve view rendering performance by what they’re calling <a href="http://signalvnoise.com/posts/3690-the-performance-impact-of-russian-doll-caching">russian doll caching</a>. Prior to this, view caching was simple in syntax, but realistically more complicated when cached partials needed busting on subsequent releases.</p>
 
@@ -367,7 +370,8 @@ end
 <p>Given the <code>cache_key</code> of fragment caching is dependent on the contents of the template, I have trouble finding value in setting the <code>RAILS_CACHE_ID</code> environmental variable for fragment caching alone.</p>
 
 <p>Alternatively, the use case for using <code>ENV[“RAILS_CACHE_ID”]</code> to control browser caching can be a tremendous asset when the content of the body response is not considered. Caching strategies can be difficult to reason about and hopefully this gives you another tool in the toolbox to make parts of your Rails applications more performant.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>

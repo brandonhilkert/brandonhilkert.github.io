@@ -171,7 +171,10 @@
 
 
 </div>
-	<div class="entry-content" itemprop="articleBody"><p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
 
 <p>With the release of Rails 4.1, the time stubbing method <code>travel_to</code> was added. This new helper method forces the current time to whatever you specify, allowing you to make asserts against a historical time, or week in my case.</p>
 
@@ -253,7 +256,8 @@ end</code></pre></figure>
 <p>Rails is well-known for conventions. <code>travel_to</code> is a great addition to the framework that would&rsquo;ve otherwise required dragging in additional dependencies.</p>
 
 <p>Next time you look at the release notes for a project, don&rsquo;t skip over the less featured functionality. For all you know, it could be something that saves you time and frustration that commonly occurs in your projects.</p>
-</div>
+
+  </div>
 
   
     <script src="/javascripts/funnel-tools-funnel.min.js"></script>
