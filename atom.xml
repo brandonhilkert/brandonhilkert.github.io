@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-03-04T20:37:50-05:00</updated>
+  <updated>2015-03-11T05:58:15-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,397 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
+    <link href="http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators/"/>
+    <updated>2015-03-09T15:37:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators</id>
+    <content type="html"><![CDATA[<p>In my <a href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/">last article</a>, I presented some code that wrapped up accessing a customer&rsquo;s Stripe data and added a caching layer on top. I wanted to take some time to dig in to that code and see how we can make it better.</p>
+
+<p>Decorators give us a tool to add additional functionality to a class while still keeping the public API consistent. From the perspective of the client, this is a win-win! Not only do they get the added behavior, but they don&rsquo;t need to call different methods to do so.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>Our original class accessed data from Stripe <strong>AND</strong> cached the response for some time period. I accentuated &ldquo;AND&rdquo; because it&rsquo;s generally the word to be on alert for when considering whether functionality can be teased apart in to separate responsibilities.</p>
+
+<p>The question becomes, can we make one class that accesses Stripe data, and another that&rsquo;s only responsible for caching it?</p>
+
+<p>Of course we can!</p>
+
+<h2>The Solution</h2>
+
+<p>Let&rsquo;s start with the most basic form of accessing our Stripe customer data with the <a href="https://github.com/stripe/stripe-ruby">Stripe gem</a>:</p>
+
+<figure class='code'><pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
+
+  def show
+    @customer = Stripe::Customer.retrieve(current_user.stripe_id)
+    @invoices = @customer.invoices
+    @upcoming_invoice = @customer.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<h2>Extract an Adapter</h2>
+
+<p>Because we&rsquo;re interfacing with a third-party system (Stripe), it makes sense for to create a local adapter to access the Stripe methods. It&rsquo;s probably not likely we&rsquo;re going to switch out the official Stripe gem for another one that access the same data, but a better argument might be that we could switch billing systems entirely in the future. And if we make a more generic adapter to our third-party billing system, we would only need to update our adapter when that time comes.</p>
+
+<p>While the adapter optimization may seem like overkill here, we&rsquo;ll see how that generic adapter helps us implement our caching layer shortly.</p>
+
+<p>Let&rsquo;s start by removing the notion that it&rsquo;s Stripe and all and call it <code>Billing</code>. Here we can expose the methods needed from the  <code>AccountsController</code> above:</p>
+
+<figure class='code'><pre><code>class Billing
+  attr_reader :billing_id
+
+  def initialize(billing_id)
+    @billing_id = billing_id
+  end
+
+  def customer
+    Stripe::Customer.retrieve(billing_id)
+  end
+
+  def invoices
+    customer.invoices
+  end
+
+  def upcoming_invoice
+    customer.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+
+<p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
+
+<figure class='code'><pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
+
+  def show
+    billing = Billing.new(current_user.stripe_id)
+
+    @customer = billing.customer
+    @invoices = billing.invoices
+    @upcoming_invoice = billing.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+
+<h2>Create a Decorator</h2>
+
+<p>Now that we have our adapter set up, let&rsquo;s look at how we can add caching behavior to improve the performance of our accounts page.</p>
+
+<p>The most of basic form of a decorator is to pass in the object we&rsquo;re decorating (<code>Billing</code>), and define the same methods of the billing, but add the additional functionality on top of them.</p>
+
+<p>Let&rsquo;s create a base form of  <code>BillingWithCache</code> that <strong>does nothing more</strong> than call the host methods:</p>
+
+<figure class='code'><pre><code>class BillingWithCache
+  def initialize(billing_service)
+    @billing_service = billing_service
+  end
+
+  def customer
+    billing_service.customer
+  end
+
+  def invoices
+    customer.invoices
+  end
+
+  def upcoming_invoice
+    customer.upcoming_invoice
+  end
+
+  private
+
+  attr_reader :billing_service
+end</code></pre></figure>
+
+
+<p>So while we haven&rsquo;t added any additional functionality, we have created the ability for this class to be used in place of our existing <code>Billing</code> class because it responds to the same API (<code>#customer</code>, <code>#invoices</code>, <code>#upcoming_invoice</code>).</p>
+
+<p>Integrating this new class with <code>AccountsController</code> looks like:</p>
+
+<figure class='code'><pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
+
+  def show
+    billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
+
+    @customer = billing.customer
+    @invoices = billing.invoices
+    @upcoming_invoice = billing.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
+
+<figure class='code'><pre><code>BillingWithCache.new(Billing.new(current_user.stripe_id))</code></pre></figure>
+
+
+<p>I know what you&rsquo;re thinking, &ldquo;But it doesn&rsquo;t actually cache anything!&rdquo;. You&rsquo;re right! Let&rsquo;s dig in to the <code>BillingWithCache</code> class and add that.</p>
+
+<h2>Adding Caching Functionality</h2>
+
+<p>In order to cache data using <code>Rails.cache</code>, we&rsquo;re going to need a cache key of some kind. Fortunately, the original <code>Billing</code> class provides a reader for <code>billing_id</code> that will allow us to make this unique to that user.</p>
+
+<figure class='code'><pre><code>def cache_key(item)
+  "user/#{billing_id}/billing/#{item}"
+end</code></pre></figure>
+
+
+<p>In this case, <code>item</code> can refer to things like <code>"customer"</code>, <code>"invoices"</code>, or <code>"upcoming_invoice"</code>. This gives us a method we can use internally with <code>BillingWithCache</code> to provide a cache key unique to the both the user and the type of data we&rsquo;re caching.</p>
+
+<p>Adding in the calls to actually cache the data:</p>
+
+<figure class='code'><pre><code>class BillingWithCache
+  def initialize(billing_service)
+    @billing_service = billing_service
+  end
+
+  def customer
+    key = cache_key("customer")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      billing_service.customer
+    end
+  end
+
+  def invoices
+    key = cache_key("invoices")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      customer.invoices
+    end
+  end
+
+  def upcoming_invoice
+    key = cache_key("upcoming_invoice")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      customer.upcoming_invoice
+    end
+  end
+
+  private
+
+  attr_reader :billing_service
+
+  def cache_key(item)
+    "user/#{billing_service.billing_id}/billing/#{item}"
+  end
+end</code></pre></figure>
+
+
+<p>The code above caches the call to each of these methods for 15 minutes. We could go further and move that to an argument with a default value, but I&rsquo;ll leave as an exercise for another time.</p>
+
+<h2>Summary</h2>
+
+<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+
+<p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
+
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+
+<h2>The Problem</h2>
+
+<p>Our original class accessed data from Stripe <strong>AND</strong> cached the response for some time period. I accentuated &ldquo;AND&rdquo; because it&rsquo;s generally the word to be on alert for when considering whether functionality can be teased apart in to separate responsibilities.</p>
+
+<p>The question becomes, can we make one class that accesses Stripe data, and
+another that&rsquo;s only responsible for caching it?</p>
+
+<p>Of course we can!</p>
+
+<h2>The Solution</h2>
+
+<p>Imagine our accounts controller started like this:</p>
+
+<figure class='code'><pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
+
+  def show
+    @customer = Stripe::Customer.retrieve(current_user.stripe_id)
+    @invoices = @customer.invoices
+    @upcoming_invoice = @customer.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>This is the most basic way to retrieve a customer&rsquo;s Stripe data. Use the <a href="https://github.com/stripe/stripe-ruby">Stripe gem</a> and directly invoke the methods related to the data needed to render the view.</p>
+
+<h2>Extract an Adapter</h2>
+
+<p>Because we&rsquo;re interfacing with a third-party system (Stripe), it makes sense for to create a local adapter to access the Stripe methods. It&rsquo;s probably not likely we&rsquo;re going to switch out the official Stripe gem for another one that access the same data, but a better argument might be that we could switch billing systems entirely in the future and if we make a more generic adapter to our third-party billing system, we would only need to update our adapter.</p>
+
+<p>While the adapter optimization may seem like overkill here, or for a simple Saas app, we&rsquo;ll see how that generic adapter helps us with our a caching decorator.</p>
+
+<p>Removing the specificity of Stripe, let&rsquo;s call it <code>Billing</code> and expose the same methods that we&rsquo;re using in the <code>AccountsController</code> above:</p>
+
+<figure class='code'><pre><code>class Billing
+  attr_reader :billing_id
+
+  def initialize(billing_id)
+    @billing_id = billing_id
+  end
+
+  def customer
+    Stripe::Customer.retrieve(billing_id)
+  end
+
+  def invoices
+    customer.invoices
+  end
+
+  def upcoming_invoice
+    customer.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+
+<p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
+
+<figure class='code'><pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
+
+  def show
+    billing = Billing.new(current_user.stripe_id)
+
+    @customer = billing.customer
+    @invoices = billing.invoices
+    @upcoming_invoice = billing.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+
+<h2>Adding Cache Functionality with a Decorator</h2>
+
+<p>Now that we have our adapter set up, let&rsquo;s look at how we can add some caching behavior to the <code>Billing</code> class so we can improve the performance of our accounts page.</p>
+
+<p>The most of basic form of a decorator is to pass in the object we&rsquo;re decorating (<code>Billing</code>), and define the same methods of the billing, but add the additional functionality on top of them.</p>
+
+<p>Let&rsquo;s create a base form of  <code>BillingWithCache</code> that does nothing more than call the host methods:</p>
+
+<figure class='code'><pre><code>class BillingWithCache
+  def initialize(billing_service)
+    @billing_service = billing_service
+  end
+
+  def customer
+    billing_service.customer
+  end
+
+  def invoices
+    customer.invoices
+  end
+
+  def upcoming_invoice
+    customer.upcoming_invoice
+  end
+
+  private
+
+  attr_reader :billing_service
+end</code></pre></figure>
+
+
+<p>So while we haven&rsquo;t added any additional functionality, we have created the ability for this class to be used in place of our existing <code>Billing</code> class because it responds to the same API (<code>#customer</code>, <code>#invoices</code>, <code>#upcoming_invoice</code>).</p>
+
+<p>Integrating this new class with <code>AccountsController</code> looks like:</p>
+
+<figure class='code'><pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
+
+  def show
+    billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
+
+    @customer = billing.customer
+    @invoices = billing.invoices
+    @upcoming_invoice = billing.upcoming_invoice
+  end
+end</code></pre></figure>
+
+
+<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
+
+<figure class='code'><pre><code>BillingWithCache.new(Billing.new(current_user.stripe_id))</code></pre></figure>
+
+
+<p>I know what you&rsquo;re thinking, &ldquo;But it doesn&rsquo;t actually cache anything!&rdquo;. You&rsquo;re right! Let&rsquo;s dig in to the <code>BillingWithCache</code> class and add that.</p>
+
+<p>In order to cache data using <code>Rails.cache</code>, we&rsquo;re going to need a cache key of some kind. Fortunately, the original <code>Billing</code> class provides a reader for <code>billing_id</code> that will allow us to make this unique to that user.</p>
+
+<figure class='code'><pre><code>def cache_key(item)
+  "user/#{billing_id}/billing/#{item}"
+end</code></pre></figure>
+
+
+<p>In this case, <code>item</code> can refer to things like <code>"customer"</code>, <code>"invoices"</code>, or <code>"upcoming_invoice"</code>. This gives us a method we can use internally with <code>BillingWithCache</code> to provide a cache key unique to the both the user and the type of data we&rsquo;re caching.</p>
+
+<p>Adding in the calls to actually cache the data:</p>
+
+<figure class='code'><pre><code>class BillingWithCache
+  def initialize(billing_service)
+    @billing_service = billing_service
+  end
+
+  def customer
+    key = cache_key("customer")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      billing_service.customer
+    end
+  end
+
+  def invoices
+    key = cache_key("invoices")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      customer.invoices
+    end
+  end
+
+  def upcoming_invoice
+    key = cache_key("upcoming_invoice")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      customer.upcoming_invoice
+    end
+  end
+
+  private
+
+  attr_reader :billing_service
+
+  def cache_key(item)
+    "user/#{billing_service.billing_id}/billing/#{item}"
+  end
+end</code></pre></figure>
+
+
+<p>The code above caches the call to each of these methods for 15 minutes. We could go further and move that to an argument with a default value, but I&rsquo;ll leave as an exercise for another time.</p>
+
+<h2>Summary</h2>
+
+<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+
+<p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
+
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
@@ -3076,89 +3467,6 @@ MegaLotto::Drawing.new(config).draw #=&gt; [23, 4, 21, 33, 48, 12, 43, 13, 2, 5]
 <p>Keeping gems configurable means balancing your use case with the use cases of others. The more flexibility you offer to users of your gem, the more users will find value in your work. However, there’s a point when offering too much configuration can make the internals of a gem unnecessarily complicated. As you probably know, Ruby is a language full of conventions and it’s best to provide reasonable defaults and only adapt if the need arises.</p>
 
 <p>One approach to balance complexity is to create a system where users can write their own middleware to modify the behavior of the default system. Mike Perham created a <a href="https://github.com/mperham/sidekiq/wiki/Middleware">middleware system for Sidekiq</a> allowing users to add functionality as they wish. Doing so doesn’t require the gem to change at all when unique use cases arise. The implementation of such system is beyond the scope of this book. However, if you want to learn more, <a href="https://github.com/mperham/sidekiq/blob/master/lib/sidekiq/middleware/chain.rb">Sidekiq’s implementation</a> is a great place to start.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Why I Wrote the Sucker Punch Gem]]></title>
-    <link href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
-    <updated>2014-03-13T13:56:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
-including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
-
-<p>One of the simplest and most common application of background processing is sending emails outside of a web
-request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
-
-<p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>
-
-<!--more-->
-
-
-<h2>Ruby Background Processing Libraries</h2>
-
-<p>Until I had heard of <a href="http://sidekiq.org/">Sidekiq</a>, <a href="https://github.com/collectiveidea/delayed_job/tree/master">delayed_job</a> and <a href="https://github.com/resque/resque">Resque</a> were the standard options for processing background jobs in Ruby. I&rsquo;ve used both and believe each has a great use case.</p>
-
-<p>In my experience, it&rsquo;s easiest to start with delayed_job if you need background processing in your application. If and when the DB becomes your bottleneck, it&rsquo;s time to move on. Redis is a dependency of both Resque and Sidekiq, which increases the complexity and infrastructure maintenance, however, with <a href="https://addons.heroku.com/?q=redis">Heroku&rsquo;s hosted Redis
-Add-ons</a>, this dependency is much less of a pain.</p>
-
-<h2>My work on Sidekiq</h2>
-
-<p>I previously wrote about my my <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">open source contributions</a> and how I got started. I had spent the previous several
-months contributing to Sidekiq and learning more about concurrency patterns in Ruby.</p>
-
-<p>Sidekiq is multi-threaded, which is the reason a single Sidekiq process is <a href="https://github.com/mperham/sidekiq/wiki/Testimonials">more
-efficient</a> than a library like Resque. Although, nothing in life is free &ndash; care must be taken to ensure your jobs are thread-safe. A helpful <a href="https://github.com/mperham/sidekiq/wiki/Best-Practices">guide to writing thread-safe code</a> can be found on the Sidekiq wiki.</p>
-
-<h2>Use Case</h2>
-
-<p>I was working on <a href="http://defriendnotifierapp.com/">Defriend Notifier</a> and needed to notify users via email when their Facebook friend list changed. Using Sidekiq or any of the alternatives mentioned above certainly would’ve worked. In fact, the application originally used Sidekiq and functioned perfectly. However, as time went on, I decided the extra cost of the worker wasn’t justified, especially given that the application didn’t produce any revenue outside of advertising (very little…).</p>
-
-<p>At the time, the only background processing library that didn’t require an additional background process was
-<a href="https://github.com/mperham/girl_friday">girl_friday</a>, also written by <a href="https://twitter.com/mperham">Mike
-Perham</a>, author of Sidekiq. While this solution worked for awhile, I found the syntax to be slightly non-intuitive and it felt a little dirty to pass around a global variable within the application
-to manage a single job queue. I also experienced some memory leaks on Heroku as a result of switching to
-girl_friday, but to be fair, I didn&rsquo;t spend much time determining the root cause. <em>Disclaimer: It very likely could’ve been due to code that I wrote</em>.</p>
-
-<h2>Enter Celluloid</h2>
-
-<p><a href="https://github.com/celluloid/celluloid">Celluloid</a> describes itself as an actor-based concurrent object
-framework for Ruby. Celluloid is the guts behind Sidekiq and the reason why the multi-threaded Sidekiq code is so readable. Celluloid abstracts away the details of concurrency so your code doesn&rsquo;t have to worry about manually managing thread synchronization and object message queuing.</p>
-
-<h2>Sucker Punch is born</h2>
-
-<p>girl_friday was written several years ago — before Celluloid was created. Realizing the power of Celluloid,
-I figured there was an opportunity for a new library that behaved like girl_friday, but utilized
-Celluloid&rsquo;s more reliable multi-threading capabilities. And because Celluloid handles so much of the complexity, the gem itself would be relatively simple — really a DSL around enqueuing jobs to a <a href="https://github.com/celluloid/celluloid/wiki/Pools">Celluloid Pool</a>.</p>
-
-<p>I <a href="https://twitter.com/brandonhilkert/status/292630123981729793">posed the question to Mike Perham</a> and he confirmed my suspicions.</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/sucker-punch-tweet.png" title="&#34;Sucker Punch Tweet&#34;" alt="&#34;Sucker Punch Tweet&#34;"></p>
-
-<p>Fortunately, Celluloid had all of the functionality needed for background queues already built-in. While the
-functionality was there, the usage syntax was awkward.</p>
-
-<p>I spent the next few days creating a DSL around the Celluloid internals, thus making it feel more specific to
-background queues.</p>
-
-<p>Here’s the result of a typical job class:</p>
-
-<pre><code>class LogJob
-  include SuckerPunch::Job
-
-  def perform(event)
-    # do some other stuff to
-    # record the event in the background
-    puts "#{event} just happened"
-  end
-end
-</code></pre>
-
-<p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
-
-<p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
 ]]></content>
   </entry>
   

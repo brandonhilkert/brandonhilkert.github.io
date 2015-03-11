@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-03-04T20:37:50-05:00</updated>
+  <updated>2015-03-11T05:58:15-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,509 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
+    <link href="http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators/"/>
+    <updated>2015-03-09T15:37:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators</id>
+    <content type="html"><![CDATA[<p>In my <a href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/">last article</a>, I presented some code that wrapped up accessing a customer&rsquo;s Stripe data and added a caching layer on top. I wanted to take some time to dig in to that code and see how we can make it better.</p>
+
+<p>Decorators give us a tool to add additional functionality to a class while still keeping the public API consistent. From the perspective of the client, this is a win-win! Not only do they get the added behavior, but they don&rsquo;t need to call different methods to do so.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>Our original class accessed data from Stripe <strong>AND</strong> cached the response for some time period. I accentuated &ldquo;AND&rdquo; because it&rsquo;s generally the word to be on alert for when considering whether functionality can be teased apart in to separate responsibilities.</p>
+
+<p>The question becomes, can we make one class that accesses Stripe data, and another that&rsquo;s only responsible for caching it?</p>
+
+<p>Of course we can!</p>
+
+<h2>The Solution</h2>
+
+<p>Let&rsquo;s start with the most basic form of accessing our Stripe customer data with the <a href="https://github.com/stripe/stripe-ruby">Stripe gem</a>:</p>
+
+<p>```
+class AccountsController &lt; ApplicationController
+  before_action :require_authentication</p>
+
+<p>  def show</p>
+
+<pre><code>@customer = Stripe::Customer.retrieve(current_user.stripe_id)
+@invoices = @customer.invoices
+@upcoming_invoice = @customer.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>Extract an Adapter</h2>
+
+<p>Because we&rsquo;re interfacing with a third-party system (Stripe), it makes sense for to create a local adapter to access the Stripe methods. It&rsquo;s probably not likely we&rsquo;re going to switch out the official Stripe gem for another one that access the same data, but a better argument might be that we could switch billing systems entirely in the future. And if we make a more generic adapter to our third-party billing system, we would only need to update our adapter when that time comes.</p>
+
+<p>While the adapter optimization may seem like overkill here, we&rsquo;ll see how that generic adapter helps us implement our caching layer shortly.</p>
+
+<p>Let&rsquo;s start by removing the notion that it&rsquo;s Stripe and all and call it <code>Billing</code>. Here we can expose the methods needed from the  <code>AccountsController</code> above:</p>
+
+<p>```
+class Billing
+  attr_reader :billing_id</p>
+
+<p>  def initialize(billing_id)</p>
+
+<pre><code>@billing_id = billing_id
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>Stripe::Customer.retrieve(billing_id)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>customer.invoices
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>customer.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+
+<p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
+
+<p>```
+class AccountsController &lt; ApplicationController
+  before_action :require_authentication</p>
+
+<p>  def show</p>
+
+<pre><code>billing = Billing.new(current_user.stripe_id)
+
+@customer = billing.customer
+@invoices = billing.invoices
+@upcoming_invoice = billing.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+
+<h2>Create a Decorator</h2>
+
+<p>Now that we have our adapter set up, let&rsquo;s look at how we can add caching behavior to improve the performance of our accounts page.</p>
+
+<p>The most of basic form of a decorator is to pass in the object we&rsquo;re decorating (<code>Billing</code>), and define the same methods of the billing, but add the additional functionality on top of them.</p>
+
+<p>Let&rsquo;s create a base form of  <code>BillingWithCache</code> that <strong>does nothing more</strong> than call the host methods:</p>
+
+<p>```
+class BillingWithCache
+  def initialize(billing_service)</p>
+
+<pre><code>@billing_service = billing_service
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>billing_service.customer
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>customer.invoices
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>customer.upcoming_invoice
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :billing_service
+end
+```</p>
+
+<p>So while we haven&rsquo;t added any additional functionality, we have created the ability for this class to be used in place of our existing <code>Billing</code> class because it responds to the same API (<code>#customer</code>, <code>#invoices</code>, <code>#upcoming_invoice</code>).</p>
+
+<p>Integrating this new class with <code>AccountsController</code> looks like:</p>
+
+<p>```
+class AccountsController &lt; ApplicationController
+  before_action :require_authentication</p>
+
+<p>  def show</p>
+
+<pre><code>billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
+
+@customer = billing.customer
+@invoices = billing.invoices
+@upcoming_invoice = billing.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
+
+<p><code>
+BillingWithCache.new(Billing.new(current_user.stripe_id))
+</code></p>
+
+<p>I know what you&rsquo;re thinking, &ldquo;But it doesn&rsquo;t actually cache anything!&rdquo;. You&rsquo;re right! Let&rsquo;s dig in to the <code>BillingWithCache</code> class and add that.</p>
+
+<h2>Adding Caching Functionality</h2>
+
+<p>In order to cache data using <code>Rails.cache</code>, we&rsquo;re going to need a cache key of some kind. Fortunately, the original <code>Billing</code> class provides a reader for <code>billing_id</code> that will allow us to make this unique to that user.</p>
+
+<p><code>
+def cache_key(item)
+  "user/#{billing_id}/billing/#{item}"
+end
+</code></p>
+
+<p>In this case, <code>item</code> can refer to things like <code>"customer"</code>, <code>"invoices"</code>, or <code>"upcoming_invoice"</code>. This gives us a method we can use internally with <code>BillingWithCache</code> to provide a cache key unique to the both the user and the type of data we&rsquo;re caching.</p>
+
+<p>Adding in the calls to actually cache the data:</p>
+
+<p>```
+class BillingWithCache
+  def initialize(billing_service)</p>
+
+<pre><code>@billing_service = billing_service
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>key = cache_key("customer")
+
+Rails.cache.fetch(key, expires: 15.minutes) do
+  billing_service.customer
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>key = cache_key("invoices")
+
+Rails.cache.fetch(key, expires: 15.minutes) do
+  customer.invoices
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>key = cache_key("upcoming_invoice")
+
+Rails.cache.fetch(key, expires: 15.minutes) do
+  customer.upcoming_invoice
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :billing_service</p>
+
+<p>  def cache_key(item)</p>
+
+<pre><code>"user/#{billing_service.billing_id}/billing/#{item}"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The code above caches the call to each of these methods for 15 minutes. We could go further and move that to an argument with a default value, but I&rsquo;ll leave as an exercise for another time.</p>
+
+<h2>Summary</h2>
+
+<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+
+<p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
+
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+
+<h2>The Problem</h2>
+
+<p>Our original class accessed data from Stripe <strong>AND</strong> cached the response for some time period. I accentuated &ldquo;AND&rdquo; because it&rsquo;s generally the word to be on alert for when considering whether functionality can be teased apart in to separate responsibilities.</p>
+
+<p>The question becomes, can we make one class that accesses Stripe data, and
+another that&rsquo;s only responsible for caching it?</p>
+
+<p>Of course we can!</p>
+
+<h2>The Solution</h2>
+
+<p>Imagine our accounts controller started like this:</p>
+
+<p>```
+class AccountsController &lt; ApplicationController
+  before_action :require_authentication</p>
+
+<p>  def show</p>
+
+<pre><code>@customer = Stripe::Customer.retrieve(current_user.stripe_id)
+@invoices = @customer.invoices
+@upcoming_invoice = @customer.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>This is the most basic way to retrieve a customer&rsquo;s Stripe data. Use the <a href="https://github.com/stripe/stripe-ruby">Stripe gem</a> and directly invoke the methods related to the data needed to render the view.</p>
+
+<h2>Extract an Adapter</h2>
+
+<p>Because we&rsquo;re interfacing with a third-party system (Stripe), it makes sense for to create a local adapter to access the Stripe methods. It&rsquo;s probably not likely we&rsquo;re going to switch out the official Stripe gem for another one that access the same data, but a better argument might be that we could switch billing systems entirely in the future and if we make a more generic adapter to our third-party billing system, we would only need to update our adapter.</p>
+
+<p>While the adapter optimization may seem like overkill here, or for a simple Saas app, we&rsquo;ll see how that generic adapter helps us with our a caching decorator.</p>
+
+<p>Removing the specificity of Stripe, let&rsquo;s call it <code>Billing</code> and expose the same methods that we&rsquo;re using in the <code>AccountsController</code> above:</p>
+
+<p>```
+class Billing
+  attr_reader :billing_id</p>
+
+<p>  def initialize(billing_id)</p>
+
+<pre><code>@billing_id = billing_id
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>Stripe::Customer.retrieve(billing_id)
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>customer.invoices
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>customer.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+
+<p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
+
+<p>```
+class AccountsController &lt; ApplicationController
+  before_action :require_authentication</p>
+
+<p>  def show</p>
+
+<pre><code>billing = Billing.new(current_user.stripe_id)
+
+@customer = billing.customer
+@invoices = billing.invoices
+@upcoming_invoice = billing.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+
+<h2>Adding Cache Functionality with a Decorator</h2>
+
+<p>Now that we have our adapter set up, let&rsquo;s look at how we can add some caching behavior to the <code>Billing</code> class so we can improve the performance of our accounts page.</p>
+
+<p>The most of basic form of a decorator is to pass in the object we&rsquo;re decorating (<code>Billing</code>), and define the same methods of the billing, but add the additional functionality on top of them.</p>
+
+<p>Let&rsquo;s create a base form of  <code>BillingWithCache</code> that does nothing more than call the host methods:</p>
+
+<p>```
+class BillingWithCache
+  def initialize(billing_service)</p>
+
+<pre><code>@billing_service = billing_service
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>billing_service.customer
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>customer.invoices
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>customer.upcoming_invoice
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :billing_service
+end
+```</p>
+
+<p>So while we haven&rsquo;t added any additional functionality, we have created the ability for this class to be used in place of our existing <code>Billing</code> class because it responds to the same API (<code>#customer</code>, <code>#invoices</code>, <code>#upcoming_invoice</code>).</p>
+
+<p>Integrating this new class with <code>AccountsController</code> looks like:</p>
+
+<p>```
+class AccountsController &lt; ApplicationController
+  before_action :require_authentication</p>
+
+<p>  def show</p>
+
+<pre><code>billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
+
+@customer = billing.customer
+@invoices = billing.invoices
+@upcoming_invoice = billing.upcoming_invoice
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
+
+<p><code>
+BillingWithCache.new(Billing.new(current_user.stripe_id))
+</code></p>
+
+<p>I know what you&rsquo;re thinking, &ldquo;But it doesn&rsquo;t actually cache anything!&rdquo;. You&rsquo;re right! Let&rsquo;s dig in to the <code>BillingWithCache</code> class and add that.</p>
+
+<p>In order to cache data using <code>Rails.cache</code>, we&rsquo;re going to need a cache key of some kind. Fortunately, the original <code>Billing</code> class provides a reader for <code>billing_id</code> that will allow us to make this unique to that user.</p>
+
+<p><code>
+def cache_key(item)
+  "user/#{billing_id}/billing/#{item}"
+end
+</code></p>
+
+<p>In this case, <code>item</code> can refer to things like <code>"customer"</code>, <code>"invoices"</code>, or <code>"upcoming_invoice"</code>. This gives us a method we can use internally with <code>BillingWithCache</code> to provide a cache key unique to the both the user and the type of data we&rsquo;re caching.</p>
+
+<p>Adding in the calls to actually cache the data:</p>
+
+<p>```
+class BillingWithCache
+  def initialize(billing_service)</p>
+
+<pre><code>@billing_service = billing_service
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>key = cache_key("customer")
+
+Rails.cache.fetch(key, expires: 15.minutes) do
+  billing_service.customer
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>key = cache_key("invoices")
+
+Rails.cache.fetch(key, expires: 15.minutes) do
+  customer.invoices
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>key = cache_key("upcoming_invoice")
+
+Rails.cache.fetch(key, expires: 15.minutes) do
+  customer.upcoming_invoice
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :billing_service</p>
+
+<p>  def cache_key(item)</p>
+
+<pre><code>"user/#{billing_service.billing_id}/billing/#{item}"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The code above caches the call to each of these methods for 15 minutes. We could go further and move that to an argument with a default value, but I&rsquo;ll leave as an exercise for another time.</p>
+
+<h2>Summary</h2>
+
+<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+
+<p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
+
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
@@ -669,209 +1172,6 @@ And for whatever reason, I&rsquo;ve not used them before. I&rsquo;ll probably gi
 shot on another occasion for comparison.</p>
 
 <p>What are your thoughts on this technique?</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
-    <link href="http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/"/>
-    <updated>2014-07-30T06:03:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view</id>
-    <content type="html"><![CDATA[<p>It’s generally known that leaving any kind of logic in a Rails view is bad news, both for debugging and your own sanity. Rails views can be cumbersome to test and leave a lot to be desired when it comes to debugging.</p>
-
-<!--more-->
-
-
-<p>I recently went through the process of refactoring a Rails view that included logic. The end result was an isolated <a href="http://blog.jayfields.com/2007/10/ruby-poro.html">PORO</a> that was easily integrated with the controller/view.</p>
-
-<h2>Background</h2>
-
-<p>The app I’m currently working on is a greenfield app with vague specs, at best. I don’t mention this to fault anyone, but more to illustrate a point. Not all greenfield projects have well-defined specs.</p>
-
-<p>In this particular case, the stakeholders were somewhat unsure of what the interface should look like. Together, we tossed around a number of ideas, ultimately leading to a few options. Only once an iteration of the UI was available, would we have a clear picture of whether it <em>felt right</em>.</p>
-
-<h2>The Problem</h2>
-
-<p>I implemented the first option in the most crude way I could think of. Unfortunately, that way involved putting logic in the view. I know, I know — I can hear it now, <em>”C’mon Brandon, everyone knows you shouldn’t do this!”</em>. Here’s the thing — I knew it too.</p>
-
-<p>Here’s what I ended up with:</p>
-
-<p>```</p>
-
-<h1>controller</h1>
-
-<p>def people
-  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
-  @people = current_user.reports
-end</p>
-
-<h1>view</h1>
-
-<p>&lt;% @people.each do |person| %>
-  &lt;% checkin = person.checkin_for(@week_of) %>
-  <tr></p>
-
-<pre><code>&lt;td&gt;
-  &lt;%= profile_picture person %&gt;
-  &lt;%= person %&gt;
-&lt;/td&gt;
-
-&lt;td&gt;
-  &lt;%= checkin_status(checkin) %&gt;
-&lt;/td&gt;
-</code></pre>
-
-<p>  </tr>
-&lt;% end %>
-```</p>
-
-<p>For each iteration of <code>@people</code>, I looked up the check-in for that particular week from the model:</p>
-
-<p><code>
-def checkin_for(week_of)
-  Checkin.find_by(user_id: id, week_of: week_of)
-end
-</code></p>
-
-<p>This crosses concerns, blurs responsibility — all the things that bad Rails app are made of. But I was doing this knowing it would either be entirely ripped out (we’d change the UI altogether), or refactored to something better.</p>
-
-<p><em>Note: I could’ve just saved myself one step and never made the method in the model. For some reason, that made me feel better about it at the time. *shrugs*</em></p>
-
-<p>So I added a Github issue and went on my way…</p>
-
-<p><img class="center" src="/images/view-refactor/gh-issue.png" title="&ldquo;Github issue to refactor Rails view&rdquo;" ></p>
-
-<h2>The Solution</h2>
-
-<p>With a few minor tweaks, this implementation of the functionality and UI was adequate. So as time allowed, I jumped back in to untangling the mess I created.</p>
-
-<p>The biggest variable in the display of a <code>Checkin</code> was the week (a date field corresponding to the beginning of that particular week). Once the date was known, I could look for a <code>Checkin</code> for each user in my visibility, see if it existed, and if not, return a stand-in object to represent a non-completed check-in.</p>
-
-<p>I removed the model method:</p>
-
-<p><code>
-def checkin_for(week_of)
-  Checkin.find_by(user_id: id, week_of: week_of)
-end
-</code></p>
-
-<p>and the line in the view largely responsible for the mess:</p>
-
-<p><code>
-&lt;% checkin = person.checkin_for(@week_of) %&gt;
-</code></p>
-
-<p>I went back to the controller and initialized a new object that would allow me to iterate over a list of check-ins:</p>
-
-<p><code>
-def people
-  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
-  @reports = Checkin::Reports.new(current_user, @week_of)
-end
-</code></p>
-
-<p>Let’s dig in to the new <code>Checkin::Reports</code> class…</p>
-
-<p>```
-class Checkin
-  class Reports</p>
-
-<pre><code>def initialize(user, week_of)
-  @user, @week_of = user, week_of
-end
-
-def checkins
-  reports.map { |person|
-    Checkin.find_or_initialize_by(user_id: person.id, week_of: week_of)
-  }
-end
-
-private
-
-attr_reader :user, :week_of
-
-def reports
-  user.reports
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>I instantiate with the user and week, similar to what the <code>checkin_for</code> model method did above.</p>
-
-<p>The only relatively interesting part of this class is that it’s using <code>find_or_intialize_by</code>. It turns out that the view didn’t care if the object was <code>nil</code>, or just a non-persisted <code>Checkin</code> object. All it did was interrogate certain attributes of the object, and guard against the argument being <code>nil</code>. From that perspective, we’ve improved our code even more because now instead of supplying nil to the helper, we are actually supplying it with a newly instantiated <code>Checkin</code> with some default attributes.</p>
-
-<p>This means that our <code>checkin_status</code> helper, went from:</p>
-
-<p>```
-def checkin_status(checkin)
-  if checkin &amp;&amp; checkin.completed_at?</p>
-
-<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>to:</p>
-
-<p>```
-def checkin_status(checkin)
-  if checkin.completed_at?</p>
-
-<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>It’s a subtle change (removing the check <code>if checkin</code> from the first conditional), but one that’s less susceptible to bizarre edge cases. And clearer — It’s reasonable to expect that by calling the first argument <code>checkin</code>, <strong>the variable should be a <code>Checkin</code></strong>, and not sometimes <code>nil</code>.</p>
-
-<p>Returning back to the view…using the new <code>@reports</code> variable, we no longer have to query during each iteration:</p>
-
-<p>```
-&lt;% @reports.checkins.each do |checkin| %>
-  <tr></p>
-
-<pre><code>&lt;td&gt;
-  &lt;%= profile_picture checkin.user %&gt;
-  &lt;%= checkin.user %&gt;
-&lt;/td&gt;
-
-&lt;td&gt;
-  &lt;%= checkin_status(checkin) %&gt;
-&lt;/td&gt;
-</code></pre>
-
-<p>  </tr>
-&lt;% end %>
-```</p>
-
-<p>Tests pass, and we’re in a much better place than we were before.</p>
-
-<h2>Summary</h2>
-
-<p>I’ve seen a lot of people make notes for themselves to improve areas of their application and either never get the opportunity to go back and do so, or get so far removed from the mess, they forget about how bad it was in the first place. The approach I took above by making a note for myself worked because <strong>I knew</strong> I would go back to it. It’s possible this may not work for everyone.</p>
-
-<p>If it takes more than just making a Github issue for your and your team, find what works. The important part is that the refactor takes place, in whatever way convenient for you.</p>
-
-<p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
-
-<p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://www.sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
 ]]></content>
   </entry>
   
