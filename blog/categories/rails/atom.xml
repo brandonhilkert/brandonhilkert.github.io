@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-03-11T06:01:25-04:00</updated>
+  <updated>2015-03-18T20:38:31-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -374,7 +374,7 @@ upcoming_invoice
 
 <p>  def purge_all</p>
 
-<pre><code>Rails.cache.delete_matched("stripe")
+<pre><code>Rails.cache.delete_matched("#{user.id}/stripe")
 </code></pre>
 
 <p>  end</p>

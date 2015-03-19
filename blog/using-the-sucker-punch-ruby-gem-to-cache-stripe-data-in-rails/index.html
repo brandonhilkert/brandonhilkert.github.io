@@ -252,7 +252,7 @@ upcoming_invoices = customer.upcoming_invoices</code></pre></figure>
   end
 
   def purge_all
-    Rails.cache.delete_matched("stripe")
+    Rails.cache.delete_matched("#{user.id}/stripe")
   end
 
 
