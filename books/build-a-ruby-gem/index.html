@@ -101,13 +101,9 @@
       </h2>
       <!--End of Banner Title-->
 
-      <div class="announcement">
-  <p class="title">*** Announcement ***</p>
-  <p>
-    In light of RailsConf 2015,
-    all <em>Build a Ruby Gem</em> packages are <strong><a href="#pricing">25% off</a></strong> until <em>Thurs., April 22nd at 5pm EDT</em>.
-  </p>
-</div>
+      <p>
+  Sound good? <a href="#pricing">Jump straight to the packages</a>.
+</p>
 
     </div>
     <!--End of Product Banner Description-->
@@ -585,16 +581,15 @@
 
 <script>
   function getQueryVariable(variable) {
-    // var query = window.location.search.substring(1);
-    // var vars = query.split('&');
-    // for (var i = 0; i < vars.length; i++) {
-    //   var pair = vars[i].split('=');
-    //   if (decodeURIComponent(pair[0]) == variable) {
-    //     return decodeURIComponent(pair[1]);
-    //   }
-    // }
-    // return null;
-    return "railsconf15";
+    var query = window.location.search.substring(1);
+    var vars = query.split('&');
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split('=');
+      if (decodeURIComponent(pair[0]) == variable) {
+        return decodeURIComponent(pair[1]);
+      }
+    }
+    return null;
   }
 
   function updateGumroadLinkWithCoupon(el) {
