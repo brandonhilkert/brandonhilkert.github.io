@@ -84,6 +84,10 @@
 #funnel-tools-capture input[type="submit"]:hover {
   background: #2690db;
 }
+#funnel-tools-capture .funnel-tools-footer {
+  text-align: center;
+  font-size: 0.8rem;
+}
 @-webkit-keyframes bounceInUp {
   0%, 60%, 75%, 90%, 100% {
     -webkit-transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
