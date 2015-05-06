@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-04-27T20:28:45-04:00</updated>
+  <updated>2015-05-06T06:06:50-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,82 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to Start with Ruby?]]></title>
+    <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
+    <updated>2015-05-06T06:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
+    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterens, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
+
+<p>Turning the clocks back to when you knew much less about something is hard. But putting yourself back in that position can offer valuable insight to the opportunities available and how they might be improved in the future.</p>
+
+<!--more-->
+
+
+<h2>How I Started</h2>
+
+<p>Most come to the Rails community not knowing much about Ruby. Learning any new technology is hard. And learning a few at the same time is even harder.</p>
+
+<p>This was me in 2009. A relatively new Rails 2.3 app was dropped in to my lap, and despite only having experience with PHP, my job was to aggressively ship new features. I read Agile Web Development with Rails cover to cover and dove in head first. Little did I know it would be one of the best career decisions of my life.</p>
+
+<p>I spent the next few months pounding my head against my desk. The days and weeks of frustration seemed endless. And then&hellip;it just went away. The pain I&rsquo;d endured merged in to an intense desire to dig in harder.  There were more light bulbs moments in the months that followed than any other time I can remember.</p>
+
+<p>During those intense months of frustration, I leaned heavily on the Rails and Philly.rb IRC rooms. In the former, I tried not to say anything too stupid. Fortunately, the latter felt more welcoming and approachable and I owe that group a lot of holding my hand through what might have otherwise been a deathwish for me and the Ruby language.</p>
+
+<p>A few questions pop out in my head&hellip;I was confused about filtering an ActiveRecord query and was surprised to learn methods that were built in to the Ruby language would do exactly what I want. At the time, if it wasn&rsquo;t in ActiveRecord, it might as well have not existed to me.</p>
+
+<p>From someone who <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">advocates for using tools without fancy DSL&rsquo;s</a>, this is hysterical to me. Ruby, of all things, had the answer. At that point, I&rsquo;m almost certain I&rsquo;d never seen the Ruby standard library documentation.</p>
+
+<h2>Rails Starts Where Ruby Stops</h2>
+
+<p>Out of convenience, Rails does a lot to make our experience with the Ruby language easier than it is out of the box. Like <code>2.hours.ago</code>&hellip;.none of this is possible if Rails doesn&rsquo;t <a href="http://api.rubyonrails.org/classes/Integer.html">monkey patch the <code>Integer</code> class</a>. For someone who doesn&rsquo;t know any better (me in 2009!), being able to calls <code>#hours</code> on an integer just seems like something the language would do. Because Ruby was created for developer happiness, right?</p>
+
+<p>So perhaps the approach of monkey patching doesn&rsquo;t offer a clear indication of where functionality is coming from. The flip side of that argument is convenience. If I had to instantiate a time-related class every time I wanted &ldquo;noon time yesterday&rdquo;, maybe I&rsquo;d be slightly less enthralled with my ability to get stuff done in Rails. Perhaps it would cater more to the true OO neckbeards, but also may have resulted in far less adoption. Who knows!</p>
+
+<p>I don&rsquo;t have strong numbers to back this up, but I&rsquo;m guessing large majority of developers that get paid to write Ruby, due so within the context of a Rails application. And whether we want to admit it or not, a large reason new developers learn Ruby, is to learn Rails. So does it matter that newcomers don&rsquo;t know Ruby?</p>
+
+<p>From the standpoint of creating a web application fast and being able to iterate quickly, maybe not. But certainly if the person is interested in understanding the interworkings of what&rsquo;s happening within the application, knowing where Ruby stops and Rails starts is ideal.</p>
+
+<h2>How to Start?</h2>
+
+<p>I&rsquo;ve talked to quite a few people that are new to Ruby and I always struggle to suggest a good start project when they ask.  Everyone learns differently and has different interests, but in general, I think there are core-level motivating factors that can keep someone focused and interested.</p>
+
+<p>To me, it&rsquo;s the following:</p>
+
+<ol>
+<li>Does the project have real-world value?</li>
+<li>Does the project offer immediate feedback?</li>
+</ol>
+
+
+<p>Why does it matter if the project has real-world value? For one, continuing on something that doesn&rsquo;t improve our lives is sometimes hard to keep up with. And learning Ruby/Rails is definitely something that&rsquo;ll take more than a few nights and weekends. If the project we&rsquo;re driving towards continues to seem desirable, we&rsquo;ll have a better chance not to lose focus.</p>
+
+<p>Second, I don&rsquo;t want to get too philosophical, but there are plenty of resources that suggest if you want something badly enough and can visualize the end goal, there&rsquo;s a higher likelyhood that it&rsquo;ll come to be. Our desires will be stronger when we can see the end goal and know there is an increased real-world value for this application to be in existence.</p>
+
+<p>The immediate feedback piece shortens the time we&rsquo;re able to see changes and progress. This brings a lower rate of abandonment and better chance we&rsquo;ll see the project through.</p>
+
+<p>Rails answers both of these questions with a resounding, &ldquo;<strong>YES!</strong>&rdquo;. Think about it&hellip;</p>
+
+<p><strong>Does a Rails application have real world value?</strong> Of course it does. It&rsquo;s a web application. There has been no better time to be focused on Rails, where it be for the web and the backend of a mobile app.</p>
+
+<p><strong>Does the project offer immediate feedback?</strong> Sure does! A couple keystrokes and a refresh can give you instant gratifcation in the browser (or the occasional disappointment!).</p>
+
+<p>Whether it&rsquo;s a command-line tool, game, or other utility, I struggle to find other oppotunities to get people started. Frankly, many newcomers to Rails have never used a terminal before. So why would we suggest a command-line application as a good place to start? This is especially true for someone with little programming experience.</p>
+
+<p>For the experienced developer, it&rsquo;d be much easier to suggest writing something like a markdown processor, but only because they have the context of another language. At that point, they&rsquo;re really just comparing the Ruby language to what they already know and figuring out how to translate the things they <em>do</em> know to Ruby.</p>
+
+<p>For a new developer altogether, they would get little value of writing a markdown processor, and in fact, probably seems more like a research project than a sure-fire way to learn a developer-friendly programming language.</p>
+
+<p>So now we&rsquo;re back to suggesting Rails, but then you consider everything else a newcomer would need familiarity with to traverse the Rails eco-stytem: HTML, CSS, Javascript, Coffeescript, Sass, SQL&hellip;</p>
+
+<p>The list goes on and on. Not so easy after all. No wonder people get intimidated and bail. I suppose there&rsquo;s starting with Sinatra, but the doesn&rsquo;t remove you from the HTML and CSS requirements. Perhaps those impossible to dodge, given the medium. And even with Sinatra, we often end up creating the functionality that&rsquo;s in Rails anyway.</p>
+
+<p>I wish I had a better answer.</p>
+
+<p><strong>How would you suggest someone start with Ruby?</strong></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
@@ -718,215 +794,6 @@ gem &lsquo;intercom-rails&rsquo;
 <h2>Build a Ruby Gem</h2>
 
 <p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Active Record Validation Contexts with Inheritance]]></title>
-    <link href="http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/"/>
-    <updated>2014-11-18T17:20:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance</id>
-    <content type="html"><![CDATA[<p>If you’ve used <code>validates</code> in a Rails Active Record model, you know they work great -- at least until the first bit of complexity arises. At that point, they can quickly morph in to a ball of conditional spaghetti convoluting the initial reason the validation was added in the first place.</p>
-
-
-
-
-<p>I recently had an experience using <code>has_secure_password</code> where I wanted control the length of the user-supplied password. Adding a length validation to the password accessor invalidated existing records, so I was in a bit of a bind. In the end, I sub-classed the Active Record model to create a unique model made specifically for that context. This allowed me to inherit the core functionality from the model and sprinkle on existing validations for specific use cases. This was a new tactic for me and I’m still not sure how I feel about it. I like the fact that it removed complexity from the <code>User</code> model. This, in hopes, will keep the minimize the likelihood of it becoming a God object.</p>
-
-
-
-
-<!--more-->
-
-
-
-
-<h2>The Problem</h2>
-
-
-
-
-<p>Using <code>has_secure_password</code> is a relatively easy way to add authentication to a Rails app. In order to disguise the plain text passwords, an <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L106">accessor for the plain <code>password</code></a> is added that encrypts it before saving.</p>
-
-
-
-
-<p>The only true Active Record validation <code>has_secure_password</code> adds is a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L68">confirmation of the password</a> — and only when the password is present. This allows us to create a user object without supplying a password, or maybe saving straight to the <code>password_digest</code> field, which is used to store the encrypted password in the database.</p>
-
-
-
-
-<p>I wanted to enforce a minimum password length, because what good is a 1 character password (or 0 for that matter) ?!?!</p>
-
-
-
-
-<p>The first thing I did was add this to the <code>User</code> model:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }
-</code></pre>
-
-
-
-
-<p>This works for new users, but not for those with a <code>password_digest</code> already. Attempting to updated an existing user produces the following error:</p>
-
-
-
-
-<pre><code>ActiveRecord::RecordInvalid: Validation failed: Password is too short (minimum is 8 characters)
-</code></pre>
-
-
-
-
-<p>The next step was to conditionalize only on create:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }, on: :create
-</code></pre>
-
-
-
-
-<p>Except, that wasn’t right either because I’d definitely want to allow users to update their password, in which case, the length validation wouldn’t be enforced.</p>
-
-
-
-
-<p>I found another <a href="http://quickleft.com/blog/rails-tip-validating-users-with-has_secure_password">post suggesting to allow <code>nil</code></a> using:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }, allow_nil: true
-</code></pre>
-
-
-
-
-<p>But, again, that felt weird and doesn’t read particularly well when you’re looking through the source trying to understand what condition would generate a <code>nil</code> password.</p>
-
-
-
-
-<p>Other solutions included <a href="http://stackoverflow.com/a/6486345/2261909">mixing conditionals and checking model dirty state</a> and <a href="http://urgetopunt.com/rails/2012/11/12/validate-password-presence-has-secure-password.html">some combination of all of the above</a>.</p>
-
-
-
-
-<p>I’m guessing some combination of the above would’ve worked, but something didn’t feel quite right. A quick glance over any of those solutions left me wanting something cleaner and more approachable. Because it’s a complex and tremendously important part of the app, I wanted to feel comfortable with the solution.</p>
-
-
-
-
-<h2>The Solution</h2>
-
-
-
-
-<p>I recently read <a href="https://leanpub.com/growing-rails"><em>Growing Rails Application in Practice</em></a>. The most interesting takeaway for me was the idea of sub-classing an Active Record object to exactly the problem described above.</p>
-
-
-
-
-<p>Consider this…we have our <code>User</code> model with <code>has_secure_password</code>:</p>
-
-
-
-
-<pre><code>class User &lt; ActiveRecord::Base
-  has_secure_password
-end
-</code></pre>
-
-
-
-
-<p>As we saw above, the variety of validation contexts made the standard ActiveModel validation awkward. What if we sub-class <code>User</code> and add the validation contexts for a specific use case? In our case, minimum length:</p>
-
-
-
-
-<pre><code>class User::AsSignUp &lt; User
-  validates :password, length: { minimum: 8 }
-end
-</code></pre>
-
-
-
-
-<p>In this case, we’re create a separate model, for the purpose of signing up, and perhaps other user-related attribute management (profile, password reset, etc.).</p>
-
-
-
-
-<p>Now, instead of passing the <code>User</code> model to the view from the controller, we pass an instantiated version of the new context-specific model class:</p>
-
-
-
-
-<pre><code>def create
-  @user = User::AsSignUp.find(current_user.id)
-  …
-end
-</code></pre>
-
-
-
-
-<p>Lastly, because the sub-class name is inferred within the form, we have to do one more thing to make the params are accessible on the <code>create</code> action using <code>params[:user]</code>. We’ll change the form from:</p>
-
-
-
-
-<pre><code>&lt;%= form_for @user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
-</code></pre>
-
-
-
-
-<p>to:</p>
-
-
-
-
-<pre><code>&lt;%= form_for @user, as: :user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
-</code></pre>
-
-
-
-
-<p>Because the remainder of the app operates fine without any need for the password validation, the <code>User</code> can be used where necessary and without worry of it becoming invalid because the password accessor isn’t present.</p>
-
-
-
-
-<h2>Summary</h2>
-
-
-
-
-<p>While sub-classing models in Rails is generally frowned upon, this use case is one of the few that felt reasonable. It feels relatively low cost and stays in isolation. I’d love to hear how you might have solved this problem. I looked and explored a handful of solutions. While others worked, none seems as expressive as the one above.</p>
-
-
-<p>A form object using
-<a href="http://api.rubyonrails.org/classes/ActiveModel/Model.html">ActiveModel</a> or
-similar could&rsquo;ve been an alternative option. I didn&rsquo;t explore it for this
-particular use case, mostly because I wanted to give this one a shot. However,
-I have no doubt it would&rsquo;ve at least worked equally as well.</p>
-
-<p>I should also point out that I&rsquo;m familiar with the built-in <a href="https://github.com/rails/rails/blob/master/activemodel/lib/active_model/validations.rb#L73">validation
-contexts in ActiveModel</a>.
-And for whatever reason, I&rsquo;ve not used them before. I&rsquo;ll probably give it a
-shot on another occasion for comparison.</p>
-
-<p>What are your thoughts on this technique?</p>
 ]]></content>
   </entry>
   

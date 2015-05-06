@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-04-27T20:28:45-04:00</updated>
+  <updated>2015-05-06T06:06:50-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,82 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[How to Start with Ruby?]]></title>
+    <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
+    <updated>2015-05-06T06:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
+    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterens, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
+
+<p>Turning the clocks back to when you knew much less about something is hard. But putting yourself back in that position can offer valuable insight to the opportunities available and how they might be improved in the future.</p>
+
+<!--more-->
+
+
+<h2>How I Started</h2>
+
+<p>Most come to the Rails community not knowing much about Ruby. Learning any new technology is hard. And learning a few at the same time is even harder.</p>
+
+<p>This was me in 2009. A relatively new Rails 2.3 app was dropped in to my lap, and despite only having experience with PHP, my job was to aggressively ship new features. I read Agile Web Development with Rails cover to cover and dove in head first. Little did I know it would be one of the best career decisions of my life.</p>
+
+<p>I spent the next few months pounding my head against my desk. The days and weeks of frustration seemed endless. And then&hellip;it just went away. The pain I&rsquo;d endured merged in to an intense desire to dig in harder.  There were more light bulbs moments in the months that followed than any other time I can remember.</p>
+
+<p>During those intense months of frustration, I leaned heavily on the Rails and Philly.rb IRC rooms. In the former, I tried not to say anything too stupid. Fortunately, the latter felt more welcoming and approachable and I owe that group a lot of holding my hand through what might have otherwise been a deathwish for me and the Ruby language.</p>
+
+<p>A few questions pop out in my head&hellip;I was confused about filtering an ActiveRecord query and was surprised to learn methods that were built in to the Ruby language would do exactly what I want. At the time, if it wasn&rsquo;t in ActiveRecord, it might as well have not existed to me.</p>
+
+<p>From someone who <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">advocates for using tools without fancy DSL&rsquo;s</a>, this is hysterical to me. Ruby, of all things, had the answer. At that point, I&rsquo;m almost certain I&rsquo;d never seen the Ruby standard library documentation.</p>
+
+<h2>Rails Starts Where Ruby Stops</h2>
+
+<p>Out of convenience, Rails does a lot to make our experience with the Ruby language easier than it is out of the box. Like <code>2.hours.ago</code>&hellip;.none of this is possible if Rails doesn&rsquo;t <a href="http://api.rubyonrails.org/classes/Integer.html">monkey patch the <code>Integer</code> class</a>. For someone who doesn&rsquo;t know any better (me in 2009!), being able to calls <code>#hours</code> on an integer just seems like something the language would do. Because Ruby was created for developer happiness, right?</p>
+
+<p>So perhaps the approach of monkey patching doesn&rsquo;t offer a clear indication of where functionality is coming from. The flip side of that argument is convenience. If I had to instantiate a time-related class every time I wanted &ldquo;noon time yesterday&rdquo;, maybe I&rsquo;d be slightly less enthralled with my ability to get stuff done in Rails. Perhaps it would cater more to the true OO neckbeards, but also may have resulted in far less adoption. Who knows!</p>
+
+<p>I don&rsquo;t have strong numbers to back this up, but I&rsquo;m guessing large majority of developers that get paid to write Ruby, due so within the context of a Rails application. And whether we want to admit it or not, a large reason new developers learn Ruby, is to learn Rails. So does it matter that newcomers don&rsquo;t know Ruby?</p>
+
+<p>From the standpoint of creating a web application fast and being able to iterate quickly, maybe not. But certainly if the person is interested in understanding the interworkings of what&rsquo;s happening within the application, knowing where Ruby stops and Rails starts is ideal.</p>
+
+<h2>How to Start?</h2>
+
+<p>I&rsquo;ve talked to quite a few people that are new to Ruby and I always struggle to suggest a good start project when they ask.  Everyone learns differently and has different interests, but in general, I think there are core-level motivating factors that can keep someone focused and interested.</p>
+
+<p>To me, it&rsquo;s the following:</p>
+
+<ol>
+<li>Does the project have real-world value?</li>
+<li>Does the project offer immediate feedback?</li>
+</ol>
+
+
+<p>Why does it matter if the project has real-world value? For one, continuing on something that doesn&rsquo;t improve our lives is sometimes hard to keep up with. And learning Ruby/Rails is definitely something that&rsquo;ll take more than a few nights and weekends. If the project we&rsquo;re driving towards continues to seem desirable, we&rsquo;ll have a better chance not to lose focus.</p>
+
+<p>Second, I don&rsquo;t want to get too philosophical, but there are plenty of resources that suggest if you want something badly enough and can visualize the end goal, there&rsquo;s a higher likelyhood that it&rsquo;ll come to be. Our desires will be stronger when we can see the end goal and know there is an increased real-world value for this application to be in existence.</p>
+
+<p>The immediate feedback piece shortens the time we&rsquo;re able to see changes and progress. This brings a lower rate of abandonment and better chance we&rsquo;ll see the project through.</p>
+
+<p>Rails answers both of these questions with a resounding, &ldquo;<strong>YES!</strong>&rdquo;. Think about it&hellip;</p>
+
+<p><strong>Does a Rails application have real world value?</strong> Of course it does. It&rsquo;s a web application. There has been no better time to be focused on Rails, where it be for the web and the backend of a mobile app.</p>
+
+<p><strong>Does the project offer immediate feedback?</strong> Sure does! A couple keystrokes and a refresh can give you instant gratifcation in the browser (or the occasional disappointment!).</p>
+
+<p>Whether it&rsquo;s a command-line tool, game, or other utility, I struggle to find other oppotunities to get people started. Frankly, many newcomers to Rails have never used a terminal before. So why would we suggest a command-line application as a good place to start? This is especially true for someone with little programming experience.</p>
+
+<p>For the experienced developer, it&rsquo;d be much easier to suggest writing something like a markdown processor, but only because they have the context of another language. At that point, they&rsquo;re really just comparing the Ruby language to what they already know and figuring out how to translate the things they <em>do</em> know to Ruby.</p>
+
+<p>For a new developer altogether, they would get little value of writing a markdown processor, and in fact, probably seems more like a research project than a sure-fire way to learn a developer-friendly programming language.</p>
+
+<p>So now we&rsquo;re back to suggesting Rails, but then you consider everything else a newcomer would need familiarity with to traverse the Rails eco-stytem: HTML, CSS, Javascript, Coffeescript, Sass, SQL&hellip;</p>
+
+<p>The list goes on and on. Not so easy after all. No wonder people get intimidated and bail. I suppose there&rsquo;s starting with Sinatra, but the doesn&rsquo;t remove you from the HTML and CSS requirements. Perhaps those impossible to dodge, given the medium. And even with Sinatra, we often end up creating the functionality that&rsquo;s in Rails anyway.</p>
+
+<p>I wish I had a better answer.</p>
+
+<p><strong>How would you suggest someone start with Ruby?</strong></p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
@@ -637,513 +713,6 @@ halfway through something, I want to stop and do something else, so be it.</p>
 
 
 <p>I’m excited for 2015!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Ruby Refactor: Dependency Injection Options]]></title>
-    <link href="http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/"/>
-    <updated>2014-12-17T07:07:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options</id>
-    <content type="html"><![CDATA[<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
-
-<p><a href="http://en.m.wikipedia.org/wiki/Dependency_injection">Dependency injection</a> was a necessary piece of that puzzle. I’ve always been curious about the various forms of dependency injection and the effects each would have on the code. Below I explore 2 options (constructor injection and setter injection).</p>
-
-<!--more-->
-
-
-<p>In the end, setter injection felt for more natural for this case and it didn’t interfere with the classes argument list and felt ancillary to the responsibility of the code. While the change in code was small, it has a huge impact on my confidence in the code and associated tests.</p>
-
-<h2>The Code</h2>
-
-<p>The class below is responsible for handling Stripe’s <code>invoice.created</code> webhook. Prior to a customer being billed monthly subscription, Stripe will ping your application (if configured) — giving you the opportunity to add additional line items (think metered billing…). It could be additional services, or perhaps the entire bill itself (this use case). Nevertheless, the responsibility of the class is to create an invoice item based on the customer’s usage during the previous period.</p>
-
-<p>```
-module StripeEvent
-  class InvoiceCreated</p>
-
-<pre><code>attr_reader :payload
-
-def initialize(payload)
-  @payload = payload
-end
-
-def perform
-  Stripe::InvoiceItem.create(
-    customer: user.stripe_id,
-    amount: additional_charges_in_cents,
-    currency: "usd",
-    description: "Usage charges"
-  )
-end
-
-private
-
-def additional_charges_in_cents
-  Billing::Tier.new(usage).additional_charges_in_cents
-end
-
-def usage
-  Billing::Usage.new(user).last_30_days
-end
-
-def user
-  @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>I wrote this code pretty quickly and felt pretty good about it. The responsibility of determining the pricing tier had been broken out in to a separate class, as well as determining the customer’s actual usage. At least I thought they were…</p>
-
-<p>So what about the tests?</p>
-
-<p>```
-require &lsquo;test_helper&rsquo;</p>
-
-<p>class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup</p>
-
-<pre><code>@payload = {
-  "data" =&gt; {
-    "object" =&gt; {
-      "customer" =&gt; "stripe_brandon"
-    }
-  }
-}
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds invoice item based on usage&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-).returns(true)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds next level charge for usage&rsquo; do</p>
-
-<pre><code>Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-).returns(true)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>The first thing I noticed with this setup was the detailed usage of <code>Stripe::InvoiceItem.expects</code>. I wasn’t sure if this was necessarily a bad thing because it was a third-party service and it seemed like reasonable boundary of the application.</p>
-
-<p>Aside from the mock, another thing that bothered me was the difficulty simulating different pricing tiers and customer usage. You probably noticed the <code>Stat.create!…</code> in the last test. I could’ve duplicated <code>Stat</code> entries until I reached some arbitrary level of usage that bumped this user to the next pricing tier. But that felt risky and very dependent on knowing the actual value of the subsequent tier.</p>
-
-<p>What if I wanted to change the ceiling of that tier next month? I’d have to come in here and adjust the stats being created until it totaled something above the adjustment. It just felt weird…</p>
-
-<p>What if we had a way to easily swap in implementations of the <code>Billing::Usage</code>? It would then allow me to concoct any combination of usage and mock the expected values sent to Stripe.</p>
-
-<h2>Setter Injection</h2>
-
-<p>In a few other articles, I’ve heard this termed “accessors as collaborators”. Whatever the name, it was surprising how such a little a change could produce so much flexibility in my tests. And with that additional flexibility came confidence because it allowed me to test the edge cases with minimal overhead.</p>
-
-<p>```
-module StripeEvent
-  class InvoiceCreated</p>
-
-<pre><code>attr_writer :usage_service
-attr_reader :payload
-
-def initialize(payload)
-  @payload = payload
-end
-
-def perform
-  if user.created_at &lt; 14.days.ago
-    Stripe::InvoiceItem.create(
-      customer: user.stripe_id,
-      amount: additional_charges_in_cents,
-      currency: "usd",
-      description: "Usage charges"
-    )
-  end
-end
-
-private
-
-def additional_charges_in_cents
-  Billing::Tier.new(usage).additional_charges_in_cents
-end
-
-def usage
-  usage_service.last_30_days
-end
-
-def usage_service
-  @usage_service ||= Billing::Usage.new(user)
-end
-
-def user
-  @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>A couple things changed:</p>
-
-<ol>
-<li><p><code>usage_service</code> was created to extract the code to calculate customer usage</p></li>
-<li><p>The <code>usage</code> method now calls the <code>last_30_days</code> method on <code>usage_service</code></p>
-
-<p> This is interesting because you’ll notice now that the only important idea about <code>usage_service</code> is the   fact that is has a <code>last_30_days</code> method. We can now take comfort in the idea that <code>usage_service</code> could    be anything really, as long as it implements the <code>last_30_days</code> method.</p></li>
-<li><p><code>attr_writer :usage_service</code> was added to allow for other implementations of the usage class</p></li>
-</ol>
-
-
-<p>This allows us to inject other forms of the <code>usage_service</code> to simulate more or less customer usage:</p>
-
-<p>```
-require &lsquo;test_helper&rsquo;</p>
-
-<p>class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup</p>
-
-<pre><code>@payload = {
-  "data" =&gt; {
-    "object" =&gt; {
-      "customer" =&gt; "stripe_brandon"
-    }
-  }
-}
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds invoice item based on usage&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds next level charge for usage&rsquo; do</p>
-
-<pre><code>Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds highest tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 49900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level5Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd highest tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 24900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level4Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds middle tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 12900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level3Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level2Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 1st tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level1Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  Level5Usage = Class.new { def last_30_days; 2_000_000; end }
-  Level4Usage = Class.new { def last_30_days; 900_000; end }
-  Level3Usage = Class.new { def last_30_days; 190_000; end }
-  Level2Usage = Class.new { def last_30_days; 19_000; end }
-  Level1Usage = Class.new { def last_30_days; 1_900; end }
-```</p>
-
-<p>I’ve created classes for each usage tier that implement the <code>last_30_days</code> method. In real life, this usage service is more complex, but we can test the complexity of it alone through unit tests. The responsibility of this class is to ensure invoice items are added to Stripe correctly, so removing the complexity of <code>Billing::Usage</code> form this test allows us to maximize this test’s value and keep us isolated from the implementation of <code>Billing::Usage</code> — assuming it implements the <code>last_30_days</code> method.</p>
-
-<h2>Constructor Injection</h2>
-
-<p>Most dependency injection posts focus on constructor injection. The idea being that an implementation can be supplied. If not, a reasonable default will be provided. How might that change this scenario?</p>
-
-<p>```
-module StripeEvent
-  class InvoiceCreated</p>
-
-<pre><code>attr_reader :payload
-
-def initialize(payload, usage_service = Billing::Usage)
-  @payload = payload
-  @usage_service = usage_service
-end
-
-def perform
-  if user.created_at &lt; 14.days.ago
-    Stripe::InvoiceItem.create(
-      customer: user.stripe_id,
-      amount: additional_charges_in_cents,
-      currency: "usd",
-      description: "Usage charges"
-    )
-  end
-end
-
-private
-
-def additional_charges_in_cents
-  Billing::Tier.new(usage).additional_charges_in_cents
-end
-
-def usage
-  @usage_service.new(user).last_30_days
-end
-
-def user
-  @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Because the <code>usage</code> method requires instantiation from within the class, I had to update the fake test Usage classes to accept <code>user</code> as an argument during instantiation:</p>
-
-<p>```
-require &lsquo;test_helper&rsquo;</p>
-
-<p>class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup</p>
-
-<pre><code>@payload = {
-  "data" =&gt; {
-    "object" =&gt; {
-      "customer" =&gt; "stripe_brandon"
-    }
-  }
-}
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds invoice item based on usage&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds next level charge for usage&rsquo; do</p>
-
-<pre><code>Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds highest tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 49900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level5Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd highest tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 24900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level4Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds middle tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 12900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level3Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level2Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 1st tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level1Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  Level5Usage = Struct.new(:user) { def last_30_days; 2_000_000; end }
-  Level4Usage = Struct.new(:user) { def last_30_days; 900_000; end }
-  Level3Usage = Struct.new(:user) { def last_30_days; 190_000; end }
-  Level2Usage = Struct.new(:user) { def last_30_days; 19_000; end }
-  Level1Usage = Struct.new(:user) { def last_30_days; 1_900; end }
-```</p>
-
-<p>The resulting test classes seem overly complex and sprinkled with details that aren’t particularly relevant to its responsibility. If we were to pass in an already instantiated usage class as an argument, it means we would have to already know the user before-hand, which means we’d have to parse <code>@user ||= User.find_by(stripe_id: payload["data"]["object"]["customer”])</code> outside of this class. I don’t love that solution — the parent that calls this <code>InvoiceCreated</code> class is pretty minimal and I wanted to keep it that way.</p>
-
-<p>Another option would be to provide <code>user</code> as an argument to the to the <code>last_30_days</code> method:</p>
-
-<p><code>
-def usage
-  @usage_service.new.last_30_days(user)
-end
-</code></p>
-
-<p>We could then change our fake test usage classes back to:</p>
-
-<p><code>
-Level1Usage = Class.new { def last_30_days; 1_900; end }
-</code></p>
-
-<p>Notice the lack of <code>Struct</code> with an argument…</p>
-
-<h2>Summary</h2>
-
-<p>Of the two options, I prefer the setter injector in this case. There’s something about changing the signature of a class just for tests that didn’t feel natural.</p>
-
-<p>An accessor (or writer…), in this case, provided the same flexibility without changing the signature. I like being able to quickly look at the argument list of <code>initialize</code> and clearly understand its roles and responsibilities within the system.</p>
-
-<p>Which do you prefer?</p>
 ]]></content>
   </entry>
   
