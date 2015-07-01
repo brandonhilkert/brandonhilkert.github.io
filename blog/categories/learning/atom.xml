@@ -4,7 +4,7 @@
   <title><![CDATA[Category: learning | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/learning/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-06-03T20:57:07-04:00</updated>
+  <updated>2015-06-30T21:15:17-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -18,7 +18,7 @@
     <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
     <updated>2015-05-06T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
-    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterens, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
+    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterans, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
 
 <p>Turning the clocks back to when you knew much less about something is hard. But putting yourself back in that position can offer valuable insight to the opportunities available and how they might be improved in the future.</p>
 

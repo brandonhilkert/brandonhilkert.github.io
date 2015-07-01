@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-06-03T20:57:07-04:00</updated>
+  <updated>2015-06-30T21:15:17-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,11 +14,259 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
+    <link href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/"/>
+    <updated>2015-06-30T16:10:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s impossible to escape Javascript in a Rails application. From a tiny script to a full-on Javascript framework, websites are becoming more and more reliant on Javascript, whether we like it or not.</p>
+
+<p>Several articles back, I documented <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">how I handle page-specific Javascript in a Rails application</a>. My solution included a third-party jQuery plugin that did some magic on the <code>$(document).ready</code> function in combination with CSS style scoping to limit the functionality.</p>
+
+<!--more-->
+
+
+<p>The plugin worked well for awhile, but with the advent of Turbolinks, the
+solution felt less and less appropriate. I&rsquo;ve since settled on some techniques
+to not only handle page-specific Javascript, but overall organization and structure of Javascript within a Rails application. I&rsquo;ve used it in a hand full of large applications over the past few months and it&rsquo;s held up incredibly well.</p>
+
+<h2>The Problem</h2>
+
+<p>Using &ldquo;sprinkles&rdquo; of Javascript throughout a Rails application can get unwieldly fast if we&rsquo;re not consistent. What we ideally want is some techniques and guidelines that can keep the Javascript organized in our projects. <strong>We also don&rsquo;t want to have to disable Turbolinks to make our application work as we expect</strong>.</p>
+
+<h2>The Solution</h2>
+
+<p>Generally, javascript behavior can be boiled down to the following categories:</p>
+
+<ol>
+<li>Behavior that&rsquo;s &ldquo;always on&rdquo;</li>
+<li>Behavior that&rsquo;s triggered from a user action</li>
+</ol>
+
+
+<p>But first, a few things to will help us stay organized&hellip;</p>
+
+<h2>Class Scoping</h2>
+
+<p>I still like to scope the body element of the layout(s) with the controller and action name:</p>
+
+<figure class='code'><pre><code>&lt;body class="&lt;%= controller_name %&gt; &lt;%= action_name %&gt;"&gt;
+  &lt;%= yield %&gt;
+&lt;/body&gt;</code></pre></figure>
+
+
+<p>This not only let&rsquo;s us control access to the DOM through jQuery if we need to, but also provides some top-level styling classes to allow us to easily add page-specific CSS.</p>
+
+<p>In the case we&rsquo;re working on the proverbial blog posts application, the body tag ends up looking like:</p>
+
+<figure class='code'><pre><code>&lt;body class="posts index"&gt;
+  &lt;%= yield %&gt;
+&lt;/body&gt;</code></pre></figure>
+
+
+<p>This gives us the opportunity to scope CSS and Javascripts to all <code>posts</code>-related pages in the controller with the <code>.posts</code> class, or down to the specific page using a combination of both the controller and action: <code>.posts.index</code>.</p>
+
+<h2>Default Application Manifest</h2>
+
+<p>Here&rsquo;s the default <code>app/assets/javascripts/application.js</code>:</p>
+
+<figure class='code'><pre><code>// This is a manifest file that'll be compiled into application.js, which will include all the files
+// listed below.
+//
+// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
+// or any plugin's vendor/assets/javascripts directory can be referenced here using a relative path.
+//
+// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
+// compiled file.
+//
+// Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
+// about supported directives.
+//
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require_tree .</code></pre></figure>
+
+
+<p>I start by removing the line <code>//= require_tree .</code>. I do this because if you don&rsquo;t, the javascript files in the folder will be loaded in alphabetical order. As you&rsquo;ll see below, there&rsquo;s an initialization file that needs to be loaded before other Javascript. We&rsquo;ll also remove the comments from the top of the file to preserve space.</p>
+
+<p>So we&rsquo;re left with:</p>
+
+<figure class='code'><pre><code>//= require jquery
+//= require jquery_ujs
+//= require turbolinks</code></pre></figure>
+
+
+<h2>Initialization</h2>
+
+<p>Let&rsquo;s start by adding the file <code>app/assets/javascripts/init.coffee</code> with the following:</p>
+
+<figure class='code'><pre><code>window.App ||= {}
+
+App.init = -&gt;
+  $("a, span, i, div").tooltip()
+
+$(document).on "page:change", -&gt;
+  App.init()</code></pre></figure>
+
+
+<p>Let&rsquo;s dig in to each pagef of this:</p>
+
+<figure class='code'><pre><code>window.App ||= {}</code></pre></figure>
+
+
+<p>We&rsquo;re creating the <code>App</code> object on window so the functionality added to the object is available throughout the application.</p>
+
+<p>Next, we define an <code>init()</code> function on <code>App</code> to initialize common jQuery plugins and other Javascript libraries:</p>
+
+<figure class='code'><pre><code>App.init = -&gt;
+  $("a, span, i, div").tooltip()</code></pre></figure>
+
+
+<p>The call to <code>$("a, span, i, div").tooltip()</code> initializes Bootstrap Tooltips. This is an example of the type of libraries that can/should be setup here. Obviously, if you&rsquo;re not using Bootstrap tooltips, you would haven&rsquo;t this here, but coupled with the next line, we&rsquo;ll see why this works.</p>
+
+<p>Lastly, as many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>page:change</code> event:</p>
+
+<figure class='code'><pre><code>$(document).on "page:change", -&gt;
+  App.init()</code></pre></figure>
+
+
+<p><em>Note: the <code>page:change</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
+
+<h2>&ldquo;Always On&rdquo; Javascript Functionality</h2>
+
+<p>Now with the defaults out of the way, let&rsquo;s take a look at adding some behavior.</p>
+
+<p>Let&rsquo;s assume one of our pages will show a Javascript graph of data. We&rsquo;ll start by adding a file with a name related to that responsibility.</p>
+
+<figure class='code'><pre><code># app/assets/javascripts/app.chart.coffee
+
+class App.Chart
+  constructor: (@el) -&gt;
+    # intialize some stuff
+
+  render: -&gt;
+    # do some stuff
+
+$(document).on "page:change", -&gt;
+  chart = new App.Chart $("#chart")
+  chart.render()
+</code></pre></figure>
+
+
+<p>A few things to note here&hellip;</p>
+
+<h3>Structure</h3>
+
+<p>I created a class in the <code>App</code> namespace &mdash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
+
+<p>You might notice the file takes the form:</p>
+
+<figure class='code'><pre><code>|
+|
+class definition
+|
+|
+
+
+|
+invocation
+|</code></pre></figure>
+
+
+<p>While this may seem obvious, it&rsquo;s an important point to keep in mind. I&rsquo;ve found it offers a predictable structure that allows me to open any coffeescript file that we&rsquo;ve written in the project and generally know where to look for what.</p>
+
+<h3>Turbolinks-Proof</h3>
+
+<p>We called this &ldquo;Always On&rdquo; functionality because, as you probably noticed, using the following event listener <code>$(document).on "page:change", -&gt;</code>, we know with Turbolinks, this gets triggered on every page transition.</p>
+
+<h3>Add to Manifest</h3>
+
+<p>Because we removed the <code>//= require_tree .</code> line in the default <code>application.js</code> manifest file, we&rsquo;ll have to add our chart file to be included in the asset pipeline (last line):</p>
+
+<figure class='code'><pre><code>//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require app.chart</code></pre></figure>
+
+
+<h3>Page-Specific Javascript</h3>
+
+<p>Uh oh, so maybe we don&rsquo;t want the graph to show up on every page! In this case, we&rsquo;re looking for &ldquo;Always On&rdquo; functionality for specific pages <strong>ONLY</strong>.</p>
+
+<p>We can limit the page pages certain functionality is loaded on by using the classes we added to the body of the layout. In this case, a small conditional to the invocation can prevent this being triggered on pages it shouldn&rsquo;t be.</p>
+
+<figure class='code'><pre><code>$(document).on "page:change", -&gt;
+  return unless $(".posts.index").length &gt; 0
+  f = new App.Chart $("#chart")
+  f.render()</code></pre></figure>
+
+
+<p>We added <code>return unless $(".posts.index").length &gt; 0</code> to make sure <code>App.Chart</code> never gets instantiated if we&rsquo;re on the <code>.posts.index</code> page. While this may seem verbose, I&rsquo;ve found that it&rsquo;s not very common to need page-specific functionality. There are probably plenty of libraries that do something similar, like <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">the one I previously suggested</a>. <strong>However, to me, limiting javascript to a single page and very explicit when I read the code, it&rsquo;s almost never worth dragging in a separate plugin for this. YMMV.</strong></p>
+
+<h2>User-Triggered Javascript</h2>
+
+<p>This type of Javascript is exactly what you&rsquo;d think &mdash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
+
+<h3>&ldquo;data-behavior&rdquo; Attribute</h3>
+
+<p>Let&rsquo;s assume there&rsquo;s a link in the user&rsquo;s account that allows them to update their credit card. In this case, we have the following:</p>
+
+<figure class='code'><pre><code>&lt;%= link_to "Update Credit Card", "#", data: { behavior: "update-credit-card" } %&gt;</code></pre></figure>
+
+
+<p>You&rsquo;ll probably notice the <code>data-behavior</code> tag being added to the link. This is the key we&rsquo;ll use to attach the Javascript behavior.</p>
+
+<p>We could have added a unique class to the link:</p>
+
+<figure class='code'><pre><code>&lt;%= link_to "Update Credit Card", "#", class: "update-credit-card" %&gt;</code></pre></figure>
+
+
+<p>or, perhaps, even assign an ID:</p>
+
+<figure class='code'><pre><code>&lt;%= link_to "Update Credit Card", "#", id: "update-credit-card" %&gt;</code></pre></figure>
+
+
+<p>Both of these techniques don&rsquo;t really indicate whether we added the <code>update-card-card</code> for the use of CSS styling, or to attach Javascript behavior. So in my applications, I leave classes for <strong>styling ONLY</strong>.</p>
+
+<p>So now to the Javascript:</p>
+
+<figure class='code'><pre><code>App.Billing =
+  update: -&gt;
+    # do some stuff
+
+$(document).on "click", "[data-behavior~=update-credit-card]", =&gt;
+  App.Billing.update()</code></pre></figure>
+
+
+<p>We can use the selector <code>[data-behavior~=update-credit-card]</code> to latch on to the <code>data-behavior</code> tag we defined in the view. We use the <code>on</code> jQuery method to ensure that we&rsquo;re listening to this event whether the element&rsquo;s on the page or not. This is what allows us to load this Javascript when on other pages and have it still work when a user clicks through to the page with the actual link on it.</p>
+
+<p>We could latch on to the <code>change</code> event, or whatever is appropriate to the element we&rsquo;re adding behavior.</p>
+
+<h3>Add to Manifest</h3>
+
+<p>Again, because Javascripts assets we add to <code>app/assets/javascripts</code> won&rsquo;t automatically be inserted in to the asset pipeline, we&rsquo;ll add <code>//= require app.billing</code> to the manifest file:</p>
+
+<figure class='code'><pre><code>//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require app.chart
+//= require app.billing</code></pre></figure>
+
+
+<h2>Summary</h2>
+
+<p>Using the techniques above, we can keep the Javascript in our Rails applications organized and predictable. We can rest easy knowing the files will all generally look the same. There&rsquo;s not been any uses cases where this structure hasn&rsquo;t worked for me personally.</p>
+
+<p>One thing that makes me feel good about this approach is there&rsquo;s no real magic or extra plugins. It&rsquo;s using all the tools we already have in a basic Rails application, which is one less thing to maintain and keep up to date. Less depedencies == less pain down the road.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[How to Start with Ruby?]]></title>
     <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
     <updated>2015-05-06T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
-    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterens, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
+    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterans, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
 
 <p>Turning the clocks back to when you knew much less about something is hard. But putting yourself back in that position can offer valuable insight to the opportunities available and how they might be improved in the future.</p>
 
@@ -2653,44 +2901,6 @@ end</code></pre></figure>
 <p>The introduction of Rails engines created a new way to organize micro-applications and integrate them into a host application. Doing so keeps features and otherwise separate logic truly separate.</p>
 
 <p>I’ve only scratched the surface on what a gem can provide through engines. It’s certainly more detailed than just asset and view helper integration, as shown above. If you’re interested in learning more about the other features Rails engine provide, <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">the Rails guides</a> are a great place to start.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem Ebook Available on Thursday]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday/"/>
-    <updated>2014-03-24T06:03:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
-including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
-
-<p>I spent the last couple of weeks with my head down focusing on producing the best content possible for the upcoming release of my <em><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">Build a Ruby Gem</a></em> ebook. I’m excited to finally show you what I’ve been working on.</p>
-
-<p>The book will be available starting at <strong>Midnight (EDT) on Thursday, March 27th</strong> and can be purchased from <strong><a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">my website</a></strong>.</p>
-
-<!--more-->
-
-
-<p>3 packages will be available:</p>
-
-<ol>
-<li><p><strong>Ebook</strong> only — $39</p>
-
-<p> The book is 19 chapters, totaling 136 pages. The book content ranges from how to get started with open source projects to the nitty gritty of <a href="http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">configuration patterns in a Ruby gem</a>. The <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=email&amp;utm_campaign=packages">chapter list</a> offers a detailed list of the topics included.</p></li>
-<li><p><strong>Ebook</strong> + <strong>Code</strong> (14 chapters of code)  — $79</p>
-
-<p> In addition to the ebook above, I have packaged the <strong>code from all 14 technical chapters</strong> — several of which include Rails applications with the sample gem code mounted. This is the perfect package if you want down to the code level and really get your hands dirty.</p></li>
-<li><p><strong>Ebook</strong> + <strong>Code</strong> (14 chapters of code) + <strong>Screencasts</strong> (2 hrs. of video) — $129</p>
-
-<p> In addition to the ebook and code above, I have created <strong>14 screencasts totaling over 2 hours of detailed workflow</strong>. I go through the process of writing the code for each technical chapter and discuss the benefits and downsides to the various approaches.</p></li>
-</ol>
-
-
-<p>I can’t tell you how excited I am to finally share this content with you. It’s been a little over 3 months since I announced that I was writing a book on building Ruby gems. To see so much interest has been really gratifying. I really can’t wait to see what you build as a result.</p>
-
-<p>As promised, I will be sending out a <strong>discount code on Tuesday night</strong> for those on the book mailing list, good for <strong>20% off the listed price of any package</strong>. The discount will only be <strong>available for the first 24 hours</strong>. After that, the packages will return to the prices listed above.</p>
 ]]></content>
   </entry>
   

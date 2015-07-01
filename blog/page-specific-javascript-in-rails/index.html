@@ -174,7 +174,11 @@
 	<div class="entry-content" itemprop="articleBody">
     
 
-    <p>The asset pipeline has made including javascript in Rails applications a breeze. Without any additional changes, the code included in your app is executed on every page. However, with a combination of CSS class scopes and a jQuery plugin, you can isolate certain javascript code to only run on specific pages.</p>
+    <p><em>UPDATE: I&rsquo;ve written an updated article on this and the larger topic of
+<a href="/blog/organizing-javascript-in-rails-application-with-turbolinks/">organizing Javascript within a Rails project that includes
+Turbolinks</a>.</em></p>
+
+<p>The asset pipeline has made including javascript in Rails applications a breeze. Without any additional changes, the code included in your app is executed on every page. However, with a combination of CSS class scopes and a jQuery plugin, you can isolate certain javascript code to only run on specific pages.</p>
 
 <h2>The Problem</h2>
 
@@ -267,7 +271,9 @@ $(".pages.contact").ready -&gt;
 
 <p>Let me what you think of this solution and if you’ve come across this issue before. I&rsquo;d love to hear about other solutions!</p>
 
-<p><em>Note: In order for this solution to work with Turbolinks in Rails 4, I had to drag in the <a href="https://github.com/kossnocorp/jquery.turbolinks">jquery.turbolinks plugin</a>.</em></p>
+<p><strong>If you&rsquo;re looking for solutions that work with Rails 4 and Turbolinks, see my
+latest article on <a href="/blog/organizing-javascript-in-rails-application-with-turbolinks/">organizing Javascript in a Rails application that includes
+Turbolinks</a>.</strong></p>
 
   </div>
 

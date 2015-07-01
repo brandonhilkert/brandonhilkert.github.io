@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-06-03T20:57:07-04:00</updated>
+  <updated>2015-06-30T21:15:17-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,11 +14,281 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
+    <link href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/"/>
+    <updated>2015-06-30T16:10:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s impossible to escape Javascript in a Rails application. From a tiny script to a full-on Javascript framework, websites are becoming more and more reliant on Javascript, whether we like it or not.</p>
+
+<p>Several articles back, I documented <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">how I handle page-specific Javascript in a Rails application</a>. My solution included a third-party jQuery plugin that did some magic on the <code>$(document).ready</code> function in combination with CSS style scoping to limit the functionality.</p>
+
+<!--more-->
+
+
+<p>The plugin worked well for awhile, but with the advent of Turbolinks, the
+solution felt less and less appropriate. I&rsquo;ve since settled on some techniques
+to not only handle page-specific Javascript, but overall organization and structure of Javascript within a Rails application. I&rsquo;ve used it in a hand full of large applications over the past few months and it&rsquo;s held up incredibly well.</p>
+
+<h2>The Problem</h2>
+
+<p>Using &ldquo;sprinkles&rdquo; of Javascript throughout a Rails application can get unwieldly fast if we&rsquo;re not consistent. What we ideally want is some techniques and guidelines that can keep the Javascript organized in our projects. <strong>We also don&rsquo;t want to have to disable Turbolinks to make our application work as we expect</strong>.</p>
+
+<h2>The Solution</h2>
+
+<p>Generally, javascript behavior can be boiled down to the following categories:</p>
+
+<ol>
+<li>Behavior that&rsquo;s &ldquo;always on&rdquo;</li>
+<li>Behavior that&rsquo;s triggered from a user action</li>
+</ol>
+
+
+<p>But first, a few things to will help us stay organized&hellip;</p>
+
+<h2>Class Scoping</h2>
+
+<p>I still like to scope the body element of the layout(s) with the controller and action name:</p>
+
+<p><code>
+&lt;body class="&lt;%= controller_name %&gt; &lt;%= action_name %&gt;"&gt;
+  &lt;%= yield %&gt;
+&lt;/body&gt;
+</code></p>
+
+<p>This not only let&rsquo;s us control access to the DOM through jQuery if we need to, but also provides some top-level styling classes to allow us to easily add page-specific CSS.</p>
+
+<p>In the case we&rsquo;re working on the proverbial blog posts application, the body tag ends up looking like:</p>
+
+<p><code>
+&lt;body class="posts index"&gt;
+  &lt;%= yield %&gt;
+&lt;/body&gt;
+</code></p>
+
+<p>This gives us the opportunity to scope CSS and Javascripts to all <code>posts</code>-related pages in the controller with the <code>.posts</code> class, or down to the specific page using a combination of both the controller and action: <code>.posts.index</code>.</p>
+
+<h2>Default Application Manifest</h2>
+
+<p>Here&rsquo;s the default <code>app/assets/javascripts/application.js</code>:</p>
+
+<p><code>
+// This is a manifest file that'll be compiled into application.js, which will include all the files
+// listed below.
+//
+// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
+// or any plugin's vendor/assets/javascripts directory can be referenced here using a relative path.
+//
+// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
+// compiled file.
+//
+// Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
+// about supported directives.
+//
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require_tree .
+</code></p>
+
+<p>I start by removing the line <code>//= require_tree .</code>. I do this because if you don&rsquo;t, the javascript files in the folder will be loaded in alphabetical order. As you&rsquo;ll see below, there&rsquo;s an initialization file that needs to be loaded before other Javascript. We&rsquo;ll also remove the comments from the top of the file to preserve space.</p>
+
+<p>So we&rsquo;re left with:</p>
+
+<p><code>
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+</code></p>
+
+<h2>Initialization</h2>
+
+<p>Let&rsquo;s start by adding the file <code>app/assets/javascripts/init.coffee</code> with the following:</p>
+
+<p>```
+window.App ||= {}</p>
+
+<p>App.init = &ndash;>
+  $(&ldquo;a, span, i, div&rdquo;).tooltip()</p>
+
+<p>$(document).on &ldquo;page:change&rdquo;, &ndash;>
+  App.init()
+```</p>
+
+<p>Let&rsquo;s dig in to each pagef of this:</p>
+
+<p><code>
+window.App ||= {}
+</code></p>
+
+<p>We&rsquo;re creating the <code>App</code> object on window so the functionality added to the object is available throughout the application.</p>
+
+<p>Next, we define an <code>init()</code> function on <code>App</code> to initialize common jQuery plugins and other Javascript libraries:</p>
+
+<p><code>
+App.init = -&gt;
+  $("a, span, i, div").tooltip()
+</code></p>
+
+<p>The call to <code>$("a, span, i, div").tooltip()</code> initializes Bootstrap Tooltips. This is an example of the type of libraries that can/should be setup here. Obviously, if you&rsquo;re not using Bootstrap tooltips, you would haven&rsquo;t this here, but coupled with the next line, we&rsquo;ll see why this works.</p>
+
+<p>Lastly, as many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>page:change</code> event:</p>
+
+<p><code>
+$(document).on "page:change", -&gt;
+  App.init()
+</code>
+<em>Note: the <code>page:change</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
+
+<h2>&ldquo;Always On&rdquo; Javascript Functionality</h2>
+
+<p>Now with the defaults out of the way, let&rsquo;s take a look at adding some behavior.</p>
+
+<p>Let&rsquo;s assume one of our pages will show a Javascript graph of data. We&rsquo;ll start by adding a file with a name related to that responsibility.</p>
+
+<p>```</p>
+
+<h1>app/assets/javascripts/app.chart.coffee</h1>
+
+<p>class App.Chart
+  constructor: (@el) &ndash;></p>
+
+<pre><code># intialize some stuff
+</code></pre>
+
+<p>  render: &ndash;></p>
+
+<pre><code># do some stuff
+</code></pre>
+
+<p>$(document).on &ldquo;page:change&rdquo;, &ndash;>
+  chart = new App.Chart $(&ldquo;#chart&rdquo;)
+  chart.render()</p>
+
+<p>```</p>
+
+<p>A few things to note here&hellip;</p>
+
+<h3>Structure</h3>
+
+<p>I created a class in the <code>App</code> namespace &mdash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
+
+<p>You might notice the file takes the form:</p>
+
+<p>```
+|
+|
+class definition
+|
+|</p>
+
+<p>|
+invocation
+|
+```</p>
+
+<p>While this may seem obvious, it&rsquo;s an important point to keep in mind. I&rsquo;ve found it offers a predictable structure that allows me to open any coffeescript file that we&rsquo;ve written in the project and generally know where to look for what.</p>
+
+<h3>Turbolinks-Proof</h3>
+
+<p>We called this &ldquo;Always On&rdquo; functionality because, as you probably noticed, using the following event listener <code>$(document).on "page:change", -&gt;</code>, we know with Turbolinks, this gets triggered on every page transition.</p>
+
+<h3>Add to Manifest</h3>
+
+<p>Because we removed the <code>//= require_tree .</code> line in the default <code>application.js</code> manifest file, we&rsquo;ll have to add our chart file to be included in the asset pipeline (last line):</p>
+
+<p><code>
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require app.chart
+</code></p>
+
+<h3>Page-Specific Javascript</h3>
+
+<p>Uh oh, so maybe we don&rsquo;t want the graph to show up on every page! In this case, we&rsquo;re looking for &ldquo;Always On&rdquo; functionality for specific pages <strong>ONLY</strong>.</p>
+
+<p>We can limit the page pages certain functionality is loaded on by using the classes we added to the body of the layout. In this case, a small conditional to the invocation can prevent this being triggered on pages it shouldn&rsquo;t be.</p>
+
+<p><code>
+$(document).on "page:change", -&gt;
+  return unless $(".posts.index").length &gt; 0
+  f = new App.Chart $("#chart")
+  f.render()
+</code></p>
+
+<p>We added <code>return unless $(".posts.index").length &gt; 0</code> to make sure <code>App.Chart</code> never gets instantiated if we&rsquo;re on the <code>.posts.index</code> page. While this may seem verbose, I&rsquo;ve found that it&rsquo;s not very common to need page-specific functionality. There are probably plenty of libraries that do something similar, like <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">the one I previously suggested</a>. <strong>However, to me, limiting javascript to a single page and very explicit when I read the code, it&rsquo;s almost never worth dragging in a separate plugin for this. YMMV.</strong></p>
+
+<h2>User-Triggered Javascript</h2>
+
+<p>This type of Javascript is exactly what you&rsquo;d think &mdash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
+
+<h3>&ldquo;data-behavior&rdquo; Attribute</h3>
+
+<p>Let&rsquo;s assume there&rsquo;s a link in the user&rsquo;s account that allows them to update their credit card. In this case, we have the following:</p>
+
+<p><code>
+&lt;%= link_to "Update Credit Card", "#", data: { behavior: "update-credit-card" } %&gt;
+</code></p>
+
+<p>You&rsquo;ll probably notice the <code>data-behavior</code> tag being added to the link. This is the key we&rsquo;ll use to attach the Javascript behavior.</p>
+
+<p>We could have added a unique class to the link:</p>
+
+<p><code>
+&lt;%= link_to "Update Credit Card", "#", class: "update-credit-card" %&gt;
+</code></p>
+
+<p>or, perhaps, even assign an ID:</p>
+
+<p><code>
+&lt;%= link_to "Update Credit Card", "#", id: "update-credit-card" %&gt;
+</code></p>
+
+<p>Both of these techniques don&rsquo;t really indicate whether we added the <code>update-card-card</code> for the use of CSS styling, or to attach Javascript behavior. So in my applications, I leave classes for <strong>styling ONLY</strong>.</p>
+
+<p>So now to the Javascript:</p>
+
+<p>```
+App.Billing =
+  update: &ndash;></p>
+
+<pre><code># do some stuff
+</code></pre>
+
+<p>$(document).on &ldquo;click&rdquo;, &ldquo;[data-behavior~=update-credit-card]&rdquo;, =>
+  App.Billing.update()
+```</p>
+
+<p>We can use the selector <code>[data-behavior~=update-credit-card]</code> to latch on to the <code>data-behavior</code> tag we defined in the view. We use the <code>on</code> jQuery method to ensure that we&rsquo;re listening to this event whether the element&rsquo;s on the page or not. This is what allows us to load this Javascript when on other pages and have it still work when a user clicks through to the page with the actual link on it.</p>
+
+<p>We could latch on to the <code>change</code> event, or whatever is appropriate to the element we&rsquo;re adding behavior.</p>
+
+<h3>Add to Manifest</h3>
+
+<p>Again, because Javascripts assets we add to <code>app/assets/javascripts</code> won&rsquo;t automatically be inserted in to the asset pipeline, we&rsquo;ll add <code>//= require app.billing</code> to the manifest file:</p>
+
+<p><code>
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require app.chart
+//= require app.billing
+</code></p>
+
+<h2>Summary</h2>
+
+<p>Using the techniques above, we can keep the Javascript in our Rails applications organized and predictable. We can rest easy knowing the files will all generally look the same. There&rsquo;s not been any uses cases where this structure hasn&rsquo;t worked for me personally.</p>
+
+<p>One thing that makes me feel good about this approach is there&rsquo;s no real magic or extra plugins. It&rsquo;s using all the tools we already have in a basic Rails application, which is one less thing to maintain and keep up to date. Less depedencies == less pain down the road.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[How to Start with Ruby?]]></title>
     <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
     <updated>2015-05-06T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
-    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterens, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
+    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterans, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
 
 <p>Turning the clocks back to when you knew much less about something is hard. But putting yourself back in that position can offer valuable insight to the opportunities available and how they might be improved in the future.</p>
 
@@ -646,154 +916,6 @@ fixtures_dir = if ENV[&lsquo;FIXTURES_DIR&rsquo;]</p>
 <p>This approach has saved me quite a bit of time in my last few applications. Build it once, use it everywhere. As mentioned above, using this approach to seed database records  with a foreign key should be avoided.</p>
 
 <p>Most applications have a number of tasks needed for a developer to get up and running. Combining fixture data with additional seed data placed in <code>db/seeds.rb</code> can give you the best of both worlds, while still ensuring you have robust data to test against.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
-    <updated>2014-12-03T13:14:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
-    <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
-
-<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
-
-<!--more-->
-
-
-<p>A <code>Gemfile</code> also includes hints about preference and style. And style is something most Ruby developers are very passionate about. It doesn’t take long to find the story of a Rubyist describing their “love at first sight” experience with the language. It’s hard to find another file in a Rails project that’s so telling.</p>
-
-<p>A year ago, I wrote about the <a href="/blog/patterns-in-a-rails-gemfile/">Ruby gems I regularly use in my Rails applications</a>. Because technology and the tools we use change so fast, I thought it’d be interesting to take a look at one of my more recent Gemfiles to see what’s changed.</p>
-
-<h2>Rails Templates</h2>
-
-<p>As I mentioned in the last <a href="/blog/patterns-in-a-rails-gemfile/">Gemfile post</a>, I tend to write a bunch of small applications sprinkled around some larger ones. Despite the size of the project, I feel like I’ve honed in a set of Ruby gems that feel comfortable and productive for me and my workflow.</p>
-
-<p>Knowing the act of bootstrapping a Rails project is sometimes tedious, I took some time to build a <a href="https://github.com/brandonhilkert/rails_templates">Rails template</a> around the gems and patterns I commonly use. I’ll definitely be writing about this experience in the future since there seems to be very little discussion about it.</p>
-
-<p>In short, extracting my preferences to a template has been a HUGE time saver. It no longer feels like a burden to run <code>rails new</code>. I can jump right in and have a consistent set of tools that enable me to be productive within a few minutes.</p>
-
-<h2>My 2014 Gemfile</h2>
-
-<p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
-
-<p>```
-source &lsquo;<a href="https://rubygems.org">https://rubygems.org</a>&rsquo;</p>
-
-<p>ruby &lsquo;2.1.4&rsquo;</p>
-
-<p>gem &lsquo;rails&rsquo;, &lsquo;4.1.8&rsquo;
-gem &lsquo;pg&rsquo;
-gem &lsquo;sass-rails&rsquo;, &lsquo;~> 4.0.3&rsquo;
-gem &lsquo;uglifier&rsquo;, &lsquo;>= 1.3.0&rsquo;
-gem &lsquo;coffee-rails&rsquo;, &lsquo;~> 4.0.0&rsquo;
-gem &lsquo;jquery-rails&rsquo;
-gem &lsquo;turbolinks&rsquo;</p>
-
-<p>gem &lsquo;bcrypt-ruby&rsquo;, &lsquo;~> 3.1.2&rsquo;</p>
-
-<p>group :development, :test do
-  gem &lsquo;pry&rsquo;
-end</p>
-
-<p>group :test do
-  gem &lsquo;selenium-webdriver&rsquo;
-  gem &lsquo;capybara&rsquo;
-  gem &lsquo;timecop&rsquo;
-  gem &lsquo;mocha&rsquo;
-end</p>
-
-<p>group :development do
-  gem &lsquo;quiet_assets&rsquo;
-  gem &lsquo;spring&rsquo;
-  gem &lsquo;bullet&rsquo;
-  gem &lsquo;stripe_tester&rsquo;, &lsquo;~> 0.1.0&rsquo;
-end</p>
-
-<p>group :production, :demo do
-  gem &lsquo;rails_12factor&rsquo;
-  gem &lsquo;heroku-deflater&rsquo;
-end</p>
-
-<p>gem &lsquo;font-awesome-rails&rsquo;
-gem &lsquo;unicorn&rsquo;
-gem &lsquo;bootstrap-sass&rsquo;
-gem &lsquo;sidekiq&rsquo;, require: &lsquo;sidekiq/web&rsquo;
-gem &lsquo;sinatra&rsquo;
-gem &lsquo;local_time&rsquo;
-gem &lsquo;gravatar_image_tag&rsquo;
-gem &lsquo;so_meta&rsquo;
-gem &lsquo;chronic&rsquo;
-gem &lsquo;recurrence&rsquo;</p>
-
-<p>gem &lsquo;premailer-rails&rsquo;</p>
-
-<p>gem &lsquo;momentjs-rails&rsquo;
-gem &lsquo;bootstrap3-datetimepicker-rails&rsquo;
-gem &lsquo;bootstrap-switch-rails&rsquo;
-gem &lsquo;bootstrap-wysihtml5-rails&rsquo;
-gem &lsquo;bootstrap-select-rails&rsquo;
-gem &lsquo;autosize-rails&rsquo;</p>
-
-<p>gem &lsquo;aws-sdk&rsquo;</p>
-
-<p>gem &lsquo;html-pipeline&rsquo;
-gem &lsquo;rinku&rsquo;</p>
-
-<p>gem &lsquo;newrelic_rpm&rsquo;
-gem &lsquo;doc_raptor&rsquo;
-gem &lsquo;stripe&rsquo;
-gem &lsquo;jquery-ui-rails&rsquo;
-gem &lsquo;active_model_serializers&rsquo;
-gem &lsquo;rubyzip&rsquo;
-gem &lsquo;render_anywhere&rsquo;, require: false
-gem &lsquo;pusher&rsquo;
-gem &lsquo;filepicker-rails&rsquo;
-gem &lsquo;memcachier&rsquo;
-gem &lsquo;dalli&rsquo;
-gem &lsquo;intercom-rails&rsquo;
-```</p>
-
-<p>A few comments:</p>
-
-<ul>
-<li><p>I’ve standardized on <a href="http://www.postgresql.org/">Postgres</a> as the database for my apps, even in development. It’s reliable and allows me to be sure that the code I write will work the same way in production, since I tend to deploy most of my apps to <a href="https://www.heroku.com/">Heroku</a>.</p></li>
-<li><p>I leave <code>turbolinks</code> on. Judging from recent posts and comments within the community, this will probably one of the more controversial decisions.</p>
-
-<p>  If I’m being honest, my first experience with Turbolinks wasn’t great. And by “wasn’t great”, I mean — it broke <strong>EVERYTHING</strong>! But the good news was that it brought to light the fact that I sucked at javascript. At the time, I was capable of writing <em>just</em> enough to modify form behavior or fade in an DOM element.</p>
-
-<p>  The time had come to level up on my javascript skills. I was able to improve my javascript and also do it in a way that can took full advantage of the benefits that Turbolinks offers. Since that time, I’ve left Turbolinks on and no longer had to worry that my client-side code will stop working after clicking through a few application links.</p></li>
-<li><p>I’ve standardized on using <code>has_secure_password</code> for authentication. I previously used <a href="https://github.com/plataformatec/devise">devise</a>, but found the extra features are no longer worth the additional complexity. <code>has_secure_password</code> provides me reliable authentication patterns that are simple to understand and maintain. Hence the need for <code>bcrypt</code> in the <code>Gemfile</code> above.</p></li>
-<li><p>As for my test environment, I’ve written about <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">my switch to Minitest and fixtures</a>. I’m still just as happy with that decision as the time I wrote about it. I’ve seen Rspec go through a variety of API changes since then, and thankful I no longer have to worry about updating my test suite every couple months. I continue to find value in <code>capybara</code> and include <code>mocha</code> for the times <code>Minitest</code>’s stubbing and mocking isn’t enough (I’ve been meaning to dig in to the places I use <code>mocha</code>. I’m guessing if the code was better, I probably wouldn’t need it at all).</p></li>
-<li><p><code>bullet</code> is a killer gem for tracking down performances issues. It’s saved me countless hours of debugging.</p></li>
-<li><p>The inclusion of <code>spring</code> in Rails 4.1 is great. I realize it’s a bandaid in some respects, but waiting for the environment to load on every test run is a drag. I’ve found that because my tests are so responsive when <code>spring</code> is working properly, it encourages me to run my tests more often. Once setup, it works well and only in rare cases has not reloaded when it should have.</p></li>
-<li><p>I generally always include <code>bootstrap</code> and <code>font-awesome</code> in my projects. Being a non-designer, it helps me get something on the screen faster, even if it’s not the final design.</p></li>
-<li><p>I continue to use <code>unicorn</code>. It’s been around for so long and continues to be competitive in benchmarks against other Ruby web servers. I tested Passenger in a few applications, but got scared off when it printed the entire environment to the screen in production on Heroku on an exception. I’m told there are ways around this with some non-trivial configuration, but I think it’s a bizarre default and isn’t conducive to my workflow.</p></li>
-<li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
-<li><p>I’ve written about putting together <a href="/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
-<li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
-<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
-<li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
-<li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
-<li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
-</ul>
-
-
-<p>The rest are very use case-specific. And in general, the defacto solution for each (<code>pusher</code> for real-time features, <code>dalli</code> for memcached, etc.).</p>
-
-<h2>Summary</h2>
-
-<p>I’m happy with my current toolkit. This doesn’t mean I’m not on the lookout for shiny new things, but I’m generally a little more cautious about replacing something reliable, even if it doesn’t do everything under the sun.</p>
-
-<p>Even though Ruby makes it easy to include third party libraries, it doesn’t mean we always should. As developers, we inherit the stability of the dependencies we include. Even though a gem’s code might be locked away behind a separate git repository, it likely has the same holes and complexities that we’re worried about in our applications. And perhaps, even more…</p>
-
-<p><a href="https://www.ruby-toolbox.com/">Ruby toolbox</a> is a great resource when searching for a gem. I generally consider the number of downloads, age of the project and development activity when deciding which one to go with.</p>
-
-<p>What have your favorite gems been this year?</p>
-
-<h2>Build a Ruby Gem</h2>
-
-<p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
 ]]></content>
   </entry>
   
