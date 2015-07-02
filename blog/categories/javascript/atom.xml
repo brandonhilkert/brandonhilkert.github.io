@@ -4,7 +4,7 @@
   <title><![CDATA[Category: javascript | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-06-30T21:15:17-04:00</updated>
+  <updated>2015-07-02T08:07:24-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -131,13 +131,22 @@ App.init = -&gt;
 
 <p>The call to <code>$("a, span, i, div").tooltip()</code> initializes Bootstrap Tooltips. This is an example of the type of libraries that can/should be setup here. Obviously, if you&rsquo;re not using Bootstrap tooltips, you would haven&rsquo;t this here, but coupled with the next line, we&rsquo;ll see why this works.</p>
 
-<p>Lastly, as many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>page:change</code> event:</p>
+<p>As many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>page:change</code> event:</p>
 
 <p><code>
 $(document).on "page:change", -&gt;
   App.init()
 </code>
 <em>Note: the <code>page:change</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
+
+<p>Lastly, we need to add <code>init.coffee</code> to the asset pipeline:</p>
+
+<p><code>
+//= require jquery
+//= require jquery_ujs
+//= require turbolinks
+//= require init
+</code></p>
 
 <h2>&ldquo;Always On&rdquo; Javascript Functionality</h2>
 
@@ -200,6 +209,7 @@ invocation
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require init
 //= require app.chart
 </code></p>
 
@@ -271,6 +281,7 @@ App.Billing =
 //= require jquery
 //= require jquery_ujs
 //= require turbolinks
+//= require init
 //= require app.chart
 //= require app.billing
 </code></p>
