@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-07-02T08:07:24-04:00</updated>
+  <updated>2015-07-06T08:53:24-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,54 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The Ruby Book Bundle Is Live]]></title>
+    <link href="http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live/"/>
+    <updated>2015-07-06T07:01:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live</id>
+    <content type="html"><![CDATA[<p>A few fellow authors and friends of mine have put together the <a href="http://rubybookbundle.com/?c=bh">Ruby Book Bundle</a> including some of the best Ruby/Rails books out there. The <a href="http://rubybookbundle.com/?c=bh">bundle went on sale this morning</a>! It&#8217;ll <strong>only be available for a week</strong>, so be sure to pick it up soon if you&rsquo;re interested.</p>
+
+<!--more-->
+
+
+<p><img class="center" src="http://brandonhilkert.com/images/ruby-book-bundle.png" title="&#34;The Ruby Book Bundle&#34;" alt="&#34;The Ruby Book Bundle&#34;"></p>
+
+<p>Here&rsquo;s a quick rundown of the details:</p>
+
+<p><strong>Is this bundle right for me?</strong></p>
+
+<p>The books in the Ruby Book Bundle span a range from beginner to advanced developers. <strong>As long as you understand the Ruby basics, though, you’ll learn a lot from these books.</strong></p>
+
+<p>You’ll probably get the <em>most</em> out of the bundle if you’re an intermediate Ruby dev, focused on building more specific development skills. But if you’re interested in mastering the most important and most challenging parts of Rails, like testing, refactoring, gem-building, metaprogramming/DSL-writing, and app-building, this bundle will be perfect for you.</p>
+
+<h2>What will I get?</h2>
+
+<p>When you buy the bundle, you’ll immediately get the following to download:</p>
+
+<ul>
+<li><strong>Build a Ruby Gem</strong> (pdf, epub, mobi) with source code and screencasts</li>
+<li><strong>Minitest Cookbook</strong> (pdf, epub, mobi) and source code examples</li>
+<li><strong>Practicing Rails</strong> (pdf, epub, mobi)</li>
+<li><strong>Fearless Refactoring</strong> (pdf)</li>
+<li><strong>Ruby DSL Handbook</strong> (pdf, epub, mobi) with cheat sheets, sample code and screencasts</li>
+<li><strong>Rebuilding Rails</strong> (pdf)</li>
+</ul>
+
+
+<h2>How long will the sale run?</h2>
+
+<p>The bundle will be <strong>available for 1 week only</strong> &ndash; ending <strong>July 10th, 11:59PM PDT</strong>.</p>
+
+<h2>What if I’m not happy with the bundle?</h2>
+
+<p>We want you to be happy with what you’ve bought! <strong>So if you’re not 100% satisfied with the value you got from the bundle, shoot me an email at <a href="mailto:brandonhilkert%2Bbundle@gmail.com">brandonhilkert+bundle@gmail.com</a> within 30 days, and I’ll refund your money.</strong></p>
+
+<p>I feel fortunate to be part of such a great group of developers. They&rsquo;ve
+provided a ton of value to the community and their books continue to impress
+me.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
@@ -2701,216 +2749,6 @@ on it and really look forward to hearing your feedback.</p>
 
 <!--more-->
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to Build a Rails Engine]]></title>
-    <link href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/"/>
-    <updated>2014-03-24T17:26:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/how-to-build-a-rails-engine</id>
-    <content type="html"><![CDATA[<p><em>This is one of the final post leading up the the launch of the
-<a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
-including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
-
-<p>Rails engines range from simple plugins to powerful micro-applications. The discussions we’ve had so far about Railties are closely related to the function of a Rails engine. One interesting side note is that a Rails application is a Rails engine itself — so it’s easy to see how we can encapsulate just about any normal Rails functionality in an engine, to ultimately embed in a host application.</p>
-
-<p>The <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Rails engine documentation</a> is well written and touches on the many ways to include functionality. I won’t cover every detail of Rails engines in this chapter, just enough to get you started making use of them. It’s possible to make full applications (routes, controllers, models, migrations, etc.) using Rails engines. However, we’re going to focus on some of the simpler the elements of a Rails engine that allow us to integrate functionality where a Railtie won’t suffice. Just know, there is far more you can do with Rails engines than what we’ll cover here. The documentation link above provides examples of many of those use cases.</p>
-
-<!--more-->
-
-
-<h2>Use Case</h2>
-
-<p>I wrote a <a href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">blog post about rendering relatives timestamps in Rails</a> on the client. Using a client-side solution like <a href="http://timeago.yarp.com/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">timeago.js</a> allows timestamps to update in real-time, so when we see “15 minutes ago”, we know the record <em>really</em> is 15 minutes old.</p>
-
-<p>The other benefit to using a client-side library like <code>timeago.js</code> is timezone offsets are handled automatically. All we have to do is render the UTC time in the view and javascript will handle converting it to the relative timezone of the browser, along with keeping it updated as the page becomes stale.</p>
-
-<p>For this example, we’ll make a gem that integrates <code>timeago.js</code> in to a Rails application and provides a simple way to render relative timestamps in a view.</p>
-
-<h2>The Implementation</h2>
-
-<p>The implementation of our gem will require:</p>
-
-<ol>
-<li>Adding the <code>timeago.js</code> javascript asset to the asset pipeline</li>
-<li>Adding a javascript asset to invoke the <code>timeago()</code> plugin</li>
-<li>Adding a view helper to render html in a format the javascript plugin expects</li>
-</ol>
-
-
-<p>The third requirement was covered in a previous chapter on view helpers, so we’ll cruise through that one quickly. However, including assets hasn’t been covered and it’s the perfect segue in to the benefits of using a Rails engine, rather than just a Railtie.</p>
-
-<p>Rails engines allow us create the same directory structure of a Rails application, since a Rails application is just a Rails engine. By indicating our gem is an engine (we’ll see how to do this soon…), Rails will pick up the related files in the Rails-specific directories in our gem. So if we add a file in the <code>app/helpers/</code> directory of our gem, that same file will be available in the host Rails application. The same approach applies for controllers, models, migrations, assets and anything else we would add to a typical Rails application.</p>
-
-<p>To start, let’s create our new gem:</p>
-
-<figure class='code'><pre><code>$ bundle gem time_ago
-      create  time_ago/Gemfile
-      create  time_ago/Rakefile
-      create  time_ago/LICENSE.txt
-      create  time_ago/README.md
-      create  time_ago/.gitignore
-      create  time_ago/time_ago.gemspec
-      create  time_ago/lib/time_ago.rb
-      create  time_ago/lib/time_ago/version.rb
-Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago</code></pre></figure>
-
-
-<p>When we include javascript libraries from external sources, the <code>vender/</code> directory is the most appropriate place for them. Let’s create the directory <code>vendor/assets/javascripts/</code> and place the source for the <code>timeago.js</code> plugin there:</p>
-
-<figure class='code'><pre><code>├── Gemfile
-├── LICENSE.txt
-├── Rakefile
-├── lib
-│   ├── time_ago
-│   │   └── version.rb
-│   └── time_ago.rb
-├── time_ago.gemspec
-└── vendor
-    └── assets
-        └── javascripts
-            └── jquery.timeago.js</code></pre></figure>
-
-
-<p>To create our view helper, we’ll add the <code>/app/helpers/</code> directory:</p>
-
-<figure class='code'><pre><code>├── Gemfile
-├── LICENSE.txt
-├── Rakefile
-├── app
-│   └── helpers
-│       └── time_ago_helper.rb
-├── lib
-│   ├── time_ago
-│   │   └── version.rb
-│   └── time_ago.rb
-├── time_ago.gemspec
-└── vendor
-    └── assets
-        └── javascripts
-            └── jquery.timeago.js</code></pre></figure>
-
-
-<p>The code for the view helper is shown below:</p>
-
-<figure class='code'><pre><code>module TimeAgoHelper
-  def timeago(time, options = {})
-    options[:class] ||= "timeago"
-    content_tag(
-     :time,
-     time.to_s,
-     options.merge(datetime: time.getutc.iso8601)
-    ) if time
-  end
-end</code></pre></figure>
-
-
-<p>Lastly, we want to include a javascript asset to invoke the <code>timeago.js</code> plugin on page change (this includes the initial page load). This is almost identical to the first step of including the vendored <code>timeago.js</code> asset, except we’re going to put it in the <code>app/assets/javascripts/</code> directory since it’s not an external library, but rather a javascript include that will invoke the javascript plugin.</p>
-
-<p>Let’s create the directory <code>app/assets/javascripts/</code> and place the following file there:</p>
-
-<figure class='code'><pre><code>// app/assets/javascripts/timeago.js
-//
-// jQuery Timeago setup for timeago helper
-//
-//= require jquery.timeago
-
-$(document).on('page:change', function() {
-  $("time.timeago").timeago();
-});</code></pre></figure>
-
-
-<p>This file serves as both a manifest file for the <code>jquery.timeago.js</code> asset and a function to invoke the plugin whenever the page loads or changes.</p>
-
-<p>Lastly, we need to designate our gem as an engine. The default entry file that was created when we used bundler to bootstrap our gem looked like this:</p>
-
-<figure class='code'><pre><code>require "time_ago/version"
-
-module TimeAgo
-end</code></pre></figure>
-
-
-<p>All we need to do is add the <code>Engine</code> class and inherit from <code>Rails::Engine</code>, giving us:</p>
-
-<figure class='code'><pre><code>require "time_ago/version"
-
-module TimeAgo
-  class Engine &lt; ::Rails::Engine
-  end
-end</code></pre></figure>
-
-
-<p>At this point, because our gem is so closely tied to Rails, we should add Rails as a dependency in our gemspec:</p>
-
-<figure class='code'><pre><code># coding: utf-8
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'time_ago/version'
-
-Gem::Specification.new do |spec|
-  spec.name          = "time_ago"
-  spec.version       = TimeAgo::VERSION
-  spec.authors       = ["Brandon Hilkert"]
-  spec.email         = ["brandonhilkert@gmail.com"]
-  spec.summary       = %q{A gem to integrate the timeago.js}
-  spec.description   = %q{A gem to integrate the timeago.js}
-  spec.homepage      = ""
-  spec.license       = "MIT"
-
-  spec.files         = `git ls-files -z`.split("\x0")
-  spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
-  spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = ["lib"]
-
-  spec.add_dependency "rails", "&gt;= 3.1"
-
-  spec.add_development_dependency "bundler", "~&gt; 1.5"
-  spec.add_development_dependency "rake"
-end</code></pre></figure>
-
-
-<p><em>Note: In addition to adding Rails as a dependency, we’ve also specified that it’s only compatible with Rails version <code>3.1</code> or later because of the need for the asset pipeline.</em></p>
-
-<p>Moving to a sample Rails application, we can include the gem in our host application by adding it to the <code>Gemfile</code> using the path option:</p>
-
-<figure class='code'><pre><code>gem "time_ago", path: "../time_ago"</code></pre></figure>
-
-
-<p>Since we included an asset that needs to be included in the Rails asset pipeline, we have to take one more step and instruct the user to add the following to their <code>app/assets/javascripts/application.js</code> manifest file:</p>
-
-<figure class='code'><pre><code>//= require timeago</code></pre></figure>
-
-
-<p>This directive actually refers to the <code>app/assets/javascripts/timeago.js</code> file we included in our gem to invoke the timeago.js plugin on page change.</p>
-
-<p>Now when we load our Rails application, tags using the <code>timeago</code> view helper get rendered to UI as:</p>
-
-<figure class='code'><pre><code>&lt;time class="timeago" datetime="2014-01-08T14:55:58Z"&gt;
-    2014-01-08 14:55:58 UTC
-&lt;/time&gt;</code></pre></figure>
-
-
-<p>and are updated by the javascript plugin to:</p>
-
-<figure class='code'><pre><code>&lt;time class="timeago" datetime="2014-01-08T15:04:10Z"
-   title="2014-01-08 15:04:10 UTC"&gt;
-     18 days ago
-&lt;/time&gt;</code></pre></figure>
-
-
-<h2>Implementations in the Wild</h2>
-
-<p>One of the greatest examples of making the most of a Rails engine is <a href="https://github.com/plataformatec/devise?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">Devise</a>. Devise is one of the more popular options for adding authentication to a Rails application. Just looking at the <a href="https://github.com/plataformatec/devise/tree/master/app?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">app directory of the gem</a>, we can see Devise adds functionality through controllers, helpers, mailers and views. The structure of Devise is fairly complicated because it is doing so much, but <a href="https://github.com/plataformatec/devise/blob/master/lib/devise/rails.rb?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines#L5">here is where the Rails engine is defined</a> allowing the elements in the <code>/app</code> directory (among other things) to be integrated in to a Rails application.</p>
-
-<p>The <a href="https://github.com/basecamp/local_time?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">local_time gem</a> from Basecamp is a simple example of using the asset includes of a Rails engine to render relative timestamps. It’s similar to the one we created above, but uses the <a href="http://momentjs.com/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">moment.js</a> javascript library instead. Because it’s well tested and likely to be supported long-term, I’d suggest using it instead of the gem we created above.</p>
-
-<h2>Summary</h2>
-
-<p>The introduction of Rails engines created a new way to organize micro-applications and integrate them into a host application. Doing so keeps features and otherwise separate logic truly separate.</p>
-
-<p>I’ve only scratched the surface on what a gem can provide through engines. It’s certainly more detailed than just asset and view helper integration, as shown above. If you’re interested in learning more about the other features Rails engine provide, <a href="http://guides.rubyonrails.org/engines.html?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=rails-engines">the Rails guides</a> are a great place to start.</p>
 ]]></content>
   </entry>
   
