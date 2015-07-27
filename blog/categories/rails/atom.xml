@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-07-06T08:55:01-04:00</updated>
+  <updated>2015-07-27T11:23:15-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,181 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
+    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/"/>
+    <updated>2015-07-27T11:18:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small</id>
+    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>The PipelineDeals web application recently celebrated its ninth birthday. It&rsquo;s
+seen its fair share of developers, all of whom had their own idea of &ldquo;clean
+code&rdquo;. As a team, we&rsquo;d been brainstorming ways to wrangle certain areas of the
+application. The question we&rsquo;d frequently ask ourselves was <em>&ldquo;How do we clean
+up [x] (some neglected feature of the application)?</em>&rdquo;.</p>
+
+<!--more-->
+
+
+<p>Reasonable solutions ended up being:</p>
+
+<ol>
+<li>Rewrite it</li>
+<li>Rewrite and put it elsewhere</li>
+</ol>
+
+
+<p>In short, we chose to rewrite many of the hairy areas of the app into separate services communicating over HTTP. It&rsquo;s been about a year since our first commit in a separate service, and we&rsquo;ve learned quite a bit since then. This is part 1 in a series of posts related to our transition to microservices.</p>
+
+<h2>How we got here</h2>
+
+<p>This was us 18 months ago. PipelineDeals was a crufty Rails 2 application that many of us were scared to open. It&rsquo;d been several years of adding feature upon feature without consistent knowledge, style, or guidance. And it&rsquo;s probably not surprising we had what we did. Regardless, we needed to fix it.</p>
+
+<p>One of our goals was to move to Rails 3, and later more updated versions, but in order to get there, we had to refactor (or remove) quite a bit of code to make the transition easier.</p>
+
+<p>This, to me, was a huge factor around our decision to move to a more service-focused approach. <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">At this year&rsquo;s Railsconf keynote</a>, DHH joked about the &ldquo;majestic monolith&rdquo; and how many companies prematurely piece out services, all to later suffer pain when they realize it was a premature optimization.</p>
+
+<p>The same could be said for our move. Instead of spinning out separate services, we could have cleaned up the mess we had by refactoring every nasty piece of our app. We could have turned our ugly monolith into a majestic one. But while it would&rsquo;ve been possible, our team agreed we were better served by more or less starting over. Not in the big-bang rewrite sense, but instead to stand up brand new service apps when we added new features, and when it made sense. &ldquo;Made sense&rdquo; is the key here. There have been many times when it didn&rsquo;t make sense over the past 12 months. But we&rsquo;re learning and getting better at identifying the things that are good candidates for a more isolated service.</p>
+
+<h2>Now what?</h2>
+
+<p><em>Do we wait for the next requested feature or what?</em></p>
+
+<p>At one of our weekly team hangouts, we watched a talk focused on starting by isolating the responsibility of Email. It was the perfect introduction and motivation for us to get a small win and some experience under our belts. For some reason prior, we didn&rsquo;t have a great sense of how to start making that transition.</p>
+
+<p>The idea was to take our emails (and there were plenty) and move them to a separate Rails app that&rsquo;s only responsibilty is sending email. While it sounds trivial, the idea alone introduces a lot of interesting questions: <em>What do we do with those really nasty emails that have 30 instance variables? What do we do if the email service is down? How do we trigger an email to be sent?</em></p>
+
+<h2>Rails new</h2>
+
+<p>We created a new Rails 4 app, removed all the stuff we didn&rsquo;t need and created a golden shrine where emails could flourish&hellip;but seriously, that&rsquo;s all it did. And it did it really well.</p>
+
+<p>The next question was how to send emails from the main application. We&rsquo;re very happy <a href="http://sidekiq.org/pro/">Sidekiq Pro</a> users, and one of the benefits we love about Sidekiq is the built-in retries. This gives us a layer of reliability outside of the code layer. So rather than build some ad-hoc retry mechanism by creating a counter in ruby, and rescuing failures within a certain range, we shoot off a job. If it fails because the network is down, or the endpoint isn&rsquo;t available, the job will retry soon after and continue down the happy path. Sidekiq retries are a recurring theme with our infrastructure. We&rsquo;ve made a number of decisions around the fact that we have this advantage already built-in, and we might as well take advantage of it. More on that to come.</p>
+
+<h2>Communicate</h2>
+
+<p>The defacto communication method between services is over HTTP. And we did nothing different. Our services use JSON payloads to exchange data, which let&rsquo;s us easily take advantage of Sidekiq on both ends.</p>
+
+<p>So now, rather than invoking a built-in Rails mailer like:</p>
+
+<p><code>
+UserMailer.welcome(current_user).deliver
+</code></p>
+
+<p>we invoke a PORO to send off the communication:</p>
+
+<p><code>
+Email.to current_user, :user_welcome
+</code></p>
+
+<p>where <code>Email</code> is defined as</p>
+
+<p>```
+class Email
+  def initialize(users, email_key, opts)</p>
+
+<pre><code>@users, @email_key, @opts = users, email_key, opts
+</code></pre>
+
+<p>  end</p>
+
+<p>  def self.to(users, email_key, opts = {})</p>
+
+<pre><code>new(users, email_key, opts).queue_email
+</code></pre>
+
+<p>  end</p>
+
+<p>  def queue_email</p>
+
+<pre><code>opts[:email_key] = email_key
+opts[:to] ||= email_array
+opts[:name] ||= first_users_name
+opts[:user_id] ||= user_id
+opts[:account_id] ||= account_id
+
+json = JSON.generate(opts)
+RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>There&rsquo;re a number of use-case specific variables above, but the <code>email_key</code> is probably the most important. We used that to describe what email should be invoked on the service.</p>
+
+<p>In the above example, we triggered the <code>welcome</code> email on the <code>UserMailer</code> class. We translated this request into an email key of <code>user_welcome</code>.</p>
+
+<p>This key then gets interpreted by the Email service app and turned into an actual <code>Mailer</code> class and method within it. We could have done this in a variety of ways, but we split the string on the service-side at the <code>_</code>, and the first element described the mailer, the rest the method. So in this case, it gets interpreted as <code>UserMailer#welcome</code>.</p>
+
+<p>One thing this pattern allowed us to do was almost full copy/paste the old mailer methods in to the new Email service application.</p>
+
+<h2>Failures, failures, failures</h2>
+
+<p>&ldquo;What if the service is down?&rdquo; you say, &ldquo;the email request will fail!&rdquo; Sure will.</p>
+
+<p>So let&rsquo;s wrap that request in a Sidekiq job to take advantage of the built-in retries.</p>
+
+<p>Rather than invoke the following method in the email object:</p>
+
+<p><code>
+RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
+</code></p>
+
+<p>we&rsquo;ll shoot off a Sidekiq job instead, changing the <code>queue_email</code> method to:</p>
+
+<p>```
+def queue_email
+  opts[:email_key] = email_key
+  opts[:to] ||= email_array
+  opts[:name] ||= first_users_name
+  opts[:user_id] ||= user_id
+  opts[:account_id] ||= account_id</p>
+
+<p>  EmailWorker.perform_async(opts)
+end
+```</p>
+
+<p>There we have it. Network-proof email requests!</p>
+
+<p>Not so fast&hellip;</p>
+
+<p>Astute readers will probably recognize that the service-side network communication can potentially also fail. This is becoming a pattern, huh? More communication, more potential for failure and more potential headaches.</p>
+
+<p>On the <strong>service side</strong>, we have a controller that takes in the request for the email and immediately serializes it to a Sidekiq job:</p>
+
+<p>```
+  def create</p>
+
+<pre><code>EmailWorker.perform_async(parsed_params)
+head :accepted
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  def parse_params</p>
+
+<pre><code>JSON.parse(request.body) || {}
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Because we immediately serialize the job to Sidekiq, we&rsquo;ve successfully acknowledged the job was received, and the main app&rsquo;s Sidekiq job completes successfully. Now the email service can move on to doing the heavy-lifting in whatever way makes the most sense. In our case, we use Mailgun to send our emails, so the <code>EmailWorker</code> Sidekiq job invokes a new mailer based on the <code>email_key</code> param and sends it off to mailgun for transport. And because it&rsquo;s wrapped in a Sidekiq job, we can sleep well knowing that the Mailgun request can fail and the job will successfully retry until it goes through.</p>
+
+<h2>Summary</h2>
+
+<p>Service communication is definitely not for the faint of heart and as a team, we can completely appreciate the challenges that come along with keeping services in sync now&mdash;especially having stood up about 8 new services in the last 12 months.</p>
+
+<p>Sidekiq has been the queueing solution we&rsquo;ve leaned on to keep communication in sync and reliable. We&rsquo;ve also written a few internal tools that piggy-backy off Sidekiq that we&rsquo;re really excited share with the community in the near future.</p>
+
+<p>Part II, in this series, will discuss the methods of communication necessary to consider when implementing a service-based architecture.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The Ruby Book Bundle Is Live]]></title>
@@ -673,202 +848,6 @@ end
 <p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
 
 <p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
-    <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
-    <updated>2015-02-26T20:46:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
-    <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
-
-<p>While Stripe does provide a number of features and plugins that make updating a credit card or signing up for a service simple, there are occasions when data needs to be fetched from Stripe in real-time. For these cases, it&rsquo;s great to be able to fetch and cache this data before-hand, and only expire if you know there&rsquo;s been a change.</p>
-
-<!--more-->
-
-
-<p>Combining <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> with Rails cache allows you to cache Stripe customer data so that billing pages are just as snappy as the rest of the application.</p>
-
-<h2>The Pain</h2>
-
-<p>Even though Stripe is generally pretty fast, retrieving customer data on the fly can be expensive. In order to optimize page load times, we can look to cache this data before it&rsquo;s actually used.</p>
-
-<p>If you&rsquo;re familiary with the Stripe gem, you&rsquo;ve probably seen something like this:</p>
-
-<p><code>
-customer = Stripe::Customer.retrieve(user.stripe_id)
-</code></p>
-
-<p>With the response of <code>customer</code>, we can further query customer data with the following methods:</p>
-
-<p><code>
-invoices = customer.invoices
-upcoming_invoices = customer.upcoming_invoices
-</code></p>
-
-<p>If we make all 3 of these method calls on page load, we&rsquo;d have 3 separate lookups from Stripe. This is pretty common for the typical billing page where you might want to show the customer&rsquo;s current credit card on file, their past invoices, and charges they can expect for the next invoice.</p>
-
-<p>Three lookups like this could potentially add another second or so to page load, which is not ideal.</p>
-
-<p>So how can we improve this?</p>
-
-<h2>The Solution</h2>
-
-<p>First, we can move the code to fetch the relevant stripe data in to a class of it&rsquo;s own, which wraps the notion of caching around the data retrieval.</p>
-
-<p>```
-class StripeCache
-  def initialize(user)</p>
-
-<pre><code>@user = user
-</code></pre>
-
-<p>  end</p>
-
-<p>  def refresh</p>
-
-<pre><code>purge_all
-cache_all
-self
-</code></pre>
-
-<p>  end</p>
-
-<p>  def customer</p>
-
-<pre><code>return @customer if @customer
-
-@customer = Rails.cache.fetch(cache_key("customer"), expires: 15.minutes) do
-  Stripe::Customer.retrieve(user.stripe_id)
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>Rails.cache.fetch(cache_key("invoices"), expires: 15.minutes) do
-  customer.invoices
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>Rails.cache.fetch(cache_key("upcoming_invoice"), expires: 15.minutes) do
-  customer.upcoming_invoice
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :user</p>
-
-<p>  def cache_all</p>
-
-<pre><code>customer
-invoices
-upcoming_invoice
-</code></pre>
-
-<p>  end</p>
-
-<p>  def purge_all</p>
-
-<pre><code>Rails.cache.delete_matched("#{user.id}/stripe")
-</code></pre>
-
-<p>  end</p>
-
-<p>  def cache_key(item)</p>
-
-<pre><code>"user/#{user.id}/stripe/#{item}"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>To use this on a billing page, we could do:</p>
-
-<p><code>
-stripe = StripeCache.new(current_user).refresh
-</code></p>
-
-<p>And from the response of that class, we could access the <code>customer</code>, <code>invoices</code>, and <code>upcoming_invoice</code> respectively:</p>
-
-<p><code>
-@customer = stripe.customer
-@invoices = stripe.invoices
-@upcoming_invoice = stripe.invoices
-</code></p>
-
-<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
-
-<p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
-
-<p>But let&rsquo;s be honest, what users are going to the billing page multiple times during a session? Probably not many. So we still need to fix the initial load somehow.</p>
-
-<p>This is where <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> comes in. Like other Ruby background processing libraries, Sucker Punch allows you to move the processing of code to the background. However, unlike the others, Sucker Punch doesn&rsquo;t require additional infrastructure like Redis, and doesn&rsquo;t require a separate worker process to monitor and execute enqueued jobs. Because of this, the time it takes to extract code to a Sucker Punch job and have it incorporated with your application code is much lower.</p>
-
-<p>In this case, rather than send a transactional email or perform some database calculation, we can write a job thats only responsibility is to run the Stripe caching code.</p>
-
-<p>```
-class StripeCacheJob
-  include SuckerPunch::Job</p>
-
-<p>  def perform(user)</p>
-
-<pre><code>StripeCache.new(user).refresh
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>The next question is, when do you run this?</p>
-
-<p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
-
-<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
-
-<p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
-
-<p>```
-module Accounts
-  class CardsController &lt; ApplicationController</p>
-
-<pre><code>before_action :require_authentication
-
-def create
-  cust = StripeCache.new(current_user).customer
-  cust.save(card: params[:stripeToken])
-
-  StripeCacheJob.new.async.perform(current_user)
-
-  redirect_to account_path, notice: t("card.update.success")
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<h2>Summary</h2>
-
-<p>Using Sucker Punch in combination with Rails cache feels like a great way make optimizations to third-party data requests. This article focused on using it to fetch Stripe data, but it could be used with another service just as easily.</p>
-
-<p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
-
-<p>Sucker Punch excels at background jobs that are relatively fast and if missed,
-wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost,
-it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
-
-<p>What other jobs have you used Sucker Punch for?</p>
 ]]></content>
   </entry>
   

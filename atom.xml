@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-07-06T08:55:01-04:00</updated>
+  <updated>2015-07-27T11:23:15-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,160 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
+    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/"/>
+    <updated>2015-07-27T11:18:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small</id>
+    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>The PipelineDeals web application recently celebrated its ninth birthday. It&rsquo;s
+seen its fair share of developers, all of whom had their own idea of &ldquo;clean
+code&rdquo;. As a team, we&rsquo;d been brainstorming ways to wrangle certain areas of the
+application. The question we&rsquo;d frequently ask ourselves was <em>&ldquo;How do we clean
+up [x] (some neglected feature of the application)?</em>&rdquo;.</p>
+
+<!--more-->
+
+
+<p>Reasonable solutions ended up being:</p>
+
+<ol>
+<li>Rewrite it</li>
+<li>Rewrite and put it elsewhere</li>
+</ol>
+
+
+<p>In short, we chose to rewrite many of the hairy areas of the app into separate services communicating over HTTP. It&rsquo;s been about a year since our first commit in a separate service, and we&rsquo;ve learned quite a bit since then. This is part 1 in a series of posts related to our transition to microservices.</p>
+
+<h2>How we got here</h2>
+
+<p>This was us 18 months ago. PipelineDeals was a crufty Rails 2 application that many of us were scared to open. It&rsquo;d been several years of adding feature upon feature without consistent knowledge, style, or guidance. And it&rsquo;s probably not surprising we had what we did. Regardless, we needed to fix it.</p>
+
+<p>One of our goals was to move to Rails 3, and later more updated versions, but in order to get there, we had to refactor (or remove) quite a bit of code to make the transition easier.</p>
+
+<p>This, to me, was a huge factor around our decision to move to a more service-focused approach. <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">At this year&rsquo;s Railsconf keynote</a>, DHH joked about the &ldquo;majestic monolith&rdquo; and how many companies prematurely piece out services, all to later suffer pain when they realize it was a premature optimization.</p>
+
+<p>The same could be said for our move. Instead of spinning out separate services, we could have cleaned up the mess we had by refactoring every nasty piece of our app. We could have turned our ugly monolith into a majestic one. But while it would&rsquo;ve been possible, our team agreed we were better served by more or less starting over. Not in the big-bang rewrite sense, but instead to stand up brand new service apps when we added new features, and when it made sense. &ldquo;Made sense&rdquo; is the key here. There have been many times when it didn&rsquo;t make sense over the past 12 months. But we&rsquo;re learning and getting better at identifying the things that are good candidates for a more isolated service.</p>
+
+<h2>Now what?</h2>
+
+<p><em>Do we wait for the next requested feature or what?</em></p>
+
+<p>At one of our weekly team hangouts, we watched a talk focused on starting by isolating the responsibility of Email. It was the perfect introduction and motivation for us to get a small win and some experience under our belts. For some reason prior, we didn&rsquo;t have a great sense of how to start making that transition.</p>
+
+<p>The idea was to take our emails (and there were plenty) and move them to a separate Rails app that&rsquo;s only responsibilty is sending email. While it sounds trivial, the idea alone introduces a lot of interesting questions: <em>What do we do with those really nasty emails that have 30 instance variables? What do we do if the email service is down? How do we trigger an email to be sent?</em></p>
+
+<h2>Rails new</h2>
+
+<p>We created a new Rails 4 app, removed all the stuff we didn&rsquo;t need and created a golden shrine where emails could flourish&hellip;but seriously, that&rsquo;s all it did. And it did it really well.</p>
+
+<p>The next question was how to send emails from the main application. We&rsquo;re very happy <a href="http://sidekiq.org/pro/">Sidekiq Pro</a> users, and one of the benefits we love about Sidekiq is the built-in retries. This gives us a layer of reliability outside of the code layer. So rather than build some ad-hoc retry mechanism by creating a counter in ruby, and rescuing failures within a certain range, we shoot off a job. If it fails because the network is down, or the endpoint isn&rsquo;t available, the job will retry soon after and continue down the happy path. Sidekiq retries are a recurring theme with our infrastructure. We&rsquo;ve made a number of decisions around the fact that we have this advantage already built-in, and we might as well take advantage of it. More on that to come.</p>
+
+<h2>Communicate</h2>
+
+<p>The defacto communication method between services is over HTTP. And we did nothing different. Our services use JSON payloads to exchange data, which let&rsquo;s us easily take advantage of Sidekiq on both ends.</p>
+
+<p>So now, rather than invoking a built-in Rails mailer like:</p>
+
+<figure class='code'><pre><code>UserMailer.welcome(current_user).deliver</code></pre></figure>
+
+
+<p>we invoke a PORO to send off the communication:</p>
+
+<figure class='code'><pre><code>Email.to current_user, :user_welcome</code></pre></figure>
+
+
+<p>where <code>Email</code> is defined as</p>
+
+<figure class='code'><pre><code>class Email
+  def initialize(users, email_key, opts)
+    @users, @email_key, @opts = users, email_key, opts
+  end
+
+  def self.to(users, email_key, opts = {})
+    new(users, email_key, opts).queue_email
+  end
+
+  def queue_email
+    opts[:email_key] = email_key
+    opts[:to] ||= email_array
+    opts[:name] ||= first_users_name
+    opts[:user_id] ||= user_id
+    opts[:account_id] ||= account_id
+
+    json = JSON.generate(opts)
+    RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
+  end
+end</code></pre></figure>
+
+
+<p>There&rsquo;re a number of use-case specific variables above, but the <code>email_key</code> is probably the most important. We used that to describe what email should be invoked on the service.</p>
+
+<p>In the above example, we triggered the <code>welcome</code> email on the <code>UserMailer</code> class. We translated this request into an email key of <code>user_welcome</code>.</p>
+
+<p>This key then gets interpreted by the Email service app and turned into an actual <code>Mailer</code> class and method within it. We could have done this in a variety of ways, but we split the string on the service-side at the <code>_</code>, and the first element described the mailer, the rest the method. So in this case, it gets interpreted as <code>UserMailer#welcome</code>.</p>
+
+<p>One thing this pattern allowed us to do was almost full copy/paste the old mailer methods in to the new Email service application.</p>
+
+<h2>Failures, failures, failures</h2>
+
+<p>&ldquo;What if the service is down?&rdquo; you say, &ldquo;the email request will fail!&rdquo; Sure will.</p>
+
+<p>So let&rsquo;s wrap that request in a Sidekiq job to take advantage of the built-in retries.</p>
+
+<p>Rather than invoke the following method in the email object:</p>
+
+<figure class='code'><pre><code>RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)</code></pre></figure>
+
+
+<p>we&rsquo;ll shoot off a Sidekiq job instead, changing the <code>queue_email</code> method to:</p>
+
+<figure class='code'><pre><code>def queue_email
+  opts[:email_key] = email_key
+  opts[:to] ||= email_array
+  opts[:name] ||= first_users_name
+  opts[:user_id] ||= user_id
+  opts[:account_id] ||= account_id
+
+  EmailWorker.perform_async(opts)
+end</code></pre></figure>
+
+
+<p>There we have it. Network-proof email requests!</p>
+
+<p>Not so fast&hellip;</p>
+
+<p>Astute readers will probably recognize that the service-side network communication can potentially also fail. This is becoming a pattern, huh? More communication, more potential for failure and more potential headaches.</p>
+
+<p>On the <strong>service side</strong>, we have a controller that takes in the request for the email and immediately serializes it to a Sidekiq job:</p>
+
+<figure class='code'><pre><code>  def create
+    EmailWorker.perform_async(parsed_params)
+    head :accepted
+  end
+
+  private
+
+  def parse_params
+    JSON.parse(request.body) || {}
+  end
+end</code></pre></figure>
+
+
+<p>Because we immediately serialize the job to Sidekiq, we&rsquo;ve successfully acknowledged the job was received, and the main app&rsquo;s Sidekiq job completes successfully. Now the email service can move on to doing the heavy-lifting in whatever way makes the most sense. In our case, we use Mailgun to send our emails, so the <code>EmailWorker</code> Sidekiq job invokes a new mailer based on the <code>email_key</code> param and sends it off to mailgun for transport. And because it&rsquo;s wrapped in a Sidekiq job, we can sleep well knowing that the Mailgun request can fail and the job will successfully retry until it goes through.</p>
+
+<h2>Summary</h2>
+
+<p>Service communication is definitely not for the faint of heart and as a team, we can completely appreciate the challenges that come along with keeping services in sync now&mdash;especially having stood up about 8 new services in the last 12 months.</p>
+
+<p>Sidekiq has been the queueing solution we&rsquo;ve leaned on to keep communication in sync and reliable. We&rsquo;ve also written a few internal tools that piggy-backy off Sidekiq that we&rsquo;re really excited share with the community in the near future.</p>
+
+<p>Part II, in this series, will discuss the methods of communication necessary to consider when implementing a service-based architecture.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The Ruby Book Bundle Is Live]]></title>
@@ -2732,23 +2886,6 @@ end</code></pre></figure>
 <p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
 
 <p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem eBook is Live!]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-is-live/"/>
-    <updated>2014-03-26T23:49:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-is-live</id>
-    <content type="html"><![CDATA[<p>After several weeks of <strong>really</strong> early mornings, <a href="http://brandonhilkert.com/books/build-a-ruby-gem?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><em>Build a Ruby Gem</em></a> is finally live:</p>
-
-<p><a href="http://brandonhilkert.com/books/build-a-ruby-gem?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">http://brandonhilkert.com/books/build-a-ruby-gem/</a></p>
-
-<p>Thanks again for all the support and encouragement. I had a great time working
-on it and really look forward to hearing your feedback.</p>
-
-<!--more-->
-
 ]]></content>
   </entry>
   
