@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-07-27T11:24:05-04:00</updated>
+  <updated>2015-07-28T11:23:39-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -804,19 +804,19 @@ upcoming_invoices = customer.upcoming_invoices</code></pre></figure>
   def customer
     return @customer if @customer
 
-    @customer = Rails.cache.fetch(cache_key("customer"), expires: 15.minutes) do
+    @customer = Rails.cache.fetch(cache_key("customer"), expires_in: 15.minutes) do
       Stripe::Customer.retrieve(user.stripe_id)
     end
   end
 
   def invoices
-    Rails.cache.fetch(cache_key("invoices"), expires: 15.minutes) do
+    Rails.cache.fetch(cache_key("invoices"), expires_in: 15.minutes) do
       customer.invoices
     end
   end
 
   def upcoming_invoice
-    Rails.cache.fetch(cache_key("upcoming_invoice"), expires: 15.minutes) do
+    Rails.cache.fetch(cache_key("upcoming_invoice"), expires_in: 15.minutes) do
       customer.upcoming_invoice
     end
   end
