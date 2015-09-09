@@ -165,6 +165,48 @@
   
 
 
+<time datetime="2015-08-14T10:32:00-04:00" data-updated="true" itemprop="datePublished">August 14<span>th</span>, 2015</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/" itemprop="url">A Path to Services - Part 2 - Synchronous vs. Asynchronous</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/microservices/'>microservices</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we moved the responsibility of emails to a separate Rails application. In order to leverage this new service, we created a PORO to encapsulate the specifics of communicating with our new service by taking advantage of Sidekiq&rsquo;s built-in retry mechanism to protect from intermittent network issues.</p>
+
+<p>Communication between microservices can be broken down in to 2 categories: <strong>synchronous</strong> and  <strong>asynchronous</strong>.
+Understanding when to use each is critical in maintaining a healthy infrastructure. This post will explore details about these two methods of communication and their associated use cases.</p>
+
+
+		
+		<a href="/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2015-07-27T11:18:00-04:00" data-updated="true" itemprop="datePublished">July 27<span>th</span>, 2015</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/a-path-to-services-part-1-start-small/" itemprop="url">A Path to Services - Part 1 - Start Small</a></h1>
   <div class="tags">
@@ -495,44 +537,6 @@ go well in the previous year. Think weight loss (everyone makes this resolution 
 
 		
 		<a href="/blog/a-ruby-refactor-exploring-dependency-injection-options/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-12-03T13:14:00-05:00" data-updated="true" itemprop="datePublished">December 3<span>rd</span>, 2014</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/rails-gemfile-teardown-2014/" itemprop="url">Rails Gemfile Teardown - 2014</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
-
-<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
-
-
-		
-		<a href="/blog/rails-gemfile-teardown-2014/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

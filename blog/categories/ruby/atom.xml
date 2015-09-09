@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-08-24T21:35:40-04:00</updated>
+  <updated>2015-09-09T07:19:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,110 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
+    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
+    <updated>2015-08-14T10:32:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
+    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we moved the responsibility of emails to a separate Rails application. In order to leverage this new service, we created a PORO to encapsulate the specifics of communicating with our new service by taking advantage of Sidekiq&rsquo;s built-in retry mechanism to protect from intermittent network issues.</p>
+
+<p>Communication between microservices can be broken down in to 2 categories: <strong>synchronous</strong> and  <strong>asynchronous</strong>.
+Understanding when to use each is critical in maintaining a healthy infrastructure. This post will explore details about these two methods of communication and their associated use cases.</p>
+
+<!--more-->
+
+
+<h2>Background</h2>
+
+<p>Continuing the discussion of our architecture from last time, we have a primary
+Rails web application serving the majority of our business logic. We now have an additional application that&rsquo;s only responsibility is the formatting and sending of emails.</p>
+
+<p><img class="center" src="/images/services/app-email.png" title="&ldquo;Application service with email microservice&rdquo;" ></p>
+
+<p>In this article, we&rsquo;ll discuss the addition of our Billing service. The service&rsquo;s responsibility to is to process transactions related to money. This can come in the form of a trial conversion, adding a seat to an additional account, or deleting users from an existing account, among others.</p>
+
+<p>Like many SaaS applications, PipelineDeals has multiple tiers of service. The most expensive intended for customers needing advanced functionality. Part of the billing service&rsquo;s responsibility is to manage the knowledge of which features an account can access.</p>
+
+<p>So stepping back to the main PipelineDeals web application, the app has to decide which features to render at page load. Because the billing service is our source of truth for this information, a page load will now require a call to this service to understand which features to render.</p>
+
+<p>This new dependency looks a little different than the email dependency from the
+<a href="/blog/a-path-to-services-part-1-start-small/">previous article</a>. Email has the
+luxury of not being in the dependency path of a page load. Very few customers
+will complain if an email is 10 seconds late. On the other hand, they&rsquo;ll
+complain immediately if their account won&rsquo;t load, and rightfully so.</p>
+
+<p><img class="center" src="/images/services/app-email-billing.png" title="&ldquo;Application service include email and billing microservices&rdquo;" ></p>
+
+<p>An interesting benefit from having already extracted the email service is that the billing service sends email regarding financial transactions and account changes. Typically, we would have done the same thing for every other Rails app that needed to send email, which was integrate <code>ActionMailer</code> and setup the templates and mailers needed to do the work. In this case, we can add those emails to the email service and use the same communication patterns we do from the main web application to trigger the sending of an email from the billing service. This does require making changes to 2 different projects for a single feature (business logic in billing and mailer in email), but removes the necessity to configure another app to send email properly. We viewed this as a benefit.</p>
+
+<h2>Asynchronous Events</h2>
+
+<p>As the easier of the two, asynchronous would be any communication not necessary for the request/response cycle to complete. Email is the perfect example. Logging also falls in to this category.</p>
+
+<p>For the networks gurus out there, this would be similar to UDP communication. More of a fire-and-forget approach.</p>
+
+<p>An email, in this case, is triggered due to something like an account sign up.
+We send a welcome email thanking the customer for signing up and giving them
+some guidance on how to get the most benefit from the application. Somewhere in
+the process of signing up, the code triggers an email and passes along the data
+needed for email template.</p>
+
+<p>As shown in the previous article, the call to send the email looks something like this:</p>
+
+<p><code>ruby
+Email.to current_user, :user_welcome
+</code></p>
+
+<p>The value in this call is that under the covers, it&rsquo;s enqueuing a Sidekiq job:</p>
+
+<p><code>ruby
+EmailWorker.perform_async(opts)
+</code></p>
+
+<p>where <code>opts</code> is a hash of data related to the email and the variables needed for the template.</p>
+
+<p><em>Note: Because the options are serialized to JSON, values in hash must be simple structures. Objects won&rsquo;t work here.</em></p>
+
+<p>As you can see above, the code invoking the <code>Email.to</code> method doesn&rsquo;t care about what it returns. In fact, it doesn&rsquo;t return anything we care about at this point. So as long as the method is called, the code can move forward without waiting for the email to finish sending.</p>
+
+<p>Extracting asynchronous operations like this that exist in a code path is a
+great way to improve performance. There are times, though, where deferring an operation to background job might not make sense.</p>
+
+<p>For example, imagine a user changes the name of a person. They click one of their contact&rsquo;s names, enter a new name, and click &ldquo;Save&rdquo;. It doesn&rsquo;t make sense to send the task of updating the actual name in the database to a background job because depending on what else is in the queue at that time, the update might not complete until after the next refresh, which would make the user believe their update wasn&rsquo;t successful. This would be incredibly confusing.</p>
+
+<p>Logging is another perfect candidate for asynchronicity. In most cases, our users don&rsquo;t care if a log of their actions has been written to the database before their next refresh. It&rsquo;s information we may want to store, and as a result, can be a fire-and-forget operation. We can rest easy knowing we&rsquo;ll have that information, soon-ish, and it won&rsquo;t add any additional overhead to the end user&rsquo;s request cycle.</p>
+
+<p>The opposite of asynchronous events like this are <strong>synchronous</strong> events! (surprise right?). Let&rsquo;s explore how they&rsquo;re different.</p>
+
+<h2>Synchronous Events</h2>
+
+<p>We can look at synchronous events as dependencies of the request cycle. We use MySQL as a backend for the main PipelineDeals web application and queries to MySQL would be considered synchronous. In that, in order to successfully fulfill the current request, we require the information returned from MySQL before we can respond.</p>
+
+<p>In most cases, we don&rsquo;t think of our main datastore as a service. It doesn&rsquo;t necessarily have a separate application layer on top of it, but it&rsquo;s behavior and requirements are very much like a service.</p>
+
+<p>If we consider the addition of our billing service above, we require information about the features allowed for a particular account before we can render the page. This allows us to include/exclude modules they should or should not see. The flow goes something like this:</p>
+
+<p><code>Web request -&gt; lookup account in DB -&gt; Request features from Billing service -&gt; render page</code></p>
+
+<p>If the request to the billing service didn&rsquo;t require a response, we would consider this to be an <strong>asynchronous</strong> service, which might change how we invoke the request for data.</p>
+
+<p>Synchronous communication can happen over a variety of protocols. The most
+common is a JSON payload over HTTP. In general, it&rsquo;s not the most performant,
+but it&rsquo;s one of the easier to debug and is human-readable, so it tends to be pretty popular.</p>
+
+<p>The synchronous services we&rsquo;ve setup all communicate over HTTP. Rails APIs are a known thing. We&rsquo;re familiar with the stack and the dependencies required to set up a common JSON API, which is a large part of the reason it&rsquo;s our preferred communication protocol between services.</p>
+
+<h2>Summary</h2>
+
+<p>We&rsquo;ve simplified the communication between services into these two categories. Knowing this helps dictate the infrastructure and configuration of the applications.</p>
+
+<p>Next time, we&rsquo;ll take a closer look at the synchronous side and the specifics about the JSON payloads involved to send an email successfully.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
@@ -590,264 +694,6 @@ App.Billing =
 <p>I wish I had a better answer.</p>
 
 <p><strong>How would you suggest someone start with Ruby?</strong></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
-    <link href="http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators/"/>
-    <updated>2015-03-09T15:37:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators</id>
-    <content type="html"><![CDATA[<p>In my <a href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/">last article</a>, I presented some code that wrapped up accessing a customer&rsquo;s Stripe data and added a caching layer on top. I wanted to take some time to dig in to that code and see how we can make it better.</p>
-
-<p>Decorators give us a tool to add additional functionality to a class while still keeping the public API consistent. From the perspective of the client, this is a win-win! Not only do they get the added behavior, but they don&rsquo;t need to call different methods to do so.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p>Our original class accessed data from Stripe <strong>AND</strong> cached the response for some time period. I accentuated &ldquo;AND&rdquo; because it&rsquo;s generally the word to be on alert for when considering whether functionality can be teased apart in to separate responsibilities.</p>
-
-<p>The question becomes, can we make one class that accesses Stripe data, and another that&rsquo;s only responsible for caching it?</p>
-
-<p>Of course we can!</p>
-
-<h2>The Solution</h2>
-
-<p>Let&rsquo;s start with the most basic form of accessing our Stripe customer data with the <a href="https://github.com/stripe/stripe-ruby">Stripe gem</a>:</p>
-
-<p>```
-class AccountsController &lt; ApplicationController
-  before_action :require_authentication</p>
-
-<p>  def show</p>
-
-<pre><code>@customer = Stripe::Customer.retrieve(current_user.stripe_id)
-@invoices = @customer.invoices
-@upcoming_invoice = @customer.upcoming_invoice
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<h2>Extract an Adapter</h2>
-
-<p>Because we&rsquo;re interfacing with a third-party system (Stripe), it makes sense for to create a local adapter to access the Stripe methods. It&rsquo;s probably not likely we&rsquo;re going to switch out the official Stripe gem for another one that access the same data, but a better argument might be that we could switch billing systems entirely in the future. And if we make a more generic adapter to our third-party billing system, we would only need to update our adapter when that time comes.</p>
-
-<p>While the adapter optimization may seem like overkill here, we&rsquo;ll see how that generic adapter helps us implement our caching layer shortly.</p>
-
-<p>Let&rsquo;s start by removing the notion that it&rsquo;s Stripe and all and call it <code>Billing</code>. Here we can expose the methods needed from the  <code>AccountsController</code> above:</p>
-
-<p>```
-class Billing
-  attr_reader :billing_id</p>
-
-<p>  def initialize(billing_id)</p>
-
-<pre><code>@billing_id = billing_id
-</code></pre>
-
-<p>  end</p>
-
-<p>  def customer</p>
-
-<pre><code>Stripe::Customer.retrieve(billing_id)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>customer.invoices
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>customer.upcoming_invoice
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
-
-<p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
-
-<p>```
-class AccountsController &lt; ApplicationController
-  before_action :require_authentication</p>
-
-<p>  def show</p>
-
-<pre><code>billing = Billing.new(current_user.stripe_id)
-
-@customer = billing.customer
-@invoices = billing.invoices
-@upcoming_invoice = billing.upcoming_invoice
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
-
-<h2>Create a Decorator</h2>
-
-<p>Now that we have our adapter set up, let&rsquo;s look at how we can add caching behavior to improve the performance of our accounts page.</p>
-
-<p>The most of basic form of a decorator is to pass in the object we&rsquo;re decorating (<code>Billing</code>), and define the same methods of the billing, but add the additional functionality on top of them.</p>
-
-<p>Let&rsquo;s create a base form of  <code>BillingWithCache</code> that <strong>does nothing more</strong> than call the host methods:</p>
-
-<p>```
-class BillingWithCache
-  def initialize(billing_service)</p>
-
-<pre><code>@billing_service = billing_service
-</code></pre>
-
-<p>  end</p>
-
-<p>  def customer</p>
-
-<pre><code>billing_service.customer
-</code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>customer.invoices
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>customer.upcoming_invoice
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :billing_service
-end
-```</p>
-
-<p>So while we haven&rsquo;t added any additional functionality, we have created the ability for this class to be used in place of our existing <code>Billing</code> class because it responds to the same API (<code>#customer</code>, <code>#invoices</code>, <code>#upcoming_invoice</code>).</p>
-
-<p>Integrating this new class with <code>AccountsController</code> looks like:</p>
-
-<p>```
-class AccountsController &lt; ApplicationController
-  before_action :require_authentication</p>
-
-<p>  def show</p>
-
-<pre><code>billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
-
-@customer = billing.customer
-@invoices = billing.invoices
-@upcoming_invoice = billing.upcoming_invoice
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
-
-<p><code>
-BillingWithCache.new(Billing.new(current_user.stripe_id))
-</code></p>
-
-<p>I know what you&rsquo;re thinking, &ldquo;But it doesn&rsquo;t actually cache anything!&rdquo;. You&rsquo;re right! Let&rsquo;s dig in to the <code>BillingWithCache</code> class and add that.</p>
-
-<h2>Adding Caching Functionality</h2>
-
-<p>In order to cache data using <code>Rails.cache</code>, we&rsquo;re going to need a cache key of some kind. Fortunately, the original <code>Billing</code> class provides a reader for <code>billing_id</code> that will allow us to make this unique to that user.</p>
-
-<p><code>
-def cache_key(item)
-  "user/#{billing_id}/billing/#{item}"
-end
-</code></p>
-
-<p>In this case, <code>item</code> can refer to things like <code>"customer"</code>, <code>"invoices"</code>, or <code>"upcoming_invoice"</code>. This gives us a method we can use internally with <code>BillingWithCache</code> to provide a cache key unique to the both the user and the type of data we&rsquo;re caching.</p>
-
-<p>Adding in the calls to actually cache the data:</p>
-
-<p>```
-class BillingWithCache
-  def initialize(billing_service)</p>
-
-<pre><code>@billing_service = billing_service
-</code></pre>
-
-<p>  end</p>
-
-<p>  def customer</p>
-
-<pre><code>key = cache_key("customer")
-
-Rails.cache.fetch(key, expires: 15.minutes) do
-  billing_service.customer
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>key = cache_key("invoices")
-
-Rails.cache.fetch(key, expires: 15.minutes) do
-  customer.invoices
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>key = cache_key("upcoming_invoice")
-
-Rails.cache.fetch(key, expires: 15.minutes) do
-  customer.upcoming_invoice
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :billing_service</p>
-
-<p>  def cache_key(item)</p>
-
-<pre><code>"user/#{billing_service.billing_id}/billing/#{item}"
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>The code above caches the call to each of these methods for 15 minutes. We could go further and move that to an argument with a default value, but I&rsquo;ll leave as an exercise for another time.</p>
-
-<h2>Summary</h2>
-
-<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
-
-<p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
-
-<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
 ]]></content>
   </entry>
   

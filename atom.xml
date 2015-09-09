@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-08-24T21:35:40-04:00</updated>
+  <updated>2015-09-09T07:19:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,108 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
+    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
+    <updated>2015-08-14T10:32:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
+    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we moved the responsibility of emails to a separate Rails application. In order to leverage this new service, we created a PORO to encapsulate the specifics of communicating with our new service by taking advantage of Sidekiq&rsquo;s built-in retry mechanism to protect from intermittent network issues.</p>
+
+<p>Communication between microservices can be broken down in to 2 categories: <strong>synchronous</strong> and  <strong>asynchronous</strong>.
+Understanding when to use each is critical in maintaining a healthy infrastructure. This post will explore details about these two methods of communication and their associated use cases.</p>
+
+<!--more-->
+
+
+<h2>Background</h2>
+
+<p>Continuing the discussion of our architecture from last time, we have a primary
+Rails web application serving the majority of our business logic. We now have an additional application that&rsquo;s only responsibility is the formatting and sending of emails.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/services/app-email.png" title="&#34;Application service with email microservice&#34;" alt="&#34;Application service with email microservice&#34;"></p>
+
+<p>In this article, we&rsquo;ll discuss the addition of our Billing service. The service&rsquo;s responsibility to is to process transactions related to money. This can come in the form of a trial conversion, adding a seat to an additional account, or deleting users from an existing account, among others.</p>
+
+<p>Like many SaaS applications, PipelineDeals has multiple tiers of service. The most expensive intended for customers needing advanced functionality. Part of the billing service&rsquo;s responsibility is to manage the knowledge of which features an account can access.</p>
+
+<p>So stepping back to the main PipelineDeals web application, the app has to decide which features to render at page load. Because the billing service is our source of truth for this information, a page load will now require a call to this service to understand which features to render.</p>
+
+<p>This new dependency looks a little different than the email dependency from the
+<a href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/">previous article</a>. Email has the
+luxury of not being in the dependency path of a page load. Very few customers
+will complain if an email is 10 seconds late. On the other hand, they&rsquo;ll
+complain immediately if their account won&rsquo;t load, and rightfully so.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/services/app-email-billing.png" title="&#34;Application service include email and billing microservices&#34;" alt="&#34;Application service include email and billing microservices&#34;"></p>
+
+<p>An interesting benefit from having already extracted the email service is that the billing service sends email regarding financial transactions and account changes. Typically, we would have done the same thing for every other Rails app that needed to send email, which was integrate <code>ActionMailer</code> and setup the templates and mailers needed to do the work. In this case, we can add those emails to the email service and use the same communication patterns we do from the main web application to trigger the sending of an email from the billing service. This does require making changes to 2 different projects for a single feature (business logic in billing and mailer in email), but removes the necessity to configure another app to send email properly. We viewed this as a benefit.</p>
+
+<h2>Asynchronous Events</h2>
+
+<p>As the easier of the two, asynchronous would be any communication not necessary for the request/response cycle to complete. Email is the perfect example. Logging also falls in to this category.</p>
+
+<p>For the networks gurus out there, this would be similar to UDP communication. More of a fire-and-forget approach.</p>
+
+<p>An email, in this case, is triggered due to something like an account sign up.
+We send a welcome email thanking the customer for signing up and giving them
+some guidance on how to get the most benefit from the application. Somewhere in
+the process of signing up, the code triggers an email and passes along the data
+needed for email template.</p>
+
+<p>As shown in the previous article, the call to send the email looks something like this:</p>
+
+<figure class='code'><pre><code>Email.to current_user, :user_welcome</code></pre></figure>
+
+
+<p>The value in this call is that under the covers, it&rsquo;s enqueuing a Sidekiq job:</p>
+
+<figure class='code'><pre><code>EmailWorker.perform_async(opts)</code></pre></figure>
+
+
+<p>where <code>opts</code> is a hash of data related to the email and the variables needed for the template.</p>
+
+<p><em>Note: Because the options are serialized to JSON, values in hash must be simple structures. Objects won&rsquo;t work here.</em></p>
+
+<p>As you can see above, the code invoking the <code>Email.to</code> method doesn&rsquo;t care about what it returns. In fact, it doesn&rsquo;t return anything we care about at this point. So as long as the method is called, the code can move forward without waiting for the email to finish sending.</p>
+
+<p>Extracting asynchronous operations like this that exist in a code path is a
+great way to improve performance. There are times, though, where deferring an operation to background job might not make sense.</p>
+
+<p>For example, imagine a user changes the name of a person. They click one of their contact&rsquo;s names, enter a new name, and click &ldquo;Save&rdquo;. It doesn&rsquo;t make sense to send the task of updating the actual name in the database to a background job because depending on what else is in the queue at that time, the update might not complete until after the next refresh, which would make the user believe their update wasn&rsquo;t successful. This would be incredibly confusing.</p>
+
+<p>Logging is another perfect candidate for asynchronicity. In most cases, our users don&rsquo;t care if a log of their actions has been written to the database before their next refresh. It&rsquo;s information we may want to store, and as a result, can be a fire-and-forget operation. We can rest easy knowing we&rsquo;ll have that information, soon-ish, and it won&rsquo;t add any additional overhead to the end user&rsquo;s request cycle.</p>
+
+<p>The opposite of asynchronous events like this are <strong>synchronous</strong> events! (surprise right?). Let&rsquo;s explore how they&rsquo;re different.</p>
+
+<h2>Synchronous Events</h2>
+
+<p>We can look at synchronous events as dependencies of the request cycle. We use MySQL as a backend for the main PipelineDeals web application and queries to MySQL would be considered synchronous. In that, in order to successfully fulfill the current request, we require the information returned from MySQL before we can respond.</p>
+
+<p>In most cases, we don&rsquo;t think of our main datastore as a service. It doesn&rsquo;t necessarily have a separate application layer on top of it, but it&rsquo;s behavior and requirements are very much like a service.</p>
+
+<p>If we consider the addition of our billing service above, we require information about the features allowed for a particular account before we can render the page. This allows us to include/exclude modules they should or should not see. The flow goes something like this:</p>
+
+<p><code>Web request -&gt; lookup account in DB -&gt; Request features from Billing service -&gt; render page</code></p>
+
+<p>If the request to the billing service didn&rsquo;t require a response, we would consider this to be an <strong>asynchronous</strong> service, which might change how we invoke the request for data.</p>
+
+<p>Synchronous communication can happen over a variety of protocols. The most
+common is a JSON payload over HTTP. In general, it&rsquo;s not the most performant,
+but it&rsquo;s one of the easier to debug and is human-readable, so it tends to be pretty popular.</p>
+
+<p>The synchronous services we&rsquo;ve setup all communicate over HTTP. Rails APIs are a known thing. We&rsquo;re familiar with the stack and the dependencies required to set up a common JSON API, which is a large part of the reason it&rsquo;s our preferred communication protocol between services.</p>
+
+<h2>Summary</h2>
+
+<p>We&rsquo;ve simplified the communication between services into these two categories. Knowing this helps dictate the infrastructure and configuration of the applications.</p>
+
+<p>Next time, we&rsquo;ll take a closer look at the synchronous side and the specifics about the JSON payloads involved to send an email successfully.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
@@ -2774,118 +2876,6 @@ end</code></pre></figure>
 <p>Rails is well-known for conventions. <code>travel_to</code> is a great addition to the framework that would&rsquo;ve otherwise required dragging in additional dependencies.</p>
 
 <p>Next time you look at the release notes for a project, don&rsquo;t skip over the less featured functionality. For all you know, it could be something that saves you time and frustration that commonly occurs in your projects.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/"/>
-    <updated>2014-04-21T19:48:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook</id>
-    <content type="html"><![CDATA[<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
-
-<p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="https://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
-
-<p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
-
-<figure class='code'><pre><code>  config.cache_classes = false</code></pre></figure>
-
-
-<p>Without it, we’d be forced to restart the server after almost every request. If that sounds like a giant PITA to you, I whole heartedly agree!</p>
-
-<p>So now you make your awesome job class, do some background work (send an email for example) and reload the page and boom:</p>
-
-<figure class='code'><pre><code>Celluloid::PoolManager: async call `perform` aborted!
-ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!
-        gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
-        gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
-        my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'</code></pre></figure>
-
-
-<p>The Celluloid registry still has reference to a the original <code>SendInvitationJob</code> class when it was initialized, however, reloading the code has caused the original reference to disappear and all hell breaks loose when the queue key is fetched to send another job to the class.</p>
-
-<p>In my head, it made sense for the queues to be cleared out upon every request in development. In general, because Sucker Punch doesn’t have persistent queues, the best use case is for quick one-off jobs that aren’t extremely important — email and logging come to mind. Since both of these examples are typically pretty speedy, it’s unlikely there will be a huge job backup upon subsequent requests.</p>
-
-<p>I knew what I wanted, but didn’t know how to accomplish it.</p>
-
-<h2>The Solution</h2>
-
-<p>Knowing the issue was related to the setting <code>config.cache_classes = false</code> in the development environment, I broke open the Rails source code and searched for <code>cache_classes</code>. The first result was the <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/reloader.rb"><code>ActionDispatch</code> reloader middleware</a>. Fortunately, there’s a very descriptive comment at the top of the class:</p>
-
-<figure class='code'><pre><code>  # By default, ActionDispatch::Reloader is included in the middleware stack
-  # only in the development environment; specifically, when +config.cache_classes+
-  # is false. Callbacks may be registered even when it is not included in the
-  # middleware stack, but are executed only when &lt;tt&gt;ActionDispatch::Reloader.prepare!&lt;/tt&gt;
-  # or &lt;tt&gt;ActionDispatch::Reloader.cleanup!&lt;/tt&gt; are called manually.</code></pre></figure>
-
-
-<p>This functionality is exactly what I needed!. From here, I just needed to know what callbacks were valid. A few lines in to the class are the following methods:</p>
-
-<figure class='code'><pre><code># Add a prepare callback. Prepare callbacks are run before each request, prior
-# to ActionDispatch::Callback's before callbacks.
-def self.to_prepare(*args, &block)
-  unless block_given?
-    warn "to_prepare without a block is deprecated. Please use a block"
-  end
-  set_callback(:prepare, *args, &block)
-end
-
-# Add a cleanup callback. Cleanup callbacks are run after each request is
-# complete (after #close is called on the response body).
-def self.to_cleanup(*args, &block)
-  unless block_given?
-    warn "to_cleanup without a block is deprecated. Please use a block"
-  end
-  set_callback(:cleanup, *args, &block)
-end</code></pre></figure>
-
-
-<p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
-
-<p>A quick glade over the <a href="http://www.rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
-
-<p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
-
-<figure class='code'><pre><code>module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie
-    initializer "sucker_punch.logger" do
-      SuckerPunch.logger = Rails.logger
-    end
-  end
-end</code></pre></figure>
-
-
-<p>All it did was connect the logger to the existing Rails logger. Adding the callback to <code>ActionDispatch</code> looks like:</p>
-
-<figure class='code'><pre><code>module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie
-    initializer "sucker_punch.logger" do
-      SuckerPunch.logger = Rails.logger
-    end
-
-    config.to_prepare do
-      Celluloid::Actor.clear_registry
-    end
-  end
-end</code></pre></figure>
-
-
-<p>Now when the Railtie is loaded, the <code>Celluloid::Actor.clear_registry</code> method is triggered before the reloading of code in the development environment, clearing out the Celluloid registry and allowing Sucker Punch to instantiate new job queues for each request.</p>
-
-<h2>Summary</h2>
-
-<p>I was unaware of any of these methods when the issue was submitted. Rather than throw my hands up and close the issue because it didn’t affect me, I thought through an approach that could work, and only then started to write code. And in fact, didn’t know what code to write!</p>
-
-<p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
-
-<p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
 ]]></content>
   </entry>
   
