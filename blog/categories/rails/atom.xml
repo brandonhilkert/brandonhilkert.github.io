@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-09-09T07:19:51-04:00</updated>
+  <updated>2015-10-15T09:38:46-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,153 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
+    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
+    <updated>2015-10-15T09:07:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
+    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we introduced a billing service to determine which features an account could access. If you remember, <a href="/our-path-to-services-part-1-start-small/">the email service</a> was a &ldquo;fire and forget&rdquo; operation and was capable of handling throughput delays given its low value to the core application.</p>
+
+<p>This post will explore how we handle synchronous communication for a service like billing where an inline response is required to service a request from the core application.</p>
+
+<!--more-->
+
+
+<h2>Background</h2>
+
+<p>If you remember from the previous post, we introduced the billing service to an infrastructure that looked like this:</p>
+
+<p><img class="center" src="/images/services/app-email-billing.png" title="&ldquo;Web application with Email and Billing Microservice&rdquo;" ></p>
+
+<p>Handling multiple pricing tiers in a SaaS app means you have to control authorization based on account status. Our billing service encapsulates the knowledge of which features correspond to which pricing tier.</p>
+
+<p>For instance, one feature is the ability to send trackable email to contacts in your PipelineDeals account. To service this request, we add an option to the bulk action menu from a list view:</p>
+
+<p><img class="center" src="/images/services/send-email.png" title="&ldquo;Send email feature&rdquo;" ></p>
+
+<h2>Service Request</h2>
+
+<p>Before we can conditionally show this option based on the pricing tier, we have to first make a request to the billing service to get the list of features available to that user.</p>
+
+<p>```
+class Billing::Features
+  def initialize(user)</p>
+
+<pre><code>@user = user
+@account = user.account
+</code></pre>
+
+<p>  end</p>
+
+<p>  def list</p>
+
+<pre><code>Rails.cache.fetch("account_#{account.id}_billing_features") do
+  response = Billing::Api.get "account/#{account.id}/features"
+  response['features']
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :user, :account
+end
+```</p>
+
+<p><code>Billing::Api</code>, in this case, is a wrapper around the API calls to handle exceptions and other information like security.</p>
+
+<p><em>Note: When making synchronous HTTP calls like this, it&rsquo;s worth considering the failure state and providing a default response set in that case so the user isn&rsquo;t burdened with a failure page. In this case, one option would be dumb down the features on the page to the most basic tier.</em></p>
+
+<h2>Serving a JSON API</h2>
+
+<p>Plenty of articles have been written about how to create a JSON API with Rails, so we won&rsquo;t rehash those techniques here. Instead, we&rsquo;ll highlight patterns we&rsquo;ve used for consistency.</p>
+
+<p>We tend to reserve the root URL namespace for UI-related routes, so we start by creating a unique namespace for the API:</p>
+
+<p>```
+namespace :api do
+  resources :account do</p>
+
+<pre><code>resource :features, only: :show
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>This setup gives us the path <code>/api/account/:account_id/features</code>. We haven&rsquo;t found a need for versioning internal APIs. If we decided to in the future, we could always add the API version as a request header.</p>
+
+<p>The <code>features</code> endpoint looks like:</p>
+
+<p>```
+class Api::FeaturesController &lt; Api::ApiController
+  skip_before_filter :verify_authenticity_token</p>
+
+<p>  def show</p>
+
+<pre><code>render json: {
+  success: true,
+  features: AccountFeatures.new(@account_id).list
+}
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Notice <code>Api::FeaturesController</code> inherits from <code>Api::ApiController</code>. We keep the API-related functionality in this base controller so each endpoint will get access to security and response handling commonalities.</p>
+
+<p><code>AccountFeatures</code> is a PORO that knows how to list billing features for a particular account. We could&rsquo;ve queried it straight from an ActiveRecord-based model, but our handling of features is a little more complicated than picking them straight from the database.</p>
+
+<p>Another note here is that we haven&rsquo;t introduced a serializing library like <code>active_model_serializers</code> or <code>jbuilder</code>. Using <code>render json</code> alone has serviced us well for simple APIs. We reach for something more complex when the response has more attributes than shown above.</p>
+
+<h2>Handling Service Response</h2>
+
+<p>By introducing <code>Rails.cache</code>, we can serve requests (after the initial) without requiring a call to the billing service.</p>
+
+<p>One of the first things we do is serialize the set of features to JavaScript so our client-side code has access:</p>
+
+<p><code>
+&lt;%= javascript_tag do %&gt;
+  window.Features = &lt;%= Billing::Features.new(logged_in_user).list.to_json %&gt;;
+&lt;% end %&gt;
+</code></p>
+
+<p>We also include a helper module in to our Rails views/controllers, so we can handle conditional feature logic:</p>
+
+<p>```
+module Features
+  def feature_enabled?(feature)</p>
+
+<pre><code>Billing::Features.new(logged_in_user).list.include?(feature.to_s)
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>Synchronous Side Effects</h2>
+
+<p>When we <a href="/our-path-to-services-part-2-synchronous-vs-asynchronous/">looked at asynchronous service requests</a>, there was less immediacy associated with the request due to its &ldquo;fire-and-forget&rdquo; nature. A synchronous request, on the other hand, will handle all requests to the core application, so scaling can be challenge and infrastructure costs can add up.</p>
+
+<p><img class="center" src="/images/services/synchronous-service-cost.png" title="&ldquo;Increased cost by introducing synchronous microservice&rdquo;" ></p>
+
+<p>In addition to the infrastructure costs, performance can be a factor. If the original page response time was 100ms and we&rsquo;re adding a synchronous service request that takes another 100ms, all of a sudden we&rsquo;ve doubled our users' response times. And while this architectural decision might seem like an optimization, I&rsquo;m positive none of our users will thank us for making their page load times 2x slower.</p>
+
+<h2>Summary</h2>
+
+<p>As you can see, there&rsquo;s little magic to setting up a synchronous service request.</p>
+
+<p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
+
+<p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
@@ -618,82 +765,6 @@ App.Billing =
 <p>Using the techniques above, we can keep the Javascript in our Rails applications organized and predictable. We can rest easy knowing the files will all generally look the same. There&rsquo;s not been any uses cases where this structure hasn&rsquo;t worked for me personally.</p>
 
 <p>One thing that makes me feel good about this approach is there&rsquo;s no real magic or extra plugins. It&rsquo;s using all the tools we already have in a basic Rails application, which is one less thing to maintain and keep up to date. Less depedencies == less pain down the road.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[How to Start with Ruby?]]></title>
-    <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
-    <updated>2015-05-06T06:03:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
-    <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterans, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
-
-<p>Turning the clocks back to when you knew much less about something is hard. But putting yourself back in that position can offer valuable insight to the opportunities available and how they might be improved in the future.</p>
-
-<!--more-->
-
-
-<h2>How I Started</h2>
-
-<p>Most come to the Rails community not knowing much about Ruby. Learning any new technology is hard. And learning a few at the same time is even harder.</p>
-
-<p>This was me in 2009. A relatively new Rails 2.3 app was dropped in to my lap, and despite only having experience with PHP, my job was to aggressively ship new features. I read Agile Web Development with Rails cover to cover and dove in head first. Little did I know it would be one of the best career decisions of my life.</p>
-
-<p>I spent the next few months pounding my head against my desk. The days and weeks of frustration seemed endless. And then&hellip;it just went away. The pain I&rsquo;d endured merged in to an intense desire to dig in harder.  There were more light bulbs moments in the months that followed than any other time I can remember.</p>
-
-<p>During those intense months of frustration, I leaned heavily on the Rails and Philly.rb IRC rooms. In the former, I tried not to say anything too stupid. Fortunately, the latter felt more welcoming and approachable and I owe that group a lot of holding my hand through what might have otherwise been a deathwish for me and the Ruby language.</p>
-
-<p>A few questions pop out in my head&hellip;I was confused about filtering an ActiveRecord query and was surprised to learn methods that were built in to the Ruby language would do exactly what I want. At the time, if it wasn&rsquo;t in ActiveRecord, it might as well have not existed to me.</p>
-
-<p>From someone who <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">advocates for using tools without fancy DSL&rsquo;s</a>, this is hysterical to me. Ruby, of all things, had the answer. At that point, I&rsquo;m almost certain I&rsquo;d never seen the Ruby standard library documentation.</p>
-
-<h2>Rails Starts Where Ruby Stops</h2>
-
-<p>Out of convenience, Rails does a lot to make our experience with the Ruby language easier than it is out of the box. Like <code>2.hours.ago</code>&hellip;.none of this is possible if Rails doesn&rsquo;t <a href="http://api.rubyonrails.org/classes/Integer.html">monkey patch the <code>Integer</code> class</a>. For someone who doesn&rsquo;t know any better (me in 2009!), being able to calls <code>#hours</code> on an integer just seems like something the language would do. Because Ruby was created for developer happiness, right?</p>
-
-<p>So perhaps the approach of monkey patching doesn&rsquo;t offer a clear indication of where functionality is coming from. The flip side of that argument is convenience. If I had to instantiate a time-related class every time I wanted &ldquo;noon time yesterday&rdquo;, maybe I&rsquo;d be slightly less enthralled with my ability to get stuff done in Rails. Perhaps it would cater more to the true OO neckbeards, but also may have resulted in far less adoption. Who knows!</p>
-
-<p>I don&rsquo;t have strong numbers to back this up, but I&rsquo;m guessing large majority of developers that get paid to write Ruby, due so within the context of a Rails application. And whether we want to admit it or not, a large reason new developers learn Ruby, is to learn Rails. So does it matter that newcomers don&rsquo;t know Ruby?</p>
-
-<p>From the standpoint of creating a web application fast and being able to iterate quickly, maybe not. But certainly if the person is interested in understanding the interworkings of what&rsquo;s happening within the application, knowing where Ruby stops and Rails starts is ideal.</p>
-
-<h2>How to Start?</h2>
-
-<p>I&rsquo;ve talked to quite a few people that are new to Ruby and I always struggle to suggest a good start project when they ask.  Everyone learns differently and has different interests, but in general, I think there are core-level motivating factors that can keep someone focused and interested.</p>
-
-<p>To me, it&rsquo;s the following:</p>
-
-<ol>
-<li>Does the project have real-world value?</li>
-<li>Does the project offer immediate feedback?</li>
-</ol>
-
-
-<p>Why does it matter if the project has real-world value? For one, continuing on something that doesn&rsquo;t improve our lives is sometimes hard to keep up with. And learning Ruby/Rails is definitely something that&rsquo;ll take more than a few nights and weekends. If the project we&rsquo;re driving towards continues to seem desirable, we&rsquo;ll have a better chance not to lose focus.</p>
-
-<p>Second, I don&rsquo;t want to get too philosophical, but there are plenty of resources that suggest if you want something badly enough and can visualize the end goal, there&rsquo;s a higher likelyhood that it&rsquo;ll come to be. Our desires will be stronger when we can see the end goal and know there is an increased real-world value for this application to be in existence.</p>
-
-<p>The immediate feedback piece shortens the time we&rsquo;re able to see changes and progress. This brings a lower rate of abandonment and better chance we&rsquo;ll see the project through.</p>
-
-<p>Rails answers both of these questions with a resounding, &ldquo;<strong>YES!</strong>&rdquo;. Think about it&hellip;</p>
-
-<p><strong>Does a Rails application have real world value?</strong> Of course it does. It&rsquo;s a web application. There has been no better time to be focused on Rails, where it be for the web and the backend of a mobile app.</p>
-
-<p><strong>Does the project offer immediate feedback?</strong> Sure does! A couple keystrokes and a refresh can give you instant gratifcation in the browser (or the occasional disappointment!).</p>
-
-<p>Whether it&rsquo;s a command-line tool, game, or other utility, I struggle to find other oppotunities to get people started. Frankly, many newcomers to Rails have never used a terminal before. So why would we suggest a command-line application as a good place to start? This is especially true for someone with little programming experience.</p>
-
-<p>For the experienced developer, it&rsquo;d be much easier to suggest writing something like a markdown processor, but only because they have the context of another language. At that point, they&rsquo;re really just comparing the Ruby language to what they already know and figuring out how to translate the things they <em>do</em> know to Ruby.</p>
-
-<p>For a new developer altogether, they would get little value of writing a markdown processor, and in fact, probably seems more like a research project than a sure-fire way to learn a developer-friendly programming language.</p>
-
-<p>So now we&rsquo;re back to suggesting Rails, but then you consider everything else a newcomer would need familiarity with to traverse the Rails eco-stytem: HTML, CSS, Javascript, Coffeescript, Sass, SQL&hellip;</p>
-
-<p>The list goes on and on. Not so easy after all. No wonder people get intimidated and bail. I suppose there&rsquo;s starting with Sinatra, but the doesn&rsquo;t remove you from the HTML and CSS requirements. Perhaps those impossible to dodge, given the medium. And even with Sinatra, we often end up creating the functionality that&rsquo;s in Rails anyway.</p>
-
-<p>I wish I had a better answer.</p>
-
-<p><strong>How would you suggest someone start with Ruby?</strong></p>
 ]]></content>
   </entry>
   

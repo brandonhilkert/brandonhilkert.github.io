@@ -1,0 +1,593 @@
+
+<!DOCTYPE HTML>
+<html xmlns:og="http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
+<head>
+	<meta charset="utf-8">
+	
+	
+	
+  
+  
+  <title>A Path to Services - Part 3 - Synchronous Events | Brandon Hilkert</title>
+	<meta name="author" content="Brandon Hilkert">
+
+	<meta name="description" content="October 15th, 2015 A Path to Services - Part 3 - Synchronous Events microservices, rails, ruby This article was originally posted on the PipelineDeals &hellip;">
+	
+
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:creator" content="@brandonhilkert">
+  <meta name="twitter:title" content="A Path to Services - Part 3 - Synchronous Events">
+  <meta name="twitter:description" content="October 15th, 2015 A Path to Services - Part 3 - Synchronous Events microservices, rails, ruby This article was originally posted on the PipelineDeals Engineering
+Blog In the previous article in &hellip;">
+  <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
+
+  <meta property="og:title" content="A Path to Services - Part 3 - Synchronous Events | Brandon Hilkert"/>
+  <meta property="og:description" content="October 15th, 2015 A Path to Services - Part 3 - Synchronous Events microservices, rails, ruby This article was originally posted on the PipelineDeals Engineering
+Blog In the previous article in &hellip;">
+  <meta property="og:url" content="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
+  <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
+  <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
+  <meta property="og:type" content="article"/>
+  <meta property="fb:profile_id" content="1472745932"/>
+
+	<link href="/atom.xml" rel="alternate" title="A Path to Services - Part 3 - Synchronous Events | Brandon Hilkert" type="application/atom+xml">
+	<link rel="canonical" href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/">
+	<link href="/favicon.png" rel="shortcut icon">
+	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+  <link href='http://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
+  <link href="http://fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
+  <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
+  <script src="/javascripts/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-24469169-1', 'auto');
+  ga('require', 'linkid', 'linkid.js');
+  ga('require', 'displayfeatures');
+  ga('send', 'pageview');
+</script>
+
+</head>
+
+
+<body>
+	<div class="container">
+		<div class="left-col">
+			<header id="header"><div class="profilepic">
+  <a href="/">
+    <img src="/images/brandon-hilkert.jpg" width="80" height="80" alt="Brandon Hilkert Profile Picture" />
+  </a>
+</div>
+<hgroup>
+  <h1><a href="/">Brandon Hilkert</a></h1>
+  
+</hgroup>
+
+<nav id="main-nav">
+  <ul class="main-navigation">
+    <li><a href="/about/">About</a></li>
+    <li><a href="/">Blog</a></li>
+    <li><a href="/newsletter/">Newsletter</a></li>
+    <!-- <li> -->
+    <!--   <a href="/courses/build&#45;a&#45;ruby&#45;gem/">Courses</a> -->
+    <!-- </li> -->
+    <li>
+      <div class="new-label">New</div>
+      <a href="/books/build-a-ruby-gem/">Books</a>
+    </li>
+    <!-- <li> -->
+    <!--   <a href="/tools/">Tools</a> -->
+    <!-- </li> -->
+  </ul>
+</nav>
+
+<nav id="sub-nav">
+	<div class="social">
+		
+		
+		
+		<a class="twitter" href="https://twitter.com/brandonhilkert" title="Twitter">Twitter</a>
+		
+		
+		<a class="github" href="https://github.com/brandonhilkert" title="GitHub">GitHub</a>
+		
+		
+		<a class="linkedin" href="http://www.linkedin.com/in/brandonhilkert">LinkedIn</a>
+		
+		
+		<a class="rss" href="/atom.xml" title="RSS">RSS</a>
+		
+	</div>
+</nav>
+
+<aside class="popular-posts">
+  <h4>Popular Posts</h4>
+<ul>
+  <li>
+    <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">7 Reasons I'm sticking with Minitest</a>
+  </li>
+  <li>
+    <a href="/blog/page-specific-javascript-in-rails/">Page-specific Javascript in Rails</a>
+  </li>
+  <li>
+    <a href="/blog/using-rails-4-dot-1-secrets-for-configuration/">Using Rails 4.1 Secrets for Config</a>
+  </li>
+  <li>
+    <a href="/blog/how-to-build-a-rails-engine/">How to Build a Rails Engine</a>
+  </li>
+  <li>
+    <a href="/blog/ruby-gem-configuration-patterns/">Ruby Gem Configuration Patterns</a>
+  </li>
+  <!-- <li> -->
+  <!--   <a href="/blog/how&#45;to&#45;build&#45;a&#45;rails&#45;engine/">How to Build a Rails Engine</a> -->
+  <!-- </li> -->
+  <!-- <li> -->
+  <!--   <a href="/blog/why&#45;i&#45;wrote&#45;the&#45;sucker&#45;punch&#45;gem/">Why I Wrote the Sucker Punch Gem</a> -->
+  <!-- </li> -->
+  <!-- <li> -->
+  <!--   <a href="/blog/setting&#45;up&#45;a&#45;cloudfront&#45;cdn&#45;for&#45;rails/">Setup a Cloudfront CDN for Rails</a> -->
+  <!-- </li> -->
+  <!-- <li> -->
+  <!--   <a href="/blog/3&#45;ways&#45;to&#45;get&#45;started&#45;contributing&#45;to&#45;open&#45;source/">Get Started with Open Source</a> -->
+  <!-- </li> -->
+</ul>
+
+
+</aside>
+
+</header>
+		</div>
+		<div class="mid-col">
+			<div class="mid-col-container">
+				<div id="content" class="inner"><article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-10-15T09:07:00-04:00" data-updated="true" itemprop="datePublished">October 15<span>th</span>, 2015</time></div>
+	<h1 class="title" itemprop="name">A Path to Services - Part 3 - Synchronous Events</h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/microservices/'>microservices</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="entry-content" itemprop="articleBody">
+    
+
+    <p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we introduced a billing service to determine which features an account could access. If you remember, <a href="/our-path-to-services-part-1-start-small/">the email service</a> was a &ldquo;fire and forget&rdquo; operation and was capable of handling throughput delays given its low value to the core application.</p>
+
+<p>This post will explore how we handle synchronous communication for a service like billing where an inline response is required to service a request from the core application.</p>
+
+<!--more-->
+
+
+<h2>Background</h2>
+
+<p>If you remember from the previous post, we introduced the billing service to an infrastructure that looked like this:</p>
+
+<p><img class="center" src="/images/services/app-email-billing.png" title="&#34;Web application with Email and Billing Microservice&#34;" alt="&#34;Web application with Email and Billing Microservice&#34;"></p>
+
+<p>Handling multiple pricing tiers in a SaaS app means you have to control authorization based on account status. Our billing service encapsulates the knowledge of which features correspond to which pricing tier.</p>
+
+<p>For instance, one feature is the ability to send trackable email to contacts in your PipelineDeals account. To service this request, we add an option to the bulk action menu from a list view:</p>
+
+<p><img class="center" src="/images/services/send-email.png" title="&#34;Send email feature&#34;" alt="&#34;Send email feature&#34;"></p>
+
+<h2>Service Request</h2>
+
+<p>Before we can conditionally show this option based on the pricing tier, we have to first make a request to the billing service to get the list of features available to that user.</p>
+
+<figure class='code'><pre><code>class Billing::Features
+  def initialize(user)
+    @user = user
+    @account = user.account
+  end
+
+  def list
+    Rails.cache.fetch("account_#{account.id}_billing_features") do
+      response = Billing::Api.get "account/#{account.id}/features"
+      response['features']
+    end
+  end
+
+  private
+
+  attr_reader :user, :account
+end</code></pre></figure>
+
+
+<p><code>Billing::Api</code>, in this case, is a wrapper around the API calls to handle exceptions and other information like security.</p>
+
+<p><em>Note: When making synchronous HTTP calls like this, it&rsquo;s worth considering the failure state and providing a default response set in that case so the user isn&rsquo;t burdened with a failure page. In this case, one option would be dumb down the features on the page to the most basic tier.</em></p>
+
+<h2>Serving a JSON API</h2>
+
+<p>Plenty of articles have been written about how to create a JSON API with Rails, so we won&rsquo;t rehash those techniques here. Instead, we&rsquo;ll highlight patterns we&rsquo;ve used for consistency.</p>
+
+<p>We tend to reserve the root URL namespace for UI-related routes, so we start by creating a unique namespace for the API:</p>
+
+<figure class='code'><pre><code>namespace :api do
+  resources :account do
+    resource :features, only: :show
+  end
+end</code></pre></figure>
+
+
+<p>This setup gives us the path <code>/api/account/:account_id/features</code>. We haven&rsquo;t found a need for versioning internal APIs. If we decided to in the future, we could always add the API version as a request header.</p>
+
+<p>The <code>features</code> endpoint looks like:</p>
+
+<figure class='code'><pre><code>class Api::FeaturesController &lt; Api::ApiController
+  skip_before_filter :verify_authenticity_token
+
+  def show
+    render json: {
+      success: true,
+      features: AccountFeatures.new(@account_id).list
+    }
+  end
+end</code></pre></figure>
+
+
+<p>Notice <code>Api::FeaturesController</code> inherits from <code>Api::ApiController</code>. We keep the API-related functionality in this base controller so each endpoint will get access to security and response handling commonalities.</p>
+
+<p><code>AccountFeatures</code> is a PORO that knows how to list billing features for a particular account. We could&rsquo;ve queried it straight from an ActiveRecord-based model, but our handling of features is a little more complicated than picking them straight from the database.</p>
+
+<p>Another note here is that we haven&rsquo;t introduced a serializing library like <code>active_model_serializers</code> or <code>jbuilder</code>. Using <code>render json</code> alone has serviced us well for simple APIs. We reach for something more complex when the response has more attributes than shown above.</p>
+
+<h2>Handling Service Response</h2>
+
+<p>By introducing <code>Rails.cache</code>, we can serve requests (after the initial) without requiring a call to the billing service.</p>
+
+<p>One of the first things we do is serialize the set of features to JavaScript so our client-side code has access:</p>
+
+<figure class='code'><pre><code>&lt;%= javascript_tag do %&gt;
+  window.Features = &lt;%= Billing::Features.new(logged_in_user).list.to_json %&gt;;
+&lt;% end %&gt;</code></pre></figure>
+
+
+<p>We also include a helper module in to our Rails views/controllers, so we can handle conditional feature logic:</p>
+
+<figure class='code'><pre><code>module Features
+  def feature_enabled?(feature)
+    Billing::Features.new(logged_in_user).list.include?(feature.to_s)
+  end
+end</code></pre></figure>
+
+
+<h2>Synchronous Side Effects</h2>
+
+<p>When we <a href="/our-path-to-services-part-2-synchronous-vs-asynchronous/">looked at asynchronous service requests</a>, there was less immediacy associated with the request due to its &ldquo;fire-and-forget&rdquo; nature. A synchronous request, on the other hand, will handle all requests to the core application, so scaling can be challenge and infrastructure costs can add up.</p>
+
+<p><img class="center" src="/images/services/synchronous-service-cost.png" title="&#34;Increased cost by introducing synchronous microservice&#34;" alt="&#34;Increased cost by introducing synchronous microservice&#34;"></p>
+
+<p>In addition to the infrastructure costs, performance can be a factor. If the original page response time was 100ms and we&rsquo;re adding a synchronous service request that takes another 100ms, all of a sudden we&rsquo;ve doubled our users&#8217; response times. And while this architectural decision might seem like an optimization, I&rsquo;m positive none of our users will thank us for making their page load times 2x slower.</p>
+
+<h2>Summary</h2>
+
+<p>As you can see, there&rsquo;s little magic to setting up a synchronous service request.</p>
+
+<p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
+
+<p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
+
+  </div>
+
+  
+    <script src="/javascripts/funnel-tools-funnel.min.js"></script>
+
+<div class="funnel-tools-funnel funnel-tools-funnel-default">
+  <section class="newsletter-top">
+  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
+</section>
+<section class="newsletter clearfix">
+  <div class="ribbon">
+    <span>
+      Join 3,000+ Rubyists
+    </span>
+  </div>
+  <section class="picture">
+    <img src="/images/newsletter/brandon-hilkert-point-right.png" alt="Brandon Hilkert pointing right">
+  </section>
+  <section class="signup">
+    <h2>Want More?</h2>
+    <h3>Ruby and Rails tips delivered to <br />your inbox twice a month</h3>
+
+    <form data-drip-embedded-form="6902355" action="https://www.getdrip.com/forms/6902355/submissions" method="post">
+  <div class="email-input-container">
+    <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
+  </div>
+  <input type="hidden" name="fields[location]" value="A Path to Services - Part 3 - Synchronous Events" />
+  <input type="submit" value="Send me articles like this!" name="subscribe" class="button">
+  <br class="clear">
+</form>
+
+
+
+    <aside>
+      I hate spam as much as you do!
+      <br />
+      Unsubscribe at any time.
+    </aside>
+  </section>
+</section>
+
+
+</div>
+
+<div class="funnel-tools-funnel funnel-tools-funnel-course-gem">
+  <section class="newsletter-top">
+  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
+</section>
+<section class="newsletter clearfix">
+  <div class="ribbon">
+    <span>
+      Join 1,300+ Rubyists
+    </span>
+  </div>
+  <section class="picture" style="padding-top: 30px;">
+    <img src="/images/newsletter/ruby-logo.png" alt="Ruby lanugage logo">
+  </section>
+  <section class="signup">
+    <h2>Want to Build a Ruby Gem?</h2>
+    <h3>A <strong>FREE</strong> 10-day email course helping you <br />build a Ruby Gem from start to finish.</h3>
+
+    <form data-drip-embedded-form="8461781" action="https://www.getdrip.com/forms/8461781/submissions" method="post">
+  <div class="email-input-container">
+    <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
+  </div>
+  <input type="hidden" name="fields[location]" value="A Path to Services - Part 3 - Synchronous Events" />
+  <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
+  <br class="clear">
+</form>
+
+
+
+    <aside>
+      I hate spam as much as you do!
+      <br />
+      Unsubscribe at any time.
+    </aside>
+  </section>
+</section>
+
+
+
+</div>
+
+<div class="funnel-tools-funnel funnel-tools-funnel-book-gem">
+  <section class="newsletter-top">
+  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
+</section>
+<section class="newsletter clearfix">
+  <div class="ribbon">
+    <span>
+      Join 400+ Rubyists
+    </span>
+  </div>
+  <section class="picture">
+    <img src="/images/newsletter/build-a-ruby-gem-book.png" style="padding-bottom: 15px;" alt="Build a Ruby Gem book">
+  </section>
+  <section class="signup">
+    <h2>Build a Ruby Gem</h2>
+    <h3>Learn to build a <br />Ruby gem from start to finish</h3>
+    <h3>19 chapters and 2+ hours of screencasts</h3>
+    <h3>Use the link below to get <strong>25% off</strong> any package</h3>
+    <a href="/books/build-a-ruby-gem/?utm_source=fo&utm_medium=web&utm_campaign=fo14&c=fo14" class="button">Take me to the book!</a>
+  </section>
+</section>
+
+</div>
+
+<script>
+  FunnelTools.Funnel.load();
+</script>
+
+  
+
+  
+
+
+</article>
+
+	<div class="share">
+	<div class="addthis_toolbox addthis_default_style ">
+
+    
+    <a href="http://bufferapp.com/add" class="buffer-add-button" data-count="horizontal" data-via="brandonhilkert" >Buffer</a>
+    <script type="text/javascript" src="http://static.bufferapp.com/js/button.js"></script>
+    
+
+    
+    <a class="addthis_button_facebook_like" fb:like:layout="button_count"></a>
+    
+
+    
+    <a class="addthis_button_tweet"></a>
+    
+
+    
+    <script type="IN/Share" data-counter="right"></script>
+    
+
+    
+    <a class="addthis_button_google_plusone" g:plusone:size="medium"></a>
+    
+
+	</div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid="></script>
+</div>
+
+
+
+  <section id="comment">
+    <h1 class="title">Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+			</div>
+      
+        <footer id="footer" class="inner"><ul>
+  <li>
+    <h4>Categories</h4>
+    <ul>
+      <li><a href="/blog/categories/ruby/">Ruby</a></li>
+      <li><a href="/blog/categories/rails/">Rails</a></li>
+      <li><a href="/blog/categories/open-source/">Open Source</a></li>
+      <li><a href="/blog/categories/marketing/">Marketing</a></li>
+      <li><a href="/blog/categories/email-course/">Email Course</a></li>
+      <li><a href="/blog/categories/book/">Book</a></li>
+    </ul>
+  </li>
+  <li>
+    <h4>Popular Posts</h4>
+<ul>
+  <li>
+    <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">7 Reasons I'm sticking with Minitest</a>
+  </li>
+  <li>
+    <a href="/blog/page-specific-javascript-in-rails/">Page-specific Javascript in Rails</a>
+  </li>
+  <li>
+    <a href="/blog/using-rails-4-dot-1-secrets-for-configuration/">Using Rails 4.1 Secrets for Config</a>
+  </li>
+  <li>
+    <a href="/blog/how-to-build-a-rails-engine/">How to Build a Rails Engine</a>
+  </li>
+  <li>
+    <a href="/blog/ruby-gem-configuration-patterns/">Ruby Gem Configuration Patterns</a>
+  </li>
+  <!-- <li> -->
+  <!--   <a href="/blog/how&#45;to&#45;build&#45;a&#45;rails&#45;engine/">How to Build a Rails Engine</a> -->
+  <!-- </li> -->
+  <!-- <li> -->
+  <!--   <a href="/blog/why&#45;i&#45;wrote&#45;the&#45;sucker&#45;punch&#45;gem/">Why I Wrote the Sucker Punch Gem</a> -->
+  <!-- </li> -->
+  <!-- <li> -->
+  <!--   <a href="/blog/setting&#45;up&#45;a&#45;cloudfront&#45;cdn&#45;for&#45;rails/">Setup a Cloudfront CDN for Rails</a> -->
+  <!-- </li> -->
+  <!-- <li> -->
+  <!--   <a href="/blog/3&#45;ways&#45;to&#45;get&#45;started&#45;contributing&#45;to&#45;open&#45;source/">Get Started with Open Source</a> -->
+  <!-- </li> -->
+</ul>
+
+
+  </li>
+</ul>
+<br class="clear" />
+<p>
+  &copy; 2015 Big Blue Media, LLC. All rights reserved.
+</p>
+</footer>
+        <script src="/javascripts/slash.js"></script>
+
+
+<script type="text/javascript">
+      var disqus_shortname = 'brandonhilkert';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/';
+        var disqus_url = 'http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+      
+		</div>
+	</div>
+  <link href="/stylesheets/funnel-tools-capture.css" media="screen, projection" rel="stylesheet" type="text/css">
+
+<div id="funnel-tools-capture" class="bounceInUp">
+  <div class="close">&#10005;</div>
+  <div class="open">&#8593;</div>
+
+  <div class="title">
+    Build a Ruby Gem Course - FREE!
+  </div>
+  <div class="description">
+    <p>
+      Join <strong>1,300+</strong> other Rubyists and take your Ruby gem skills to the next level!
+    </p>
+    <p>
+      Whether you're an expert Rubyist, or just starting out,
+      this <strong>FREE 10-day</strong> email course will guide you through
+      the process of creating your own Ruby gems from start to finish.
+    </p>
+
+    <p>
+      Enter your email below to get started today:
+    </p>
+  </div>
+
+  <form data-drip-embedded-form="8461781" action="https://www.getdrip.com/forms/8461781/submissions" method="post">
+  <div class="email-input-container">
+    <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
+  </div>
+  <input type="hidden" name="fields[location]" value="A Path to Services - Part 3 - Synchronous Events" />
+  <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
+  <br class="clear">
+</form>
+
+
+  <p class="funnel-tools-footer">
+  Powered by <a href="http://brandonhilkert.com/tools?utm_source=bh-com&utm_medium=web&utm_campaign=ft-capture">Funnel Tools</a>
+</p>
+
+</div>
+
+
+<script src="/javascripts/funnel-tools-capture.min.js"></script>
+
+
+  <!-- Drip -->
+<script type="text/javascript">
+  var _dcq = _dcq || [];
+  var _dcs = _dcs || {};
+  _dcs.account = '7901432';
+
+  (function() {
+    var dc = document.createElement('script');
+    dc.type = 'text/javascript'; dc.async = true;
+    dc.src = '//tag.getdrip.com/7901432.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(dc, s);
+  })();
+</script>
+
+</body>
+</html>

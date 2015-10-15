@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-09-09T07:19:51-04:00</updated>
+  <updated>2015-10-15T09:38:46-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,133 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
+    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
+    <updated>2015-10-15T09:07:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
+    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we introduced a billing service to determine which features an account could access. If you remember, <a href="http://brandonhilkert.com/our-path-to-services-part-1-start-small/">the email service</a> was a &ldquo;fire and forget&rdquo; operation and was capable of handling throughput delays given its low value to the core application.</p>
+
+<p>This post will explore how we handle synchronous communication for a service like billing where an inline response is required to service a request from the core application.</p>
+
+<!--more-->
+
+
+<h2>Background</h2>
+
+<p>If you remember from the previous post, we introduced the billing service to an infrastructure that looked like this:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/services/app-email-billing.png" title="&#34;Web application with Email and Billing Microservice&#34;" alt="&#34;Web application with Email and Billing Microservice&#34;"></p>
+
+<p>Handling multiple pricing tiers in a SaaS app means you have to control authorization based on account status. Our billing service encapsulates the knowledge of which features correspond to which pricing tier.</p>
+
+<p>For instance, one feature is the ability to send trackable email to contacts in your PipelineDeals account. To service this request, we add an option to the bulk action menu from a list view:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/services/send-email.png" title="&#34;Send email feature&#34;" alt="&#34;Send email feature&#34;"></p>
+
+<h2>Service Request</h2>
+
+<p>Before we can conditionally show this option based on the pricing tier, we have to first make a request to the billing service to get the list of features available to that user.</p>
+
+<figure class='code'><pre><code>class Billing::Features
+  def initialize(user)
+    @user = user
+    @account = user.account
+  end
+
+  def list
+    Rails.cache.fetch("account_#{account.id}_billing_features") do
+      response = Billing::Api.get "account/#{account.id}/features"
+      response['features']
+    end
+  end
+
+  private
+
+  attr_reader :user, :account
+end</code></pre></figure>
+
+
+<p><code>Billing::Api</code>, in this case, is a wrapper around the API calls to handle exceptions and other information like security.</p>
+
+<p><em>Note: When making synchronous HTTP calls like this, it&rsquo;s worth considering the failure state and providing a default response set in that case so the user isn&rsquo;t burdened with a failure page. In this case, one option would be dumb down the features on the page to the most basic tier.</em></p>
+
+<h2>Serving a JSON API</h2>
+
+<p>Plenty of articles have been written about how to create a JSON API with Rails, so we won&rsquo;t rehash those techniques here. Instead, we&rsquo;ll highlight patterns we&rsquo;ve used for consistency.</p>
+
+<p>We tend to reserve the root URL namespace for UI-related routes, so we start by creating a unique namespace for the API:</p>
+
+<figure class='code'><pre><code>namespace :api do
+  resources :account do
+    resource :features, only: :show
+  end
+end</code></pre></figure>
+
+
+<p>This setup gives us the path <code>/api/account/:account_id/features</code>. We haven&rsquo;t found a need for versioning internal APIs. If we decided to in the future, we could always add the API version as a request header.</p>
+
+<p>The <code>features</code> endpoint looks like:</p>
+
+<figure class='code'><pre><code>class Api::FeaturesController &lt; Api::ApiController
+  skip_before_filter :verify_authenticity_token
+
+  def show
+    render json: {
+      success: true,
+      features: AccountFeatures.new(@account_id).list
+    }
+  end
+end</code></pre></figure>
+
+
+<p>Notice <code>Api::FeaturesController</code> inherits from <code>Api::ApiController</code>. We keep the API-related functionality in this base controller so each endpoint will get access to security and response handling commonalities.</p>
+
+<p><code>AccountFeatures</code> is a PORO that knows how to list billing features for a particular account. We could&rsquo;ve queried it straight from an ActiveRecord-based model, but our handling of features is a little more complicated than picking them straight from the database.</p>
+
+<p>Another note here is that we haven&rsquo;t introduced a serializing library like <code>active_model_serializers</code> or <code>jbuilder</code>. Using <code>render json</code> alone has serviced us well for simple APIs. We reach for something more complex when the response has more attributes than shown above.</p>
+
+<h2>Handling Service Response</h2>
+
+<p>By introducing <code>Rails.cache</code>, we can serve requests (after the initial) without requiring a call to the billing service.</p>
+
+<p>One of the first things we do is serialize the set of features to JavaScript so our client-side code has access:</p>
+
+<figure class='code'><pre><code>&lt;%= javascript_tag do %&gt;
+  window.Features = &lt;%= Billing::Features.new(logged_in_user).list.to_json %&gt;;
+&lt;% end %&gt;</code></pre></figure>
+
+
+<p>We also include a helper module in to our Rails views/controllers, so we can handle conditional feature logic:</p>
+
+<figure class='code'><pre><code>module Features
+  def feature_enabled?(feature)
+    Billing::Features.new(logged_in_user).list.include?(feature.to_s)
+  end
+end</code></pre></figure>
+
+
+<h2>Synchronous Side Effects</h2>
+
+<p>When we <a href="http://brandonhilkert.com/our-path-to-services-part-2-synchronous-vs-asynchronous/">looked at asynchronous service requests</a>, there was less immediacy associated with the request due to its &ldquo;fire-and-forget&rdquo; nature. A synchronous request, on the other hand, will handle all requests to the core application, so scaling can be challenge and infrastructure costs can add up.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/services/synchronous-service-cost.png" title="&#34;Increased cost by introducing synchronous microservice&#34;" alt="&#34;Increased cost by introducing synchronous microservice&#34;"></p>
+
+<p>In addition to the infrastructure costs, performance can be a factor. If the original page response time was 100ms and we&rsquo;re adding a synchronous service request that takes another 100ms, all of a sudden we&rsquo;ve doubled our users&#8217; response times. And while this architectural decision might seem like an optimization, I&rsquo;m positive none of our users will thank us for making their page load times 2x slower.</p>
+
+<h2>Summary</h2>
+
+<p>As you can see, there&rsquo;s little magic to setting up a synchronous service request.</p>
+
+<p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
+
+<p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
@@ -2786,96 +2913,6 @@ end</code></pre></figure>
 <p>I’m excited to add Minitest and fixtures to my toolkit. With the benefits I’ve seen so far, it’s hard for me to imagine using anything else going forward — assuming I have the choice.</p>
 
 <p>If you have beef over the default Minitest assertion syntax, you’ll be happy to know that Minitest comes with the option to use a <a href="http://ruby-doc.org/stdlib-2.1.0/libdoc/minitest/rdoc/MiniTest/Expectations.html">spec-style syntax</a>. While it’s not identical to the Rspec syntax, it gets you closer to the natural language syntax, if that’s important to you.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[New Rails 4.1 travel_to test helper]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/"/>
-    <updated>2014-05-11T14:08:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper</id>
-    <content type="html"><![CDATA[<p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
-
-<p>With the release of Rails 4.1, the time stubbing method <code>travel_to</code> was added. This new helper method forces the current time to whatever you specify, allowing you to make asserts against a historical time, or week in my case.</p>
-
-<!--more-->
-
-
-<h2>The Test</h2>
-
-<p><a href="https://github.com/travisjeffery/timecop">Timecop</a> performed valiantly and did more than I ever needed (I generally only used the <code>freeze</code> method). However, dragging in another gem was the last thing I wanted to do for something relatively simple.</p>
-
-<p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
-
-<figure class='code'><pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
-  Timecop.freeze Chronic.parse("4/15/14") do
-    Reminders::Checkin.new.email
-    assert_equal 3, ActionMailer::Base.deliveries.size
-  end
-end</code></pre></figure>
-
-
-<p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
-
-<h2>Rails 4.1</h2>
-
-<p>I think I first heard about some additional testing methods from my friend <a href="http://iamericsteele.com/">Eric Steele</a>. He mentioned them in one of our various conversations about testing (he’s writing a book titled <em><a href="https://whatdoitest.com/?utm_source=brandonhilkert-com&amp;utm_medium=web&amp;%20utm_campaign=travel-to">What Do I Test?</a></em>).</p>
-
-<p>Like many, I looked over the <a href="http://guides.rubyonrails.org/4_1_release_notes.html">release notes for Rails 4.1</a> and features like <a href="http://guides.rubyonrails.org/4_1_release_notes.html#spring-application-preloader">Spring</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#config-secrets-yml">secrets</a>, <a href="http://guides.rubyonrails.org/4_1_release_notes.html#action-mailer-previews">ActionMailer previews</a>, and <a href="http://guides.rubyonrails.org/4_1_release_notes.html#active-record-enums">ActiveRecord enums</a> jumped out at me.</p>
-
-<p>Towards the bottom, though, was a feature barely mentioned or written about:</p>
-
-<p><img class="center" src="http://brandonhilkert.com/images/rails-41-travel-to.png" title="&#34;Test helper addition in Rails 4.1&#34;" alt="&#34;Test helper addition in Rails 4.1&#34;"></p>
-
-<p><a href="https://github.com/rails/rails/blob/master/activesupport/lib/active_support/testing/time_helpers.rb">The <code>TimeHelpers</code> test module</a> adds the <code>travel_to</code> and <code>travel_back</code> methods to assist in stubbing <code>Time.now</code> and <code>Date.today</code>.</p>
-
-<h2>Updated Tests</h2>
-
-<p>Using the <code>travel_to</code> method with the example above results in the following:</p>
-
-<figure class='code'><pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
-  travel_to Chronic.parse("4/15/14") do
-    Reminders::Checkin.new.email
-    assert_equal 3, ActionMailer::Base.deliveries.size
-  end
-end</code></pre></figure>
-
-
-<p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
-
-<p>While the change doesn&rsquo;t look significant, it removed my need for the <code>Timecop</code> gem entirely.</p>
-
-<p>Additionally, the same test could be written as:</p>
-
-<figure class='code'><pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
-  travel_to Chronic.parse("4/15/14")
-  Reminders::Checkin.new.email
-  assert_equal 3, ActionMailer::Base.deliveries.size
-  travel_back
-end</code></pre></figure>
-
-
-<p>or with <code>setup</code> and <code>teardown</code>:</p>
-
-<figure class='code'><pre><code>def setup
-  travel_to Chronic.parse("4/15/14")
-end
-
-test "sends reminders on tuesday for those scheduled on wednesday" do
-  Reminders::Checkin.new.email
-  assert_equal 3, ActionMailer::Base.deliveries.size
-end
-
-def teardown
-  travel_back
-end</code></pre></figure>
-
-
-<h2>Summary</h2>
-
-<p>Rails is well-known for conventions. <code>travel_to</code> is a great addition to the framework that would&rsquo;ve otherwise required dragging in additional dependencies.</p>
-
-<p>Next time you look at the release notes for a project, don&rsquo;t skip over the less featured functionality. For all you know, it could be something that saves you time and frustration that commonly occurs in your projects.</p>
 ]]></content>
   </entry>
   

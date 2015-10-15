@@ -225,12 +225,16 @@
         <lastmod>2015-09-09T07:19:22-04:00</lastmod>
     </url>
     <url>
+        <loc>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/</loc>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
+    </url>
+    <url>
         <loc>http://brandonhilkert.com/about/</loc>
         <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/bonus/sucker-punch.html</loc>
@@ -238,7 +242,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -250,23 +254,23 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/funnel/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -278,7 +282,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -286,6 +290,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
+        <lastmod>2015-10-15T09:13:57-04:00</lastmod>
     </url>
 </urlset>
