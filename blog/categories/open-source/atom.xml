@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-10-15T09:38:46-04:00</updated>
+  <updated>2015-12-02T07:07:19-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,172 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
+    <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
+    <updated>2015-11-30T12:06:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
+    <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
+
+<p>Sadly, the answer is, &ldquo;it depends&rdquo;. The &ldquo;depends&rdquo; part is specific to your context. While microservices may seem like the right move for you and your application, it&rsquo;s also possible it could cause a mess if not done carefully.</p>
+
+<!--more-->
+
+
+<p>This post will explore opportunities for splitting out unique microservices using <a href="http://sidekiq.org/">Sidekiq</a>, without introducing an enterprise message broker like <a href="https://www.rabbitmq.com/">RabbitMQ</a> or <a href="http://kafka.apache.org/">Apache Kafka</a>.</p>
+
+<h2>When are Microservices right?</h2>
+
+<p>Martin Fowler <a href="http://martinfowler.com/articles/microservice-trade-offs.html">wrote about trade-offs that come when introducing microservices</a>.</p>
+
+<p>The article outlines 6 pros and cons introduced when you moved a microservices-based architecture. The strongest argument for microservices is the strengthening of module boundaries.</p>
+
+<p>Module boundaries are naturally strengthened when we&rsquo;re forced to move code to another codebase. The result being, in most cases a group of microservices appears to be better constructed than the legacy monolith it was extracted from.</p>
+
+<p>There&rsquo;s no doubt Rails allows developers to get something up and running very quickly. Sadly, you can do so while making a big mess at the same time. It&rsquo;s worth nothing there&rsquo;s nothing stopping a monolith from being well constructed. With some discipline, <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">your monolith can be the bright and shiny beauty that DHH wants it to be</a>.</p>
+
+<h2>Sidekiq Queues</h2>
+
+<p>Ok, ok. You get it. Microservices can be awesome, but they can also make a big mess. I want to tell you about how I recently avoided a big mess without going &ldquo;all in&rdquo;.</p>
+
+<p>There&rsquo;s no hiding I&rsquo;m a huge <a href="http://sidekiq.org/">Sidekiq</a> fan. It&rsquo;s my goto solution for background processing.</p>
+
+<p>Sidekiq has the notion of <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">named queues</a> for both <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">jobs</a> and <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues">workers</a>. This is great from the standpoint that it allows you to put that unimportant long-running job in a different queue without delayed other important fast-running jobs.</p>
+
+<p>A typical worker might look like:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>If we want to send this job to a different queue, we&rsquo;d add <code>sidekiq_options queue: :important</code> to the worker, resulting in:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now, we need to make sure the worker process that&rsquo;s running the jobs knows to process jobs off this queue. A typical worker might be invoked with:</p>
+
+<p><code>
+bin/sidekiq
+</code></p>
+
+<p>Since new jobs going through this worker will end up on the <code>important</code> queue, we want to make sure the worker is processing jobs from the <code>important</code> queue too:</p>
+
+<p><code>
+bin/sidekiq -q important -q default
+</code></p>
+
+<p><em>Note: Jobs that don&rsquo;t specify a queue will go to the <code>default</code> queue. We have to include the <code>default</code> queue when we using the <code>-q</code> option, otherwise the default queue will be ignored in favor of the queue passed to the <code>-q</code> option.</em></p>
+
+<p>The best part, you don&rsquo;t even have to have multiple worker processes to process jobs from multiple queues. Furthermore, the <code>important</code> queue can be checked twice as often as the <code>default</code> queue:</p>
+
+<p><code>
+bin/sidekiq -q important,2 -q default
+</code></p>
+
+<p>This flexibility of where jobs are enqueued and how they&rsquo;re processed gives us an incredible amount of freedom when building our applications.</p>
+
+<h2>Extracting Worker to a Microservice</h2>
+
+<p>Let&rsquo;s assume that we&rsquo;ve deployed your main application to Heroku. The application uses Sidekiq and we&rsquo;ve included a Redis add-on. With the addition of the add-on, our application now has a <code>REDIS_URL</code> environment variable that Sidekiq connects to on startup. We have a web process, and worker process. A pretty standard Rails stack:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-web-worker.png" title="&ldquo;Rails with typical worker process&rdquo;" ></p>
+
+<p><strong>What&rsquo;s stopping us from using that same <code>REDIS_URL</code> in another application?</strong></p>
+
+<p>Nothing, actually. And if we consider what we know about the isolation of jobs in queue and workers working on specific queues, there&rsquo;s nothing stopping us from having workers for a specific queue in a different application altogether.</p>
+
+<p>Remember <code>ImportantWorker</code>, imagine the logic for that job was better left for a different application. We&rsquo;ll leave that part a little hand-wavey because there still should be a really good reason to do so. But we&rsquo;ll assume you&rsquo;ve thought long and hard about this and decided the core application was not a great place for this job logic.</p>
+
+<p>Extracting the worker a separate application might now look something like this:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-with-microservice.png" title="&ldquo;Using Sidekiq as a Message Queue between two Rails microservices&rdquo;" ></p>
+
+<h2>Enqueueing Jobs with the Sidekiq Client</h2>
+
+<p>Typically, to enqueue the <code>ImportantWorker</code> above, we&rsquo;d call the following from our application:</p>
+
+<p><code>
+ImportantWorker.perform_async(1)
+</code></p>
+
+<p>This works great when <code>ImportantWorker</code> is defined in our application. With the expanded stack above, <code>ImportantWorker</code> now lives in a new microservice, which means we don&rsquo;t have access to the <code>ImportantWorker</code> class from within the application. We <em>could</em> define it in the application just so we can enqueue it, with the intent that the application won&rsquo;t process jobs for that worker, but that feels funny to me.</p>
+
+<p>Rather, we can turn to the underlying Sidekiq client API to enqueue the job instead:</p>
+
+<p>```
+Sidekiq::Client.push(
+  &ldquo;class&rdquo; => &ldquo;ImportantWorker&rdquo;,
+  &ldquo;queue&rdquo; => &ldquo;important&rdquo;,
+  &ldquo;args&rdquo; => [1]
+)</p>
+
+<p>```</p>
+
+<p><em>Note: We have to be sure to define the <code>class</code> as a string <code>"ImportantWorker"</code>, otherwise we&rsquo;ll get an exception during enqueuing because the worker isn&rsquo;t defined in the application.</em></p>
+
+<h2>Processing Sidekiq Jobs from a Microservice</h2>
+
+<p>Now we&rsquo;re pushing jobs to the <code>important</code> queue, but have nothing in our application to process them. In fact, our worker process isn&rsquo;t even looking at that queue:</p>
+
+<p><code>
+bin/sidekiq -q default
+</code></p>
+
+<p>From our microservice, we setup a worker process to <strong>ONLY</strong> look at the <code>important</code> queue:</p>
+
+<p><code>
+bin/sidekiq -q important
+</code></p>
+
+<p>We define the <code>ImportantWorker</code> in our microservice:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>And now when the worker picks jobs out of the <code>important</code> queue, it&rsquo;ll process them using the <code>ImportantWorker</code> defined above in our microservice.</p>
+
+<p>If we wanted to go one step further, the microservice could then enqueue a job using the Sidekiq client API to a queue that only the core application is working on in order to send communication back the other direction.</p>
+
+<h2>Summary</h2>
+
+<p>Any architectural decision has risks. Microservices are no exception. Microservices can be easier than an enterprise message broker, cluster of new servers and a handful of devops headaches.</p>
+
+<p>I originally dubbed this the &ldquo;poor man&rsquo;s message bus&rdquo;. With more thought, there&rsquo;s nothing &ldquo;poor&rdquo; about this. Sidekiq has a been a reliable piece of our infrastructure and I have no reason to believe that&rsquo;ll change, even if we are using it for more than just simple background processing from a single application.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
@@ -482,136 +648,6 @@ gem &lsquo;intercom-rails&rsquo;
 <p>Submissions will be open until <strong>5:00pm EDT on Friday, July 11</strong>. I’ll announcement the winner shortly thereafter.</p>
 
 <p>Even if you don’t win, I’ll send everyone that submits a response a <strong>20% discount code</strong> for any package of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/"/>
-    <updated>2014-04-21T19:48:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook</id>
-    <content type="html"><![CDATA[<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
-
-<p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="https://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
-
-<p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
-
-<p><code>
-  config.cache_classes = false
-</code></p>
-
-<p>Without it, we’d be forced to restart the server after almost every request. If that sounds like a giant PITA to you, I whole heartedly agree!</p>
-
-<p>So now you make your awesome job class, do some background work (send an email for example) and reload the page and boom:</p>
-
-<p><code>``
-Celluloid::PoolManager: async call</code>perform` aborted!
-ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!</p>
-
-<pre><code>    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
-    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
-    my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'
-</code></pre>
-
-<p>```</p>
-
-<p>The Celluloid registry still has reference to a the original <code>SendInvitationJob</code> class when it was initialized, however, reloading the code has caused the original reference to disappear and all hell breaks loose when the queue key is fetched to send another job to the class.</p>
-
-<p>In my head, it made sense for the queues to be cleared out upon every request in development. In general, because Sucker Punch doesn’t have persistent queues, the best use case is for quick one-off jobs that aren’t extremely important — email and logging come to mind. Since both of these examples are typically pretty speedy, it’s unlikely there will be a huge job backup upon subsequent requests.</p>
-
-<p>I knew what I wanted, but didn’t know how to accomplish it.</p>
-
-<h2>The Solution</h2>
-
-<p>Knowing the issue was related to the setting <code>config.cache_classes = false</code> in the development environment, I broke open the Rails source code and searched for <code>cache_classes</code>. The first result was the <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/reloader.rb"><code>ActionDispatch</code> reloader middleware</a>. Fortunately, there’s a very descriptive comment at the top of the class:</p>
-
-<p><code>
-  # By default, ActionDispatch::Reloader is included in the middleware stack
-  # only in the development environment; specifically, when +config.cache_classes+
-  # is false. Callbacks may be registered even when it is not included in the
-  # middleware stack, but are executed only when &lt;tt&gt;ActionDispatch::Reloader.prepare!&lt;/tt&gt;
-  # or &lt;tt&gt;ActionDispatch::Reloader.cleanup!&lt;/tt&gt; are called manually.
-</code></p>
-
-<p>This functionality is exactly what I needed!. From here, I just needed to know what callbacks were valid. A few lines in to the class are the following methods:</p>
-
-<p>```</p>
-
-<pre><code># Add a prepare callback. Prepare callbacks are run before each request, prior
-# to ActionDispatch::Callback's before callbacks.
-def self.to_prepare(*args, &amp;block)
-  unless block_given?
-    warn "to_prepare without a block is deprecated. Please use a block"
-  end
-  set_callback(:prepare, *args, &amp;block)
-end
-
-# Add a cleanup callback. Cleanup callbacks are run after each request is
-# complete (after #close is called on the response body).
-def self.to_cleanup(*args, &amp;block)
-  unless block_given?
-    warn "to_cleanup without a block is deprecated. Please use a block"
-  end
-  set_callback(:cleanup, *args, &amp;block)
-end
-</code></pre>
-
-<p>```</p>
-
-<p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
-
-<p>A quick glade over the <a href="http://www.rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
-
-<p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
-
-<p>```
-module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie</p>
-
-<pre><code>initializer "sucker_punch.logger" do
-  SuckerPunch.logger = Rails.logger
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>All it did was connect the logger to the existing Rails logger. Adding the callback to <code>ActionDispatch</code> looks like:</p>
-
-<p>```
-module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie</p>
-
-<pre><code>initializer "sucker_punch.logger" do
-  SuckerPunch.logger = Rails.logger
-end
-
-config.to_prepare do
-  Celluloid::Actor.clear_registry
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Now when the Railtie is loaded, the <code>Celluloid::Actor.clear_registry</code> method is triggered before the reloading of code in the development environment, clearing out the Celluloid registry and allowing Sucker Punch to instantiate new job queues for each request.</p>
-
-<h2>Summary</h2>
-
-<p>I was unaware of any of these methods when the issue was submitted. Rather than throw my hands up and close the issue because it didn’t affect me, I thought through an approach that could work, and only then started to write code. And in fact, didn’t know what code to write!</p>
-
-<p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
-
-<p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
 ]]></content>
   </entry>
   

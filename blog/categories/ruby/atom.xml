@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-10-15T09:38:46-04:00</updated>
+  <updated>2015-12-02T07:07:19-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,172 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
+    <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
+    <updated>2015-11-30T12:06:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
+    <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
+
+<p>Sadly, the answer is, &ldquo;it depends&rdquo;. The &ldquo;depends&rdquo; part is specific to your context. While microservices may seem like the right move for you and your application, it&rsquo;s also possible it could cause a mess if not done carefully.</p>
+
+<!--more-->
+
+
+<p>This post will explore opportunities for splitting out unique microservices using <a href="http://sidekiq.org/">Sidekiq</a>, without introducing an enterprise message broker like <a href="https://www.rabbitmq.com/">RabbitMQ</a> or <a href="http://kafka.apache.org/">Apache Kafka</a>.</p>
+
+<h2>When are Microservices right?</h2>
+
+<p>Martin Fowler <a href="http://martinfowler.com/articles/microservice-trade-offs.html">wrote about trade-offs that come when introducing microservices</a>.</p>
+
+<p>The article outlines 6 pros and cons introduced when you moved a microservices-based architecture. The strongest argument for microservices is the strengthening of module boundaries.</p>
+
+<p>Module boundaries are naturally strengthened when we&rsquo;re forced to move code to another codebase. The result being, in most cases a group of microservices appears to be better constructed than the legacy monolith it was extracted from.</p>
+
+<p>There&rsquo;s no doubt Rails allows developers to get something up and running very quickly. Sadly, you can do so while making a big mess at the same time. It&rsquo;s worth nothing there&rsquo;s nothing stopping a monolith from being well constructed. With some discipline, <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">your monolith can be the bright and shiny beauty that DHH wants it to be</a>.</p>
+
+<h2>Sidekiq Queues</h2>
+
+<p>Ok, ok. You get it. Microservices can be awesome, but they can also make a big mess. I want to tell you about how I recently avoided a big mess without going &ldquo;all in&rdquo;.</p>
+
+<p>There&rsquo;s no hiding I&rsquo;m a huge <a href="http://sidekiq.org/">Sidekiq</a> fan. It&rsquo;s my goto solution for background processing.</p>
+
+<p>Sidekiq has the notion of <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">named queues</a> for both <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">jobs</a> and <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues">workers</a>. This is great from the standpoint that it allows you to put that unimportant long-running job in a different queue without delayed other important fast-running jobs.</p>
+
+<p>A typical worker might look like:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>If we want to send this job to a different queue, we&rsquo;d add <code>sidekiq_options queue: :important</code> to the worker, resulting in:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now, we need to make sure the worker process that&rsquo;s running the jobs knows to process jobs off this queue. A typical worker might be invoked with:</p>
+
+<p><code>
+bin/sidekiq
+</code></p>
+
+<p>Since new jobs going through this worker will end up on the <code>important</code> queue, we want to make sure the worker is processing jobs from the <code>important</code> queue too:</p>
+
+<p><code>
+bin/sidekiq -q important -q default
+</code></p>
+
+<p><em>Note: Jobs that don&rsquo;t specify a queue will go to the <code>default</code> queue. We have to include the <code>default</code> queue when we using the <code>-q</code> option, otherwise the default queue will be ignored in favor of the queue passed to the <code>-q</code> option.</em></p>
+
+<p>The best part, you don&rsquo;t even have to have multiple worker processes to process jobs from multiple queues. Furthermore, the <code>important</code> queue can be checked twice as often as the <code>default</code> queue:</p>
+
+<p><code>
+bin/sidekiq -q important,2 -q default
+</code></p>
+
+<p>This flexibility of where jobs are enqueued and how they&rsquo;re processed gives us an incredible amount of freedom when building our applications.</p>
+
+<h2>Extracting Worker to a Microservice</h2>
+
+<p>Let&rsquo;s assume that we&rsquo;ve deployed your main application to Heroku. The application uses Sidekiq and we&rsquo;ve included a Redis add-on. With the addition of the add-on, our application now has a <code>REDIS_URL</code> environment variable that Sidekiq connects to on startup. We have a web process, and worker process. A pretty standard Rails stack:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-web-worker.png" title="&ldquo;Rails with typical worker process&rdquo;" ></p>
+
+<p><strong>What&rsquo;s stopping us from using that same <code>REDIS_URL</code> in another application?</strong></p>
+
+<p>Nothing, actually. And if we consider what we know about the isolation of jobs in queue and workers working on specific queues, there&rsquo;s nothing stopping us from having workers for a specific queue in a different application altogether.</p>
+
+<p>Remember <code>ImportantWorker</code>, imagine the logic for that job was better left for a different application. We&rsquo;ll leave that part a little hand-wavey because there still should be a really good reason to do so. But we&rsquo;ll assume you&rsquo;ve thought long and hard about this and decided the core application was not a great place for this job logic.</p>
+
+<p>Extracting the worker a separate application might now look something like this:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-with-microservice.png" title="&ldquo;Using Sidekiq as a Message Queue between two Rails microservices&rdquo;" ></p>
+
+<h2>Enqueueing Jobs with the Sidekiq Client</h2>
+
+<p>Typically, to enqueue the <code>ImportantWorker</code> above, we&rsquo;d call the following from our application:</p>
+
+<p><code>
+ImportantWorker.perform_async(1)
+</code></p>
+
+<p>This works great when <code>ImportantWorker</code> is defined in our application. With the expanded stack above, <code>ImportantWorker</code> now lives in a new microservice, which means we don&rsquo;t have access to the <code>ImportantWorker</code> class from within the application. We <em>could</em> define it in the application just so we can enqueue it, with the intent that the application won&rsquo;t process jobs for that worker, but that feels funny to me.</p>
+
+<p>Rather, we can turn to the underlying Sidekiq client API to enqueue the job instead:</p>
+
+<p>```
+Sidekiq::Client.push(
+  &ldquo;class&rdquo; => &ldquo;ImportantWorker&rdquo;,
+  &ldquo;queue&rdquo; => &ldquo;important&rdquo;,
+  &ldquo;args&rdquo; => [1]
+)</p>
+
+<p>```</p>
+
+<p><em>Note: We have to be sure to define the <code>class</code> as a string <code>"ImportantWorker"</code>, otherwise we&rsquo;ll get an exception during enqueuing because the worker isn&rsquo;t defined in the application.</em></p>
+
+<h2>Processing Sidekiq Jobs from a Microservice</h2>
+
+<p>Now we&rsquo;re pushing jobs to the <code>important</code> queue, but have nothing in our application to process them. In fact, our worker process isn&rsquo;t even looking at that queue:</p>
+
+<p><code>
+bin/sidekiq -q default
+</code></p>
+
+<p>From our microservice, we setup a worker process to <strong>ONLY</strong> look at the <code>important</code> queue:</p>
+
+<p><code>
+bin/sidekiq -q important
+</code></p>
+
+<p>We define the <code>ImportantWorker</code> in our microservice:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>And now when the worker picks jobs out of the <code>important</code> queue, it&rsquo;ll process them using the <code>ImportantWorker</code> defined above in our microservice.</p>
+
+<p>If we wanted to go one step further, the microservice could then enqueue a job using the Sidekiq client API to a queue that only the core application is working on in order to send communication back the other direction.</p>
+
+<h2>Summary</h2>
+
+<p>Any architectural decision has risks. Microservices are no exception. Microservices can be easier than an enterprise message broker, cluster of new servers and a handful of devops headaches.</p>
+
+<p>I originally dubbed this the &ldquo;poor man&rsquo;s message bus&rdquo;. With more thought, there&rsquo;s nothing &ldquo;poor&rdquo; about this. Sidekiq has a been a reliable piece of our infrastructure and I have no reason to believe that&rsquo;ll change, even if we are using it for more than just simple background processing from a single application.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
@@ -484,287 +650,6 @@ end
 <p>I feel fortunate to be part of such a great group of developers. They&rsquo;ve
 provided a ton of value to the community and their books continue to impress
 me.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
-    <link href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/"/>
-    <updated>2015-06-30T16:10:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks</id>
-    <content type="html"><![CDATA[<p>It&rsquo;s impossible to escape Javascript in a Rails application. From a tiny script to a full-on Javascript framework, websites are becoming more and more reliant on Javascript, whether we like it or not.</p>
-
-<p>Several articles back, I documented <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">how I handle page-specific Javascript in a Rails application</a>. My solution included a third-party jQuery plugin that did some magic on the <code>$(document).ready</code> function in combination with CSS style scoping to limit the functionality.</p>
-
-<!--more-->
-
-
-<p>The plugin worked well for awhile, but with the advent of Turbolinks, the
-solution felt less and less appropriate. I&rsquo;ve since settled on some techniques
-to not only handle page-specific Javascript, but overall organization and structure of Javascript within a Rails application. I&rsquo;ve used it in a hand full of large applications over the past few months and it&rsquo;s held up incredibly well.</p>
-
-<h2>The Problem</h2>
-
-<p>Using &ldquo;sprinkles&rdquo; of Javascript throughout a Rails application can get unwieldly fast if we&rsquo;re not consistent. What we ideally want is some techniques and guidelines that can keep the Javascript organized in our projects. <strong>We also don&rsquo;t want to have to disable Turbolinks to make our application work as we expect</strong>.</p>
-
-<h2>The Solution</h2>
-
-<p>Generally, javascript behavior can be boiled down to the following categories:</p>
-
-<ol>
-<li>Behavior that&rsquo;s &ldquo;always on&rdquo;</li>
-<li>Behavior that&rsquo;s triggered from a user action</li>
-</ol>
-
-
-<p>But first, a few things to will help us stay organized&hellip;</p>
-
-<h2>Class Scoping</h2>
-
-<p>I still like to scope the body element of the layout(s) with the controller and action name:</p>
-
-<p><code>
-&lt;body class="&lt;%= controller_name %&gt; &lt;%= action_name %&gt;"&gt;
-  &lt;%= yield %&gt;
-&lt;/body&gt;
-</code></p>
-
-<p>This not only let&rsquo;s us control access to the DOM through jQuery if we need to, but also provides some top-level styling classes to allow us to easily add page-specific CSS.</p>
-
-<p>In the case we&rsquo;re working on the proverbial blog posts application, the body tag ends up looking like:</p>
-
-<p><code>
-&lt;body class="posts index"&gt;
-  &lt;%= yield %&gt;
-&lt;/body&gt;
-</code></p>
-
-<p>This gives us the opportunity to scope CSS and Javascripts to all <code>posts</code>-related pages in the controller with the <code>.posts</code> class, or down to the specific page using a combination of both the controller and action: <code>.posts.index</code>.</p>
-
-<h2>Default Application Manifest</h2>
-
-<p>Here&rsquo;s the default <code>app/assets/javascripts/application.js</code>:</p>
-
-<p><code>
-// This is a manifest file that'll be compiled into application.js, which will include all the files
-// listed below.
-//
-// Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
-// or any plugin's vendor/assets/javascripts directory can be referenced here using a relative path.
-//
-// It's not advisable to add code directly here, but if you do, it'll appear at the bottom of the
-// compiled file.
-//
-// Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
-// about supported directives.
-//
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-//= require_tree .
-</code></p>
-
-<p>I start by removing the line <code>//= require_tree .</code>. I do this because if you don&rsquo;t, the javascript files in the folder will be loaded in alphabetical order. As you&rsquo;ll see below, there&rsquo;s an initialization file that needs to be loaded before other Javascript. We&rsquo;ll also remove the comments from the top of the file to preserve space.</p>
-
-<p>So we&rsquo;re left with:</p>
-
-<p><code>
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-</code></p>
-
-<h2>Initialization</h2>
-
-<p>Let&rsquo;s start by adding the file <code>app/assets/javascripts/init.coffee</code> with the following:</p>
-
-<p>```
-window.App ||= {}</p>
-
-<p>App.init = &ndash;>
-  $(&ldquo;a, span, i, div&rdquo;).tooltip()</p>
-
-<p>$(document).on &ldquo;page:change&rdquo;, &ndash;>
-  App.init()
-```</p>
-
-<p>Let&rsquo;s dig in to each pagef of this:</p>
-
-<p><code>
-window.App ||= {}
-</code></p>
-
-<p>We&rsquo;re creating the <code>App</code> object on window so the functionality added to the object is available throughout the application.</p>
-
-<p>Next, we define an <code>init()</code> function on <code>App</code> to initialize common jQuery plugins and other Javascript libraries:</p>
-
-<p><code>
-App.init = -&gt;
-  $("a, span, i, div").tooltip()
-</code></p>
-
-<p>The call to <code>$("a, span, i, div").tooltip()</code> initializes Bootstrap Tooltips. This is an example of the type of libraries that can/should be setup here. Obviously, if you&rsquo;re not using Bootstrap tooltips, you would haven&rsquo;t this here, but coupled with the next line, we&rsquo;ll see why this works.</p>
-
-<p>As many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>page:change</code> event:</p>
-
-<p><code>
-$(document).on "page:change", -&gt;
-  App.init()
-</code>
-<em>Note: the <code>page:change</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
-
-<p>Lastly, we need to add <code>init.coffee</code> to the asset pipeline:</p>
-
-<p><code>
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-//= require init
-</code></p>
-
-<h2>&ldquo;Always On&rdquo; Javascript Functionality</h2>
-
-<p>Now with the defaults out of the way, let&rsquo;s take a look at adding some behavior.</p>
-
-<p>Let&rsquo;s assume one of our pages will show a Javascript graph of data. We&rsquo;ll start by adding a file with a name related to that responsibility.</p>
-
-<p>```</p>
-
-<h1>app/assets/javascripts/app.chart.coffee</h1>
-
-<p>class App.Chart
-  constructor: (@el) &ndash;></p>
-
-<pre><code># intialize some stuff
-</code></pre>
-
-<p>  render: &ndash;></p>
-
-<pre><code># do some stuff
-</code></pre>
-
-<p>$(document).on &ldquo;page:change&rdquo;, &ndash;>
-  chart = new App.Chart $(&ldquo;#chart&rdquo;)
-  chart.render()</p>
-
-<p>```</p>
-
-<p>A few things to note here&hellip;</p>
-
-<h3>Structure</h3>
-
-<p>I created a class in the <code>App</code> namespace &mdash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
-
-<p>You might notice the file takes the form:</p>
-
-<p>```
-|
-|
-class definition
-|
-|</p>
-
-<p>|
-invocation
-|
-```</p>
-
-<p>While this may seem obvious, it&rsquo;s an important point to keep in mind. I&rsquo;ve found it offers a predictable structure that allows me to open any coffeescript file that we&rsquo;ve written in the project and generally know where to look for what.</p>
-
-<h3>Turbolinks-Proof</h3>
-
-<p>We called this &ldquo;Always On&rdquo; functionality because, as you probably noticed, using the following event listener <code>$(document).on "page:change", -&gt;</code>, we know with Turbolinks, this gets triggered on every page transition.</p>
-
-<h3>Add to Manifest</h3>
-
-<p>Because we removed the <code>//= require_tree .</code> line in the default <code>application.js</code> manifest file, we&rsquo;ll have to add our chart file to be included in the asset pipeline (last line):</p>
-
-<p><code>
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-//= require init
-//= require app.chart
-</code></p>
-
-<h3>Page-Specific Javascript</h3>
-
-<p>Uh oh, so maybe we don&rsquo;t want the graph to show up on every page! In this case, we&rsquo;re looking for &ldquo;Always On&rdquo; functionality for specific pages <strong>ONLY</strong>.</p>
-
-<p>We can limit the page pages certain functionality is loaded on by using the classes we added to the body of the layout. In this case, a small conditional to the invocation can prevent this being triggered on pages it shouldn&rsquo;t be.</p>
-
-<p><code>
-$(document).on "page:change", -&gt;
-  return unless $(".posts.index").length &gt; 0
-  f = new App.Chart $("#chart")
-  f.render()
-</code></p>
-
-<p>We added <code>return unless $(".posts.index").length &gt; 0</code> to make sure <code>App.Chart</code> never gets instantiated if we&rsquo;re on the <code>.posts.index</code> page. While this may seem verbose, I&rsquo;ve found that it&rsquo;s not very common to need page-specific functionality. There are probably plenty of libraries that do something similar, like <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">the one I previously suggested</a>. <strong>However, to me, limiting javascript to a single page and very explicit when I read the code, it&rsquo;s almost never worth dragging in a separate plugin for this. YMMV.</strong></p>
-
-<h2>User-Triggered Javascript</h2>
-
-<p>This type of Javascript is exactly what you&rsquo;d think &mdash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
-
-<h3>&ldquo;data-behavior&rdquo; Attribute</h3>
-
-<p>Let&rsquo;s assume there&rsquo;s a link in the user&rsquo;s account that allows them to update their credit card. In this case, we have the following:</p>
-
-<p><code>
-&lt;%= link_to "Update Credit Card", "#", data: { behavior: "update-credit-card" } %&gt;
-</code></p>
-
-<p>You&rsquo;ll probably notice the <code>data-behavior</code> tag being added to the link. This is the key we&rsquo;ll use to attach the Javascript behavior.</p>
-
-<p>We could have added a unique class to the link:</p>
-
-<p><code>
-&lt;%= link_to "Update Credit Card", "#", class: "update-credit-card" %&gt;
-</code></p>
-
-<p>or, perhaps, even assign an ID:</p>
-
-<p><code>
-&lt;%= link_to "Update Credit Card", "#", id: "update-credit-card" %&gt;
-</code></p>
-
-<p>Both of these techniques don&rsquo;t really indicate whether we added the <code>update-card-card</code> for the use of CSS styling, or to attach Javascript behavior. So in my applications, I leave classes for <strong>styling ONLY</strong>.</p>
-
-<p>So now to the Javascript:</p>
-
-<p>```
-App.Billing =
-  update: &ndash;></p>
-
-<pre><code># do some stuff
-</code></pre>
-
-<p>$(document).on &ldquo;click&rdquo;, &ldquo;[data-behavior~=update-credit-card]&rdquo;, =>
-  App.Billing.update()
-```</p>
-
-<p>We can use the selector <code>[data-behavior~=update-credit-card]</code> to latch on to the <code>data-behavior</code> tag we defined in the view. We use the <code>on</code> jQuery method to ensure that we&rsquo;re listening to this event whether the element&rsquo;s on the page or not. This is what allows us to load this Javascript when on other pages and have it still work when a user clicks through to the page with the actual link on it.</p>
-
-<p>We could latch on to the <code>change</code> event, or whatever is appropriate to the element we&rsquo;re adding behavior.</p>
-
-<h3>Add to Manifest</h3>
-
-<p>Again, because Javascripts assets we add to <code>app/assets/javascripts</code> won&rsquo;t automatically be inserted in to the asset pipeline, we&rsquo;ll add <code>//= require app.billing</code> to the manifest file:</p>
-
-<p><code>
-//= require jquery
-//= require jquery_ujs
-//= require turbolinks
-//= require init
-//= require app.chart
-//= require app.billing
-</code></p>
-
-<h2>Summary</h2>
-
-<p>Using the techniques above, we can keep the Javascript in our Rails applications organized and predictable. We can rest easy knowing the files will all generally look the same. There&rsquo;s not been any uses cases where this structure hasn&rsquo;t worked for me personally.</p>
-
-<p>One thing that makes me feel good about this approach is there&rsquo;s no real magic or extra plugins. It&rsquo;s using all the tools we already have in a basic Rails application, which is one less thing to maintain and keep up to date. Less depedencies == less pain down the road.</p>
 ]]></content>
   </entry>
   

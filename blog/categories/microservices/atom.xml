@@ -4,7 +4,7 @@
   <title><![CDATA[Category: microservices | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/microservices/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-10-15T09:38:46-04:00</updated>
+  <updated>2015-12-02T07:07:19-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,172 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
+    <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
+    <updated>2015-11-30T12:06:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
+    <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
+
+<p>Sadly, the answer is, &ldquo;it depends&rdquo;. The &ldquo;depends&rdquo; part is specific to your context. While microservices may seem like the right move for you and your application, it&rsquo;s also possible it could cause a mess if not done carefully.</p>
+
+<!--more-->
+
+
+<p>This post will explore opportunities for splitting out unique microservices using <a href="http://sidekiq.org/">Sidekiq</a>, without introducing an enterprise message broker like <a href="https://www.rabbitmq.com/">RabbitMQ</a> or <a href="http://kafka.apache.org/">Apache Kafka</a>.</p>
+
+<h2>When are Microservices right?</h2>
+
+<p>Martin Fowler <a href="http://martinfowler.com/articles/microservice-trade-offs.html">wrote about trade-offs that come when introducing microservices</a>.</p>
+
+<p>The article outlines 6 pros and cons introduced when you moved a microservices-based architecture. The strongest argument for microservices is the strengthening of module boundaries.</p>
+
+<p>Module boundaries are naturally strengthened when we&rsquo;re forced to move code to another codebase. The result being, in most cases a group of microservices appears to be better constructed than the legacy monolith it was extracted from.</p>
+
+<p>There&rsquo;s no doubt Rails allows developers to get something up and running very quickly. Sadly, you can do so while making a big mess at the same time. It&rsquo;s worth nothing there&rsquo;s nothing stopping a monolith from being well constructed. With some discipline, <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">your monolith can be the bright and shiny beauty that DHH wants it to be</a>.</p>
+
+<h2>Sidekiq Queues</h2>
+
+<p>Ok, ok. You get it. Microservices can be awesome, but they can also make a big mess. I want to tell you about how I recently avoided a big mess without going &ldquo;all in&rdquo;.</p>
+
+<p>There&rsquo;s no hiding I&rsquo;m a huge <a href="http://sidekiq.org/">Sidekiq</a> fan. It&rsquo;s my goto solution for background processing.</p>
+
+<p>Sidekiq has the notion of <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">named queues</a> for both <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">jobs</a> and <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues">workers</a>. This is great from the standpoint that it allows you to put that unimportant long-running job in a different queue without delayed other important fast-running jobs.</p>
+
+<p>A typical worker might look like:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>If we want to send this job to a different queue, we&rsquo;d add <code>sidekiq_options queue: :important</code> to the worker, resulting in:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now, we need to make sure the worker process that&rsquo;s running the jobs knows to process jobs off this queue. A typical worker might be invoked with:</p>
+
+<p><code>
+bin/sidekiq
+</code></p>
+
+<p>Since new jobs going through this worker will end up on the <code>important</code> queue, we want to make sure the worker is processing jobs from the <code>important</code> queue too:</p>
+
+<p><code>
+bin/sidekiq -q important -q default
+</code></p>
+
+<p><em>Note: Jobs that don&rsquo;t specify a queue will go to the <code>default</code> queue. We have to include the <code>default</code> queue when we using the <code>-q</code> option, otherwise the default queue will be ignored in favor of the queue passed to the <code>-q</code> option.</em></p>
+
+<p>The best part, you don&rsquo;t even have to have multiple worker processes to process jobs from multiple queues. Furthermore, the <code>important</code> queue can be checked twice as often as the <code>default</code> queue:</p>
+
+<p><code>
+bin/sidekiq -q important,2 -q default
+</code></p>
+
+<p>This flexibility of where jobs are enqueued and how they&rsquo;re processed gives us an incredible amount of freedom when building our applications.</p>
+
+<h2>Extracting Worker to a Microservice</h2>
+
+<p>Let&rsquo;s assume that we&rsquo;ve deployed your main application to Heroku. The application uses Sidekiq and we&rsquo;ve included a Redis add-on. With the addition of the add-on, our application now has a <code>REDIS_URL</code> environment variable that Sidekiq connects to on startup. We have a web process, and worker process. A pretty standard Rails stack:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-web-worker.png" title="&ldquo;Rails with typical worker process&rdquo;" ></p>
+
+<p><strong>What&rsquo;s stopping us from using that same <code>REDIS_URL</code> in another application?</strong></p>
+
+<p>Nothing, actually. And if we consider what we know about the isolation of jobs in queue and workers working on specific queues, there&rsquo;s nothing stopping us from having workers for a specific queue in a different application altogether.</p>
+
+<p>Remember <code>ImportantWorker</code>, imagine the logic for that job was better left for a different application. We&rsquo;ll leave that part a little hand-wavey because there still should be a really good reason to do so. But we&rsquo;ll assume you&rsquo;ve thought long and hard about this and decided the core application was not a great place for this job logic.</p>
+
+<p>Extracting the worker a separate application might now look something like this:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-with-microservice.png" title="&ldquo;Using Sidekiq as a Message Queue between two Rails microservices&rdquo;" ></p>
+
+<h2>Enqueueing Jobs with the Sidekiq Client</h2>
+
+<p>Typically, to enqueue the <code>ImportantWorker</code> above, we&rsquo;d call the following from our application:</p>
+
+<p><code>
+ImportantWorker.perform_async(1)
+</code></p>
+
+<p>This works great when <code>ImportantWorker</code> is defined in our application. With the expanded stack above, <code>ImportantWorker</code> now lives in a new microservice, which means we don&rsquo;t have access to the <code>ImportantWorker</code> class from within the application. We <em>could</em> define it in the application just so we can enqueue it, with the intent that the application won&rsquo;t process jobs for that worker, but that feels funny to me.</p>
+
+<p>Rather, we can turn to the underlying Sidekiq client API to enqueue the job instead:</p>
+
+<p>```
+Sidekiq::Client.push(
+  &ldquo;class&rdquo; => &ldquo;ImportantWorker&rdquo;,
+  &ldquo;queue&rdquo; => &ldquo;important&rdquo;,
+  &ldquo;args&rdquo; => [1]
+)</p>
+
+<p>```</p>
+
+<p><em>Note: We have to be sure to define the <code>class</code> as a string <code>"ImportantWorker"</code>, otherwise we&rsquo;ll get an exception during enqueuing because the worker isn&rsquo;t defined in the application.</em></p>
+
+<h2>Processing Sidekiq Jobs from a Microservice</h2>
+
+<p>Now we&rsquo;re pushing jobs to the <code>important</code> queue, but have nothing in our application to process them. In fact, our worker process isn&rsquo;t even looking at that queue:</p>
+
+<p><code>
+bin/sidekiq -q default
+</code></p>
+
+<p>From our microservice, we setup a worker process to <strong>ONLY</strong> look at the <code>important</code> queue:</p>
+
+<p><code>
+bin/sidekiq -q important
+</code></p>
+
+<p>We define the <code>ImportantWorker</code> in our microservice:</p>
+
+<p>```
+class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important</p>
+
+<p>  def perform(id)</p>
+
+<pre><code># Do the important stuff
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>And now when the worker picks jobs out of the <code>important</code> queue, it&rsquo;ll process them using the <code>ImportantWorker</code> defined above in our microservice.</p>
+
+<p>If we wanted to go one step further, the microservice could then enqueue a job using the Sidekiq client API to a queue that only the core application is working on in order to send communication back the other direction.</p>
+
+<h2>Summary</h2>
+
+<p>Any architectural decision has risks. Microservices are no exception. Microservices can be easier than an enterprise message broker, cluster of new servers and a handful of devops headaches.</p>
+
+<p>I originally dubbed this the &ldquo;poor man&rsquo;s message bus&rdquo;. With more thought, there&rsquo;s nothing &ldquo;poor&rdquo; about this. Sidekiq has a been a reliable piece of our infrastructure and I have no reason to believe that&rsquo;ll change, even if we are using it for more than just simple background processing from a single application.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>

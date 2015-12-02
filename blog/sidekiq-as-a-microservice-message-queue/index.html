@@ -8,10 +8,10 @@
 	
   
   
-  <title>How I Launched an Email Course to 500+ People | Brandon Hilkert</title>
+  <title>Sidekiq As A Microservice Message Queue | Brandon Hilkert</title>
 	<meta name="author" content="Brandon Hilkert">
 
-	<meta name="description" content="I launched an email course on how to build a Ruby gem. With over 500+ subscribers, I've decided write a book on the subject. This is how I did it.">
+	<meta name="description" content="November 30th, 2015 Sidekiq as a Microservice Message Queue microservices, open source, rails, ruby, sidekiq In the recent series on transitioning to &hellip;">
 	
 
   <meta name="HandheldFriendly" content="True">
@@ -20,20 +20,20 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content="@brandonhilkert">
-  <meta name="twitter:title" content="How I Launched an Email Course to 500+ People">
-  <meta name="twitter:description" content="I launched an email course on how to build a Ruby gem. With over 500+ subscribers, I've decided write a book on the subject. This is how I did it.">
+  <meta name="twitter:title" content="Sidekiq As A Microservice Message Queue">
+  <meta name="twitter:description" content="November 30th, 2015 Sidekiq as a Microservice Message Queue microservices, open source, rails, ruby, sidekiq In the recent series on transitioning to microservices, I detailed a path to move a large &hellip;">
   <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
 
-  <meta property="og:title" content="How I Launched an Email Course to 500+ People | Brandon Hilkert"/>
-  <meta property="og:description" content="I launched an email course on how to build a Ruby gem. With over 500+ subscribers, I've decided write a book on the subject. This is how I did it.">
-  <meta property="og:url" content="http://brandonhilkert.com/blog/how-i-launched-an-email-course/"/>
+  <meta property="og:title" content="Sidekiq As A Microservice Message Queue | Brandon Hilkert"/>
+  <meta property="og:description" content="November 30th, 2015 Sidekiq as a Microservice Message Queue microservices, open source, rails, ruby, sidekiq In the recent series on transitioning to microservices, I detailed a path to move a large &hellip;">
+  <meta property="og:url" content="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
   <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
   <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
   <meta property="og:type" content="article"/>
   <meta property="fb:profile_id" content="1472745932"/>
 
-	<link href="/atom.xml" rel="alternate" title="How I Launched an Email Course to 500+ People | Brandon Hilkert" type="application/atom+xml">
-	<link rel="canonical" href="http://brandonhilkert.com/blog/how-i-launched-an-email-course/">
+	<link href="/atom.xml" rel="alternate" title="Sidekiq As A Microservice Message Queue | Brandon Hilkert" type="application/atom+xml">
+	<link rel="canonical" href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/">
 	<link href="/favicon.png" rel="shortcut icon">
 	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -162,135 +162,157 @@
   
 
 
-<time datetime="2014-01-06T06:15:00-05:00" data-updated="true" itemprop="datePublished">January 6<span>th</span>, 2014</time></div>
-	<h1 class="title" itemprop="name">How I Launched an Email Course to 500+ People</h1>
+<time datetime="2015-11-30T12:06:00-05:00" data-updated="true" itemprop="datePublished">November 30<span>th</span>, 2015</time></div>
+	<h1 class="title" itemprop="name">Sidekiq as a Microservice Message Queue</h1>
   <div class="tags">
 
 
-	<a class='category' href='/blog/categories/book/'>book</a>, <a class='category' href='/blog/categories/email-course/'>email course</a>, <a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/marketing/'>marketing</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+	<a class='category' href='/blog/categories/microservices/'>microservices</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/sidekiq/'>sidekiq</a>
 
 
 </div>
 	<div class="entry-content" itemprop="articleBody">
     
 
-    <p>About a month ago, I joined <a href="http://jfdi.bz/">JFDI.bz</a> &ndash; a community for
-solo-founders launching their own thing. Once a month, the group engages in a
-<em>Week of Hustle</em> &ndash; a week long sprint to launch something.
-I chose to launch an email course on the topic of <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=woh-summary">building a Ruby
-gem</a>.</p>
+    <p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
+
+<p>Sadly, the answer is, &ldquo;it depends&rdquo;. The &ldquo;depends&rdquo; part is specific to your context. While microservices may seem like the right move for you and your application, it&rsquo;s also possible it could cause a mess if not done carefully.</p>
 
 <!--more-->
 
 
-<h2>Why <em>Build a Ruby Gem</em>?</h2>
+<p>This post will explore opportunities for splitting out unique microservices using <a href="http://sidekiq.org/">Sidekiq</a>, without introducing an enterprise message broker like <a href="https://www.rabbitmq.com/">RabbitMQ</a> or <a href="http://kafka.apache.org/">Apache Kafka</a>.</p>
 
-<p>A few years ago, I was building my first Ruby gem and I was left pretty
-confused with the process and conventions. After working through my
-frustrations, I thought the information I learned could be useful to others.</p>
+<h2>When are Microservices right?</h2>
 
-<p>Honestly, I thought to write an eBook at first, however, the last thing I
-wanted was to invest a month or two of my time only to find out people
-weren&rsquo;t interested.</p>
+<p>Martin Fowler <a href="http://martinfowler.com/articles/microservice-trade-offs.html">wrote about trade-offs that come when introducing microservices</a>.</p>
 
-<p>An email course was a good medium &ndash; I could cover the basics well enough to get
-people through their hangups, while also validating the need for an eBook. I
-figured if I got <strong>100-200</strong> people to sign up for the course, I would move
-forward with the book.</p>
+<p>The article outlines 6 pros and cons introduced when you moved a microservices-based architecture. The strongest argument for microservices is the strengthening of module boundaries.</p>
 
-<h2>Results</h2>
+<p>Module boundaries are naturally strengthened when we&rsquo;re forced to move code to another codebase. The result being, in most cases a group of microservices appears to be better constructed than the legacy monolith it was extracted from.</p>
 
-<p>It turns out my marketing efforts were more successful than I anticipated.</p>
+<p>There&rsquo;s no doubt Rails allows developers to get something up and running very quickly. Sadly, you can do so while making a big mess at the same time. It&rsquo;s worth nothing there&rsquo;s nothing stopping a monolith from being well constructed. With some discipline, <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">your monolith can be the bright and shiny beauty that DHH wants it to be</a>.</p>
 
-<h3>Today, almost 600 people have taken the Build a Ruby Gem email course!</h3>
+<h2>Sidekiq Queues</h2>
 
-<h2>Email is King&hellip;still</h2>
+<p>Ok, ok. You get it. Microservices can be awesome, but they can also make a big mess. I want to tell you about how I recently avoided a big mess without going &ldquo;all in&rdquo;.</p>
 
-<p>Prior to launching this email course, I&rsquo;d read about the value of building an
-email list from people like <a href="http://nathanbarry.com/">Nathan Barry</a>, <a href="https://unicornfree.com/">Amy
-Hoy</a> and <a href="http://justinjackson.ca/">Justin Jackson</a>.</p>
+<p>There&rsquo;s no hiding I&rsquo;m a huge <a href="http://sidekiq.org/">Sidekiq</a> fan. It&rsquo;s my goto solution for background processing.</p>
 
-<p>I&rsquo;d also read countless other posts describing the most common regrets when
-launching a new product. Almost all of them included not building an email
-list. With that said, it was one of the first things I setup.</p>
+<p>Sidekiq has the notion of <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">named queues</a> for both <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers">jobs</a> and <a href="https://github.com/mperham/sidekiq/wiki/Advanced-Options#queues">workers</a>. This is great from the standpoint that it allows you to put that unimportant long-running job in a different queue without delayed other important fast-running jobs.</p>
 
-<p>I blogged each day about my progress. Each post had a
-mailing list subscription form that sent them subsequent daily updates.  Subscriptions
-were slow at first, but interest built.  By then end of the week <strong>232</strong> people had
-subscribed. And the day the course went live, I was able to to convert <strong>115</strong>
-(~50%) of them.</p>
+<p>A typical worker might look like:</p>
 
-<p>The people subscribed were <strong>EXACTLY</strong> my target audience so it&rsquo;s no surprise
-conversion was high.</p>
+<figure class='code'><pre><code>class ImportantWorker
+  include Sidekiq::Worker
 
-<h2>Finding Your Target Audience</h2>
-
-<p>Fortunately for me, my target audience was Ruby developers and they hang out
-online (surprise, surprise). But where online&hellip;</p>
-
-<p>Let me hit you with something that seems obvious in hindsight:</p>
-
-<h3>Marketing is easy when you build a product for an audience you&rsquo;re already part of.</h3>
-
-<p>This was something I&rsquo;d <a href="http://unicornfree.com/2013/how-do-you-create-a-product-people-want-to-buy">read over the past few
-months</a>,
-but not seen its value until now.</p>
-
-<p>The email course is for <strong>Ruby developers</strong>, I&rsquo;m a <strong>Ruby Developer</strong>, so the
-question becomes&hellip;.<em>where do I hang out online?</em></p>
-
-<p>That question is <strong>easy</strong> to answer &ndash; <a href="http://rubyweekly.com/">Ruby weekly</a>,
-<a href="http://www.reddit.com/r/ruby">Reddit</a> and
-<a href="http://www.rubyflow.com/">RubyFlow</a>.</p>
-
-<p>And don&rsquo;t you know&hellip;it turns out those 3 sources have been the highest
-converting sources since the course launched:</p>
-
-<ol>
-<li>Ruby weekly &ndash; 131</li>
-<li>RubyFlow &ndash; 65</li>
-<li>Reddit &ndash; 62</li>
-</ol>
+  def perform(id)
+    # Do the important stuff
+  end
+end</code></pre></figure>
 
 
-<p>The remaining sources were a combination of direct links, social media and
-other technology news aggregation sites (probably mostly stemming from the top
-sources above).</p>
+<p>If we want to send this job to a different queue, we&rsquo;d add <code>sidekiq_options queue: :important</code> to the worker, resulting in:</p>
 
-<p><em>Note: I&rsquo;ve been reading <a href="http://www.amazon.com/80-20-Sales-Marketing-Definitive/dp/1599185059">80/20 Sales and
-Marketing</a>
-and the numbers above coincide, almost exactly, to the 80/20 curve. That is,
-80% of the conversion came from 20% of the sources.</em></p>
+<figure class='code'><pre><code>class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important
 
-<h2>Twitter Tip</h2>
+  def perform(id)
+    # Do the important stuff
+  end
+end</code></pre></figure>
 
-<p>The last day of the email course has a <em>Summary</em> section thanking people for
-taking the course and attempting to get feedback. While I haven&rsquo;t received much
-constructive criticism, I dropped this little doozie at the bottom:</p>
 
-<p><img class="center" src="/images/email-course/click-to-tweet.png" title="&#34;Build a Ruby Gem Email Course Click To Tweet&#34;" alt="&#34;Build a Ruby Gem Email Course Click To Tweet&#34;"></p>
+<p>Now, we need to make sure the worker process that&rsquo;s running the jobs knows to process jobs off this queue. A typical worker might be invoked with:</p>
 
-<p>I&rsquo;d read a post about <a href="http://grinnick.com/posts/how-groove-s-email-copy-makes-their-posts-go-viral?ref=hn">GroveHQ&rsquo;s emails going
-viral</a>
-and this was something they did in their campaigns.</p>
+<figure class='code'><pre><code>bin/sidekiq</code></pre></figure>
 
-<p>The link allows people to click and immediately be setup to Tweet the
-following:</p>
 
-<p><img class="center" src="/images/email-course/course-tweet.png" title="&#34;Build a Ruby Gem Email Course Tweet&#34;" alt="&#34;Build a Ruby Gem Email Course Tweet&#34;"></p>
+<p>Since new jobs going through this worker will end up on the <code>important</code> queue, we want to make sure the worker is processing jobs from the <code>important</code> queue too:</p>
 
-<p>It&rsquo;s difficult to determine the value of those tweets, but over 10 people have
-clicked and tweeted. To me, this was surprising, but valuable.</p>
+<figure class='code'><pre><code>bin/sidekiq -q important -q default</code></pre></figure>
 
-<p>I&rsquo;ll probably look to make it stand out a bit more to hopefully improve the
-click-through.</p>
 
-<h2>In Summary</h2>
+<p><em>Note: Jobs that don&rsquo;t specify a queue will go to the <code>default</code> queue. We have to include the <code>default</code> queue when we using the <code>-q</code> option, otherwise the default queue will be ignored in favor of the queue passed to the <code>-q</code> option.</em></p>
 
-<p>I spent a total of <strong>16 hours</strong> creating the <em>Build a Ruby Gem</em> email
-course, which has since <strong>validated the need for a book</strong>. While interest
-in a free email course doesn&rsquo;t guarantee a book on the same subject will sell, it was
-the closet thing I could think to do outside of taking pre-orders.</p>
+<p>The best part, you don&rsquo;t even have to have multiple worker processes to process jobs from multiple queues. Furthermore, the <code>important</code> queue can be checked twice as often as the <code>default</code> queue:</p>
+
+<figure class='code'><pre><code>bin/sidekiq -q important,2 -q default</code></pre></figure>
+
+
+<p>This flexibility of where jobs are enqueued and how they&rsquo;re processed gives us an incredible amount of freedom when building our applications.</p>
+
+<h2>Extracting Worker to a Microservice</h2>
+
+<p>Let&rsquo;s assume that we&rsquo;ve deployed your main application to Heroku. The application uses Sidekiq and we&rsquo;ve included a Redis add-on. With the addition of the add-on, our application now has a <code>REDIS_URL</code> environment variable that Sidekiq connects to on startup. We have a web process, and worker process. A pretty standard Rails stack:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-web-worker.png" title="&#34;Rails with typical worker process&#34;" alt="&#34;Rails with typical worker process&#34;"></p>
+
+<p><strong>What&rsquo;s stopping us from using that same <code>REDIS_URL</code> in another application?</strong></p>
+
+<p>Nothing, actually. And if we consider what we know about the isolation of jobs in queue and workers working on specific queues, there&rsquo;s nothing stopping us from having workers for a specific queue in a different application altogether.</p>
+
+<p>Remember <code>ImportantWorker</code>, imagine the logic for that job was better left for a different application. We&rsquo;ll leave that part a little hand-wavey because there still should be a really good reason to do so. But we&rsquo;ll assume you&rsquo;ve thought long and hard about this and decided the core application was not a great place for this job logic.</p>
+
+<p>Extracting the worker a separate application might now look something like this:</p>
+
+<p><img class="center" src="/images/sidekiq/rails-with-microservice.png" title="&#34;Using Sidekiq as a Message Queue between two Rails microservices&#34;" alt="&#34;Using Sidekiq as a Message Queue between two Rails microservices&#34;"></p>
+
+<h2>Enqueueing Jobs with the Sidekiq Client</h2>
+
+<p>Typically, to enqueue the <code>ImportantWorker</code> above, we&rsquo;d call the following from our application:</p>
+
+<figure class='code'><pre><code>ImportantWorker.perform_async(1)</code></pre></figure>
+
+
+<p>This works great when <code>ImportantWorker</code> is defined in our application. With the expanded stack above, <code>ImportantWorker</code> now lives in a new microservice, which means we don&rsquo;t have access to the <code>ImportantWorker</code> class from within the application. We <em>could</em> define it in the application just so we can enqueue it, with the intent that the application won&rsquo;t process jobs for that worker, but that feels funny to me.</p>
+
+<p>Rather, we can turn to the underlying Sidekiq client API to enqueue the job instead:</p>
+
+<figure class='code'><pre><code>Sidekiq::Client.push(
+  "class" =&gt; "ImportantWorker",
+  "queue" =&gt; "important",
+  "args" =&gt; [1]
+)
+</code></pre></figure>
+
+
+<p><em>Note: We have to be sure to define the <code>class</code> as a string <code>"ImportantWorker"</code>, otherwise we&rsquo;ll get an exception during enqueuing because the worker isn&rsquo;t defined in the application.</em></p>
+
+<h2>Processing Sidekiq Jobs from a Microservice</h2>
+
+<p>Now we&rsquo;re pushing jobs to the <code>important</code> queue, but have nothing in our application to process them. In fact, our worker process isn&rsquo;t even looking at that queue:</p>
+
+<figure class='code'><pre><code>bin/sidekiq -q default</code></pre></figure>
+
+
+<p>From our microservice, we setup a worker process to <strong>ONLY</strong> look at the <code>important</code> queue:</p>
+
+<figure class='code'><pre><code>bin/sidekiq -q important</code></pre></figure>
+
+
+<p>We define the <code>ImportantWorker</code> in our microservice:</p>
+
+<figure class='code'><pre><code>class ImportantWorker
+  include Sidekiq::Worker
+  sidekiq_options queue: :important
+
+  def perform(id)
+    # Do the important stuff
+  end
+end</code></pre></figure>
+
+
+<p>And now when the worker picks jobs out of the <code>important</code> queue, it&rsquo;ll process them using the <code>ImportantWorker</code> defined above in our microservice.</p>
+
+<p>If we wanted to go one step further, the microservice could then enqueue a job using the Sidekiq client API to a queue that only the core application is working on in order to send communication back the other direction.</p>
+
+<h2>Summary</h2>
+
+<p>Any architectural decision has risks. Microservices are no exception. Microservices can be easier than an enterprise message broker, cluster of new servers and a handful of devops headaches.</p>
+
+<p>I originally dubbed this the &ldquo;poor man&rsquo;s message bus&rdquo;. With more thought, there&rsquo;s nothing &ldquo;poor&rdquo; about this. Sidekiq has a been a reliable piece of our infrastructure and I have no reason to believe that&rsquo;ll change, even if we are using it for more than just simple background processing from a single application.</p>
 
   </div>
 
@@ -318,7 +340,7 @@ the closet thing I could think to do outside of taking pre-orders.</p>
   <div class="email-input-container">
     <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
   </div>
-  <input type="hidden" name="fields[location]" value="How I Launched an Email Course to 500+ People" />
+  <input type="hidden" name="fields[location]" value="Sidekiq As A Microservice Message Queue" />
   <input type="submit" value="Send me articles like this!" name="subscribe" class="button">
   <br class="clear">
 </form>
@@ -357,7 +379,7 @@ the closet thing I could think to do outside of taking pre-orders.</p>
   <div class="email-input-container">
     <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
   </div>
-  <input type="hidden" name="fields[location]" value="How I Launched an Email Course to 500+ People" />
+  <input type="hidden" name="fields[location]" value="Sidekiq As A Microservice Message Queue" />
   <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
   <br class="clear">
 </form>
@@ -510,8 +532,8 @@ the closet thing I could think to do outside of taking pre-orders.</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://brandonhilkert.com/blog/how-i-launched-an-email-course/';
-        var disqus_url = 'http://brandonhilkert.com/blog/how-i-launched-an-email-course/';
+        var disqus_identifier = 'http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/';
+        var disqus_url = 'http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/';
         var disqus_script = 'embed.js';
       
     (function () {
@@ -554,7 +576,7 @@ the closet thing I could think to do outside of taking pre-orders.</p>
   <div class="email-input-container">
     <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
   </div>
-  <input type="hidden" name="fields[location]" value="How I Launched an Email Course to 500+ People" />
+  <input type="hidden" name="fields[location]" value="Sidekiq As A Microservice Message Queue" />
   <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
   <br class="clear">
 </form>
