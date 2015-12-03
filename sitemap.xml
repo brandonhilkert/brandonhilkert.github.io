@@ -230,7 +230,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
@@ -238,7 +238,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/bonus/sucker-punch.html</loc>
@@ -246,7 +246,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -258,23 +258,23 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/funnel/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -286,7 +286,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -294,6 +294,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2015-12-02T07:06:55-05:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
 </urlset>

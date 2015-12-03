@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-12-02T07:07:19-05:00</updated>
+  <updated>2015-12-03T16:29:05-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -35,7 +35,7 @@
 
 <p>Module boundaries are naturally strengthened when we&rsquo;re forced to move code to another codebase. The result being, in most cases a group of microservices appears to be better constructed than the legacy monolith it was extracted from.</p>
 
-<p>There&rsquo;s no doubt Rails allows developers to get something up and running very quickly. Sadly, you can do so while making a big mess at the same time. It&rsquo;s worth nothing there&rsquo;s nothing stopping a monolith from being well constructed. With some discipline, <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">your monolith can be the bright and shiny beauty that DHH wants it to be</a>.</p>
+<p>There&rsquo;s no doubt Rails allows developers to get something up and running very quickly. Sadly, you can do so while making a big mess at the same time. It&rsquo;s worth noting there&rsquo;s nothing stopping a monolith from being well constructed. With some discipline, <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">your monolith can be the bright and shiny beauty that DHH wants it to be</a>.</p>
 
 <h2>Sidekiq Queues</h2>
 
