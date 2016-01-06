@@ -8,10 +8,10 @@
 	
   
   
-  <title>Why I Wrote the Sucker Punch Gem | Brandon Hilkert</title>
+  <title>Lessons Learned from Building a Ruby Gem API | Brandon Hilkert</title>
 	<meta name="author" content="Brandon Hilkert">
 
-	<meta name="description" content="Sucker Punch is a simple Ruby background processing library that runs in a single web process.">
+	<meta name="description" content="January 4th, 2016 Lessons Learned From Building a Ruby Gem API open source, ruby, sidekiq, sucker punch Sucker Punch was created because I had a need for &hellip;">
 	
 
   <meta name="HandheldFriendly" content="True">
@@ -20,20 +20,20 @@
 
   <meta name="twitter:card" content="summary">
   <meta name="twitter:creator" content="@brandonhilkert">
-  <meta name="twitter:title" content="Why I Wrote the Sucker Punch Gem">
-  <meta name="twitter:description" content="Sucker Punch is a simple Ruby background processing library that runs in a single web process.">
+  <meta name="twitter:title" content="Lessons Learned from Building a Ruby Gem API">
+  <meta name="twitter:description" content="January 4th, 2016 Lessons Learned From Building a Ruby Gem API open source, ruby, sidekiq, sucker punch Sucker Punch was created because I had a need for background processing without a separate &hellip;">
   <meta name="twitter:image" content="http://brandonhilkert.com/images/brandon-hilkert.jpg">
 
-  <meta property="og:title" content="Why I Wrote the Sucker Punch Gem | Brandon Hilkert"/>
-  <meta property="og:description" content="Sucker Punch is a simple Ruby background processing library that runs in a single web process.">
-  <meta property="og:url" content="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/"/>
+  <meta property="og:title" content="Lessons Learned from Building a Ruby Gem API | Brandon Hilkert"/>
+  <meta property="og:description" content="January 4th, 2016 Lessons Learned From Building a Ruby Gem API open source, ruby, sidekiq, sucker punch Sucker Punch was created because I had a need for background processing without a separate &hellip;">
+  <meta property="og:url" content="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
   <meta property="og:image" content="http://brandonhilkert.com/images/brandon-hilkert-large.jpg" />
   <meta property="og:site_name" content="Brandon Hilkert's Blog"/>
   <meta property="og:type" content="article"/>
   <meta property="fb:profile_id" content="1472745932"/>
 
-	<link href="/atom.xml" rel="alternate" title="Why I Wrote the Sucker Punch Gem | Brandon Hilkert" type="application/atom+xml">
-	<link rel="canonical" href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">
+	<link href="/atom.xml" rel="alternate" title="Lessons Learned from Building a Ruby Gem API | Brandon Hilkert" type="application/atom+xml">
+	<link rel="canonical" href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">
 	<link href="/favicon.png" rel="shortcut icon">
 	<link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 	<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
@@ -162,93 +162,125 @@
   
 
 
-<time datetime="2014-03-13T13:56:00-04:00" data-updated="true" itemprop="datePublished">March 13<span>th</span>, 2014</time></div>
-	<h1 class="title" itemprop="name">Why I Wrote the Sucker Punch Gem</h1>
+<time datetime="2016-01-04T13:12:00-05:00" data-updated="true" itemprop="datePublished">January 4<span>th</span>, 2016</time></div>
+	<h1 class="title" itemprop="name">Lessons Learned From Building a Ruby Gem API</h1>
   <div class="tags">
 
 
-	<a class='category' href='/blog/categories/book/'>book</a>, <a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/sucker-punch/'>sucker punch</a>
+	<a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/sidekiq/'>sidekiq</a>, <a class='category' href='/blog/categories/sucker-punch/'>sucker punch</a>
 
 
 </div>
 	<div class="entry-content" itemprop="articleBody">
     
 
-    <p><em>This is one of the final post leading up the the launch of the
-<a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch"><strong>Build a Ruby Gem Ebook</strong></a>,
-which is now available for sale in <a href="/books/build-a-ruby-gem/?utm_source=bh-com&amp;utm_medium=web&amp;utm_campaign=launch">3 packages</a>,
-including <strong>14 chapters of code</strong> and over 2 hours of screencasts</em>.</p>
+    <p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
 
-<p>One of the simplest and most common application of background processing is sending emails outside of a web
-request. And while background processing is pretty common, most existing Ruby background processing libraries require an additional process to execute these jobs, resulting in increased infrastructure costs.</p>
-
-<p>At the time, I was working on an application hosted on Heroku, and the cost of an additional dyno ($35/month) wasn’t justified. The background jobs did very little more than send emails out of band. To me, the traditional solutions seemed like overkill. And with this, the idea of <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> was born&hellip;</p>
+<p>Having gotten familiar with Celluloid from my work on Sidekiq, I knew Celluloid had all the pieces to puzzle to make this easier. In fact, one of the earliest incarnations of Sucker Punch wasn&rsquo;t a gem at all, just some Ruby classes implementing the pieces of Celluloid necessary to put together a background processing queue.</p>
 
 <!--more-->
 
 
-<h2>Ruby Background Processing Libraries</h2>
+<p>The resulting code was less than ideal. It worked, but didn&rsquo;t feel like an API that anyone would want to use. From a beginner&rsquo;s perspective, this would stop adoption in its tracks. This is a common challenge with any code we encounter. No doubt, the Ruby standard library has all the tools necessary to make just about anything we can dream of, but sometimes the result isn&rsquo;t ideal. It&rsquo;s the same reason libraries like Rspec and HTTParty can exist. Developers prefer to use simplistic <a href="https://en.wikipedia.org/wiki/Domain-specific_language">DSLs</a> over convoluted, similarly-functioning code. Ruby has always been a language where developers consistently tout their ability to write code that reads well, feeding the levels of developer happiness.</p>
 
-<p>Until I had heard of <a href="http://sidekiq.org/">Sidekiq</a>, <a href="https://github.com/collectiveidea/delayed_job/tree/master">delayed_job</a> and <a href="https://github.com/resque/resque">Resque</a> were the standard options for processing background jobs in Ruby. I&rsquo;ve used both and believe each has a great use case.</p>
+<h2>Why Rewrite Sucker Punch</h2>
 
-<p>In my experience, it&rsquo;s easiest to start with delayed_job if you need background processing in your application. If and when the DB becomes your bottleneck, it&rsquo;s time to move on. Redis is a dependency of both Resque and Sidekiq, which increases the complexity and infrastructure maintenance, however, with <a href="https://addons.heroku.com/?q=redis">Heroku&rsquo;s hosted Redis
-Add-ons</a>, this dependency is much less of a pain.</p>
+<p>It started when <a href="https://github.com/brandonhilkert/sucker_punch/issues/122">a version of Celluloid was yanked from RubyGems.org</a>. This resulted in a flurry of tweets and GH issues detailing their inability to bundle their applications.</p>
 
-<h2>My work on Sidekiq</h2>
+<p>As of version <code>0.17</code>, methods in public API changed without supporting documentation. On top of that, the core <code>celluloid</code> gem was split in to a series of child gems causing navigation to be painful.</p>
 
-<p>I previously wrote about my my <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">open source contributions</a> and how I got started. I had spent the previous several
-months contributing to Sidekiq and learning more about concurrency patterns in Ruby.</p>
+<p>This made my life as the Sucker Punch maintainer difficult. There were some requests to upgrade Sucker Punch to use Celluloid <code>~&gt; 0.17</code> and I feared of what would happen if I did. This caused me to think about what the future of Sucker Punch looked like without Celluloid. I still use Sucker Punch and believe it&rsquo;s a valuable asset to the community. My goal was to find a way to move it forward productively without experiencing similar pains.</p>
 
-<p>Sidekiq is multi-threaded, which is the reason a single Sidekiq process is <a href="https://github.com/mperham/sidekiq/wiki/Testimonials">more
-efficient</a> than a library like Resque. Although, nothing in life is free &ndash; care must be taken to ensure your jobs are thread-safe. A helpful <a href="https://github.com/mperham/sidekiq/wiki/Best-Practices">guide to writing thread-safe code</a> can be found on the Sidekiq wiki.</p>
+<p>In the end, thanks to some <a href="https://github.com/brandonhilkert/sucker_punch/pull/126">communinity contributions</a>, <a href="https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#160">Sucker Punch <code>1.6.0</code> was released with Celluloid <code>0.17.2</code> support</a>.</p>
 
-<h2>Use Case</h2>
+<h2>Where to now?</h2>
 
-<p>I was working on <a href="http://defriendnotifierapp.com/">Defriend Notifier</a> and needed to notify users via email when their Facebook friend list changed. Using Sidekiq or any of the alternatives mentioned above certainly would’ve worked. In fact, the application originally used Sidekiq and functioned perfectly. However, as time went on, I decided the extra cost of the worker wasn’t justified, especially given that the application didn’t produce any revenue outside of advertising (very little…).</p>
+<p>Around that same time, Mike Perham had been writing about his experiences <a href="http://www.mikeperham.com/2015/10/14/optimizing-sidekiq/">optimizing Sidekiq</a> and <a href="http://www.mikeperham.com/2015/10/14/should-you-use-celluloid/">whether continuing with Celluloid made sense for Sidekiq</a>. Having less experience with multi-threading, it didn&rsquo;t make sense for me to reinvent the wheel.</p>
 
-<p>At the time, the only background processing library that didn’t require an additional background process was
-<a href="https://github.com/mperham/girl_friday">girl_friday</a>, also written by <a href="https://twitter.com/mperham">Mike
-Perham</a>, author of Sidekiq. While this solution worked for awhile, I found the syntax to be slightly non-intuitive and it felt a little dirty to pass around a global variable within the application
-to manage a single job queue. I also experienced some memory leaks on Heroku as a result of switching to
-girl_friday, but to be fair, I didn&rsquo;t spend much time determining the root cause. <em>Disclaimer: It very likely could’ve been due to code that I wrote</em>.</p>
+<p>I had been hearing about <a href="https://github.com/ruby-concurrency/concurrent-ruby`"><code>concurrent-ruby</code></a> through a variety of outlets, one of which was Rails <a href="https://github.com/rails/rails/pull/20866">replacing the existing concurrency latch with similar functionality from <code>concurrent-ruby</code></a>. After poking around <code>concurrent-ruby</code>, I realized it had all the tools necessary to build a background job processing library. Much like Celluloid in that respect, had the tools, but lacked the simple DSL for the use case.</p>
 
-<h2>Enter Celluloid</h2>
+<p>What if Sucker Punch used <code>concurrent-ruby</code> in place of <code>celluloid</code>?</p>
 
-<p><a href="https://github.com/celluloid/celluloid">Celluloid</a> describes itself as an actor-based concurrent object
-framework for Ruby. Celluloid is the guts behind Sidekiq and the reason why the multi-threaded Sidekiq code is so readable. Celluloid abstracts away the details of concurrency so your code doesn&rsquo;t have to worry about manually managing thread synchronization and object message queuing.</p>
+<p>I can hear what you&rsquo;re thinking&hellip;&ldquo;What&rsquo;s the difference? You&rsquo;re swapping one dependency for another!&rdquo;. 100% true. The difference was that the little bit of communication I had with the maintainers of <code>concurrent-ruby</code> felt comfortable, easy, and welcoming. And with <code>concurrent-ruby</code> now a dependency of Rails, it&rsquo;s even more accessible for those using Sucker Punch within a Rails application (a common use case). But like before, there&rsquo;s no way to be sure that  <code>concurrent-ruby</code> won&rsquo;t cause similar pains/frustrations.</p>
 
-<h2>Sucker Punch is born</h2>
+<h2>Celluloid Basics</h2>
 
-<p>girl_friday was written several years ago — before Celluloid was created. Realizing the power of Celluloid,
-I figured there was an opportunity for a new library that behaved like girl_friday, but utilized
-Celluloid&rsquo;s more reliable multi-threading capabilities. And because Celluloid handles so much of the complexity, the gem itself would be relatively simple — really a DSL around enqueuing jobs to a <a href="https://github.com/celluloid/celluloid/wiki/Pools">Celluloid Pool</a>.</p>
+<p>A basic Sucker Punch job looks like:</p>
 
-<p>I <a href="https://twitter.com/brandonhilkert/status/292630123981729793">posed the question to Mike Perham</a> and he confirmed my suspicions.</p>
-
-<p><img class="center" src="/images/sucker-punch-tweet.png" title="&#34;Sucker Punch Tweet&#34;" alt="&#34;Sucker Punch Tweet&#34;"></p>
-
-<p>Fortunately, Celluloid had all of the functionality needed for background queues already built-in. While the
-functionality was there, the usage syntax was awkward.</p>
-
-<p>I spent the next few days creating a DSL around the Celluloid internals, thus making it feel more specific to
-background queues.</p>
-
-<p>Here’s the result of a typical job class:</p>
-
-<pre><code>class LogJob
+<figure class='code'><pre><code>class LogJob
   include SuckerPunch::Job
 
   def perform(event)
-    # do some other stuff to
-    # record the event in the background
-    puts "#{event} just happened"
+    Log.new(event).track
   end
-end
-</code></pre>
+end</code></pre></figure>
 
-<p>I deployed my sucker_punch-converted application code to production and gave it a week or so before I declared it a success. Once I realized sucker_punch was going to be a maintainable method for processing background jobs in a single web process, I added additional niceties like logging and queue configuration details that may be valuable for other use cases.</p>
 
-<p>Have you tried <a href="https://github.com/brandonhilkert/sucker_punch">sucker_punch</a> yet? If so, I&rsquo;d love to know how it went and what you used it for&hellip;</p>
+<p>To run the job asynchronously, we use the following syntax:</p>
+
+<figure class='code'><pre><code>LogJob.new.async.perform("new_user")</code></pre></figure>
+
+
+<p>The most interesting part of this method chain is the <code>async</code>. Removing <code>async</code>, leaves us with a call to a regular instance method.</p>
+
+<p>It so happens that <a href="https://github.com/celluloid/celluloid/wiki/Basic-usage"><code>async</code> is a method in Celluloid that causes the next method to execute asynchronously</a>. And this works because by including <code>SuckerPunch::Job</code>, we&rsquo;re including <code>Celluloid</code>, which gives us the <code>async</code> method on instances of the job class.</p>
+
+<h2>Developing APIs</h2>
+
+<p>If you&rsquo;re familiar with the basics of Celluloid, you&rsquo;ll notice there&rsquo;s not much to Sucker Punch. It adds the Celluloid functionality to job classes and does some things under the hood to ensure there&rsquo;s one queue for each job class.</p>
+
+<p><strong>Early in my <code>concurrent-ruby</code> spike, I realized what a mistake to tie Sucker Punch&rsquo;s API to the API of Celluloid</strong>. Tinkering with the idea of removing Celluloid has left Sucker Punch with two options:</p>
+
+<ol>
+<li>Continue using the <code>async</code> method with the new dependency</li>
+<li>Break the existing DSL and create a dependency-independent syntax and try my best to document and support the change through the backwards-incompatible change</li>
+</ol>
+
+
+<p>Option 1 is the easy way out. Option 2 is more work, far more scary, but the right thing to do.</p>
+
+<p>I decided to abandon my thoughts about previous versions and write as if it were new today. This will be the basis for the next major release of Sucker Punch (<code>2.0.0</code>).</p>
+
+<p>Settling on abandoning the existing API, the next question is, <strong>&ldquo;What should the new API look like?&rdquo;</strong>.</p>
+
+<p>Being a fan of Sidekiq, it didn&rsquo;t take long for me to realize it could actually make developers lives easier if Sucker Punch&rsquo;s API was the same.</p>
+
+<p>Switching between Sidekiq and Sucker Punch is not uncommon. I look at Sidekiq as Sucker Punch&rsquo;s big brother and often suggest people use it instead when the use case makes sense.</p>
+
+<p>If you&rsquo;re familiar with Sidekiq, using the <code>perform_async</code> class method should look familiar:</p>
+
+<figure class='code'><pre><code>LogJob.peform_async("new_user")</code></pre></figure>
+
+
+<p><strong>So why not use the same for Sucker Punch?</strong></p>
+
+<p>If so, switching between Sidekiq and Sucker Punch would be no more than swapping <code>include Sidekiq::Worker</code> for <code>include SuckerPunch::Job</code> in the job class, aside from the gem installation itself. The result would be less context switching and more opportunity focus on the important parts of the application.</p>
+
+<p>I can hear the same question again, &ldquo;What&rsquo;s the difference? You suggested isolating yourself from a dependency&rsquo;s API and now you&rsquo;re suggesting using another!&rdquo;. I look at this one a little differently&hellip;</p>
+
+<p>Sidekiq is uniquely positioned in the community as a paid open source project. We&rsquo;re happy users of Sidekiq Pro and continue to do so for the support. You can certainly get support for the open source version, but one way to ensure Sidekiq is actively maintained is by paying for it. This financial support from us and others decreases the likelihood Mike will choose to abandon it. Mike&rsquo;s also been public about his long-term interest in maintaining Sidekiq. With all this in mind, I&rsquo;m willing to bank on its existence as the defacto way to enqueue jobs for background processing.</p>
+
+<p>And if for some reason Sidekiq does disappear, there&rsquo;s nothing lost on Sucker Punch. There&rsquo;s no dependency. Just a similar syntax.</p>
+
+<p>Sucker Punch <code>2.0.0</code> will have 2 class methods to enqueue jobs:</p>
+
+<figure class='code'><pre><code>LogJob.perform_async("new_user")</code></pre></figure>
+
+
+<p>and</p>
+
+<figure class='code'><pre><code>LogJob.perform_in(5.minutes, "new_user")</code></pre></figure>
+
+
+<p>The latter defining a delayed processing of the <code>perform</code> method 5 minutes from now.</p>
+
+<h2>Summary</h2>
+
+<p>Settling on a library&rsquo;s API isn&rsquo;t easy. Isolating it from underlying dependencies is the best bet for long-term stability. Using the <a href="https://en.wikipedia.org/wiki/Adapter">adapter pattern</a> can help create a layer (adapter) between your code and the dependency&rsquo;s API. But like always, there are always exceptions.</p>
+
+<p>I&rsquo;m taking a leap of faith that doing what I believe is right won&rsquo;t leave existing users frustrated, ultimately abandoning Sucker Punch altogether.</p>
+
+<p>Sucker Punch <code>v2.0</code> is shaping up to be the best release yet. I&rsquo;m looking forward to sharing it with you.</p>
 
   </div>
 
@@ -276,7 +308,7 @@ end
   <div class="email-input-container">
     <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
   </div>
-  <input type="hidden" name="fields[location]" value="Why I Wrote the Sucker Punch Gem" />
+  <input type="hidden" name="fields[location]" value="Lessons Learned from Building a Ruby Gem API" />
   <input type="submit" value="Send me articles like this!" name="subscribe" class="button">
   <br class="clear">
 </form>
@@ -315,7 +347,7 @@ end
   <div class="email-input-container">
     <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
   </div>
-  <input type="hidden" name="fields[location]" value="Why I Wrote the Sucker Punch Gem" />
+  <input type="hidden" name="fields[location]" value="Lessons Learned from Building a Ruby Gem API" />
   <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
   <br class="clear">
 </form>
@@ -468,8 +500,8 @@ end
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/';
-        var disqus_url = 'http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/';
+        var disqus_identifier = 'http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/';
+        var disqus_url = 'http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/';
         var disqus_script = 'embed.js';
       
     (function () {
@@ -512,7 +544,7 @@ end
   <div class="email-input-container">
     <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
   </div>
-  <input type="hidden" name="fields[location]" value="Why I Wrote the Sucker Punch Gem" />
+  <input type="hidden" name="fields[location]" value="Lessons Learned from Building a Ruby Gem API" />
   <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
   <br class="clear">
 </form>

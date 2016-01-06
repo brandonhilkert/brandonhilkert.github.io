@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2015-12-03T16:29:05-05:00</updated>
+  <updated>2016-01-06T07:09:53-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,129 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
+    <link href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
+    <updated>2016-01-04T13:12:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api</id>
+    <content type="html"><![CDATA[<p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
+
+<p>Having gotten familiar with Celluloid from my work on Sidekiq, I knew Celluloid had all the pieces to puzzle to make this easier. In fact, one of the earliest incarnations of Sucker Punch wasn&rsquo;t a gem at all, just some Ruby classes implementing the pieces of Celluloid necessary to put together a background processing queue.</p>
+
+<!--more-->
+
+
+<p>The resulting code was less than ideal. It worked, but didn&rsquo;t feel like an API that anyone would want to use. From a beginner&rsquo;s perspective, this would stop adoption in its tracks. This is a common challenge with any code we encounter. No doubt, the Ruby standard library has all the tools necessary to make just about anything we can dream of, but sometimes the result isn&rsquo;t ideal. It&rsquo;s the same reason libraries like Rspec and HTTParty can exist. Developers prefer to use simplistic <a href="https://en.wikipedia.org/wiki/Domain-specific_language">DSLs</a> over convoluted, similarly-functioning code. Ruby has always been a language where developers consistently tout their ability to write code that reads well, feeding the levels of developer happiness.</p>
+
+<h2>Why Rewrite Sucker Punch</h2>
+
+<p>It started when <a href="https://github.com/brandonhilkert/sucker_punch/issues/122">a version of Celluloid was yanked from RubyGems.org</a>. This resulted in a flurry of tweets and GH issues detailing their inability to bundle their applications.</p>
+
+<p>As of version <code>0.17</code>, methods in public API changed without supporting documentation. On top of that, the core <code>celluloid</code> gem was split in to a series of child gems causing navigation to be painful.</p>
+
+<p>This made my life as the Sucker Punch maintainer difficult. There were some requests to upgrade Sucker Punch to use Celluloid <code>~&gt; 0.17</code> and I feared of what would happen if I did. This caused me to think about what the future of Sucker Punch looked like without Celluloid. I still use Sucker Punch and believe it&rsquo;s a valuable asset to the community. My goal was to find a way to move it forward productively without experiencing similar pains.</p>
+
+<p>In the end, thanks to some <a href="https://github.com/brandonhilkert/sucker_punch/pull/126">communinity contributions</a>, <a href="https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#160">Sucker Punch <code>1.6.0</code> was released with Celluloid <code>0.17.2</code> support</a>.</p>
+
+<h2>Where to now?</h2>
+
+<p>Around that same time, Mike Perham had been writing about his experiences <a href="http://www.mikeperham.com/2015/10/14/optimizing-sidekiq/">optimizing Sidekiq</a> and <a href="http://www.mikeperham.com/2015/10/14/should-you-use-celluloid/">whether continuing with Celluloid made sense for Sidekiq</a>. Having less experience with multi-threading, it didn&rsquo;t make sense for me to reinvent the wheel.</p>
+
+<p>I had been hearing about <a href="https://github.com/ruby-concurrency/concurrent-ruby`"><code>concurrent-ruby</code></a> through a variety of outlets, one of which was Rails <a href="https://github.com/rails/rails/pull/20866">replacing the existing concurrency latch with similar functionality from <code>concurrent-ruby</code></a>. After poking around <code>concurrent-ruby</code>, I realized it had all the tools necessary to build a background job processing library. Much like Celluloid in that respect, had the tools, but lacked the simple DSL for the use case.</p>
+
+<p>What if Sucker Punch used <code>concurrent-ruby</code> in place of <code>celluloid</code>?</p>
+
+<p>I can hear what you&rsquo;re thinking&hellip;&ldquo;What&rsquo;s the difference? You&rsquo;re swapping one dependency for another!&rdquo;. 100% true. The difference was that the little bit of communication I had with the maintainers of <code>concurrent-ruby</code> felt comfortable, easy, and welcoming. And with <code>concurrent-ruby</code> now a dependency of Rails, it&rsquo;s even more accessible for those using Sucker Punch within a Rails application (a common use case). But like before, there&rsquo;s no way to be sure that  <code>concurrent-ruby</code> won&rsquo;t cause similar pains/frustrations.</p>
+
+<h2>Celluloid Basics</h2>
+
+<p>A basic Sucker Punch job looks like:</p>
+
+<p>```
+class LogJob
+  include SuckerPunch::Job</p>
+
+<p>  def perform(event)</p>
+
+<pre><code>Log.new(event).track
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To run the job asynchronously, we use the following syntax:</p>
+
+<p><code>
+LogJob.new.async.perform("new_user")
+</code></p>
+
+<p>The most interesting part of this method chain is the <code>async</code>. Removing <code>async</code>, leaves us with a call to a regular instance method.</p>
+
+<p>It so happens that <a href="https://github.com/celluloid/celluloid/wiki/Basic-usage"><code>async</code> is a method in Celluloid that causes the next method to execute asynchronously</a>. And this works because by including <code>SuckerPunch::Job</code>, we&rsquo;re including <code>Celluloid</code>, which gives us the <code>async</code> method on instances of the job class.</p>
+
+<h2>Developing APIs</h2>
+
+<p>If you&rsquo;re familiar with the basics of Celluloid, you&rsquo;ll notice there&rsquo;s not much to Sucker Punch. It adds the Celluloid functionality to job classes and does some things under the hood to ensure there&rsquo;s one queue for each job class.</p>
+
+<p><strong>Early in my <code>concurrent-ruby</code> spike, I realized what a mistake to tie Sucker Punch&rsquo;s API to the API of Celluloid</strong>. Tinkering with the idea of removing Celluloid has left Sucker Punch with two options:</p>
+
+<ol>
+<li>Continue using the <code>async</code> method with the new dependency</li>
+<li>Break the existing DSL and create a dependency-independent syntax and try my best to document and support the change through the backwards-incompatible change</li>
+</ol>
+
+
+<p>Option 1 is the easy way out. Option 2 is more work, far more scary, but the right thing to do.</p>
+
+<p>I decided to abandon my thoughts about previous versions and write as if it were new today. This will be the basis for the next major release of Sucker Punch (<code>2.0.0</code>).</p>
+
+<p>Settling on abandoning the existing API, the next question is, <strong>&ldquo;What should the new API look like?&rdquo;</strong>.</p>
+
+<p>Being a fan of Sidekiq, it didn&rsquo;t take long for me to realize it could actually make developers lives easier if Sucker Punch&rsquo;s API was the same.</p>
+
+<p>Switching between Sidekiq and Sucker Punch is not uncommon. I look at Sidekiq as Sucker Punch&rsquo;s big brother and often suggest people use it instead when the use case makes sense.</p>
+
+<p>If you&rsquo;re familiar with Sidekiq, using the <code>perform_async</code> class method should look familiar:</p>
+
+<p><code>
+LogJob.peform_async("new_user")
+</code></p>
+
+<p><strong>So why not use the same for Sucker Punch?</strong></p>
+
+<p>If so, switching between Sidekiq and Sucker Punch would be no more than swapping <code>include Sidekiq::Worker</code> for <code>include SuckerPunch::Job</code> in the job class, aside from the gem installation itself. The result would be less context switching and more opportunity focus on the important parts of the application.</p>
+
+<p>I can hear the same question again, &ldquo;What&rsquo;s the difference? You suggested isolating yourself from a dependency&rsquo;s API and now you&rsquo;re suggesting using another!&rdquo;. I look at this one a little differently&hellip;</p>
+
+<p>Sidekiq is uniquely positioned in the community as a paid open source project. We&rsquo;re happy users of Sidekiq Pro and continue to do so for the support. You can certainly get support for the open source version, but one way to ensure Sidekiq is actively maintained is by paying for it. This financial support from us and others decreases the likelihood Mike will choose to abandon it. Mike&rsquo;s also been public about his long-term interest in maintaining Sidekiq. With all this in mind, I&rsquo;m willing to bank on its existence as the defacto way to enqueue jobs for background processing.</p>
+
+<p>And if for some reason Sidekiq does disappear, there&rsquo;s nothing lost on Sucker Punch. There&rsquo;s no dependency. Just a similar syntax.</p>
+
+<p>Sucker Punch <code>2.0.0</code> will have 2 class methods to enqueue jobs:</p>
+
+<p><code>
+LogJob.perform_async("new_user")
+</code></p>
+
+<p>and</p>
+
+<p><code>
+LogJob.perform_in(5.minutes, "new_user")
+</code></p>
+
+<p>The latter defining a delayed processing of the <code>perform</code> method 5 minutes from now.</p>
+
+<h2>Summary</h2>
+
+<p>Settling on a library&rsquo;s API isn&rsquo;t easy. Isolating it from underlying dependencies is the best bet for long-term stability. Using the <a href="https://en.wikipedia.org/wiki/Adapter">adapter pattern</a> can help create a layer (adapter) between your code and the dependency&rsquo;s API. But like always, there are always exceptions.</p>
+
+<p>I&rsquo;m taking a leap of faith that doing what I believe is right won&rsquo;t leave existing users frustrated, ultimately abandoning Sucker Punch altogether.</p>
+
+<p>Sucker Punch <code>v2.0</code> is shaping up to be the best release yet. I&rsquo;m looking forward to sharing it with you.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
@@ -604,50 +727,6 @@ gem &lsquo;intercom-rails&rsquo;
 <p>Use cases are real. And the less we force our own biases on people, the faster they’ll realize experience is key and the random guy behind the cat avatar on Stack Overflow might actually be asking the right questions — even if they are convoluted.</p>
 
 <p>Next time you hear an absolute, ask <em>”Why?”</em>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem - Ruby Heroes]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes/"/>
-    <updated>2014-07-09T06:03:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes</id>
-    <content type="html"><![CDATA[<p>It’s been 3 months since the release of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a> and I’ve gotten tremendous feedback since the launch.</p>
-
-<p>I’ve love to share some news and an opportunity to win a <strong>FREE</strong> copy of the book. If you’ve already purchased the book, don’t worry, we’ll find a way to make it worth it for you.</p>
-
-<!--more-->
-
-
-<h2>Feedback</h2>
-
-<p>The two questions I’ve heard the most since the release of the <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">email course</a> and <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">book</a> are:</p>
-
-<ol>
-<li><p>Why should I get involved with open source software?</p></li>
-<li><p>How do I get started contributing to an open source project?</p></li>
-</ol>
-
-
-<h2>Benefits of Getting Involved</h2>
-
-<p>Participating in open source projects is an enlightening experience. The benefits are widespread and different for each developer. Speaking personally, I’ve learned a ton from the codebases I’ve gotten involved with. Learning was the primary reason I got involved in the first place.</p>
-
-<p>Going beyond the learning aspect, my open source contributions have resulted in several <strong>jobs offers</strong>, among other things. It’s easy to think that getting involved is only just about doing good for the community — but it’s <strong>bigger than that</strong>.</p>
-
-<p>I could go on and on, but it’s likely you’ve already heard me talk about this through my post on <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">ways to get started contributing to open source</a> or the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">open source chapter in <em>Build a Ruby Gem</em></a>.</p>
-
-<h2>Hear It From Others in the Community</h2>
-
-<p>Hearing other people’s stories has always had a profound effect on my comfort-level when approaching things I’m unfamiliar with. So with that being said, I want you to hear the answers to the questions above from those YOU look up to in the Ruby community.</p>
-
-<p>This person could be the author of your favorite gem or Matz himself (disclaimer: I may or may not be able to make this one happen…). Either way, I’ll do my best to have live interview chats with your favorite Rubyists and dig through their experience and thoughts on the community and software in general.</p>
-
-<p><em>Entries have closed for the giveaway.</em></p>
-
-<p>Submissions will be open until <strong>5:00pm EDT on Friday, July 11</strong>. I’ll announcement the winner shortly thereafter.</p>
-
-<p>Even if you don’t win, I’ll send everyone that submits a response a <strong>20% discount code</strong> for any package of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a>.</p>
 ]]></content>
   </entry>
   
