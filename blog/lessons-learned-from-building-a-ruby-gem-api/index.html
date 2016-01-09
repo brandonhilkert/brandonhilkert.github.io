@@ -197,7 +197,7 @@
 
 <p>Around that same time, Mike Perham had been writing about his experiences <a href="http://www.mikeperham.com/2015/10/14/optimizing-sidekiq/">optimizing Sidekiq</a> and <a href="http://www.mikeperham.com/2015/10/14/should-you-use-celluloid/">whether continuing with Celluloid made sense for Sidekiq</a>. Having less experience with multi-threading, it didn&rsquo;t make sense for me to reinvent the wheel.</p>
 
-<p>I had been hearing about <a href="https://github.com/ruby-concurrency/concurrent-ruby`"><code>concurrent-ruby</code></a> through a variety of outlets, one of which was Rails <a href="https://github.com/rails/rails/pull/20866">replacing the existing concurrency latch with similar functionality from <code>concurrent-ruby</code></a>. After poking around <code>concurrent-ruby</code>, I realized it had all the tools necessary to build a background job processing library. Much like Celluloid in that respect, had the tools, but lacked the simple DSL for the use case.</p>
+<p>I had been hearing about <a href="https://github.com/ruby-concurrency/concurrent-ruby"><code>concurrent-ruby</code></a> through a variety of outlets, one of which was Rails <a href="https://github.com/rails/rails/pull/20866">replacing the existing concurrency latch with similar functionality from <code>concurrent-ruby</code></a>. After poking around <code>concurrent-ruby</code>, I realized it had all the tools necessary to build a background job processing library. Much like Celluloid in that respect, had the tools, but lacked the simple DSL for the use case.</p>
 
 <p>What if Sucker Punch used <code>concurrent-ruby</code> in place of <code>celluloid</code>?</p>
 
