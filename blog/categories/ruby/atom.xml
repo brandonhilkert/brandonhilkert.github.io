@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-01-09T15:22:25-05:00</updated>
+  <updated>2016-01-27T06:47:36-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,317 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
+    <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
+    <updated>2016-01-26T07:00:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
+    <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
+
+<p>When I published the previous article, <a href="https://twitter.com/mperham/status/684529380446441472">Mike Perham rightly pointed out the opportunity to support the previous versions&rsquo;s API through an opt-in module</a>. I was hesitant to include support for the old syntax by default, but allowing a developer to require a file to get the old syntax made complete sense to me. My intent was never to abandon existing Sucker Punch users, but it felt necessary for the success of the project going forward.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>The following is an example of enqueueing a background job with Sucker Punch using the old syntax:</p>
+
+<p><code>
+LogJob.new.async.perform("new_user")
+</code></p>
+
+<p>And with the new syntax:</p>
+
+<p><code>
+LogJob.perform_async("new_user")
+</code></p>
+
+<p><em>How do we support the old syntax in the new version?</em></p>
+
+<p>Let&rsquo;s step back and reminder ourselves of what a typical job class looks like:</p>
+
+<p>```
+class LogJob
+  include SuckerPunch::Job</p>
+
+<p>  def perform(event)</p>
+
+<pre><code>Log.new(event).track
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Important points to notice:</p>
+
+<ol>
+<li>Each job includes the <code>SuckerPunch::Job</code> module to gain access to asynchronous behavior</li>
+<li>Each job executes its logic using the <code>perform</code> instance method</li>
+<li>Each job passes arguments needed for its logic as arguments to the <code>perform</code> instance method</li>
+</ol>
+
+
+<h2>The Solution</h2>
+
+<p>We&rsquo;ll start with the test:</p>
+
+<p>```</p>
+
+<h1>test/sucker_punch/async_syntax_test.rb</h1>
+
+<p>require &lsquo;test_helper&rsquo;</p>
+
+<p>module SuckerPunch
+  class AsyncSyntaxTest &lt; Minitest::Test</p>
+
+<pre><code>def setup
+  require 'sucker_punch/async_syntax'
+end
+
+def test_perform_async_runs_job_asynchronously
+  arr = []
+  latch = Concurrent::CountDownLatch.new
+  FakeLatchJob.new.async.perform(arr, latch)
+  latch.wait(0.2)
+  assert_equal 1, arr.size
+end
+
+private
+
+class FakeLatchJob
+  include SuckerPunch::Job
+
+  def perform(arr, latch)
+    arr.push true
+    latch.count_down
+  end
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Note: Some details of this are complex because the job&rsquo;s code is running in another thread. I&rsquo;ll walk through those details in a future article.</em></p>
+
+<p>The basic sequence is:
+1. require <code>sucker_punch/async_syntax</code>
+2. Execute a background job using the <code>async</code> syntax
+3. Assert changes made in that job were successful</p>
+
+<p>Running the tests above, we get the following error:</p>
+
+<p><code>``
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+LoadError: cannot load such file -- sucker_punch/async_syntax
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in</code>require'
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'</p>
+
+<p>1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
+```</p>
+
+<p>Ok, so the file doesn&rsquo;t exist. Let&rsquo;s create it and re-run the tests:</p>
+
+<p><code>
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+NoMethodError: undefined method `async' for #&lt;SuckerPunch::AsyncSyntaxTest::FakeLatchJob:0x007fbc73cbf548&gt;
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
+</code></p>
+
+<p>Progress! The job doesn&rsquo;t have an <code>async</code> method. Let&rsquo;s add it:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async # &lt;--- New method
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Notice: We&rsquo;re monkey-patching the <code>SuckerPunch::Job</code> module. This will allow us to add methods to the background job since it&rsquo;s included in the job.</em></p>
+
+<p>The tests now:</p>
+
+<p><code>
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+NoMethodError: undefined method `perform' for nil:NilClass
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
+</code></p>
+
+<p>More progress&hellip;the <code>async</code> method we added returns nil, and because of the syntax <code>async.perform</code>, there&rsquo;s no <code>perform</code> method on the output of <code>async</code>. In short, we need to return something from <code>async</code> that responds to <code>perform</code> and can run the job.</p>
+
+<p>In its most basic form, suppose we create a proxy object that responds to <code>perform</code>:</p>
+
+<p><code>
+class AsyncProxy
+  def perform
+  end
+end
+</code></p>
+
+<p>We&rsquo;ll need to do some work in <code>perform</code> to execute the job, but this&rsquo;ll do for now. Now, let&rsquo;s integrate this new proxy to our <code>async_syntax.rb</code> file and return a new instance of the proxy from the <code>async</code> method:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new # &lt;--- new instance of the proxy
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def perform
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Running our tests gives us the following:</p>
+
+<p><code>
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+ArgumentError: wrong number of arguments (2 for 0)
+  /Users/bhilkert/Dropbox/code/sucker_punch/lib/sucker_punch/async_syntax.rb:9:in `perform'
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
+</code></p>
+
+<p>Now we&rsquo;re on to something. We see an error related to the number of arguments on the <code>perform</code> method. Because each job&rsquo;s argument list will be different, we need to find a way to be flexible for whatever&rsquo;s passed in, something like&hellip;the splat operator! Let&rsquo;s try it:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The tests now:</p>
+
+<p><code>
+1) Failure:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously [/Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:14]:
+Expected: 1
+Actual: 0
+</code></p>
+
+<p>At this point, we&rsquo;ve reached the end of test output suggesting the path forward. This error is saying, &ldquo;Your assertions failed.&rdquo;. This is good because it means our syntax implementation will work and it&rsquo;s just about executing the actual job code in the proxy&rsquo;s <code>perform</code> method.</p>
+
+<p>We want to leverage our new syntax (<code>perform_async</code>) to run the actual job asynchronously so it passes through the standard code path. To do so, we&rsquo;ll need a reference to the original job in the proxy object. Let&rsquo;s pass that to the proxy during instantiation:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new(self) # &lt;--- Pass the job instance
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def initialize(job) # &lt;--- Handle job passed in
+  @job = job
+end
+
+def perform(*args)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now that the proxy has a reference to the job instance, we can call the <code>perform_async</code> class method to execute the job:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new(self)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def initialize(job)
+  @job = job
+end
+
+def perform(*args)
+  @job.class.perform_async(*args) # &lt;---- Execute the job
+end
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>```</p>
+
+<p>Lastly, the tests:</p>
+
+<p>```
+ress ENTER or type command to continue
+bundle exec rake test TEST=&ldquo;test/sucker_punch/async_syntax_test.rb&rdquo;
+Run options: &mdash;seed 43886</p>
+
+<h1>Running:</h1>
+
+<p>.</p>
+
+<p>1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```</p>
+
+<p>Success!</p>
+
+<p>Just like that, new users of Sucker Punch will be able to add <code>require 'sucker_punch/async_syntax'</code> to their projects to use the old syntax. This will allow existing projects using Sucker Punch to take advantage of the reworked internals without the need to make sweeping changes to the enqueueing syntax.</p>
+
+<p>Support for the old syntax will be available for foreseeable future via this include. All new code/applications should use the new syntax going forward.</p>
+
+<h2>Conclusion</h2>
+
+<p>Before realizing a proxy object would work, I tinkered with <code>alias_method</code> and a handful of other approaches to latching on to the job&rsquo;s <code>perform</code> method and saving it off to execute later. While some combinations of these might have worked, the proxy object solution is simple and elegant. There&rsquo;s no magic, which means less maintenance going forward. The last thing I want is to make a breaking change, add support for the old syntax and find the support to be bug-ridden.</p>
+
+<p>Ruby is incredibly flexible. Sometimes a 9-line class is enough to get the job done without reaching for an overly complex metaprogramming approach.</p>
+
+<p>Having said all that, <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch <code>v2</code> has been
+released</a>!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
@@ -550,181 +861,6 @@ but it&rsquo;s one of the easier to debug and is human-readable, so it tends to 
 <p>We&rsquo;ve simplified the communication between services into these two categories. Knowing this helps dictate the infrastructure and configuration of the applications.</p>
 
 <p>Next time, we&rsquo;ll take a closer look at the synchronous side and the specifics about the JSON payloads involved to send an email successfully.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
-    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/"/>
-    <updated>2015-07-27T11:18:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small</id>
-    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
-Blog</a></em></p>
-
-<p>The PipelineDeals web application recently celebrated its ninth birthday. It&rsquo;s
-seen its fair share of developers, all of whom had their own idea of &ldquo;clean
-code&rdquo;. As a team, we&rsquo;d been brainstorming ways to wrangle certain areas of the
-application. The question we&rsquo;d frequently ask ourselves was <em>&ldquo;How do we clean
-up [x] (some neglected feature of the application)?</em>&rdquo;.</p>
-
-<!--more-->
-
-
-<p>Reasonable solutions ended up being:</p>
-
-<ol>
-<li>Rewrite it</li>
-<li>Rewrite and put it elsewhere</li>
-</ol>
-
-
-<p>In short, we chose to rewrite many of the hairy areas of the app into separate services communicating over HTTP. It&rsquo;s been about a year since our first commit in a separate service, and we&rsquo;ve learned quite a bit since then. This is part 1 in a series of posts related to our transition to microservices.</p>
-
-<h2>How we got here</h2>
-
-<p>This was us 18 months ago. PipelineDeals was a crufty Rails 2 application that many of us were scared to open. It&rsquo;d been several years of adding feature upon feature without consistent knowledge, style, or guidance. And it&rsquo;s probably not surprising we had what we did. Regardless, we needed to fix it.</p>
-
-<p>One of our goals was to move to Rails 3, and later more updated versions, but in order to get there, we had to refactor (or remove) quite a bit of code to make the transition easier.</p>
-
-<p>This, to me, was a huge factor around our decision to move to a more service-focused approach. <a href="https://www.youtube.com/watch?v=KJVTM7mE1Cc">At this year&rsquo;s Railsconf keynote</a>, DHH joked about the &ldquo;majestic monolith&rdquo; and how many companies prematurely piece out services, all to later suffer pain when they realize it was a premature optimization.</p>
-
-<p>The same could be said for our move. Instead of spinning out separate services, we could have cleaned up the mess we had by refactoring every nasty piece of our app. We could have turned our ugly monolith into a majestic one. But while it would&rsquo;ve been possible, our team agreed we were better served by more or less starting over. Not in the big-bang rewrite sense, but instead to stand up brand new service apps when we added new features, and when it made sense. &ldquo;Made sense&rdquo; is the key here. There have been many times when it didn&rsquo;t make sense over the past 12 months. But we&rsquo;re learning and getting better at identifying the things that are good candidates for a more isolated service.</p>
-
-<h2>Now what?</h2>
-
-<p><em>Do we wait for the next requested feature or what?</em></p>
-
-<p>At one of our weekly team hangouts, we watched a talk focused on starting by isolating the responsibility of Email. It was the perfect introduction and motivation for us to get a small win and some experience under our belts. For some reason prior, we didn&rsquo;t have a great sense of how to start making that transition.</p>
-
-<p>The idea was to take our emails (and there were plenty) and move them to a separate Rails app that&rsquo;s only responsibilty is sending email. While it sounds trivial, the idea alone introduces a lot of interesting questions: <em>What do we do with those really nasty emails that have 30 instance variables? What do we do if the email service is down? How do we trigger an email to be sent?</em></p>
-
-<h2>Rails new</h2>
-
-<p>We created a new Rails 4 app, removed all the stuff we didn&rsquo;t need and created a golden shrine where emails could flourish&hellip;but seriously, that&rsquo;s all it did. And it did it really well.</p>
-
-<p>The next question was how to send emails from the main application. We&rsquo;re very happy <a href="http://sidekiq.org/pro/">Sidekiq Pro</a> users, and one of the benefits we love about Sidekiq is the built-in retries. This gives us a layer of reliability outside of the code layer. So rather than build some ad-hoc retry mechanism by creating a counter in ruby, and rescuing failures within a certain range, we shoot off a job. If it fails because the network is down, or the endpoint isn&rsquo;t available, the job will retry soon after and continue down the happy path. Sidekiq retries are a recurring theme with our infrastructure. We&rsquo;ve made a number of decisions around the fact that we have this advantage already built-in, and we might as well take advantage of it. More on that to come.</p>
-
-<h2>Communicate</h2>
-
-<p>The defacto communication method between services is over HTTP. And we did nothing different. Our services use JSON payloads to exchange data, which let&rsquo;s us easily take advantage of Sidekiq on both ends.</p>
-
-<p>So now, rather than invoking a built-in Rails mailer like:</p>
-
-<p><code>
-UserMailer.welcome(current_user).deliver
-</code></p>
-
-<p>we invoke a PORO to send off the communication:</p>
-
-<p><code>
-Email.to current_user, :user_welcome
-</code></p>
-
-<p>where <code>Email</code> is defined as</p>
-
-<p>```
-class Email
-  def initialize(users, email_key, opts)</p>
-
-<pre><code>@users, @email_key, @opts = users, email_key, opts
-</code></pre>
-
-<p>  end</p>
-
-<p>  def self.to(users, email_key, opts = {})</p>
-
-<pre><code>new(users, email_key, opts).queue_email
-</code></pre>
-
-<p>  end</p>
-
-<p>  def queue_email</p>
-
-<pre><code>opts[:email_key] = email_key
-opts[:to] ||= email_array
-opts[:name] ||= first_users_name
-opts[:user_id] ||= user_id
-opts[:account_id] ||= account_id
-
-json = JSON.generate(opts)
-RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>There&rsquo;re a number of use-case specific variables above, but the <code>email_key</code> is probably the most important. We used that to describe what email should be invoked on the service.</p>
-
-<p>In the above example, we triggered the <code>welcome</code> email on the <code>UserMailer</code> class. We translated this request into an email key of <code>user_welcome</code>.</p>
-
-<p>This key then gets interpreted by the Email service app and turned into an actual <code>Mailer</code> class and method within it. We could have done this in a variety of ways, but we split the string on the service-side at the <code>_</code>, and the first element described the mailer, the rest the method. So in this case, it gets interpreted as <code>UserMailer#welcome</code>.</p>
-
-<p>One thing this pattern allowed us to do was almost full copy/paste the old mailer methods in to the new Email service application.</p>
-
-<h2>Failures, failures, failures</h2>
-
-<p>&ldquo;What if the service is down?&rdquo; you say, &ldquo;the email request will fail!&rdquo; Sure will.</p>
-
-<p>So let&rsquo;s wrap that request in a Sidekiq job to take advantage of the built-in retries.</p>
-
-<p>Rather than invoke the following method in the email object:</p>
-
-<p><code>
-RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
-</code></p>
-
-<p>we&rsquo;ll shoot off a Sidekiq job instead, changing the <code>queue_email</code> method to:</p>
-
-<p>```
-def queue_email
-  opts[:email_key] = email_key
-  opts[:to] ||= email_array
-  opts[:name] ||= first_users_name
-  opts[:user_id] ||= user_id
-  opts[:account_id] ||= account_id</p>
-
-<p>  EmailWorker.perform_async(opts)
-end
-```</p>
-
-<p>There we have it. Network-proof email requests!</p>
-
-<p>Not so fast&hellip;</p>
-
-<p>Astute readers will probably recognize that the service-side network communication can potentially also fail. This is becoming a pattern, huh? More communication, more potential for failure and more potential headaches.</p>
-
-<p>On the <strong>service side</strong>, we have a controller that takes in the request for the email and immediately serializes it to a Sidekiq job:</p>
-
-<p>```
-  def create</p>
-
-<pre><code>EmailWorker.perform_async(parsed_params)
-head :accepted
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  def parse_params</p>
-
-<pre><code>JSON.parse(request.body) || {}
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Because we immediately serialize the job to Sidekiq, we&rsquo;ve successfully acknowledged the job was received, and the main app&rsquo;s Sidekiq job completes successfully. Now the email service can move on to doing the heavy-lifting in whatever way makes the most sense. In our case, we use Mailgun to send our emails, so the <code>EmailWorker</code> Sidekiq job invokes a new mailer based on the <code>email_key</code> param and sends it off to mailgun for transport. And because it&rsquo;s wrapped in a Sidekiq job, we can sleep well knowing that the Mailgun request can fail and the job will successfully retry until it goes through.</p>
-
-<h2>Summary</h2>
-
-<p>Service communication is definitely not for the faint of heart and as a team, we can completely appreciate the challenges that come along with keeping services in sync now&mdash;especially having stood up about 8 new services in the last 12 months.</p>
-
-<p>Sidekiq has been the queueing solution we&rsquo;ve leaned on to keep communication in sync and reliable. We&rsquo;ve also written a few internal tools that piggy-backy off Sidekiq that we&rsquo;re really excited share with the community in the near future.</p>
-
-<p>Part II, in this series, will discuss the methods of communication necessary to consider when implementing a service-based architecture.</p>
 ]]></content>
   </entry>
   

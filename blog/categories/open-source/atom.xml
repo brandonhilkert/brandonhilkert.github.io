@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-01-09T15:22:25-05:00</updated>
+  <updated>2016-01-27T06:47:36-05:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,317 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
+    <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
+    <updated>2016-01-26T07:00:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
+    <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
+
+<p>When I published the previous article, <a href="https://twitter.com/mperham/status/684529380446441472">Mike Perham rightly pointed out the opportunity to support the previous versions&rsquo;s API through an opt-in module</a>. I was hesitant to include support for the old syntax by default, but allowing a developer to require a file to get the old syntax made complete sense to me. My intent was never to abandon existing Sucker Punch users, but it felt necessary for the success of the project going forward.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>The following is an example of enqueueing a background job with Sucker Punch using the old syntax:</p>
+
+<p><code>
+LogJob.new.async.perform("new_user")
+</code></p>
+
+<p>And with the new syntax:</p>
+
+<p><code>
+LogJob.perform_async("new_user")
+</code></p>
+
+<p><em>How do we support the old syntax in the new version?</em></p>
+
+<p>Let&rsquo;s step back and reminder ourselves of what a typical job class looks like:</p>
+
+<p>```
+class LogJob
+  include SuckerPunch::Job</p>
+
+<p>  def perform(event)</p>
+
+<pre><code>Log.new(event).track
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Important points to notice:</p>
+
+<ol>
+<li>Each job includes the <code>SuckerPunch::Job</code> module to gain access to asynchronous behavior</li>
+<li>Each job executes its logic using the <code>perform</code> instance method</li>
+<li>Each job passes arguments needed for its logic as arguments to the <code>perform</code> instance method</li>
+</ol>
+
+
+<h2>The Solution</h2>
+
+<p>We&rsquo;ll start with the test:</p>
+
+<p>```</p>
+
+<h1>test/sucker_punch/async_syntax_test.rb</h1>
+
+<p>require &lsquo;test_helper&rsquo;</p>
+
+<p>module SuckerPunch
+  class AsyncSyntaxTest &lt; Minitest::Test</p>
+
+<pre><code>def setup
+  require 'sucker_punch/async_syntax'
+end
+
+def test_perform_async_runs_job_asynchronously
+  arr = []
+  latch = Concurrent::CountDownLatch.new
+  FakeLatchJob.new.async.perform(arr, latch)
+  latch.wait(0.2)
+  assert_equal 1, arr.size
+end
+
+private
+
+class FakeLatchJob
+  include SuckerPunch::Job
+
+  def perform(arr, latch)
+    arr.push true
+    latch.count_down
+  end
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Note: Some details of this are complex because the job&rsquo;s code is running in another thread. I&rsquo;ll walk through those details in a future article.</em></p>
+
+<p>The basic sequence is:
+1. require <code>sucker_punch/async_syntax</code>
+2. Execute a background job using the <code>async</code> syntax
+3. Assert changes made in that job were successful</p>
+
+<p>Running the tests above, we get the following error:</p>
+
+<p><code>``
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+LoadError: cannot load such file -- sucker_punch/async_syntax
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in</code>require'
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'</p>
+
+<p>1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
+```</p>
+
+<p>Ok, so the file doesn&rsquo;t exist. Let&rsquo;s create it and re-run the tests:</p>
+
+<p><code>
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+NoMethodError: undefined method `async' for #&lt;SuckerPunch::AsyncSyntaxTest::FakeLatchJob:0x007fbc73cbf548&gt;
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
+</code></p>
+
+<p>Progress! The job doesn&rsquo;t have an <code>async</code> method. Let&rsquo;s add it:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async # &lt;--- New method
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p><em>Notice: We&rsquo;re monkey-patching the <code>SuckerPunch::Job</code> module. This will allow us to add methods to the background job since it&rsquo;s included in the job.</em></p>
+
+<p>The tests now:</p>
+
+<p><code>
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+NoMethodError: undefined method `perform' for nil:NilClass
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
+</code></p>
+
+<p>More progress&hellip;the <code>async</code> method we added returns nil, and because of the syntax <code>async.perform</code>, there&rsquo;s no <code>perform</code> method on the output of <code>async</code>. In short, we need to return something from <code>async</code> that responds to <code>perform</code> and can run the job.</p>
+
+<p>In its most basic form, suppose we create a proxy object that responds to <code>perform</code>:</p>
+
+<p><code>
+class AsyncProxy
+  def perform
+  end
+end
+</code></p>
+
+<p>We&rsquo;ll need to do some work in <code>perform</code> to execute the job, but this&rsquo;ll do for now. Now, let&rsquo;s integrate this new proxy to our <code>async_syntax.rb</code> file and return a new instance of the proxy from the <code>async</code> method:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new # &lt;--- new instance of the proxy
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def perform
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Running our tests gives us the following:</p>
+
+<p><code>
+1) Error:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
+ArgumentError: wrong number of arguments (2 for 0)
+  /Users/bhilkert/Dropbox/code/sucker_punch/lib/sucker_punch/async_syntax.rb:9:in `perform'
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
+</code></p>
+
+<p>Now we&rsquo;re on to something. We see an error related to the number of arguments on the <code>perform</code> method. Because each job&rsquo;s argument list will be different, we need to find a way to be flexible for whatever&rsquo;s passed in, something like&hellip;the splat operator! Let&rsquo;s try it:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The tests now:</p>
+
+<p><code>
+1) Failure:
+SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously [/Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:14]:
+Expected: 1
+Actual: 0
+</code></p>
+
+<p>At this point, we&rsquo;ve reached the end of test output suggesting the path forward. This error is saying, &ldquo;Your assertions failed.&rdquo;. This is good because it means our syntax implementation will work and it&rsquo;s just about executing the actual job code in the proxy&rsquo;s <code>perform</code> method.</p>
+
+<p>We want to leverage our new syntax (<code>perform_async</code>) to run the actual job asynchronously so it passes through the standard code path. To do so, we&rsquo;ll need a reference to the original job in the proxy object. Let&rsquo;s pass that to the proxy during instantiation:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new(self) # &lt;--- Pass the job instance
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def initialize(job) # &lt;--- Handle job passed in
+  @job = job
+end
+
+def perform(*args)
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>Now that the proxy has a reference to the job instance, we can call the <code>perform_async</code> class method to execute the job:</p>
+
+<p>```
+module SuckerPunch
+  module Job</p>
+
+<pre><code>def async
+  AsyncProxy.new(self)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  class AsyncProxy</p>
+
+<pre><code>def initialize(job)
+  @job = job
+end
+
+def perform(*args)
+  @job.class.perform_async(*args) # &lt;---- Execute the job
+end
+</code></pre>
+
+<p>  end
+end</p>
+
+<p>```</p>
+
+<p>Lastly, the tests:</p>
+
+<p>```
+ress ENTER or type command to continue
+bundle exec rake test TEST=&ldquo;test/sucker_punch/async_syntax_test.rb&rdquo;
+Run options: &mdash;seed 43886</p>
+
+<h1>Running:</h1>
+
+<p>.</p>
+
+<p>1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+```</p>
+
+<p>Success!</p>
+
+<p>Just like that, new users of Sucker Punch will be able to add <code>require 'sucker_punch/async_syntax'</code> to their projects to use the old syntax. This will allow existing projects using Sucker Punch to take advantage of the reworked internals without the need to make sweeping changes to the enqueueing syntax.</p>
+
+<p>Support for the old syntax will be available for foreseeable future via this include. All new code/applications should use the new syntax going forward.</p>
+
+<h2>Conclusion</h2>
+
+<p>Before realizing a proxy object would work, I tinkered with <code>alias_method</code> and a handful of other approaches to latching on to the job&rsquo;s <code>perform</code> method and saving it off to execute later. While some combinations of these might have worked, the proxy object solution is simple and elegant. There&rsquo;s no magic, which means less maintenance going forward. The last thing I want is to make a breaking change, add support for the old syntax and find the support to be bug-ridden.</p>
+
+<p>Ruby is incredibly flexible. Sometimes a 9-line class is enough to get the job done without reaching for an overly complex metaprogramming approach.</p>
+
+<p>Having said all that, <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch <code>v2</code> has been
+released</a>!</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
@@ -643,90 +954,6 @@ gem &lsquo;intercom-rails&rsquo;
 <h2>Build a Ruby Gem</h2>
 
 <p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Absolutes as an AntiPattern]]></title>
-    <link href="http://brandonhilkert.com/blog/absolutes-as-an-antipattern/"/>
-    <updated>2014-09-28T22:35:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/absolutes-as-an-antipattern</id>
-    <content type="html"><![CDATA[<p>It’s been awhile since my last post — almost 2 months to be specific. A trip to Portugal, getting sick and a minor run-in with a table saw made it challenging to post anything for the last couple weeks. But I’d be lying if I said I was itching to write.</p>
-
-<p>During that time, I didn’t have anything screaming to be talked about. I have a long list of “decent post” topics, but none of them got me particularly excited. Until today…</p>
-
-<!--more-->
-
-
-<p>I stumbled on a blog post related to Rails’s upcoming <a href="http://edgeguides.rubyonrails.org/active_job_basics.html">Active Job feature</a>. While demonstrating the syntax for specifying the adapter, there was comment in the code snippet that said <em>“inline and other worse options”</em>. This caught me by surprise and bummed me out at the same time. Not only because I’m the author of <a href="https://github.com/brandonhilkert/sucker_punch">one of them</a>, but because there are a handful of background processing libraries in Ruby that are really good.</p>
-
-<p>So, naturally, I pinged the author and mentioned the comment might be sending the wrong message. He responded with “I consider sidekiq to be the best background processing tool available for Ruby.” And then later, <em>“sidekiq is significantly better that delayed_job and resque. You’re welcome to disagree”</em>.</p>
-
-<p><em>Note: The responses above illustrate a general sentiment. By no means is this post focused on the individual that said them.</em></p>
-
-<p>The thing is, I don’t completely disagree. As you probably already know, I’m a huge fan of of <a href="http://sidekiq.org/">Sidekiq</a>. I’ve contributed to the project and believe Sidekiq’s author, <a href="https://www.mikeperham.com/">Mike Perham</a> is not only a great leader in the Ruby community, but a great example of how to manage and lead open source projects well.</p>
-
-<p>However, those responses reminded me how damaging absolutes can be. You’ve probably heard it before:</p>
-
-<blockquote><p>“we can <strong>ABSOLUTELY NOT</strong> do x, y and z”</p></blockquote>
-
-<p><em>Why not? Will the world end? How do I know?</em></p>
-
-<p>or, what about:</p>
-
-<blockquote><p>“this feature needs to go out tomorrow, no excuses”</p></blockquote>
-
-<p><em>What if there is an excuse? What if it’s not ready? Will I be fired? Will our company go under?</em></p>
-
-<p>There are trade-offs to every decision made. While some options may not be ideal, they may still work, perhaps just not as well.</p>
-
-<p>Absolutes beg the toddler question, <em>”why?”</em>. <em>Why won’t that language X work?</em> <em>Why can’t we use Y?</em>. If you don’t know the answer to those questions, you’re doing yourself a disservice by not asking. Maybe the person has thoroughly researched the topic to come up with those conclusions. But, maybe, they haven’t.</p>
-
-<p>I’ve noticed those who do exhaustive research on a topic tend to present the information in a different manner. They’re confident the facts they found will prove their case and seem to present their findings less defensively. No, <em>”it has to be done like this”</em>. More like, <em>“I found a few ways to fix the problem and here’s why I think option 1 might be the best solution. What do you think?”</em>.</p>
-
-<p>Whether you follow agile or any other methodology, predictions and absolutes have no place in conversations. There are plenty of examples of failed software projects. I’m pretty sure all of them featured people promising the work would be done in time and under budget. Buuuuuuut, it wasn’t.</p>
-
-<h2>Background Jobs for the Big Boys</h2>
-
-<p>Delayed Job was the first Ruby background processing library I used. I remember feeling badass that I was doing all this complicated stuff in the background. But at some point, there we so many jobs and so much activity that pushing and pulling jobs out of the primary data store wasn’t efficient. Reads from the web UI would slow down (and ultimately stop) and users would bail. Unfortunately, I couldn’t pop up a message and say, <em>”hey, hope you don’t mind, but I’m doing some pretty crucial shit in the background here, so you’re experience is gonna be sucky for a bit! sorry :(”</em>.</p>
-
-<p>So, at the time, Resque was the next logical transition. I migrated the previously written jobs from Delayed Job to Resque and experienced a new level of <em>bad ass</em>. Fast forward 4 years — I still work on projects using Resque. Needless to say, it’s a pretty awesome piece of open source software.</p>
-
-<p>A few years ago, Sidekiq came along. While I didn’t know much about multi-threading code in Ruby, I tried it on a side project and was floored at the results. Those 6 Heroku workers that I’d been paying for could be compacted in to 1?!?! And on top of that, I only needed 1 worker that had 25 workers working against the queue?!?!</p>
-
-<p>But then one day, I dropped it in to a project that was using MongoDB and MongoMapper as ORM and things didn’t go so well. In the end, MongoMapper wasn’t thread-safe, which is a requirement of Sidekiq worker code. So in that case, was Sidekiq the best tool for the job? While I would’ve loved to use Sidekiq on that project, it certainly (like the absolute there…) wasn’t the right tool for <em>that</em> job.</p>
-
-<p>And what about when I first started with Delayed Job…we were a small startup with limited cash. While it seems silly to balk over an extra $35 Heorku dyno, it was $35 that could’ve gone towards something else. Not to mention the extra Redis instance, along with the expertise to make sure the thing didn’t fall over and die. Was Sidekiq (or Resque for that matter) the best tool for that job? Nope!</p>
-
-<p>Fast forward a few years, I had the need for an in-process background processing library, so <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">I wrote one</a>. That need was driven off the motivation above — needing to minimize cost and complexity. Would Sidekiq have worked for that project? Of course! In fact, it was using Sidekiq for a year or so before I transitioned the jobs to use Sucker Punch.</p>
-
-<h2>Use Cases</h2>
-
-<p>At this point, you should be noticing a trend, right? The examples above were unique use cases with a unique set of requirements and limitations. Sure, if every project I worked on had unlimited resources (both time and money), Sidekiq would be probably be my go-to the majority of time (even when writing that sentence I hesitated and almost wrote “all the time”).</p>
-
-<p>But I hesitate now. Because I remember learning about the new cool things and thinking, <em>”This is the best! There’s no way I’ll never not use it”</em>. And when I would talk to other developers, I would rave about how <em>X</em> is the best for <em>Y</em>. And now I realize I was a dummy for doing that. There’s no way I could’ve made that judgement for someone else and their work. What I really should’ve said was, <em>”I tried [insert fancy new gem/technique] for the first time the other day. It worked really well for doing X in my project that does Y”</em>. That definitely doesn’t sound as exciting, but it was the truth.</p>
-
-<p>I feel fortunate to get to write Ruby everyday. It’s incredibly expressive, which is why the debate over the countless ways to do something is great. Does the code express the right intent? For your method, it might. But for mine, it might express the complete opposite. The good news is, that’s OK. Both versions will work and the fact that we can have conversations like that is a praise for the language itself. I prefer to have the opportunity to have that conversation about style, rather than a language more black and white. Maybe it’s the creative in me, but it seems like no 2 Ruby solutions will be identical and that’s one of the things I love most about writing Ruby.</p>
-
-<p>We often joke about the stack overflow post that starts with <em>“I’m thinking about learning Rails…is it better than PHP?”</em>. Or even more relevant today, <em>”Which javascript framework should I use?”</em>.</p>
-
-<p>And then there’s the guy who comes along and is all like, <em>”Let’s back up, what are you doing and why do you absolutely need a FRAMEWORK????”</em>. While I used to ignore those types of comments, they’re the kind that I think about now and find myself typing. And that has me wondering…why the change?</p>
-
-<h2>Experience, Experience, Experience</h2>
-
-<p>I got to thinking about how I felt when I was first learning to program. When I started to feel comfortable with Rails, my confidence was through the roof. But at the same time, my naivety was at an all time high. I had had minimal experiences with software systems that were either critical or heavily-loaded. But having found Resque, I felt like I could solve the world’s problems. This is somewhat of an exaggeration, but not too far off. I realized that, as it relates to my technical career, my naivety is doing this related to time:</p>
-
-<p><img class="center" src="/images/absolutes/naivety-graph.png" title="&ldquo;Graph of Naivety over Time&rdquo;" ></p>
-
-<p>The less naivety, the more options and, naturally, certainty takes a nose dive:</p>
-
-<p><img class="center" src="/images/absolutes/certainty-graph.png" title="&ldquo;Graph of Certainty over Time&rdquo;" ></p>
-
-<p>The more I learn about programming in general, the more questions I have. Fortunately, experiences have brought me to a point where I can fairly weigh the use of Sucker Punch or Delayed Job for a particular use case. I’m not sure projecting absolutes from up high does anyone any good. Beginners will take it as the word and spread the message to others they come across.</p>
-
-<p>Use cases are real. And the less we force our own biases on people, the faster they’ll realize experience is key and the random guy behind the cat avatar on Stack Overflow might actually be asking the right questions — even if they are convoluted.</p>
-
-<p>Next time you hear an absolute, ask <em>”Why?”</em>.</p>
 ]]></content>
   </entry>
   
