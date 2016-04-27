@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-04-20T09:52:40-04:00</updated>
+  <updated>2016-04-27T06:42:47-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,159 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Message]]></title>
+    <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
+    <updated>2016-04-22T20:13:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
+    <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
+
+<!--more-->
+
+
+<h2>What are Post-Install Messages?</h2>
+
+<p>As Rubyists, we have plenty experiences installing gems. By running <code>gem install rails</code>, we&rsquo;re asking Rubygems to install the gem named <code>rails</code> on to our system.</p>
+
+<p>The typical output of installing a gem with no other dependencies (assuming it completes successfully) is minimal:</p>
+
+<figure class="code"><pre><code class="bash">$ gem install so_meta
+Successfully installed so_meta-0.1
+1 gem installed
+</code></pre></figure>
+
+
+<p>As you can see, we ran <code>gem install so_meta</code> and the output confirmed the install, with nothing more.</p>
+
+<p>If you&rsquo;ve used the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem, you&rsquo;ve probably seen the additional line of output it generates when you run <code>gem install httparty</code>:</p>
+
+<figure class="code"><pre><code class="bash">$ gem install httparty
+When you HTTParty, you must party hard!
+Successfully installed httparty-0.13.7
+1 gem installed
+</code></pre></figure>
+
+
+<p>Where did <code>When you HTTParty, you must party hard!</code> come from? It turns out the source of that text was a [post-install message defined in the <a href="https://github.com/jnunemaker/httparty/blob/v0.13.7/httparty.gemspec#L22"><code>gemspec</code></a>.</p>
+
+<p>Now, I know what you&rsquo;re probably thinking&hellip;what good is that message? That&rsquo;s up for debate. In fact, that specific message in <code>HTTParty</code> has been the source of much debate over the years.</p>
+
+<h2>How to configure a Post-Install Message</h2>
+
+<p>As we&rsquo;ve seen before, the <code>gemspec</code> file (located at the root of the gem) defines the specification of a Ruby gem. Using bundler to bootstrap a new gem will automatically create this file. Here&rsquo;s an example of a default <code>gemspec</code> file created by bundler using the command <code>bundle gem brandon</code> (<code>brandon</code> being the name of my fake gem):</p>
+
+<figure class="code"><pre><code class="ruby"># coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'brandon/version'
+
+Gem::Specification.new do |spec|
+  spec.name          = "brandon"
+  spec.version       = Brandon::VERSION
+  spec.authors       = ["Brandon Hilkert"]
+  spec.email         = ["brandonhilkert@gmail.com"]
+
+  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
+  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+
+  # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
+  # delete this section to allow pushing this gem to any host.
+  if spec.respond_to?(:metadata)
+    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
+  else
+    raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
+  end
+
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.bindir        = "exe"
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = ["lib"]
+
+  spec.add_development_dependency "bundler", "~> 1.11"
+  spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "minitest", "~> 5.0"
+end
+</code></pre></figure>
+
+
+<p>Aside from <code>summary</code>, <code>description</code>, and <code>homepage</code>, we can leave the rest of this file intact. These setter attributes on the <code>Gem::Specification.new</code> instance allow us to define the options and metadata necessary to properly configure and release a Ruby gem (see <a href="http://guides.rubygems.org/specification-reference/">the Rubygems specification reference</a> for an extensive list of options).</p>
+
+<p>As you might have guessed by now, a post-install message is an <a href="http://guides.rubygems.org/specification-reference/#post_install_message">option available in the gemspec</a>. The value can be a simple string or a more complex <a href="https://en.wikipedia.org/wiki/Here_document">heredoc</a>.</p>
+
+<p>The simplest example being:</p>
+
+<figure class="code"><pre><code class="ruby">spec.post_install_message = "My test post-install message."
+</code></pre></figure>
+
+
+<p>With that in our <code>gemspec</code>, now when we install our fake gem <code>brandon</code>, we&rsquo;ll see the following output:</p>
+
+<figure class="code"><pre><code class="bash">$ gem install brandon
+My test post-install message.
+Successfully installed brandon-0.1.0
+1 gem installed
+</code></pre></figure>
+
+
+<p>Easy, huh?</p>
+
+<p>If we wanted to include a more complex message with line breaks and other formatting, another option would be something like:</p>
+
+<figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+My test post-install message.
+
+Another post-install message a few lines down.
+}
+</code></pre></figure>
+
+
+<p>The formatting of these messages can get weird because whitespace is preserved in multiline strings. If you&rsquo;re looking to include anything more complex than a simple string literal, it&rsquo;s worth experimenting by installing locally and confirming it&rsquo;s what you want.</p>
+
+<p>The <a href="https://github.com/newrelic/rpm">NewRelic gem</a> is another example that comes to mind that commonly includes more than just a simple string. Looking back at an <a href="https://github.com/newrelic/rpm/blob/v2.12.0/newrelic_rpm.gemspec#L193">older version of the NewRelic gem</a> yields the following <code>post_install_message</code>:</p>
+
+<figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+Please see http://support.newrelic.com/faqs/docs/ruby-agent-release-notes
+for a complete description of the features and enhancements available
+in version 2.12 of the Ruby Agent.
+
+For details on this specific release, refer to the CHANGELOG file.
+
+}
+</code></pre></figure>
+
+
+<p>Notice the message includes a line break both before and after the message. This will help isolate from our post-install messages when included in the longer output of a command like <code>bundle install</code>. Again, if you&rsquo;re focused on formatting and getting it right, it&rsquo;s worth installing locally in to something like a Rails application which yields more output than using <code>gem install [gemname]</code>.</p>
+
+<h2>When to Use Post-Install Messages</h2>
+
+<p>The examples above use post-install messages for different reasons. <code>HTTParty</code>&rsquo;s message wasn&rsquo;t for a serious technical or information reason, just a light-hearted message that&rsquo;s garnered quite a bit of negative attention from users that don&rsquo;t appreciate it.</p>
+
+<p>My suggestion would be to avoid any non-sensical messages and only provide a post-install message for something like breaking changes or information you think is critical to the usage of your gem. In most cases, <strong>post-install messages are most useful when a user is upgrading from an older version of your gem and the new version includes backwards-incompatible changes</strong>. Whether is be syntactical changes or core functionality, post-install messages provide us as gem authors a means to keep our users updated.</p>
+
+<h2>What to Include in Post-Install Messages</h2>
+
+<p>If you&rsquo;re adhering to semantic versioning and introduce any breaking changes in a major release, a post-install message is a great way to warn users about the changes. However, one thing you want to avoid is enumerating your gem&rsquo;s full changelog in the message. In most cases, a short notice about the backwards incompatible changes and a URL for more information is enough.</p>
+
+<p>I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">introduced a new public API in Sucker Punch</a>, which warranted a major release. Because of these backwards-incompatible changes, I added a post-install message to the new version:</p>
+
+<figure class="code"><pre><code class="bash">$ gem install sucker_punch
+Fetching: sucker_punch-2.0.1.gem (100%)
+Sucker Punch v2.0 introduces backwards-incompatible changes.
+Please see https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20 for details.
+Successfully installed sucker_punch-2.0.1
+1 gem installed
+</code></pre></figure>
+
+
+<p>&ldquo;Sucker Punch v2.0 introduces backwards-incompatible changes&rdquo; provided the heads up that something was different. The URL in the following line allows the users to see a more extension list of the changes and to make adjustments in their application if necessary.</p>
+
+<h2>Summary</h2>
+
+<p>In addition to documentation through a <code>README</code> or wiki, post-install messages are a great way to keep users of our gems informed. Having access to the output of their console is a privilege, so use it sparingly. Like the boy who cried wolf, if we include a wall of text with each release of our gem, users will learn to ignore it and that would negatively affect its value for everyone.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
@@ -2899,50 +3052,6 @@ end</code></pre></figure>
 <p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
 
 <p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://www.sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Build a Ruby Gem - Ruby Heroes]]></title>
-    <link href="http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes/"/>
-    <updated>2014-07-09T06:03:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes</id>
-    <content type="html"><![CDATA[<p>It’s been 3 months since the release of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a> and I’ve gotten tremendous feedback since the launch.</p>
-
-<p>I’ve love to share some news and an opportunity to win a <strong>FREE</strong> copy of the book. If you’ve already purchased the book, don’t worry, we’ll find a way to make it worth it for you.</p>
-
-<!--more-->
-
-
-<h2>Feedback</h2>
-
-<p>The two questions I’ve heard the most since the release of the <a href="http://brandonhilkert.com/courses/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">email course</a> and <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">book</a> are:</p>
-
-<ol>
-<li><p>Why should I get involved with open source software?</p></li>
-<li><p>How do I get started contributing to an open source project?</p></li>
-</ol>
-
-
-<h2>Benefits of Getting Involved</h2>
-
-<p>Participating in open source projects is an enlightening experience. The benefits are widespread and different for each developer. Speaking personally, I’ve learned a ton from the codebases I’ve gotten involved with. Learning was the primary reason I got involved in the first place.</p>
-
-<p>Going beyond the learning aspect, my open source contributions have resulted in several <strong>jobs offers</strong>, among other things. It’s easy to think that getting involved is only just about doing good for the community — but it’s <strong>bigger than that</strong>.</p>
-
-<p>I could go on and on, but it’s likely you’ve already heard me talk about this through my post on <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">ways to get started contributing to open source</a> or the <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes">open source chapter in <em>Build a Ruby Gem</em></a>.</p>
-
-<h2>Hear It From Others in the Community</h2>
-
-<p>Hearing other people’s stories has always had a profound effect on my comfort-level when approaching things I’m unfamiliar with. So with that being said, I want you to hear the answers to the questions above from those YOU look up to in the Ruby community.</p>
-
-<p>This person could be the author of your favorite gem or Matz himself (disclaimer: I may or may not be able to make this one happen…). Either way, I’ll do my best to have live interview chats with your favorite Rubyists and dig through their experience and thoughts on the community and software in general.</p>
-
-<p><em>Entries have closed for the giveaway.</em></p>
-
-<p>Submissions will be open until <strong>5:00pm EDT on Friday, July 11</strong>. I’ll announcement the winner shortly thereafter.</p>
-
-<p>Even if you don’t win, I’ll send everyone that submits a response a <strong>20% discount code</strong> for any package of <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-newsletter&amp;utm_medium=email&amp;utm_campaign=rubyheroes"><em>Build a Ruby Gem</em></a>.</p>
 ]]></content>
   </entry>
   

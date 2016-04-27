@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-04-20T09:52:40-04:00</updated>
+  <updated>2016-04-27T06:42:47-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,157 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Message]]></title>
+    <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
+    <updated>2016-04-22T20:13:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
+    <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
+
+<!--more-->
+
+
+<h2>What are Post-Install Messages?</h2>
+
+<p>As Rubyists, we have plenty experiences installing gems. By running <code>gem install rails</code>, we&rsquo;re asking Rubygems to install the gem named <code>rails</code> on to our system.</p>
+
+<p>The typical output of installing a gem with no other dependencies (assuming it completes successfully) is minimal:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install so_meta
+Successfully installed so_meta-0.1
+1 gem installed
+</code></pre></figure></p>
+
+<p>As you can see, we ran <code>gem install so_meta</code> and the output confirmed the install, with nothing more.</p>
+
+<p>If you&rsquo;ve used the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem, you&rsquo;ve probably seen the additional line of output it generates when you run <code>gem install httparty</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install httparty
+When you HTTParty, you must party hard!
+Successfully installed httparty-0.13.7
+1 gem installed
+</code></pre></figure></p>
+
+<p>Where did <code>When you HTTParty, you must party hard!</code> come from? It turns out the source of that text was a [post-install message defined in the <a href="https://github.com/jnunemaker/httparty/blob/v0.13.7/httparty.gemspec#L22"><code>gemspec</code></a>.</p>
+
+<p>Now, I know what you&rsquo;re probably thinking&hellip;what good is that message? That&rsquo;s up for debate. In fact, that specific message in <code>HTTParty</code> has been the source of much debate over the years.</p>
+
+<h2>How to configure a Post-Install Message</h2>
+
+<p>As we&rsquo;ve seen before, the <code>gemspec</code> file (located at the root of the gem) defines the specification of a Ruby gem. Using bundler to bootstrap a new gem will automatically create this file. Here&rsquo;s an example of a default <code>gemspec</code> file created by bundler using the command <code>bundle gem brandon</code> (<code>brandon</code> being the name of my fake gem):</p>
+
+<p><figure class="code"><pre><code class="ruby"># coding: utf-8
+lib = File.expand_path(&lsquo;../lib&rsquo;, <strong>FILE</strong>)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require &lsquo;brandon/version&rsquo;</p>
+
+<p>Gem::Specification.new do |spec|
+  spec.name          = &ldquo;brandon&rdquo;
+  spec.version       = Brandon::VERSION
+  spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
+  spec.email         = [&ldquo;<a href="&#109;&#97;&#105;&#108;&#x74;&#111;&#58;&#x62;&#114;&#97;&#110;&#x64;&#x6f;&#110;&#104;&#x69;&#x6c;&#107;&#x65;&#x72;&#116;&#x40;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#x6f;&#109;">&#x62;&#114;&#97;&#x6e;&#x64;&#x6f;&#x6e;&#x68;&#x69;&#x6c;&#x6b;&#x65;&#x72;&#116;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;</a>&rdquo;]</p>
+
+<p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
+  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.homepage      = &ldquo;TODO: Put your gem&rsquo;s website or public repo URL here.&rdquo;</p>
+
+<p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
+  # delete this section to allow pushing this gem to any host.
+  if spec.respond_to?(:metadata)</p>
+
+<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
+</code></pre>
+
+<p>  end</p>
+
+<p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.bindir        = &ldquo;exe&rdquo;
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = [&ldquo;lib&rdquo;]</p>
+
+<p>  spec.add_development_dependency &ldquo;bundler&rdquo;, &ldquo;~> 1.11&rdquo;
+  spec.add_development_dependency &ldquo;rake&rdquo;, &ldquo;~> 10.0&rdquo;
+  spec.add_development_dependency &ldquo;minitest&rdquo;, &ldquo;~> 5.0&rdquo;
+end
+</code></pre></figure></p>
+
+<p>Aside from <code>summary</code>, <code>description</code>, and <code>homepage</code>, we can leave the rest of this file intact. These setter attributes on the <code>Gem::Specification.new</code> instance allow us to define the options and metadata necessary to properly configure and release a Ruby gem (see <a href="http://guides.rubygems.org/specification-reference/">the Rubygems specification reference</a> for an extensive list of options).</p>
+
+<p>As you might have guessed by now, a post-install message is an <a href="http://guides.rubygems.org/specification-reference/#post_install_message">option available in the gemspec</a>. The value can be a simple string or a more complex <a href="https://en.wikipedia.org/wiki/Here_document">heredoc</a>.</p>
+
+<p>The simplest example being:</p>
+
+<p><figure class="code"><pre><code class="ruby">spec.post_install_message = &ldquo;My test post-install message.&rdquo;
+</code></pre></figure></p>
+
+<p>With that in our <code>gemspec</code>, now when we install our fake gem <code>brandon</code>, we&rsquo;ll see the following output:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install brandon
+My test post-install message.
+Successfully installed brandon-0.1.0
+1 gem installed
+</code></pre></figure></p>
+
+<p>Easy, huh?</p>
+
+<p>If we wanted to include a more complex message with line breaks and other formatting, another option would be something like:</p>
+
+<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+My test post-install message.</p>
+
+<p>Another post-install message a few lines down.
+}
+</code></pre></figure></p>
+
+<p>The formatting of these messages can get weird because whitespace is preserved in multiline strings. If you&rsquo;re looking to include anything more complex than a simple string literal, it&rsquo;s worth experimenting by installing locally and confirming it&rsquo;s what you want.</p>
+
+<p>The <a href="https://github.com/newrelic/rpm">NewRelic gem</a> is another example that comes to mind that commonly includes more than just a simple string. Looking back at an <a href="https://github.com/newrelic/rpm/blob/v2.12.0/newrelic_rpm.gemspec#L193">older version of the NewRelic gem</a> yields the following <code>post_install_message</code>:</p>
+
+<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+Please see <a href="http://support.newrelic.com/faqs/docs/ruby-agent-release-notes">http://support.newrelic.com/faqs/docs/ruby-agent-release-notes</a>
+for a complete description of the features and enhancements available
+in version 2.12 of the Ruby Agent.</p>
+
+<p>For details on this specific release, refer to the CHANGELOG file.</p>
+
+<p>}
+</code></pre></figure></p>
+
+<p>Notice the message includes a line break both before and after the message. This will help isolate from our post-install messages when included in the longer output of a command like <code>bundle install</code>. Again, if you&rsquo;re focused on formatting and getting it right, it&rsquo;s worth installing locally in to something like a Rails application which yields more output than using <code>gem install [gemname]</code>.</p>
+
+<h2>When to Use Post-Install Messages</h2>
+
+<p>The examples above use post-install messages for different reasons. <code>HTTParty</code>&rsquo;s message wasn&rsquo;t for a serious technical or information reason, just a light-hearted message that&rsquo;s garnered quite a bit of negative attention from users that don&rsquo;t appreciate it.</p>
+
+<p>My suggestion would be to avoid any non-sensical messages and only provide a post-install message for something like breaking changes or information you think is critical to the usage of your gem. In most cases, <strong>post-install messages are most useful when a user is upgrading from an older version of your gem and the new version includes backwards-incompatible changes</strong>. Whether is be syntactical changes or core functionality, post-install messages provide us as gem authors a means to keep our users updated.</p>
+
+<h2>What to Include in Post-Install Messages</h2>
+
+<p>If you&rsquo;re adhering to semantic versioning and introduce any breaking changes in a major release, a post-install message is a great way to warn users about the changes. However, one thing you want to avoid is enumerating your gem&rsquo;s full changelog in the message. In most cases, a short notice about the backwards incompatible changes and a URL for more information is enough.</p>
+
+<p>I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">introduced a new public API in Sucker Punch</a>, which warranted a major release. Because of these backwards-incompatible changes, I added a post-install message to the new version:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install sucker_punch
+Fetching: sucker_punch-2.0.1.gem (100%)
+Sucker Punch v2.0 introduces backwards-incompatible changes.
+Please see <a href="https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20">https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20</a> for details.
+Successfully installed sucker_punch-2.0.1
+1 gem installed
+</code></pre></figure></p>
+
+<p>&ldquo;Sucker Punch v2.0 introduces backwards-incompatible changes&rdquo; provided the heads up that something was different. The URL in the following line allows the users to see a more extension list of the changes and to make adjustments in their application if necessary.</p>
+
+<h2>Summary</h2>
+
+<p>In addition to documentation through a <code>README</code> or wiki, post-install messages are a great way to keep users of our gems informed. Having access to the output of their console is a privilege, so use it sparingly. Like the boy who cried wolf, if we include a wall of text with each release of our gem, users will learn to ignore it and that would negatively affect its value for everyone.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
@@ -757,110 +908,6 @@ end
 <p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
 
 <p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
-    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
-    <updated>2015-08-14T10:32:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
-    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
-Blog</a></em></p>
-
-<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we moved the responsibility of emails to a separate Rails application. In order to leverage this new service, we created a PORO to encapsulate the specifics of communicating with our new service by taking advantage of Sidekiq&rsquo;s built-in retry mechanism to protect from intermittent network issues.</p>
-
-<p>Communication between microservices can be broken down in to 2 categories: <strong>synchronous</strong> and  <strong>asynchronous</strong>.
-Understanding when to use each is critical in maintaining a healthy infrastructure. This post will explore details about these two methods of communication and their associated use cases.</p>
-
-<!--more-->
-
-
-<h2>Background</h2>
-
-<p>Continuing the discussion of our architecture from last time, we have a primary
-Rails web application serving the majority of our business logic. We now have an additional application that&rsquo;s only responsibility is the formatting and sending of emails.</p>
-
-<p><img class="center" src="/images/services/app-email.png" title="&ldquo;Application service with email microservice&rdquo;" ></p>
-
-<p>In this article, we&rsquo;ll discuss the addition of our Billing service. The service&rsquo;s responsibility to is to process transactions related to money. This can come in the form of a trial conversion, adding a seat to an additional account, or deleting users from an existing account, among others.</p>
-
-<p>Like many SaaS applications, PipelineDeals has multiple tiers of service. The most expensive intended for customers needing advanced functionality. Part of the billing service&rsquo;s responsibility is to manage the knowledge of which features an account can access.</p>
-
-<p>So stepping back to the main PipelineDeals web application, the app has to decide which features to render at page load. Because the billing service is our source of truth for this information, a page load will now require a call to this service to understand which features to render.</p>
-
-<p>This new dependency looks a little different than the email dependency from the
-<a href="/blog/a-path-to-services-part-1-start-small/">previous article</a>. Email has the
-luxury of not being in the dependency path of a page load. Very few customers
-will complain if an email is 10 seconds late. On the other hand, they&rsquo;ll
-complain immediately if their account won&rsquo;t load, and rightfully so.</p>
-
-<p><img class="center" src="/images/services/app-email-billing.png" title="&ldquo;Application service include email and billing microservices&rdquo;" ></p>
-
-<p>An interesting benefit from having already extracted the email service is that the billing service sends email regarding financial transactions and account changes. Typically, we would have done the same thing for every other Rails app that needed to send email, which was integrate <code>ActionMailer</code> and setup the templates and mailers needed to do the work. In this case, we can add those emails to the email service and use the same communication patterns we do from the main web application to trigger the sending of an email from the billing service. This does require making changes to 2 different projects for a single feature (business logic in billing and mailer in email), but removes the necessity to configure another app to send email properly. We viewed this as a benefit.</p>
-
-<h2>Asynchronous Events</h2>
-
-<p>As the easier of the two, asynchronous would be any communication not necessary for the request/response cycle to complete. Email is the perfect example. Logging also falls in to this category.</p>
-
-<p>For the networks gurus out there, this would be similar to UDP communication. More of a fire-and-forget approach.</p>
-
-<p>An email, in this case, is triggered due to something like an account sign up.
-We send a welcome email thanking the customer for signing up and giving them
-some guidance on how to get the most benefit from the application. Somewhere in
-the process of signing up, the code triggers an email and passes along the data
-needed for email template.</p>
-
-<p>As shown in the previous article, the call to send the email looks something like this:</p>
-
-<p><code>ruby
-Email.to current_user, :user_welcome
-</code></p>
-
-<p>The value in this call is that under the covers, it&rsquo;s enqueuing a Sidekiq job:</p>
-
-<p><code>ruby
-EmailWorker.perform_async(opts)
-</code></p>
-
-<p>where <code>opts</code> is a hash of data related to the email and the variables needed for the template.</p>
-
-<p><em>Note: Because the options are serialized to JSON, values in hash must be simple structures. Objects won&rsquo;t work here.</em></p>
-
-<p>As you can see above, the code invoking the <code>Email.to</code> method doesn&rsquo;t care about what it returns. In fact, it doesn&rsquo;t return anything we care about at this point. So as long as the method is called, the code can move forward without waiting for the email to finish sending.</p>
-
-<p>Extracting asynchronous operations like this that exist in a code path is a
-great way to improve performance. There are times, though, where deferring an operation to background job might not make sense.</p>
-
-<p>For example, imagine a user changes the name of a person. They click one of their contact&rsquo;s names, enter a new name, and click &ldquo;Save&rdquo;. It doesn&rsquo;t make sense to send the task of updating the actual name in the database to a background job because depending on what else is in the queue at that time, the update might not complete until after the next refresh, which would make the user believe their update wasn&rsquo;t successful. This would be incredibly confusing.</p>
-
-<p>Logging is another perfect candidate for asynchronicity. In most cases, our users don&rsquo;t care if a log of their actions has been written to the database before their next refresh. It&rsquo;s information we may want to store, and as a result, can be a fire-and-forget operation. We can rest easy knowing we&rsquo;ll have that information, soon-ish, and it won&rsquo;t add any additional overhead to the end user&rsquo;s request cycle.</p>
-
-<p>The opposite of asynchronous events like this are <strong>synchronous</strong> events! (surprise right?). Let&rsquo;s explore how they&rsquo;re different.</p>
-
-<h2>Synchronous Events</h2>
-
-<p>We can look at synchronous events as dependencies of the request cycle. We use MySQL as a backend for the main PipelineDeals web application and queries to MySQL would be considered synchronous. In that, in order to successfully fulfill the current request, we require the information returned from MySQL before we can respond.</p>
-
-<p>In most cases, we don&rsquo;t think of our main datastore as a service. It doesn&rsquo;t necessarily have a separate application layer on top of it, but it&rsquo;s behavior and requirements are very much like a service.</p>
-
-<p>If we consider the addition of our billing service above, we require information about the features allowed for a particular account before we can render the page. This allows us to include/exclude modules they should or should not see. The flow goes something like this:</p>
-
-<p><code>Web request -&gt; lookup account in DB -&gt; Request features from Billing service -&gt; render page</code></p>
-
-<p>If the request to the billing service didn&rsquo;t require a response, we would consider this to be an <strong>asynchronous</strong> service, which might change how we invoke the request for data.</p>
-
-<p>Synchronous communication can happen over a variety of protocols. The most
-common is a JSON payload over HTTP. In general, it&rsquo;s not the most performant,
-but it&rsquo;s one of the easier to debug and is human-readable, so it tends to be pretty popular.</p>
-
-<p>The synchronous services we&rsquo;ve setup all communicate over HTTP. Rails APIs are a known thing. We&rsquo;re familiar with the stack and the dependencies required to set up a common JSON API, which is a large part of the reason it&rsquo;s our preferred communication protocol between services.</p>
-
-<h2>Summary</h2>
-
-<p>We&rsquo;ve simplified the communication between services into these two categories. Knowing this helps dictate the infrastructure and configuration of the applications.</p>
-
-<p>Next time, we&rsquo;ll take a closer look at the synchronous side and the specifics about the JSON payloads involved to send an email successfully.</p>
 ]]></content>
   </entry>
   

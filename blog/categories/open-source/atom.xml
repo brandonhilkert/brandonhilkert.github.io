@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-04-20T09:52:40-04:00</updated>
+  <updated>2016-04-27T06:42:47-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,157 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Message]]></title>
+    <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
+    <updated>2016-04-22T20:13:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
+    <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
+
+<!--more-->
+
+
+<h2>What are Post-Install Messages?</h2>
+
+<p>As Rubyists, we have plenty experiences installing gems. By running <code>gem install rails</code>, we&rsquo;re asking Rubygems to install the gem named <code>rails</code> on to our system.</p>
+
+<p>The typical output of installing a gem with no other dependencies (assuming it completes successfully) is minimal:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install so_meta
+Successfully installed so_meta-0.1
+1 gem installed
+</code></pre></figure></p>
+
+<p>As you can see, we ran <code>gem install so_meta</code> and the output confirmed the install, with nothing more.</p>
+
+<p>If you&rsquo;ve used the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem, you&rsquo;ve probably seen the additional line of output it generates when you run <code>gem install httparty</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install httparty
+When you HTTParty, you must party hard!
+Successfully installed httparty-0.13.7
+1 gem installed
+</code></pre></figure></p>
+
+<p>Where did <code>When you HTTParty, you must party hard!</code> come from? It turns out the source of that text was a [post-install message defined in the <a href="https://github.com/jnunemaker/httparty/blob/v0.13.7/httparty.gemspec#L22"><code>gemspec</code></a>.</p>
+
+<p>Now, I know what you&rsquo;re probably thinking&hellip;what good is that message? That&rsquo;s up for debate. In fact, that specific message in <code>HTTParty</code> has been the source of much debate over the years.</p>
+
+<h2>How to configure a Post-Install Message</h2>
+
+<p>As we&rsquo;ve seen before, the <code>gemspec</code> file (located at the root of the gem) defines the specification of a Ruby gem. Using bundler to bootstrap a new gem will automatically create this file. Here&rsquo;s an example of a default <code>gemspec</code> file created by bundler using the command <code>bundle gem brandon</code> (<code>brandon</code> being the name of my fake gem):</p>
+
+<p><figure class="code"><pre><code class="ruby"># coding: utf-8
+lib = File.expand_path(&lsquo;../lib&rsquo;, <strong>FILE</strong>)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require &lsquo;brandon/version&rsquo;</p>
+
+<p>Gem::Specification.new do |spec|
+  spec.name          = &ldquo;brandon&rdquo;
+  spec.version       = Brandon::VERSION
+  spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
+  spec.email         = [&ldquo;<a href="&#109;&#97;&#x69;&#108;&#x74;&#x6f;&#58;&#x62;&#x72;&#x61;&#110;&#100;&#111;&#110;&#x68;&#x69;&#x6c;&#x6b;&#101;&#114;&#x74;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#x63;&#x6f;&#x6d;">&#x62;&#x72;&#x61;&#110;&#x64;&#111;&#110;&#104;&#x69;&#x6c;&#107;&#x65;&#x72;&#116;&#x40;&#x67;&#109;&#97;&#x69;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a>&rdquo;]</p>
+
+<p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
+  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.homepage      = &ldquo;TODO: Put your gem&rsquo;s website or public repo URL here.&rdquo;</p>
+
+<p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
+  # delete this section to allow pushing this gem to any host.
+  if spec.respond_to?(:metadata)</p>
+
+<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
+</code></pre>
+
+<p>  end</p>
+
+<p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.bindir        = &ldquo;exe&rdquo;
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = [&ldquo;lib&rdquo;]</p>
+
+<p>  spec.add_development_dependency &ldquo;bundler&rdquo;, &ldquo;~> 1.11&rdquo;
+  spec.add_development_dependency &ldquo;rake&rdquo;, &ldquo;~> 10.0&rdquo;
+  spec.add_development_dependency &ldquo;minitest&rdquo;, &ldquo;~> 5.0&rdquo;
+end
+</code></pre></figure></p>
+
+<p>Aside from <code>summary</code>, <code>description</code>, and <code>homepage</code>, we can leave the rest of this file intact. These setter attributes on the <code>Gem::Specification.new</code> instance allow us to define the options and metadata necessary to properly configure and release a Ruby gem (see <a href="http://guides.rubygems.org/specification-reference/">the Rubygems specification reference</a> for an extensive list of options).</p>
+
+<p>As you might have guessed by now, a post-install message is an <a href="http://guides.rubygems.org/specification-reference/#post_install_message">option available in the gemspec</a>. The value can be a simple string or a more complex <a href="https://en.wikipedia.org/wiki/Here_document">heredoc</a>.</p>
+
+<p>The simplest example being:</p>
+
+<p><figure class="code"><pre><code class="ruby">spec.post_install_message = &ldquo;My test post-install message.&rdquo;
+</code></pre></figure></p>
+
+<p>With that in our <code>gemspec</code>, now when we install our fake gem <code>brandon</code>, we&rsquo;ll see the following output:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install brandon
+My test post-install message.
+Successfully installed brandon-0.1.0
+1 gem installed
+</code></pre></figure></p>
+
+<p>Easy, huh?</p>
+
+<p>If we wanted to include a more complex message with line breaks and other formatting, another option would be something like:</p>
+
+<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+My test post-install message.</p>
+
+<p>Another post-install message a few lines down.
+}
+</code></pre></figure></p>
+
+<p>The formatting of these messages can get weird because whitespace is preserved in multiline strings. If you&rsquo;re looking to include anything more complex than a simple string literal, it&rsquo;s worth experimenting by installing locally and confirming it&rsquo;s what you want.</p>
+
+<p>The <a href="https://github.com/newrelic/rpm">NewRelic gem</a> is another example that comes to mind that commonly includes more than just a simple string. Looking back at an <a href="https://github.com/newrelic/rpm/blob/v2.12.0/newrelic_rpm.gemspec#L193">older version of the NewRelic gem</a> yields the following <code>post_install_message</code>:</p>
+
+<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+Please see <a href="http://support.newrelic.com/faqs/docs/ruby-agent-release-notes">http://support.newrelic.com/faqs/docs/ruby-agent-release-notes</a>
+for a complete description of the features and enhancements available
+in version 2.12 of the Ruby Agent.</p>
+
+<p>For details on this specific release, refer to the CHANGELOG file.</p>
+
+<p>}
+</code></pre></figure></p>
+
+<p>Notice the message includes a line break both before and after the message. This will help isolate from our post-install messages when included in the longer output of a command like <code>bundle install</code>. Again, if you&rsquo;re focused on formatting and getting it right, it&rsquo;s worth installing locally in to something like a Rails application which yields more output than using <code>gem install [gemname]</code>.</p>
+
+<h2>When to Use Post-Install Messages</h2>
+
+<p>The examples above use post-install messages for different reasons. <code>HTTParty</code>&rsquo;s message wasn&rsquo;t for a serious technical or information reason, just a light-hearted message that&rsquo;s garnered quite a bit of negative attention from users that don&rsquo;t appreciate it.</p>
+
+<p>My suggestion would be to avoid any non-sensical messages and only provide a post-install message for something like breaking changes or information you think is critical to the usage of your gem. In most cases, <strong>post-install messages are most useful when a user is upgrading from an older version of your gem and the new version includes backwards-incompatible changes</strong>. Whether is be syntactical changes or core functionality, post-install messages provide us as gem authors a means to keep our users updated.</p>
+
+<h2>What to Include in Post-Install Messages</h2>
+
+<p>If you&rsquo;re adhering to semantic versioning and introduce any breaking changes in a major release, a post-install message is a great way to warn users about the changes. However, one thing you want to avoid is enumerating your gem&rsquo;s full changelog in the message. In most cases, a short notice about the backwards incompatible changes and a URL for more information is enough.</p>
+
+<p>I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">introduced a new public API in Sucker Punch</a>, which warranted a major release. Because of these backwards-incompatible changes, I added a post-install message to the new version:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install sucker_punch
+Fetching: sucker_punch-2.0.1.gem (100%)
+Sucker Punch v2.0 introduces backwards-incompatible changes.
+Please see <a href="https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20">https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20</a> for details.
+Successfully installed sucker_punch-2.0.1
+1 gem installed
+</code></pre></figure></p>
+
+<p>&ldquo;Sucker Punch v2.0 introduces backwards-incompatible changes&rdquo; provided the heads up that something was different. The URL in the following line allows the users to see a more extension list of the changes and to make adjustments in their application if necessary.</p>
+
+<h2>Summary</h2>
+
+<p>In addition to documentation through a <code>README</code> or wiki, post-install messages are a great way to keep users of our gems informed. Having access to the output of their console is a privilege, so use it sparingly. Like the boy who cried wolf, if we include a wall of text with each release of our gem, users will learn to ignore it and that would negatively affect its value for everyone.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
@@ -806,154 +957,6 @@ wouldn&rsquo;t be critical to the operation. In this case, if a cache job is los
 it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
 
 <p>What other jobs have you used Sucker Punch for?</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
-    <updated>2014-12-03T13:14:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
-    <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
-
-<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
-
-<!--more-->
-
-
-<p>A <code>Gemfile</code> also includes hints about preference and style. And style is something most Ruby developers are very passionate about. It doesn’t take long to find the story of a Rubyist describing their “love at first sight” experience with the language. It’s hard to find another file in a Rails project that’s so telling.</p>
-
-<p>A year ago, I wrote about the <a href="/blog/patterns-in-a-rails-gemfile/">Ruby gems I regularly use in my Rails applications</a>. Because technology and the tools we use change so fast, I thought it’d be interesting to take a look at one of my more recent Gemfiles to see what’s changed.</p>
-
-<h2>Rails Templates</h2>
-
-<p>As I mentioned in the last <a href="/blog/patterns-in-a-rails-gemfile/">Gemfile post</a>, I tend to write a bunch of small applications sprinkled around some larger ones. Despite the size of the project, I feel like I’ve honed in a set of Ruby gems that feel comfortable and productive for me and my workflow.</p>
-
-<p>Knowing the act of bootstrapping a Rails project is sometimes tedious, I took some time to build a <a href="https://github.com/brandonhilkert/rails_templates">Rails template</a> around the gems and patterns I commonly use. I’ll definitely be writing about this experience in the future since there seems to be very little discussion about it.</p>
-
-<p>In short, extracting my preferences to a template has been a HUGE time saver. It no longer feels like a burden to run <code>rails new</code>. I can jump right in and have a consistent set of tools that enable me to be productive within a few minutes.</p>
-
-<h2>My 2014 Gemfile</h2>
-
-<p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
-
-<p>```
-source &lsquo;<a href="https://rubygems.org">https://rubygems.org</a>&rsquo;</p>
-
-<p>ruby &lsquo;2.1.4&rsquo;</p>
-
-<p>gem &lsquo;rails&rsquo;, &lsquo;4.1.8&rsquo;
-gem &lsquo;pg&rsquo;
-gem &lsquo;sass-rails&rsquo;, &lsquo;~> 4.0.3&rsquo;
-gem &lsquo;uglifier&rsquo;, &lsquo;>= 1.3.0&rsquo;
-gem &lsquo;coffee-rails&rsquo;, &lsquo;~> 4.0.0&rsquo;
-gem &lsquo;jquery-rails&rsquo;
-gem &lsquo;turbolinks&rsquo;</p>
-
-<p>gem &lsquo;bcrypt-ruby&rsquo;, &lsquo;~> 3.1.2&rsquo;</p>
-
-<p>group :development, :test do
-  gem &lsquo;pry&rsquo;
-end</p>
-
-<p>group :test do
-  gem &lsquo;selenium-webdriver&rsquo;
-  gem &lsquo;capybara&rsquo;
-  gem &lsquo;timecop&rsquo;
-  gem &lsquo;mocha&rsquo;
-end</p>
-
-<p>group :development do
-  gem &lsquo;quiet_assets&rsquo;
-  gem &lsquo;spring&rsquo;
-  gem &lsquo;bullet&rsquo;
-  gem &lsquo;stripe_tester&rsquo;, &lsquo;~> 0.1.0&rsquo;
-end</p>
-
-<p>group :production, :demo do
-  gem &lsquo;rails_12factor&rsquo;
-  gem &lsquo;heroku-deflater&rsquo;
-end</p>
-
-<p>gem &lsquo;font-awesome-rails&rsquo;
-gem &lsquo;unicorn&rsquo;
-gem &lsquo;bootstrap-sass&rsquo;
-gem &lsquo;sidekiq&rsquo;, require: &lsquo;sidekiq/web&rsquo;
-gem &lsquo;sinatra&rsquo;
-gem &lsquo;local_time&rsquo;
-gem &lsquo;gravatar_image_tag&rsquo;
-gem &lsquo;so_meta&rsquo;
-gem &lsquo;chronic&rsquo;
-gem &lsquo;recurrence&rsquo;</p>
-
-<p>gem &lsquo;premailer-rails&rsquo;</p>
-
-<p>gem &lsquo;momentjs-rails&rsquo;
-gem &lsquo;bootstrap3-datetimepicker-rails&rsquo;
-gem &lsquo;bootstrap-switch-rails&rsquo;
-gem &lsquo;bootstrap-wysihtml5-rails&rsquo;
-gem &lsquo;bootstrap-select-rails&rsquo;
-gem &lsquo;autosize-rails&rsquo;</p>
-
-<p>gem &lsquo;aws-sdk&rsquo;</p>
-
-<p>gem &lsquo;html-pipeline&rsquo;
-gem &lsquo;rinku&rsquo;</p>
-
-<p>gem &lsquo;newrelic_rpm&rsquo;
-gem &lsquo;doc_raptor&rsquo;
-gem &lsquo;stripe&rsquo;
-gem &lsquo;jquery-ui-rails&rsquo;
-gem &lsquo;active_model_serializers&rsquo;
-gem &lsquo;rubyzip&rsquo;
-gem &lsquo;render_anywhere&rsquo;, require: false
-gem &lsquo;pusher&rsquo;
-gem &lsquo;filepicker-rails&rsquo;
-gem &lsquo;memcachier&rsquo;
-gem &lsquo;dalli&rsquo;
-gem &lsquo;intercom-rails&rsquo;
-```</p>
-
-<p>A few comments:</p>
-
-<ul>
-<li><p>I’ve standardized on <a href="http://www.postgresql.org/">Postgres</a> as the database for my apps, even in development. It’s reliable and allows me to be sure that the code I write will work the same way in production, since I tend to deploy most of my apps to <a href="https://www.heroku.com/">Heroku</a>.</p></li>
-<li><p>I leave <code>turbolinks</code> on. Judging from recent posts and comments within the community, this will probably one of the more controversial decisions.</p>
-
-<p>  If I’m being honest, my first experience with Turbolinks wasn’t great. And by “wasn’t great”, I mean — it broke <strong>EVERYTHING</strong>! But the good news was that it brought to light the fact that I sucked at javascript. At the time, I was capable of writing <em>just</em> enough to modify form behavior or fade in an DOM element.</p>
-
-<p>  The time had come to level up on my javascript skills. I was able to improve my javascript and also do it in a way that can took full advantage of the benefits that Turbolinks offers. Since that time, I’ve left Turbolinks on and no longer had to worry that my client-side code will stop working after clicking through a few application links.</p></li>
-<li><p>I’ve standardized on using <code>has_secure_password</code> for authentication. I previously used <a href="https://github.com/plataformatec/devise">devise</a>, but found the extra features are no longer worth the additional complexity. <code>has_secure_password</code> provides me reliable authentication patterns that are simple to understand and maintain. Hence the need for <code>bcrypt</code> in the <code>Gemfile</code> above.</p></li>
-<li><p>As for my test environment, I’ve written about <a href="/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">my switch to Minitest and fixtures</a>. I’m still just as happy with that decision as the time I wrote about it. I’ve seen Rspec go through a variety of API changes since then, and thankful I no longer have to worry about updating my test suite every couple months. I continue to find value in <code>capybara</code> and include <code>mocha</code> for the times <code>Minitest</code>’s stubbing and mocking isn’t enough (I’ve been meaning to dig in to the places I use <code>mocha</code>. I’m guessing if the code was better, I probably wouldn’t need it at all).</p></li>
-<li><p><code>bullet</code> is a killer gem for tracking down performances issues. It’s saved me countless hours of debugging.</p></li>
-<li><p>The inclusion of <code>spring</code> in Rails 4.1 is great. I realize it’s a bandaid in some respects, but waiting for the environment to load on every test run is a drag. I’ve found that because my tests are so responsive when <code>spring</code> is working properly, it encourages me to run my tests more often. Once setup, it works well and only in rare cases has not reloaded when it should have.</p></li>
-<li><p>I generally always include <code>bootstrap</code> and <code>font-awesome</code> in my projects. Being a non-designer, it helps me get something on the screen faster, even if it’s not the final design.</p></li>
-<li><p>I continue to use <code>unicorn</code>. It’s been around for so long and continues to be competitive in benchmarks against other Ruby web servers. I tested Passenger in a few applications, but got scared off when it printed the entire environment to the screen in production on Heroku on an exception. I’m told there are ways around this with some non-trivial configuration, but I think it’s a bizarre default and isn’t conducive to my workflow.</p></li>
-<li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
-<li><p>I’ve written about putting together <a href="/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
-<li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
-<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
-<li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
-<li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
-<li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
-</ul>
-
-
-<p>The rest are very use case-specific. And in general, the defacto solution for each (<code>pusher</code> for real-time features, <code>dalli</code> for memcached, etc.).</p>
-
-<h2>Summary</h2>
-
-<p>I’m happy with my current toolkit. This doesn’t mean I’m not on the lookout for shiny new things, but I’m generally a little more cautious about replacing something reliable, even if it doesn’t do everything under the sun.</p>
-
-<p>Even though Ruby makes it easy to include third party libraries, it doesn’t mean we always should. As developers, we inherit the stability of the dependencies we include. Even though a gem’s code might be locked away behind a separate git repository, it likely has the same holes and complexities that we’re worried about in our applications. And perhaps, even more…</p>
-
-<p><a href="https://www.ruby-toolbox.com/">Ruby toolbox</a> is a great resource when searching for a gem. I generally consider the number of downloads, age of the project and development activity when deciding which one to go with.</p>
-
-<p>What have your favorite gems been this year?</p>
-
-<h2>Build a Ruby Gem</h2>
-
-<p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
 ]]></content>
   </entry>
   

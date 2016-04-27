@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sucker punch | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/sucker-punch/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-04-20T09:52:40-04:00</updated>
+  <updated>2016-04-27T06:42:47-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,157 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Message]]></title>
+    <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
+    <updated>2016-04-22T20:13:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
+    <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
+
+<!--more-->
+
+
+<h2>What are Post-Install Messages?</h2>
+
+<p>As Rubyists, we have plenty experiences installing gems. By running <code>gem install rails</code>, we&rsquo;re asking Rubygems to install the gem named <code>rails</code> on to our system.</p>
+
+<p>The typical output of installing a gem with no other dependencies (assuming it completes successfully) is minimal:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install so_meta
+Successfully installed so_meta-0.1
+1 gem installed
+</code></pre></figure></p>
+
+<p>As you can see, we ran <code>gem install so_meta</code> and the output confirmed the install, with nothing more.</p>
+
+<p>If you&rsquo;ve used the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem, you&rsquo;ve probably seen the additional line of output it generates when you run <code>gem install httparty</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install httparty
+When you HTTParty, you must party hard!
+Successfully installed httparty-0.13.7
+1 gem installed
+</code></pre></figure></p>
+
+<p>Where did <code>When you HTTParty, you must party hard!</code> come from? It turns out the source of that text was a [post-install message defined in the <a href="https://github.com/jnunemaker/httparty/blob/v0.13.7/httparty.gemspec#L22"><code>gemspec</code></a>.</p>
+
+<p>Now, I know what you&rsquo;re probably thinking&hellip;what good is that message? That&rsquo;s up for debate. In fact, that specific message in <code>HTTParty</code> has been the source of much debate over the years.</p>
+
+<h2>How to configure a Post-Install Message</h2>
+
+<p>As we&rsquo;ve seen before, the <code>gemspec</code> file (located at the root of the gem) defines the specification of a Ruby gem. Using bundler to bootstrap a new gem will automatically create this file. Here&rsquo;s an example of a default <code>gemspec</code> file created by bundler using the command <code>bundle gem brandon</code> (<code>brandon</code> being the name of my fake gem):</p>
+
+<p><figure class="code"><pre><code class="ruby"># coding: utf-8
+lib = File.expand_path(&lsquo;../lib&rsquo;, <strong>FILE</strong>)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require &lsquo;brandon/version&rsquo;</p>
+
+<p>Gem::Specification.new do |spec|
+  spec.name          = &ldquo;brandon&rdquo;
+  spec.version       = Brandon::VERSION
+  spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
+  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#x6c;&#x74;&#x6f;&#58;&#98;&#114;&#x61;&#x6e;&#x64;&#111;&#x6e;&#x68;&#x69;&#108;&#107;&#x65;&#114;&#x74;&#64;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;">&#98;&#114;&#97;&#110;&#x64;&#111;&#110;&#x68;&#105;&#x6c;&#107;&#101;&#x72;&#x74;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;</a>&rdquo;]</p>
+
+<p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
+  spec.description   = %q{TODO: Write a longer description or delete this line.}
+  spec.homepage      = &ldquo;TODO: Put your gem&rsquo;s website or public repo URL here.&rdquo;</p>
+
+<p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
+  # delete this section to allow pushing this gem to any host.
+  if spec.respond_to?(:metadata)</p>
+
+<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
+</code></pre>
+
+<p>  else</p>
+
+<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
+</code></pre>
+
+<p>  end</p>
+
+<p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.bindir        = &ldquo;exe&rdquo;
+  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.require_paths = [&ldquo;lib&rdquo;]</p>
+
+<p>  spec.add_development_dependency &ldquo;bundler&rdquo;, &ldquo;~> 1.11&rdquo;
+  spec.add_development_dependency &ldquo;rake&rdquo;, &ldquo;~> 10.0&rdquo;
+  spec.add_development_dependency &ldquo;minitest&rdquo;, &ldquo;~> 5.0&rdquo;
+end
+</code></pre></figure></p>
+
+<p>Aside from <code>summary</code>, <code>description</code>, and <code>homepage</code>, we can leave the rest of this file intact. These setter attributes on the <code>Gem::Specification.new</code> instance allow us to define the options and metadata necessary to properly configure and release a Ruby gem (see <a href="http://guides.rubygems.org/specification-reference/">the Rubygems specification reference</a> for an extensive list of options).</p>
+
+<p>As you might have guessed by now, a post-install message is an <a href="http://guides.rubygems.org/specification-reference/#post_install_message">option available in the gemspec</a>. The value can be a simple string or a more complex <a href="https://en.wikipedia.org/wiki/Here_document">heredoc</a>.</p>
+
+<p>The simplest example being:</p>
+
+<p><figure class="code"><pre><code class="ruby">spec.post_install_message = &ldquo;My test post-install message.&rdquo;
+</code></pre></figure></p>
+
+<p>With that in our <code>gemspec</code>, now when we install our fake gem <code>brandon</code>, we&rsquo;ll see the following output:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install brandon
+My test post-install message.
+Successfully installed brandon-0.1.0
+1 gem installed
+</code></pre></figure></p>
+
+<p>Easy, huh?</p>
+
+<p>If we wanted to include a more complex message with line breaks and other formatting, another option would be something like:</p>
+
+<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+My test post-install message.</p>
+
+<p>Another post-install message a few lines down.
+}
+</code></pre></figure></p>
+
+<p>The formatting of these messages can get weird because whitespace is preserved in multiline strings. If you&rsquo;re looking to include anything more complex than a simple string literal, it&rsquo;s worth experimenting by installing locally and confirming it&rsquo;s what you want.</p>
+
+<p>The <a href="https://github.com/newrelic/rpm">NewRelic gem</a> is another example that comes to mind that commonly includes more than just a simple string. Looking back at an <a href="https://github.com/newrelic/rpm/blob/v2.12.0/newrelic_rpm.gemspec#L193">older version of the NewRelic gem</a> yields the following <code>post_install_message</code>:</p>
+
+<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
+Please see <a href="http://support.newrelic.com/faqs/docs/ruby-agent-release-notes">http://support.newrelic.com/faqs/docs/ruby-agent-release-notes</a>
+for a complete description of the features and enhancements available
+in version 2.12 of the Ruby Agent.</p>
+
+<p>For details on this specific release, refer to the CHANGELOG file.</p>
+
+<p>}
+</code></pre></figure></p>
+
+<p>Notice the message includes a line break both before and after the message. This will help isolate from our post-install messages when included in the longer output of a command like <code>bundle install</code>. Again, if you&rsquo;re focused on formatting and getting it right, it&rsquo;s worth installing locally in to something like a Rails application which yields more output than using <code>gem install [gemname]</code>.</p>
+
+<h2>When to Use Post-Install Messages</h2>
+
+<p>The examples above use post-install messages for different reasons. <code>HTTParty</code>&rsquo;s message wasn&rsquo;t for a serious technical or information reason, just a light-hearted message that&rsquo;s garnered quite a bit of negative attention from users that don&rsquo;t appreciate it.</p>
+
+<p>My suggestion would be to avoid any non-sensical messages and only provide a post-install message for something like breaking changes or information you think is critical to the usage of your gem. In most cases, <strong>post-install messages are most useful when a user is upgrading from an older version of your gem and the new version includes backwards-incompatible changes</strong>. Whether is be syntactical changes or core functionality, post-install messages provide us as gem authors a means to keep our users updated.</p>
+
+<h2>What to Include in Post-Install Messages</h2>
+
+<p>If you&rsquo;re adhering to semantic versioning and introduce any breaking changes in a major release, a post-install message is a great way to warn users about the changes. However, one thing you want to avoid is enumerating your gem&rsquo;s full changelog in the message. In most cases, a short notice about the backwards incompatible changes and a URL for more information is enough.</p>
+
+<p>I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">introduced a new public API in Sucker Punch</a>, which warranted a major release. Because of these backwards-incompatible changes, I added a post-install message to the new version:</p>
+
+<p><figure class="code"><pre><code class="bash">$ gem install sucker_punch
+Fetching: sucker_punch-2.0.1.gem (100%)
+Sucker Punch v2.0 introduces backwards-incompatible changes.
+Please see <a href="https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20">https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20</a> for details.
+Successfully installed sucker_punch-2.0.1
+1 gem installed
+</code></pre></figure></p>
+
+<p>&ldquo;Sucker Punch v2.0 introduces backwards-incompatible changes&rdquo; provided the heads up that something was different. The URL in the following line allows the users to see a more extension list of the changes and to make adjustments in their application if necessary.</p>
+
+<h2>Summary</h2>
+
+<p>In addition to documentation through a <code>README</code> or wiki, post-install messages are a great way to keep users of our gems informed. Having access to the output of their console is a privilege, so use it sparingly. Like the boy who cried wolf, if we include a wall of text with each release of our gem, users will learn to ignore it and that would negatively affect its value for everyone.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
@@ -724,136 +875,6 @@ it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data woul
 <p>Use cases are real. And the less we force our own biases on people, the faster they’ll realize experience is key and the random guy behind the cat avatar on Stack Overflow might actually be asking the right questions — even if they are convoluted.</p>
 
 <p>Next time you hear an absolute, ask <em>”Why?”</em>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/"/>
-    <updated>2014-04-21T19:48:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook</id>
-    <content type="html"><![CDATA[<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
-
-<p>A <a href="https://github.com/brandonhilkert/sucker_punch/issues/49">recent issue</a> in <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> caused me to go digging through the Rails source code. Ultimately, the <code>to_prepare</code> method on <code>ActionDispatch::Reloader</code> resolved the issue, but I surprised was to find very little documentation about it.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p><a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> lazily creates the <a href="https://celluloid.io/">Celluloid</a> pools used for background job queues. For the purpose of keeping track of the queues already initialized, Sucker Punch makes use of the <a href="https://github.com/celluloid/celluloid/wiki/Registry">Celluloid Registry</a>. Think of it as a class-level hash.</p>
-
-<p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
-
-<p><code>
-  config.cache_classes = false
-</code></p>
-
-<p>Without it, we’d be forced to restart the server after almost every request. If that sounds like a giant PITA to you, I whole heartedly agree!</p>
-
-<p>So now you make your awesome job class, do some background work (send an email for example) and reload the page and boom:</p>
-
-<p><code>``
-Celluloid::PoolManager: async call</code>perform` aborted!
-ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!</p>
-
-<pre><code>    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
-    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
-    my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'
-</code></pre>
-
-<p>```</p>
-
-<p>The Celluloid registry still has reference to a the original <code>SendInvitationJob</code> class when it was initialized, however, reloading the code has caused the original reference to disappear and all hell breaks loose when the queue key is fetched to send another job to the class.</p>
-
-<p>In my head, it made sense for the queues to be cleared out upon every request in development. In general, because Sucker Punch doesn’t have persistent queues, the best use case is for quick one-off jobs that aren’t extremely important — email and logging come to mind. Since both of these examples are typically pretty speedy, it’s unlikely there will be a huge job backup upon subsequent requests.</p>
-
-<p>I knew what I wanted, but didn’t know how to accomplish it.</p>
-
-<h2>The Solution</h2>
-
-<p>Knowing the issue was related to the setting <code>config.cache_classes = false</code> in the development environment, I broke open the Rails source code and searched for <code>cache_classes</code>. The first result was the <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/reloader.rb"><code>ActionDispatch</code> reloader middleware</a>. Fortunately, there’s a very descriptive comment at the top of the class:</p>
-
-<p><code>
-  # By default, ActionDispatch::Reloader is included in the middleware stack
-  # only in the development environment; specifically, when +config.cache_classes+
-  # is false. Callbacks may be registered even when it is not included in the
-  # middleware stack, but are executed only when &lt;tt&gt;ActionDispatch::Reloader.prepare!&lt;/tt&gt;
-  # or &lt;tt&gt;ActionDispatch::Reloader.cleanup!&lt;/tt&gt; are called manually.
-</code></p>
-
-<p>This functionality is exactly what I needed!. From here, I just needed to know what callbacks were valid. A few lines in to the class are the following methods:</p>
-
-<p>```</p>
-
-<pre><code># Add a prepare callback. Prepare callbacks are run before each request, prior
-# to ActionDispatch::Callback's before callbacks.
-def self.to_prepare(*args, &amp;block)
-  unless block_given?
-    warn "to_prepare without a block is deprecated. Please use a block"
-  end
-  set_callback(:prepare, *args, &amp;block)
-end
-
-# Add a cleanup callback. Cleanup callbacks are run after each request is
-# complete (after #close is called on the response body).
-def self.to_cleanup(*args, &amp;block)
-  unless block_given?
-    warn "to_cleanup without a block is deprecated. Please use a block"
-  end
-  set_callback(:cleanup, *args, &amp;block)
-end
-</code></pre>
-
-<p>```</p>
-
-<p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
-
-<p>A quick glade over the <a href="http://www.rubydoc.info/gems/celluloid/Celluloid/Registry"><code>Celluloid::Registry</code> class documentation</a> shows some methods that might be of value. It turns out that these are instance methods for an instance of the <code>Celluloid::Registry</code> class. Unfortunately, when Celluloid boots, it instantiates a registry to use internally, so we need a way to get at that particular instance and clear it out. Sure enough, <a href="http://rubydoc.info/gems/celluloid/Celluloid/Actor#clear_registry-class_method">a class method to do just that in <code>Celluloid::Actor</code></a> is available.</p>
-
-<p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
-
-<p>```
-module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie</p>
-
-<pre><code>initializer "sucker_punch.logger" do
-  SuckerPunch.logger = Rails.logger
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>All it did was connect the logger to the existing Rails logger. Adding the callback to <code>ActionDispatch</code> looks like:</p>
-
-<p>```
-module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie</p>
-
-<pre><code>initializer "sucker_punch.logger" do
-  SuckerPunch.logger = Rails.logger
-end
-
-config.to_prepare do
-  Celluloid::Actor.clear_registry
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Now when the Railtie is loaded, the <code>Celluloid::Actor.clear_registry</code> method is triggered before the reloading of code in the development environment, clearing out the Celluloid registry and allowing Sucker Punch to instantiate new job queues for each request.</p>
-
-<h2>Summary</h2>
-
-<p>I was unaware of any of these methods when the issue was submitted. Rather than throw my hands up and close the issue because it didn’t affect me, I thought through an approach that could work, and only then started to write code. And in fact, didn’t know what code to write!</p>
-
-<p>Comments and well written code serve as great documentation. I probably wouldn’t have stumbled on <code>ActionDispatch::Reloader</code> without the detailed comments at the top of the class. Sure, I would’ve found the <code>cache_classes</code> line, but might not have given it more thought.</p>
-
-<p>Next time you have a question about the syntax of a method or the order of its arguments, clone the repo (if it’s open source, of course) and do a search. I think you’ll be surprised at how quickly you can find what you’re looking for. My guess is you’ll also be pleasantly surprised at the other things you stumble upon in the process.</p>
 ]]></content>
   </entry>
   
