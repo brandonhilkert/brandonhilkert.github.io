@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-04-27T06:42:47-04:00</updated>
+  <updated>2016-04-27T06:44:29-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Message]]></title>
+    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
     <updated>2016-04-22T20:13:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
