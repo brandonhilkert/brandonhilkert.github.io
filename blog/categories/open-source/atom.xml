@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-05-22T09:02:11-04:00</updated>
+  <updated>2016-05-22T09:04:09-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,93 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Progress Indicator Using Nprogress]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-progress-indicator-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-progress-indicator-using-nprogress</id>
-    <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>. I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s <em>really</em> not changing the plugin&rsquo;s behavior, it just requires the plugin to be initialized differently. If you&rsquo;re upgrading to a newer version of Rails and have a bunch of legacy JavaScript code, I can imagine this being difficult. But if you&rsquo;re green-fielding a new application, there&rsquo;s no reason not to take advantage of it. I wrote extensively about <a href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/">how to organize JavaScript in a Rails application with Turbolinks enabled</a>. If you&rsquo;re struggling to get your JavaScript code to work as expected on clicks through the application, take a look at that post. I continue to use that organization pattern for all my applications and it never lets me down.</p>
-
-<p>With Turbolinks enabled, interacting with an application feels smooth and fast. No more full page refreshes.</p>
-
-<p>Every once in awhile we&rsquo;ll stumble on a page request takes longer than others. Rather than having the user sit there thinking nothing is happening, we can offer better feedback through a loading progress bar, specifically <a href="http://ricostacruz.com/nprogress/">nprogress</a>. I use <code>nprogress</code> in all my applications. I&rsquo;ve found it to be the perfect companion to Turbolinks to create a great user experience.</p>
-
-<h2>The Problem</h2>
-
-<p>In a traditional web application, when we click a link or submit a form, we get a loading spinner where the favicon typically appears. We might also see text in the status bar saying &ldquo;Connecting&hellip;&rdquo; or &ldquo;Loading&hellip;&rdquo;. These are the loading indications that internet users have become accustomed to.</p>
-
-<p>By adopting Turbolinks, we not longer get those loading feedback mechanisms because the request for the new page is asynchronous. Once the request is complete, the new content is rendered in place of the previous page&rsquo;s body element. For fast page loads, this isn&rsquo;t a problem. However, if you have applications like mine, every once in awhile, you might have a page request take a few seconds (reasons for this are beyond the scope of this article). In those cases, a user might click a link and sit there for 2-3 sec. without any indication the page is loading. While Turbolinks generally improves the user experience of our application, having no user feedback for several seconds is not ideal (ideally, you&rsquo;d want to address a page request that takes multiple seconds). This is where <code>nprogress</code> can help.</p>
-
-<h2>The Solution</h2>
-
-<p><a href="http://ricostacruz.com/nprogress/"><code>nprogress</code></a> is a progress loading indicator, like what you see on YouTube.</p>
-
-<p>Like other JavaScript libraries, there&rsquo;s <a href="https://github.com/caarlos0/nprogress-rails">a Ruby Gem that vendors the code and includes it in the Rails asset pipeline</a>.</p>
-
-<p>We&rsquo;ll first add <code>nprogress-rails</code> to our Gemfile:</p>
-
-<p><code>
-gem "nprogress-rails"
-</code></p>
-
-<p>Bundle to install the new gem:</p>
-
-<p><code>
-$ bundle install
-</code></p>
-
-<p>Now with <code>nprogress</code> installed, we need to include the JavaScript in our application. We&rsquo;ll do this by adding the following the <code>app/assets/javascripts/application.js</code> manifest:</p>
-
-<p><code>
-//= require nprogress
-//= require nprogress-turbolinks
-</code></p>
-
-<p>We first include the <code>nprogress</code> JavaScript source, and then an adapter that&rsquo;ll hook the Turbolinks request to the progress indicator.</p>
-
-<p><em>Note: If you&rsquo;re familiar with Turbolinks and its events, you&rsquo;ll recognize the <a href="https://github.com/caarlos0/nprogress-rails/blob/master/app/assets/javascripts/nprogress-turbolinks.js">events triggered</a>.</em></p>
-
-<p>By default, the <code>nprogress</code> loading bar is anchored to the top of the browser window, but we need to include some CSS to make this work. Let&rsquo;s open the <code>app/assets/stylesheets/application.scss</code> manifest file and add the following:</p>
-
-<p><code>
-*= require nprogress
-*= require nprogress-bootstrap
-</code></p>
-
-<p><em>Note: Including <code>nprogress-bootstrap</code> isn&rsquo;t necessary if you don&rsquo;t use <a href="http://getbootstrap.com/css/">Bootstrap</a> in your application. I typically do, so I&rsquo;m going to inclue it.</em></p>
-
-<p>At this point, we&rsquo;ll have a working loading indicator. But what if we want to tweak the styles to match your application&rsquo;s theme?</p>
-
-<h2>Customizing Nprogress Styles</h2>
-
-<p>Because the <a href="https://github.com/caarlos0/nprogress-rails/blob/master/app/assets/stylesheets/nprogress.scss#L1"><code>nprgress</code> styles are Sass</a>, we can overwrite the variables for customization.</p>
-
-<p>There are 3 variables available to overwite:</p>
-
-<ul>
-<li><code>$nprogress-color</code></li>
-<li><code>$nprogress-height</code></li>
-<li><code>$nprogress-zindex</code></li>
-</ul>
-
-
-<p>For <a href="https://www.bark.us/">Bark</a>, we have an aqua accent color with use throughout the site. It made sense for the <code>nprogress</code> loading indicator to be that same color.</p>
-
-<p>Back in our <code>app/assets/stylesheets/application.scss</code>, I overwrote the variable before including the <code>nprogress</code> source code:</p>
-
-<p>```
-$nprogress-color: #37c8c9;</p>
-
-<p>@import &ldquo;nprogress&rdquo;;
-@import &ldquo;nprogress-bootstrap&rdquo;;
-```</p>
-
-<h2>Summary</h2>
-
-<p>I&rsquo;ve found <code>nprogress</code> to be a great companion library to Turbolinks. The two libraries together provide a much better user experience over full page refreshes. Turbolinks helps asynchronously load the page content that&rsquo;s changing and <code>nprogress</code> gives the user feedback that their request is in progress. Now, even when a user has to suffer through multi-second page loads, at least they&rsquo;ll know it&rsquo;s not broken and don&rsquo;t have to click again.</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
@@ -148,7 +61,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#x62;&#114;&#x61;&#x6e;&#100;&#111;&#x6e;&#104;&#105;&#x6c;&#107;&#x65;&#114;&#116;&#x40;&#103;&#x6d;&#x61;&#105;&#108;&#x2e;&#x63;&#x6f;&#109;">&#x62;&#x72;&#x61;&#x6e;&#x64;&#x6f;&#110;&#104;&#x69;&#x6c;&#107;&#x65;&#x72;&#x74;&#x40;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#109;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#x69;&#108;&#116;&#111;&#x3a;&#x62;&#114;&#97;&#x6e;&#100;&#x6f;&#x6e;&#x68;&#105;&#x6c;&#107;&#x65;&#x72;&#116;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;">&#98;&#114;&#97;&#110;&#x64;&#x6f;&#x6e;&#104;&#x69;&#x6c;&#x6b;&#101;&#x72;&#116;&#x40;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -848,6 +761,202 @@ end
 <p>Any architectural decision has risks. Microservices are no exception. Microservices can be easier than an enterprise message broker, cluster of new servers and a handful of devops headaches.</p>
 
 <p>I originally dubbed this the &ldquo;poor man&rsquo;s message bus&rdquo;. With more thought, there&rsquo;s nothing &ldquo;poor&rdquo; about this. Sidekiq has a been a reliable piece of our infrastructure and I have no reason to believe that&rsquo;ll change, even if we are using it for more than just simple background processing from a single application.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
+    <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
+    <updated>2015-02-26T20:46:00-05:00</updated>
+    <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
+    <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
+
+<p>While Stripe does provide a number of features and plugins that make updating a credit card or signing up for a service simple, there are occasions when data needs to be fetched from Stripe in real-time. For these cases, it&rsquo;s great to be able to fetch and cache this data before-hand, and only expire if you know there&rsquo;s been a change.</p>
+
+<!--more-->
+
+
+<p>Combining <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> with Rails cache allows you to cache Stripe customer data so that billing pages are just as snappy as the rest of the application.</p>
+
+<h2>The Pain</h2>
+
+<p>Even though Stripe is generally pretty fast, retrieving customer data on the fly can be expensive. In order to optimize page load times, we can look to cache this data before it&rsquo;s actually used.</p>
+
+<p>If you&rsquo;re familiary with the Stripe gem, you&rsquo;ve probably seen something like this:</p>
+
+<p><code>
+customer = Stripe::Customer.retrieve(user.stripe_id)
+</code></p>
+
+<p>With the response of <code>customer</code>, we can further query customer data with the following methods:</p>
+
+<p><code>
+invoices = customer.invoices
+upcoming_invoices = customer.upcoming_invoices
+</code></p>
+
+<p>If we make all 3 of these method calls on page load, we&rsquo;d have 3 separate lookups from Stripe. This is pretty common for the typical billing page where you might want to show the customer&rsquo;s current credit card on file, their past invoices, and charges they can expect for the next invoice.</p>
+
+<p>Three lookups like this could potentially add another second or so to page load, which is not ideal.</p>
+
+<p>So how can we improve this?</p>
+
+<h2>The Solution</h2>
+
+<p>First, we can move the code to fetch the relevant stripe data in to a class of it&rsquo;s own, which wraps the notion of caching around the data retrieval.</p>
+
+<p>```
+class StripeCache
+  def initialize(user)</p>
+
+<pre><code>@user = user
+</code></pre>
+
+<p>  end</p>
+
+<p>  def refresh</p>
+
+<pre><code>purge_all
+cache_all
+self
+</code></pre>
+
+<p>  end</p>
+
+<p>  def customer</p>
+
+<pre><code>return @customer if @customer
+
+@customer = Rails.cache.fetch(cache_key("customer"), expires_in: 15.minutes) do
+  Stripe::Customer.retrieve(user.stripe_id)
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def invoices</p>
+
+<pre><code>Rails.cache.fetch(cache_key("invoices"), expires_in: 15.minutes) do
+  customer.invoices
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  def upcoming_invoice</p>
+
+<pre><code>Rails.cache.fetch(cache_key("upcoming_invoice"), expires_in: 15.minutes) do
+  customer.upcoming_invoice
+end
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :user</p>
+
+<p>  def cache_all</p>
+
+<pre><code>customer
+invoices
+upcoming_invoice
+</code></pre>
+
+<p>  end</p>
+
+<p>  def purge_all</p>
+
+<pre><code>Rails.cache.delete_matched("#{user.id}/stripe")
+</code></pre>
+
+<p>  end</p>
+
+<p>  def cache_key(item)</p>
+
+<pre><code>"user/#{user.id}/stripe/#{item}"
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>To use this on a billing page, we could do:</p>
+
+<p><code>
+stripe = StripeCache.new(current_user).refresh
+</code></p>
+
+<p>And from the response of that class, we could access the <code>customer</code>, <code>invoices</code>, and <code>upcoming_invoice</code> respectively:</p>
+
+<p><code>
+@customer = stripe.customer
+@invoices = stripe.invoices
+@upcoming_invoice = stripe.invoices
+</code></p>
+
+<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
+
+<p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
+
+<p>But let&rsquo;s be honest, what users are going to the billing page multiple times during a session? Probably not many. So we still need to fix the initial load somehow.</p>
+
+<p>This is where <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch</a> comes in. Like other Ruby background processing libraries, Sucker Punch allows you to move the processing of code to the background. However, unlike the others, Sucker Punch doesn&rsquo;t require additional infrastructure like Redis, and doesn&rsquo;t require a separate worker process to monitor and execute enqueued jobs. Because of this, the time it takes to extract code to a Sucker Punch job and have it incorporated with your application code is much lower.</p>
+
+<p>In this case, rather than send a transactional email or perform some database calculation, we can write a job thats only responsibility is to run the Stripe caching code.</p>
+
+<p>```
+class StripeCacheJob
+  include SuckerPunch::Job</p>
+
+<p>  def perform(user)</p>
+
+<pre><code>StripeCache.new(user).refresh
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>The next question is, when do you run this?</p>
+
+<p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
+
+<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
+
+<p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
+
+<p>```
+module Accounts
+  class CardsController &lt; ApplicationController</p>
+
+<pre><code>before_action :require_authentication
+
+def create
+  cust = StripeCache.new(current_user).customer
+  cust.save(card: params[:stripeToken])
+
+  StripeCacheJob.new.async.perform(current_user)
+
+  redirect_to account_path, notice: t("card.update.success")
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<h2>Summary</h2>
+
+<p>Using Sucker Punch in combination with Rails cache feels like a great way make optimizations to third-party data requests. This article focused on using it to fetch Stripe data, but it could be used with another service just as easily.</p>
+
+<p>The beauty of Sucker Punch is that it doesn&rsquo;t require a separate worker process to be running in the background. On a platform like Heroku, this saves the cost of an additional dyno.</p>
+
+<p>Sucker Punch excels at background jobs that are relatively fast and if missed,
+wouldn&rsquo;t be critical to the operation. In this case, if a cache job is lost,
+it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data would be requested on the fly and the page would be slower than usual. But the majority of the time, the request is fast because the data&rsquo;s been cached beforehand.</p>
+
+<p>What other jobs have you used Sucker Punch for?</p>
 ]]></content>
   </entry>
   

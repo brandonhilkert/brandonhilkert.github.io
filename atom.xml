@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-05-22T09:02:11-04:00</updated>
+  <updated>2016-05-22T09:04:09-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,88 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Progress Indicator Using Nprogress]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-progress-indicator-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-progress-indicator-using-nprogress</id>
-    <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>. I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s <em>really</em> not changing the plugin&rsquo;s behavior, it just requires the plugin to be initialized differently. If you&rsquo;re upgrading to a newer version of Rails and have a bunch of legacy JavaScript code, I can imagine this being difficult. But if you&rsquo;re green-fielding a new application, there&rsquo;s no reason not to take advantage of it. I wrote extensively about <a href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/">how to organize JavaScript in a Rails application with Turbolinks enabled</a>. If you&rsquo;re struggling to get your JavaScript code to work as expected on clicks through the application, take a look at that post. I continue to use that organization pattern for all my applications and it never lets me down.</p>
-
-<p>With Turbolinks enabled, interacting with an application feels smooth and fast. No more full page refreshes.</p>
-
-<p>Every once in awhile we&rsquo;ll stumble on a page request takes longer than others. Rather than having the user sit there thinking nothing is happening, we can offer better feedback through a loading progress bar, specifically <a href="http://ricostacruz.com/nprogress/">nprogress</a>. I use <code>nprogress</code> in all my applications. I&rsquo;ve found it to be the perfect companion to Turbolinks to create a great user experience.</p>
-
-<h2>The Problem</h2>
-
-<p>In a traditional web application, when we click a link or submit a form, we get a loading spinner where the favicon typically appears. We might also see text in the status bar saying &ldquo;Connecting&hellip;&rdquo; or &ldquo;Loading&hellip;&rdquo;. These are the loading indications that internet users have become accustomed to.</p>
-
-<p>By adopting Turbolinks, we not longer get those loading feedback mechanisms because the request for the new page is asynchronous. Once the request is complete, the new content is rendered in place of the previous page&rsquo;s body element. For fast page loads, this isn&rsquo;t a problem. However, if you have applications like mine, every once in awhile, you might have a page request take a few seconds (reasons for this are beyond the scope of this article). In those cases, a user might click a link and sit there for 2-3 sec. without any indication the page is loading. While Turbolinks generally improves the user experience of our application, having no user feedback for several seconds is not ideal (ideally, you&rsquo;d want to address a page request that takes multiple seconds). This is where <code>nprogress</code> can help.</p>
-
-<h2>The Solution</h2>
-
-<p><a href="http://ricostacruz.com/nprogress/"><code>nprogress</code></a> is a progress loading indicator, like what you see on YouTube.</p>
-
-<p>Like other JavaScript libraries, there&rsquo;s <a href="https://github.com/caarlos0/nprogress-rails">a Ruby Gem that vendors the code and includes it in the Rails asset pipeline</a>.</p>
-
-<p>We&rsquo;ll first add <code>nprogress-rails</code> to our Gemfile:</p>
-
-<figure class='code'><pre><code>gem "nprogress-rails"</code></pre></figure>
-
-
-<p>Bundle to install the new gem:</p>
-
-<figure class='code'><pre><code>$ bundle install</code></pre></figure>
-
-
-<p>Now with <code>nprogress</code> installed, we need to include the JavaScript in our application. We&rsquo;ll do this by adding the following the <code>app/assets/javascripts/application.js</code> manifest:</p>
-
-<figure class='code'><pre><code>//= require nprogress
-//= require nprogress-turbolinks</code></pre></figure>
-
-
-<p>We first include the <code>nprogress</code> JavaScript source, and then an adapter that&rsquo;ll hook the Turbolinks request to the progress indicator.</p>
-
-<p><em>Note: If you&rsquo;re familiar with Turbolinks and its events, you&rsquo;ll recognize the <a href="https://github.com/caarlos0/nprogress-rails/blob/master/app/assets/javascripts/nprogress-turbolinks.js">events triggered</a>.</em></p>
-
-<p>By default, the <code>nprogress</code> loading bar is anchored to the top of the browser window, but we need to include some CSS to make this work. Let&rsquo;s open the <code>app/assets/stylesheets/application.scss</code> manifest file and add the following:</p>
-
-<figure class='code'><pre><code>*= require nprogress
-*= require nprogress-bootstrap</code></pre></figure>
-
-
-<p><em>Note: Including <code>nprogress-bootstrap</code> isn&rsquo;t necessary if you don&rsquo;t use <a href="http://getbootstrap.com/css/">Bootstrap</a> in your application. I typically do, so I&rsquo;m going to inclue it.</em></p>
-
-<p>At this point, we&rsquo;ll have a working loading indicator. But what if we want to tweak the styles to match your application&rsquo;s theme?</p>
-
-<h2>Customizing Nprogress Styles</h2>
-
-<p>Because the <a href="https://github.com/caarlos0/nprogress-rails/blob/master/app/assets/stylesheets/nprogress.scss#L1"><code>nprgress</code> styles are Sass</a>, we can overwrite the variables for customization.</p>
-
-<p>There are 3 variables available to overwite:</p>
-
-<ul>
-<li><code>$nprogress-color</code></li>
-<li><code>$nprogress-height</code></li>
-<li><code>$nprogress-zindex</code></li>
-</ul>
-
-
-<p>For <a href="https://www.bark.us/">Bark</a>, we have an aqua accent color with use throughout the site. It made sense for the <code>nprogress</code> loading indicator to be that same color.</p>
-
-<p>Back in our <code>app/assets/stylesheets/application.scss</code>, I overwrote the variable before including the <code>nprogress</code> source code:</p>
-
-<figure class='code'><pre><code>$nprogress-color: #37c8c9;
-
-@import "nprogress";
-@import "nprogress-bootstrap";</code></pre></figure>
-
-
-<h2>Summary</h2>
-
-<p>I&rsquo;ve found <code>nprogress</code> to be a great companion library to Turbolinks. The two libraries together provide a much better user experience over full page refreshes. Turbolinks helps asynchronously load the page content that&rsquo;s changing and <code>nprogress</code> gives the user feedback that their request is in progress. Now, even when a user has to suffer through multi-second page loads, at least they&rsquo;ll know it&rsquo;s not broken and don&rsquo;t have to click again.</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
@@ -2962,6 +2880,178 @@ shot on another occasion for comparison.</p>
 <p>Use cases are real. And the less we force our own biases on people, the faster they’ll realize experience is key and the random guy behind the cat avatar on Stack Overflow might actually be asking the right questions — even if they are convoluted.</p>
 
 <p>Next time you hear an absolute, ask <em>”Why?”</em>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
+    <link href="http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/"/>
+    <updated>2014-07-30T06:03:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view</id>
+    <content type="html"><![CDATA[<p>It’s generally known that leaving any kind of logic in a Rails view is bad news, both for debugging and your own sanity. Rails views can be cumbersome to test and leave a lot to be desired when it comes to debugging.</p>
+
+<!--more-->
+
+
+<p>I recently went through the process of refactoring a Rails view that included logic. The end result was an isolated <a href="http://blog.jayfields.com/2007/10/ruby-poro.html">PORO</a> that was easily integrated with the controller/view.</p>
+
+<h2>Background</h2>
+
+<p>The app I’m currently working on is a greenfield app with vague specs, at best. I don’t mention this to fault anyone, but more to illustrate a point. Not all greenfield projects have well-defined specs.</p>
+
+<p>In this particular case, the stakeholders were somewhat unsure of what the interface should look like. Together, we tossed around a number of ideas, ultimately leading to a few options. Only once an iteration of the UI was available, would we have a clear picture of whether it <em>felt right</em>.</p>
+
+<h2>The Problem</h2>
+
+<p>I implemented the first option in the most crude way I could think of. Unfortunately, that way involved putting logic in the view. I know, I know — I can hear it now, <em>”C’mon Brandon, everyone knows you shouldn’t do this!”</em>. Here’s the thing — I knew it too.</p>
+
+<p>Here’s what I ended up with:</p>
+
+<figure class='code'><pre><code># controller
+
+def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @people = current_user.reports
+end
+
+# view
+
+&lt;% @people.each do |person| %&gt;
+  &lt;% checkin = person.checkin_for(@week_of) %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;%= profile_picture person %&gt;
+      &lt;%= person %&gt;
+    &lt;/td&gt;
+
+    &lt;td&gt;
+      &lt;%= checkin_status(checkin) %&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;</code></pre></figure>
+
+
+<p>For each iteration of <code>@people</code>, I looked up the check-in for that particular week from the model:</p>
+
+<figure class='code'><pre><code>def checkin_for(week_of)
+  Checkin.find_by(user_id: id, week_of: week_of)
+end</code></pre></figure>
+
+
+<p>This crosses concerns, blurs responsibility — all the things that bad Rails app are made of. But I was doing this knowing it would either be entirely ripped out (we’d change the UI altogether), or refactored to something better.</p>
+
+<p><em>Note: I could’ve just saved myself one step and never made the method in the model. For some reason, that made me feel better about it at the time. *shrugs*</em></p>
+
+<p>So I added a Github issue and went on my way…</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/view-refactor/gh-issue.png" title="&#34;Github issue to refactor Rails view&#34;" alt="&#34;Github issue to refactor Rails view&#34;"></p>
+
+<h2>The Solution</h2>
+
+<p>With a few minor tweaks, this implementation of the functionality and UI was adequate. So as time allowed, I jumped back in to untangling the mess I created.</p>
+
+<p>The biggest variable in the display of a <code>Checkin</code> was the week (a date field corresponding to the beginning of that particular week). Once the date was known, I could look for a <code>Checkin</code> for each user in my visibility, see if it existed, and if not, return a stand-in object to represent a non-completed check-in.</p>
+
+<p>I removed the model method:</p>
+
+<figure class='code'><pre><code>def checkin_for(week_of)
+  Checkin.find_by(user_id: id, week_of: week_of)
+end</code></pre></figure>
+
+
+<p>and the line in the view largely responsible for the mess:</p>
+
+<figure class='code'><pre><code>&lt;% checkin = person.checkin_for(@week_of) %&gt;</code></pre></figure>
+
+
+<p>I went back to the controller and initialized a new object that would allow me to iterate over a list of check-ins:</p>
+
+<figure class='code'><pre><code>def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @reports = Checkin::Reports.new(current_user, @week_of)
+end</code></pre></figure>
+
+
+<p>Let’s dig in to the new <code>Checkin::Reports</code> class…</p>
+
+<figure class='code'><pre><code>class Checkin
+  class Reports
+    def initialize(user, week_of)
+      @user, @week_of = user, week_of
+    end
+
+    def checkins
+      reports.map { |person|
+        Checkin.find_or_initialize_by(user_id: person.id, week_of: week_of)
+      }
+    end
+
+    private
+
+    attr_reader :user, :week_of
+
+    def reports
+      user.reports
+    end
+  end
+end</code></pre></figure>
+
+
+<p>I instantiate with the user and week, similar to what the <code>checkin_for</code> model method did above.</p>
+
+<p>The only relatively interesting part of this class is that it’s using <code>find_or_intialize_by</code>. It turns out that the view didn’t care if the object was <code>nil</code>, or just a non-persisted <code>Checkin</code> object. All it did was interrogate certain attributes of the object, and guard against the argument being <code>nil</code>. From that perspective, we’ve improved our code even more because now instead of supplying nil to the helper, we are actually supplying it with a newly instantiated <code>Checkin</code> with some default attributes.</p>
+
+<p>This means that our <code>checkin_status</code> helper, went from:</p>
+
+<figure class='code'><pre><code>def checkin_status(checkin)
+  if checkin && checkin.completed_at?
+    fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+  else
+    fa_icon("warning", class: "yellow") + " Not completed"
+  end
+end</code></pre></figure>
+
+
+<p>to:</p>
+
+<figure class='code'><pre><code>def checkin_status(checkin)
+  if checkin.completed_at?
+    fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+  else
+    fa_icon("warning", class: "yellow") + " Not completed"
+  end
+end</code></pre></figure>
+
+
+<p>It’s a subtle change (removing the check <code>if checkin</code> from the first conditional), but one that’s less susceptible to bizarre edge cases. And clearer — It’s reasonable to expect that by calling the first argument <code>checkin</code>, <strong>the variable should be a <code>Checkin</code></strong>, and not sometimes <code>nil</code>.</p>
+
+<p>Returning back to the view…using the new <code>@reports</code> variable, we no longer have to query during each iteration:</p>
+
+<figure class='code'><pre><code>&lt;% @reports.checkins.each do |checkin| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;%= profile_picture checkin.user %&gt;
+      &lt;%= checkin.user %&gt;
+    &lt;/td&gt;
+
+    &lt;td&gt;
+      &lt;%= checkin_status(checkin) %&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;</code></pre></figure>
+
+
+<p>Tests pass, and we’re in a much better place than we were before.</p>
+
+<h2>Summary</h2>
+
+<p>I’ve seen a lot of people make notes for themselves to improve areas of their application and either never get the opportunity to go back and do so, or get so far removed from the mess, they forget about how bad it was in the first place. The approach I took above by making a note for myself worked because <strong>I knew</strong> I would go back to it. It’s possible this may not work for everyone.</p>
+
+<p>If it takes more than just making a Github issue for your and your team, find what works. The important part is that the refactor takes place, in whatever way convenient for you.</p>
+
+<p>The idea of not putting logic in a Rails view is well regarded as a best practice. Don’t think that just because I did it above, I’m advocating that it’s ok. To me, it’s only acceptable if you go back at a later time (soonish…) and clean it up.</p>
+
+<p>Leaving little bits of bad practice sprinkled all of your app is heading of for a bad time. As <a href="http://www.sandimetz.com/">Sandi Metz</a> says, <a href="http://www.confreaks.com/presenters/211-sandi-metz">“go ahead, make a mess”</a>. Just be sure to come back and clean it up.</p>
 ]]></content>
   </entry>
   
