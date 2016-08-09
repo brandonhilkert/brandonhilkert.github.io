@@ -4,7 +4,7 @@
   <title><![CDATA[Category: turbolinks | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/turbolinks/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-06-15T08:37:40-04:00</updated>
+  <updated>2016-08-09T14:39:06-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -207,7 +207,7 @@ window.App ||= {}</p>
 <p>App.init = &ndash;>
   $(&ldquo;a, span, i, div&rdquo;).tooltip()</p>
 
-<p>$(document).on &ldquo;page:change&rdquo;, &ndash;>
+<p>$(document).on &ldquo;turbolinks:load&rdquo;, &ndash;>
   App.init()
 ```</p>
 
@@ -228,13 +228,13 @@ App.init = -&gt;
 
 <p>The call to <code>$("a, span, i, div").tooltip()</code> initializes Bootstrap Tooltips. This is an example of the type of libraries that can/should be setup here. Obviously, if you&rsquo;re not using Bootstrap tooltips, you would haven&rsquo;t this here, but coupled with the next line, we&rsquo;ll see why this works.</p>
 
-<p>As many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>page:change</code> event:</p>
+<p>As many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>turbolinks:load</code> event:</p>
 
 <p><code>
-$(document).on "page:change", -&gt;
+$(document).on "turbolinks:load", -&gt;
   App.init()
 </code>
-<em>Note: the <code>page:change</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
+<em>Note: the <code>turbolinks:load</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
 
 <p>Lastly, we need to add <code>init.coffee</code> to the asset pipeline:</p>
 
@@ -266,7 +266,7 @@ $(document).on "page:change", -&gt;
 <pre><code># do some stuff
 </code></pre>
 
-<p>$(document).on &ldquo;page:change&rdquo;, &ndash;>
+<p>$(document).on &ldquo;turbolinks:load&rdquo;, &ndash;>
   chart = new App.Chart $(&ldquo;#chart&rdquo;)
   chart.render()</p>
 
@@ -296,7 +296,7 @@ invocation
 
 <h3>Turbolinks-Proof</h3>
 
-<p>We called this &ldquo;Always On&rdquo; functionality because, as you probably noticed, using the following event listener <code>$(document).on "page:change", -&gt;</code>, we know with Turbolinks, this gets triggered on every page transition.</p>
+<p>We called this &ldquo;Always On&rdquo; functionality because, as you probably noticed, using the following event listener <code>$(document).on "turbolinks:load", -&gt;</code>, we know with Turbolinks, this gets triggered on every page transition.</p>
 
 <h3>Add to Manifest</h3>
 
@@ -317,7 +317,7 @@ invocation
 <p>We can limit the page pages certain functionality is loaded on by using the classes we added to the body of the layout. In this case, a small conditional to the invocation can prevent this being triggered on pages it shouldn&rsquo;t be.</p>
 
 <p><code>
-$(document).on "page:change", -&gt;
+$(document).on "turbolinks:load", -&gt;
   return unless $(".posts.index").length &gt; 0
   f = new App.Chart $("#chart")
   f.render()
