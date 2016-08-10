@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: craft | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/craft/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2016-08-10T08:11:38-04:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Care About What You Build]]></title>
+    <link href="http://brandonhilkert.com/blog/care-about-what-you-build/"/>
+    <updated>2016-07-10T12:08:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/care-about-what-you-build</id>
+    <content type="html"><![CDATA[<p>I&rsquo;ve spent the majority of my career working for companies building products I either wasn&rsquo;t interested in, or wasn&rsquo;t the target user. They were jobs. In exchange for my 40 hours, they supplied me a paycheck. As a result, I went home at the end of the day and was able to disconnect.</p>
+
+<p>Fast forward almost 15 years and I&rsquo;m on the opposite end of the spectrum &mdash; I build a product I want to exist, a parent like me is the target user and furthermore, I have equity in the company.</p>
+
+<!--more-->
+
+
+<p>This spectrum of motivation and responsibility encapsulates all different types of software development jobs. Personal preferences play as large part in defining motivation. This articles explores how caring about what I was building changed my perception of work and the questions I asked myself to get there.</p>
+
+<h2>A Unique Time in Technology</h2>
+
+<p> Knowledge workers..is that we’re called? As most job boards illustrate, I can’t recall another time in my career when there&rsquo;s been such demand for developers. Recognizing the talent pool is limited in most areas, companies are hiring remote workers to grow their engineering teams.</p>
+
+<p>If we, as developers, are in such high demand, <strong>why do we settle for anything short of our dream job?</strong> It&rsquo;s the perfect economic time to make a change if you don&rsquo;t feel fulfilled. Who knows if there&rsquo;ll be another time where we have so much leverage. You deserve a job you love, that also fits your professional ambitions.</p>
+
+<h2>The Soapbox Test</h2>
+
+<p>Most software developers I know are introverts. They generally like writing code, shipping new features, but avoid meetings at all costs. The rise of slack and other remote-focused tooling further increases the human contact void that most developers experience.</p>
+
+<p>My experience with sales people have been the polar opposite. They thrive on human interaction. Sales people, no matter the company, generally position their product/services as the perfect fit for you and your company. That’s ultimately their job &mdash; match the customers' need(s) with a solution they hopefully sell.</p>
+
+<p>It&rsquo;s not surprising that being in a sales role for a company/product that you love and genuinely want to see succeed is much easier than one you could care less about. This is where roles at a small company often cross-over.</p>
+
+<p>Not too long ago I took a break from writing code to <a href="http://brandonhilkert.com/talks/bark-techcrunch-disrupt.html">pitch Bark at TechCrunch Disrupt</a>. I’m not in sales person don&rsquo;t strive to be. But because I deeply care about Bark and the differences we hope to make, becoming an advocate for the company is easy. I have to find a way to articulate what we do, how we do it, and why we do it. And who better than me? I spend the majority of my days already thinking about it, which makes me more qualified than anyone else.</p>
+
+<p><strong>Imagine you have a microphone in your hand, a crowd of 2,000 people and 2 minutes to tell them what you’re building and why they should care. Does it feel weird or slimy?</strong></p>
+
+<p>If they answer is &ldquo;yes&rdquo;, you should find another job where you&rsquo;re a natural advocate. If your love for what you&rsquo;re building isn&rsquo;t genuine, you’re doing yourself a disservice. Passion and care have a way to turn even the most anti-sales people in to advocates.</p>
+
+<h2>The Deathbed Test</h2>
+
+<p>Doctors and nurses that <a href="http://fourhourworkweek.com/2016/04/14/bj-miller/">spend a lot of time around people in the latter stages of their life</a> get an unusual look at the regrets of those in care. They’re often able to apply the lessons to their own life.</p>
+
+<p>If you read about the most common regrets among the dying, it&rsquo;s something like “I wish I spent more time with my family” or “I wish I didn’t work as much”. Work occupies a large majority of our lives. Assuming we agree to work a somewhat standard career, the next question is “Are we happy with what we’re working on?"</p>
+
+<p>The deathbed question is a useful one beyond your career decisions.</p>
+
+<p><strong>Imagine you have 1 more day to live and you’re left thinking about all the choices you&rsquo;ve made over your lifetime. Would you be happy with the job you have today or the job you&rsquo;re thinking about taking tomorrow?</strong></p>
+
+<p>If the answer is &ldquo;No&rdquo;, it&rsquo;s time to find something better. Life can be short. Don&rsquo;t waste it on a job you&rsquo;re less than excited about.</p>
+
+<h2>The Lottery Test</h2>
+
+<p>The media constantly reminds us about successful entrepreneurs like Mark Zuckerberg, Bill Gates and Elon Musk who don’t <em>have</em> to work, but do. A common thread amongst those founders is their genuine belief in what they’re creating. Given their financial freedom, they <em>could</em> spend hours sun-bathing on private beaches around the world or traveling to the most remote places on the planet, but they choose to work. In fact, my guess is that none of them refer to what they do as “work”.</p>
+
+<p><strong>If you had unlimited financial freedom, like a sizable lottery, would you continue doing what you’re doing now?</strong></p>
+
+<p>Whether its the position, company, lack of control, or strict hour requirements, most of us would probably adjust our current position in at least a small way. If you’d continue doing <em>exactly</em> what you’re current doing after winning the lottery, you&rsquo;ve won. This, of all the questions, is the ultimate. If you can answer “Yes” to this one, kudos to you. You’re probably happier than 99.999% of  people in the world.</p>
+
+<h2>Ditch the Product, Love the Craft</h2>
+
+<p>I know what you’re thinking, you don&rsquo;t love what you’re building, so where do you go from here? Not everyone has the freedom and ability to choose a position where they’re 100% happy. There will always be personal trade-offs, some of which might leave you working for a company/product you don&rsquo;t care about and don&rsquo;t have the luxury to leave anytime soon. I&rsquo;ve been there before &mdash; ultimately leaving &mdash; but I made it work for a period of time.</p>
+
+<p>One of the ways I separated myself was to focus on the software development craft. If you’re like me, you care about designing things in a maintainable and reliable way. Whether it’s good design, well-written tests, or using the latest and greatest, shifting your focus away from a product you have no interest levels the playing field.</p>
+
+<p>Take processing incoming email for instance, whether you’re making an internal tool for an ISP or adding email features to your latest drip campaign software, the challenge is the same. Perhaps you work for the less interesting of the two (based on personal preference), removing yourself from the end product where the feature will be present allows you to invest yourself 100% in to making the best programming decisions possible. Being content with this approach requires you have a love for software and everything that comes with it. I’ve done this dozens of times and it’s generally gotten me out of a funk. Looking back, I’ve always been proud of what I’ve accomplished after investing myself 100% in the craft.</p>
+
+<h2>Career Kickstarter</h2>
+
+<p>Whether you’ve just graduated college or a relevant developer bootcamp, you don’t always have the luxury of being picky. You take the best job available at the time, no matter the product, and get some experience under your belt. This is reasonable and expected (I think there’s value in targeting the more interesting companies even if you’re just starting, but depending on your interests, a job with an interesting company may not always be possible). Within 2-3 years (or sooner!), you’ll have the experience needed to be a little more picky. It’s worth keeping an eye on the handful of companies that do interest you in case opportunities arise there in the future.</p>
+
+<h2>Niche Guru</h2>
+
+<p>The other way this comes up is because there&rsquo;s a team or specific developer you want to work with, no matter the company/product. If your interests lie within a specific niche, what better than to learn from the best. Find the most influential person in that niche and try to work with them, attempting to suck every ounce of know-how out of them. This requires putting your own ego and opinions to the side for a bit. The two times I’ve done this in my career, I came out on top.</p>
+
+<h2>Summary</h2>
+
+<p>Happiness is subjective. Every career decision is the result of personally quantifiable trade-offs. When I look back on my career thus far, the happiest I’ve been has coincided with how fulfilled I&rsquo;ve felt about my current position. I’ve recognized this and made changes when necessary. I envy those who can hate their job and block it out when they’re not at work. I can’t. Rather than deal with it, I&rsquo;ve tried to avoid hating my job. Each step I take gets me closer to what I imagine being the <em>perfect</em> job, if there is such a thing.</p>
+
+<p>Care about what you build. Your life will be better for it.</p>
+]]></content>
+  </entry>
+  
+</feed>

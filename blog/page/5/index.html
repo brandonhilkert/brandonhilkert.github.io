@@ -168,6 +168,52 @@
   
 
 
+<time datetime="2013-12-19T18:44:00-05:00" data-updated="true" itemprop="datePublished">December 19<span>th</span>, 2013</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/flexible-rails-environment-configuration/" itemprop="url">Flexible Rails Environment Configuration</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/configuration/'>configuration</a>, <a class='category' href='/blog/categories/env/'>env</a>, <a class='category' href='/blog/categories/heroku/'>heroku</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>It&rsquo;s hard to write a Rails app without interfacing with an external service or
+API. In most cases, these services require a secret token or password. Since
+checking passwords in to source control is generally a bad practice, we need a
+good way to safely and reliably access these values in code.</p>
+
+<p>I&rsquo;ve tried a few gems that attempt to make this process easier and ultimately
+settled on a simpler solution &ndash; the combination of a few lines of code and
+<a href="http://en.wikipedia.org/wiki/Environment_variable">ENV variables</a>, which are
+accessible whether you manage your own infrastructure or use a
+<a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> service like
+<a href="https://www.heroku.com">Heroku</a>.</p>
+
+
+		
+		<a href="/blog/flexible-rails-environment-configuration/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2013-12-09T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 9<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/" itemprop="url">Build a Ruby Gem Email Course - Weekend Update</a></h1>
   <div class="tags">
@@ -720,60 +766,6 @@ engage them.</p>
 
 		
 		<a href="/blog/setting-up-a-cloudfront-cdn-for-rails/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-11-06T21:04:00-05:00" data-updated="true" itemprop="datePublished">November 6<span>th</span>, 2013</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/patterns-in-a-rails-gemfile/" itemprop="url">Patterns in a Rails Gemfile</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/programming/'>programming</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<h2>Rails Rumble</h2>
-
-<p>The <a href="http://railsrumble.com/">2013 Rails Rumble</a> concluded last week and like
-in previous years, <a href="http://www.dwellable.com/">Dwellable</a> analyzed the <a href="http://www.dwellable.com/blog/Rails-Rumble-Gem-Teardown">Gemfiles of the submitted
-projects</a>.</p>
-
-<p>While it&rsquo;s not an indication of the only gems used in the Ruby community, it&rsquo;s
-a pretty good summary of the most common needs in a typical Rails app.</p>
-
-<ul>
-<li><p>The majority of the projects used Rails defaults of
-<a href="http://coffeescript.org/">Coffeescript</a>, <a href="http://sass-lang.com/">Sass</a>,
-<a href="http://jquery.com/">jQuery</a>, and
-<a href="http://ruby-doc.org/stdlib-2.0.0/libdoc/erb/rdoc/ERB.html">ERB</a></p></li>
-<li><p>Only 37% of the projects used <a href="http://getbootstrap.com/">Bootstrap</a>. I
-thought this number would be higher. It feels like every MVP out there starts
-with bootstrap.</p></li>
-</ul>
-
-
-
-		
-		<a href="/blog/patterns-in-a-rails-gemfile/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>
