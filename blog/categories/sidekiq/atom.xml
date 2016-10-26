@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sidekiq | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/sidekiq/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-08-10T08:11:38-04:00</updated>
+  <updated>2016-10-26T07:38:42-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,268 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
+    <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
+    <updated>2016-10-25T11:54:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
+
+<p>As a remote company, we use Slack to stay in touch with everyone AND to manage/monitor our infrastructure (hello #chatops). We can deploy from Slack (we don&rsquo;t generally, we have full CI) and be notified of infrastructure and application errors.</p>
+
+<!--more-->
+
+
+<p>When Sidekiq retries accumulate, it&rsquo;s a good indication that something more severe might be wrong. Rather than get an email we won&rsquo;t see for 30 minutes, we decided to integrate these notifications in to Slack. In doing so, we found <a href="https://aws.amazon.com/lambda/">AWS Lambda</a> to be a lightweight solution to tie the monitoring of Sidekiq and notifications in Slack together.</p>
+
+<h2>The Problem</h2>
+
+<p><a href="https://www.bark.us/">Bark</a> is background job-heavy. The web application is a glorified CRUD app that sets up the data needed to poll a child&rsquo;s social media feed and monitor for potential issues. The best-case scenario for a parent is that they will never hear from us.</p>
+
+<p>Because Bark&rsquo;s background jobs commonly interact with 3rd-party APIs, failures aren&rsquo;t a big surprise. APIs can be down, network connections can fail &mdash; Sidekiq&rsquo;s retry logic protects us from transient network errors. Under normal circumstances, jobs retry and ultimately run successfully after subsequent attempts. These are non-issues and something we don&rsquo;t need an engineer to investigate.</p>
+
+<p>There are times when retries accumulate, giving us a strong indication that something more severe may be wrong. Initially, we setup New Relic to notify us of an increased error rate. This worked for simple cases, but was sometimes a false positive. As a result, we started to ignore them, which potentially masked more important issues.</p>
+
+<p>We soon realized one of the gauges of application health was the number of retries in the Sidekiq queue. We have the Sidekiq Web UI mounted within our admin application, so we&rsquo;d browse there a few times a day to make sure the number of retries weren&rsquo;t outside our expectations (in this case &lt; 50 were acceptable).</p>
+
+<p>This wasn&rsquo;t a great use of our time. Ideally, we wanted a Slack notification when the number of Sidekiq retries was > 50.</p>
+
+<h2>The Solution</h2>
+
+<p>Because Bark is on AWS, we naturally looked to their tools for assistance. In this case, we needed something that would poll Sidekiq, check the number of retries, and <code>POST</code> to Slack if the number of retries was > 50.</p>
+
+<p>There were a few options:</p>
+
+<ol>
+<li>Add the Sidekiq polling and Slack notification logic to our main application and setup a Cron job</li>
+<li>Create a new satellite application that ONLY does the above (microservices???)</li>
+<li>Setup an AWS Lambda function to handle the above logic</li>
+</ol>
+
+
+<p>The first two options would&rsquo;ve worked, but I was hesistant to add complexity to our main application. I was also hesitant to have to manage another application (ie. updates, etc.) for something that seemed simple.</p>
+
+<p>Option &ldquo;AWS Lambda&rdquo; won! Let&rsquo;s take a look at the implementation.</p>
+
+<h3>Sidekiq Queue Data Endpoint</h3>
+
+<p>First, we need to expose the number of Sideki retries somehow. As I mentioned above, the Sidekiq web UI is mounted in our admin application, but behind an authentication layer that would&rsquo;ve been non-trivial to publicly expose.</p>
+
+<p>Instead, we created a new Rails route to respond with some basic details about the Sidekiq system.</p>
+
+<p>```
+require &lsquo;sidekiq/api&rsquo;</p>
+
+<p>class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication</p>
+
+<p>  def index</p>
+
+<pre><code>base_stats = Sidekiq::Stats.new
+stats = {
+   enqueued: base_stats.enqueued,
+   queues: base_stats.queues,
+   busy: Sidekiq::Workers.new.size,
+   retries: base_stats.retry_size
+}
+
+render json: stats
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>along with the route:</p>
+
+<p><code>
+resources :sidekiq_queues, only: [:index]
+</code></p>
+
+<p>As you can see, the endpoint is public (there&rsquo;s no job args or names exposed &mdash; just counts). The code digs in to the <a href="https://github.com/mperham/sidekiq/wiki/API">Sidekiq API</a> to interrogate the size of queues.</p>
+
+<h3>Slack Incoming WebHook</h3>
+
+<p>We want to be able to POST to Slack when the number of Sidekiq retries are > 50. To do this, we&rsquo;ll setup a custom incoming webhook integration in Slack.</p>
+
+<p>We&rsquo;ll start by choose <code>Apps &amp; integrations</code> from within the main Slack options. From here, choose <code>Manage</code> in the top right, and then <code>Custom Integrations</code> on the left. You&rsquo;ll have 2 options:</p>
+
+<ol>
+<li>Incoming WebHooks</li>
+<li>Slash Commands</li>
+</ol>
+
+
+<p>We&rsquo;ll choose <code>Incoming Webhooks</code> and choose <code>Add Configuration</code> to add a new one. From here, we&rsquo;ll supply the information needed to specify the channel where the notifications will appear and how they look.</p>
+
+<p>The most important of this step is to get the <code>Webhook URL</code>. This will be the URL we <code>POST</code> to from within our Lambda function when retries are above our acceptable threshold.</p>
+
+<h3>AWS Lambda Function</h3>
+
+<p>Now that we have our endpoint to expose the number of retries (among other things) and the Slack webhook URL to <code>POST</code> to, we need to setup the AWS Lambda function to tie to the two together. We&rsquo;ll start by creating a new Lambda function with the defaults &mdash; using the latest Node.</p>
+
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/lambda-trigger.png" title="&ldquo;AWS Lambda trigger&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
+
+<p>```
+var AWS = require(&lsquo;aws-sdk&rsquo;);
+var url = require(&lsquo;url&rsquo;);
+var https = require(&lsquo;https&rsquo;);
+var sidekiqURL, hookUrl, slackChannel, retryThreshold;</p>
+
+<p>sidekiqUrl = &lsquo;[Sidekiq queue JSON endpoint]&rsquo;
+hookUrl = &lsquo;[Slack Incoming WebHooks URL w/ token]&rsquo;;
+slackChannel = &lsquo;#operations&rsquo;;  // Enter the Slack channel to send a message to
+retryThreshold = 50;</p>
+
+<p>var postMessageToSlack = function(message, callback) {</p>
+
+<pre><code>var body = JSON.stringify(message);
+var options = url.parse(hookUrl);
+options.method = 'POST';
+options.headers = {
+    'Content-Type': 'application/json',
+    'Content-Length': Buffer.byteLength(body),
+};
+
+var postReq = https.request(options, function(res) {
+    var chunks = [];
+    res.setEncoding('utf8');
+    res.on('data', function(chunk) {
+        return chunks.push(chunk);
+    });
+    res.on('end', function() {
+        var body = chunks.join('');
+        if (callback) {
+            callback({
+                body: body,
+                statusCode: res.statusCode,
+                statusMessage: res.statusMessage
+            });
+        }
+    });
+    return res;
+});
+
+postReq.write(body);
+postReq.end();
+</code></pre>
+
+<p>};</p>
+
+<p>var getQueueStats = function(callback) {</p>
+
+<pre><code>var options = url.parse(sidekiqUrl);
+options.headers = {
+    'Accept': 'application/json',
+};
+
+var getReq = https.request(options, function(res){
+    var body = '';
+
+    res.setEncoding('utf8');
+
+    //another chunk of data has been recieved, so append it to `str`
+    res.on('data', function (chunk) {
+        body += chunk;
+    });
+
+    //the whole response has been recieved, so we just print it out here
+    res.on('end', function () {
+        if (callback) {
+            callback({
+                body: JSON.parse(body),
+                statusCode: res.statusCode,
+                statusMessage: res.statusMessage
+            });
+        }
+    });
+})
+
+getReq.end();
+</code></pre>
+
+<p>}</p>
+
+<p>var processEvent = function(event, context) {</p>
+
+<pre><code>getQueueStats(function(stats){
+    console.log('STATS: ', stats.body);
+
+    var retries = stats.body.retries;
+
+    if (retries &gt; retryThreshold) {
+        var slackMessage = {
+            channel: slackChannel,
+            text: "www Sidekiq retries - " + retries
+        };
+
+        postMessageToSlack(slackMessage, function(response) {
+            if (response.statusCode &lt; 400) {
+                console.info('Message posted successfully');
+                context.succeed();
+            } else if (response.statusCode &lt; 500) {
+                console.error("Error posting message to Slack API: " + response.statusCode + " - " + response.statusMessage);
+                context.succeed();  // Don't retry because the error is due to a problem with the request
+            } else {
+                // Let Lambda retry
+                context.fail("Server error when processing message: " + response.statusCode + " - " + response.statusMessage);
+            }
+        });
+    } else {
+        console.info('Sidekiq retries were ' + retries + ' . Below threshold.');
+        context.succeed();
+    }
+})
+</code></pre>
+
+<p>};</p>
+
+<p>exports.handler = function(event, context) {</p>
+
+<pre><code>processEvent(event, context);
+</code></pre>
+
+<p>};
+```</p>
+
+<p><em>Note: <code>sidekiqURL</code> and <code>hookURL</code> need to be defined with appropriate values for this to work.</em></p>
+
+<p>Review and save the Lambda function and we&rsquo;re all set!</p>
+
+<h3>Review</h3>
+
+<p>We can review the Lambda function logs on CloudWatch. Go to CloudWatch and choose &ldquo;Logs&rdquo; from the left menu. From here, we&rsquo;ll click the link to the name of our Lambda function:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/sidekiq-logs.png" title="&ldquo;AWS Cloudwatch logs&rdquo;" ></p>
+
+<p>From here, logs for each invocation of the Lambda function will be grouped in to a log stream:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/log-streams.png" title="&ldquo;AWS Cloudwatch log streams&rdquo;" ></p>
+
+<p>Grouped by time, each link will contain multiple invocations. A single execution is wrapped with a <code>START</code> and <code>END</code>, as shown in the logs. Messages in between will be calls to <code>console.log</code> from within our function. We logged the results of the Sidekiq queue poll for debugging purposes, so you can see that below:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/log.png" title="&ldquo;AWS Cloudwatch log&rdquo;" ></p>
+
+<p>This was invocation where the number of retries were &lt; 50, and a result, didn&rsquo;t need to <code>POST</code> to Slack. Let&rsquo;s take a look at the opposite:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/log-post.png" title="&ldquo;AWS Cloudwatch log posting to Slack&rdquo;" ></p>
+
+<p>We can see the <code>Message posted successfully</code> log indicating our message was successfully sent to Slack&rsquo;s incoming webhook.</p>
+
+<p>Finally, here&rsquo;s what the resulting message looks like in Slack when the number of Sidekiq retries are above our threshold:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/slack.png" title="&ldquo;Slack notifications for Sidekiq retries&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>Using new tools is fun, but not when it brings operational complexity. I&rsquo;ve personally found AWS lamba to be a great place for endpoints/functionality that feels cumbersome to include in my applications. Bringing these notifications in to Slack has been a big win for our team. We took a previously untrustworthy notification (NewRelic error rate) and brought some clarity to the state and health of our applications.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
