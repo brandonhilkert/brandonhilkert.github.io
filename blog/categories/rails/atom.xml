@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-12-29T15:40:02-05:00</updated>
+  <updated>2017-02-11T21:06:47-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-04:00</updated>
+    <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -278,7 +278,7 @@ getReq.end();
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-04:00</updated>
+    <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
@@ -375,7 +375,7 @@ I&rsquo;m looking forward to removing the dependency if it performs similarly.</
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-05:00</updated>
+    <updated>2015-11-30T12:06:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 
@@ -541,7 +541,7 @@ end
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
-    <updated>2015-10-15T09:07:00-04:00</updated>
+    <updated>2015-10-15T09:07:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -688,7 +688,7 @@ end
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
-    <updated>2015-08-14T10:32:00-04:00</updated>
+    <updated>2015-08-14T10:32:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>

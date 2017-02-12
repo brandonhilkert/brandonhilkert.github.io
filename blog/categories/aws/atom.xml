@@ -4,7 +4,7 @@
   <title><![CDATA[Category: aws | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/aws/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-12-29T15:40:02-05:00</updated>
+  <updated>2017-02-11T21:06:47-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-04:00</updated>
+    <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -278,7 +278,7 @@ getReq.end();
   <entry>
     <title type="html"><![CDATA[Setting up a Cloudfront CDN for Rails]]></title>
     <link href="http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails/"/>
-    <updated>2013-11-12T21:18:00-05:00</updated>
+    <updated>2013-11-12T21:18:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails</id>
     <content type="html"><![CDATA[<p><em>Update: I&rsquo;ve since added a post on <a href="/blog/serving-fonts-for-firefox-with-fastly/">serving fonts for Firefox with Fastly</a>.</em></p>
 

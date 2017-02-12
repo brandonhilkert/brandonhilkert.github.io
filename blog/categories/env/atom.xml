@@ -4,7 +4,7 @@
   <title><![CDATA[Category: env | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/env/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-12-29T15:40:02-05:00</updated>
+  <updated>2017-02-11T21:06:47-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Using Rails 4.1 Secrets for Configuration]]></title>
     <link href="http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration/"/>
-    <updated>2014-06-10T20:03:00-04:00</updated>
+    <updated>2014-06-10T20:03:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration</id>
     <content type="html"><![CDATA[<p>I previously wrote about how I handle <a href="/blog/flexible-rails-environment-configuration/">environment configuration in Rails</a>. Along with solutions like the <a href="https://github.com/bkeepers/dotenv">dotenv gem</a>, it relies on entirely on environment variables.</p>
 
@@ -162,7 +162,7 @@ development:
   <entry>
     <title type="html"><![CDATA[Flexible Rails Environment Configuration]]></title>
     <link href="http://brandonhilkert.com/blog/flexible-rails-environment-configuration/"/>
-    <updated>2013-12-19T18:44:00-05:00</updated>
+    <updated>2013-12-19T18:44:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/flexible-rails-environment-configuration</id>
     <content type="html"><![CDATA[<p>It&rsquo;s hard to write a Rails app without interfacing with an external service or
 API. In most cases, these services require a secret token or password. Since

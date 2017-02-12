@@ -4,7 +4,7 @@
   <title><![CDATA[Category: refactor | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/refactor/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-12-29T15:40:02-05:00</updated>
+  <updated>2017-02-11T21:06:47-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[A Ruby Refactor: Dependency Injection Options]]></title>
     <link href="http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/"/>
-    <updated>2014-12-17T07:07:00-05:00</updated>
+    <updated>2014-12-17T07:07:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options</id>
     <content type="html"><![CDATA[<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
 
@@ -523,7 +523,7 @@ Level1Usage = Class.new { def last_30_days; 1_900; end }
   <entry>
     <title type="html"><![CDATA[Refactoring Logic from a Rails View]]></title>
     <link href="http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/"/>
-    <updated>2014-07-30T06:03:00-04:00</updated>
+    <updated>2014-07-30T06:03:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view</id>
     <content type="html"><![CDATA[<p>It’s generally known that leaving any kind of logic in a Rails view is bad news, both for debugging and your own sanity. Rails views can be cumbersome to test and leave a lot to be desired when it comes to debugging.</p>
 

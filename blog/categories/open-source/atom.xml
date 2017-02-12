@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-12-29T15:40:02-05:00</updated>
+  <updated>2017-02-11T21:06:47-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-04:00</updated>
+    <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
@@ -113,7 +113,7 @@ I&rsquo;m looking forward to removing the dependency if it performs similarly.</
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-04:00</updated>
+    <updated>2016-04-22T20:13:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
     <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
 
@@ -158,7 +158,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#108;&#x74;&#111;&#x3a;&#98;&#114;&#97;&#x6e;&#x64;&#111;&#110;&#104;&#x69;&#108;&#x6b;&#101;&#x72;&#116;&#64;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#x6d;">&#x62;&#114;&#x61;&#x6e;&#x64;&#x6f;&#x6e;&#x68;&#105;&#x6c;&#107;&#x65;&#x72;&#x74;&#x40;&#103;&#x6d;&#97;&#105;&#108;&#x2e;&#99;&#111;&#x6d;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#111;&#58;&#98;&#x72;&#97;&#110;&#100;&#x6f;&#110;&#104;&#x69;&#108;&#107;&#x65;&#x72;&#116;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#98;&#x72;&#97;&#110;&#x64;&#111;&#110;&#104;&#105;&#108;&#107;&#101;&#x72;&#116;&#64;&#103;&#x6d;&#97;&#x69;&#108;&#46;&#x63;&#111;&#x6d;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -264,7 +264,7 @@ Successfully installed sucker_punch-2.0.1
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
     <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
-    <updated>2016-01-26T07:00:00-05:00</updated>
+    <updated>2016-01-26T07:00:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
     <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
 
@@ -575,7 +575,7 @@ released</a>!</p>
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
     <link href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
-    <updated>2016-01-04T13:12:00-05:00</updated>
+    <updated>2016-01-04T13:12:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api</id>
     <content type="html"><![CDATA[<p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
 
@@ -698,7 +698,7 @@ LogJob.perform_in(5.minutes, "new_user")
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-05:00</updated>
+    <updated>2015-11-30T12:06:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 

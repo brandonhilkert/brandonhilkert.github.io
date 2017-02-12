@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2016-12-29T15:40:02-05:00</updated>
+  <updated>2017-02-11T21:06:47-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-04:00</updated>
+    <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -260,7 +260,7 @@ exports.handler = function(event, context) {
   <entry>
     <title type="html"><![CDATA[Care About What You Build]]></title>
     <link href="http://brandonhilkert.com/blog/care-about-what-you-build/"/>
-    <updated>2016-07-10T12:08:00-04:00</updated>
+    <updated>2016-07-10T12:08:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/care-about-what-you-build</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve spent the majority of my career working for companies building products I either wasn&rsquo;t interested in, or wasn&rsquo;t the target user. They were jobs. In exchange for my 40 hours, they supplied me a paycheck. As a result, I went home at the end of the day and was able to disconnect.</p>
 
@@ -338,7 +338,7 @@ exports.handler = function(event, context) {
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-04:00</updated>
+    <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
@@ -430,7 +430,7 @@ I&rsquo;m looking forward to removing the dependency if it performs similarly.</
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-04:00</updated>
+    <updated>2016-04-22T20:13:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
     <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
 
@@ -583,7 +583,7 @@ Successfully installed sucker_punch-2.0.1
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
     <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
-    <updated>2016-01-26T07:00:00-05:00</updated>
+    <updated>2016-01-26T07:00:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
     <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
 
@@ -844,7 +844,7 @@ released</a>!</p>
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
     <link href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
-    <updated>2016-01-04T13:12:00-05:00</updated>
+    <updated>2016-01-04T13:12:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api</id>
     <content type="html"><![CDATA[<p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
 
@@ -959,7 +959,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-05:00</updated>
+    <updated>2015-11-30T12:06:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 
@@ -1106,7 +1106,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
-    <updated>2015-10-15T09:07:00-04:00</updated>
+    <updated>2015-10-15T09:07:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -1233,7 +1233,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
-    <updated>2015-08-14T10:32:00-04:00</updated>
+    <updated>2015-08-14T10:32:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -1335,7 +1335,7 @@ but it&rsquo;s one of the easier to debug and is human-readable, so it tends to 
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/"/>
-    <updated>2015-07-27T11:18:00-04:00</updated>
+    <updated>2015-07-27T11:18:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -1489,7 +1489,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[The Ruby Book Bundle Is Live]]></title>
     <link href="http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live/"/>
-    <updated>2015-07-06T07:01:00-04:00</updated>
+    <updated>2015-07-06T07:01:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live</id>
     <content type="html"><![CDATA[<p>A few fellow authors and friends of mine have put together the <a href="http://rubybookbundle.com/?c=bh">Ruby Book Bundle</a> including some of the best Ruby/Rails books out there. The <a href="http://rubybookbundle.com/?c=bh">bundle went on sale this morning</a>! It&#8217;ll <strong>only be available for a week</strong>, so be sure to pick it up soon if you&rsquo;re interested.</p>
 
@@ -1537,7 +1537,7 @@ me.</p>
   <entry>
     <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
     <link href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/"/>
-    <updated>2015-06-30T16:10:00-04:00</updated>
+    <updated>2015-06-30T16:10:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks</id>
     <content type="html"><![CDATA[<p>It&rsquo;s impossible to escape Javascript in a Rails application. From a tiny script to a full-on Javascript framework, websites are becoming more and more reliant on Javascript, whether we like it or not.</p>
 
@@ -1795,7 +1795,7 @@ $(document).on "click", "[data-behavior~=update-credit-card]", =&gt;
   <entry>
     <title type="html"><![CDATA[How to Start with Ruby?]]></title>
     <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
-    <updated>2015-05-06T06:03:00-04:00</updated>
+    <updated>2015-05-06T06:03:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
     <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterans, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
 
@@ -1871,7 +1871,7 @@ $(document).on "click", "[data-behavior~=update-credit-card]", =&gt;
   <entry>
     <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
     <link href="http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators/"/>
-    <updated>2015-03-09T15:37:00-04:00</updated>
+    <updated>2015-03-09T15:37:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators</id>
     <content type="html"><![CDATA[<p>In my <a href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/">last article</a>, I presented some code that wrapped up accessing a customer&rsquo;s Stripe data and added a caching layer on top. I wanted to take some time to dig in to that code and see how we can make it better.</p>
 
@@ -2073,7 +2073,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
-    <updated>2015-02-26T20:46:00-05:00</updated>
+    <updated>2015-02-26T20:46:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
     <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
 
@@ -2233,7 +2233,7 @@ it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data woul
   <entry>
     <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
     <link href="http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database/"/>
-    <updated>2015-02-04T06:13:00-05:00</updated>
+    <updated>2015-02-04T06:13:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database</id>
     <content type="html"><![CDATA[<p>It’s no mystery that <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
 
@@ -2330,7 +2330,7 @@ ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)</code></pr
   <entry>
     <title type="html"><![CDATA[2014 In Review]]></title>
     <link href="http://brandonhilkert.com/blog/2014-in-review/"/>
-    <updated>2014-12-29T14:57:00-05:00</updated>
+    <updated>2014-12-29T14:57:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/2014-in-review</id>
     <content type="html"><![CDATA[<p>For the past 2 years, I’ve committed myself to <a href="http://brandonhilkert.com/blog/be-ambitious/">specific
 goals</a> for the year to come. Most
@@ -2397,7 +2397,7 @@ halfway through something, I want to stop and do something else, so be it.</p>
   <entry>
     <title type="html"><![CDATA[A Ruby Refactor: Dependency Injection Options]]></title>
     <link href="http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/"/>
-    <updated>2014-12-17T07:07:00-05:00</updated>
+    <updated>2014-12-17T07:07:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options</id>
     <content type="html"><![CDATA[<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
 
@@ -2830,7 +2830,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
     <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
-    <updated>2014-12-03T13:14:00-05:00</updated>
+    <updated>2014-12-03T13:14:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
     <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
 
@@ -2977,7 +2977,7 @@ gem 'intercom-rails'</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[Rails Active Record Validation Contexts with Inheritance]]></title>
     <link href="http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/"/>
-    <updated>2014-11-18T17:20:00-05:00</updated>
+    <updated>2014-11-18T17:20:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance</id>
     <content type="html"><![CDATA[<p>If you’ve used <code>validates</code> in a Rails Active Record model, you know they work great &#8211; at least until the first bit of complexity arises. At that point, they can quickly morph in to a ball of conditional spaghetti convoluting the initial reason the validation was added in the first place.</p>
 
