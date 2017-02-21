@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: phantomjs | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/phantomjs/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2017-02-21T08:37:33-08:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
+    <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
+    <updated>2017-02-17T09:20:00-08:00</updated>
+    <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
+    <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
+
+<p>Using PhantomJS, we were able to take screenshots of a modified version of the application&rsquo;s child analytics page and include the image in the email sent to the parent. The email now contains everything the parent can see from the application, all without leaving their inbox.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>If you&rsquo;ve every attempted to style an HTML email with anything more than text, you&rsquo;re sadly familiar with its limitations. Tables and other elements from the 90&rsquo;s are the only tools we have to maintain cross-platform compatibility. One of those tools, the subject of this post, is images.</p>
+
+<p>Our weekly recap email contained a line chart illustrating the number of messages the child exchanged during the past week. While this was somewhat helpful to parents, it didn&rsquo;t tell the full story.</p>
+
+<p><img class="center" src="/images/phantomjs/recap-v1.png" title="&ldquo;First version of the Bark weekly recap email&rdquo;" ></p>
+
+<p>While this email does include a graph, it&rsquo;s the result of calling out to a service that rendered the graph, stored it, and returned the URL to include as an image. While this service worked well for simple illustrations, it didn&rsquo;t provide us the flexibility we had with modern web tools and visualizations. Aside from that, the styling of the charts is limited.</p>
+
+<p>Elsewhere on Bark, we had already built the full story through other lists and illustrations.</p>
+
+<p><img class="center" src="/images/phantomjs/analytics-interactions.png" title="&ldquo;Bark analytics with interactions&rdquo;" ></p>
+
+<p><img class="center" src="/images/phantomjs/analytics-activities.png" title="&ldquo;Bark analytics with activities&rdquo;" ></p>
+
+<p><img class="center" src="/images/phantomjs/analytics-time.png" title="&ldquo;Bark analytics over time&rdquo;" ></p>
+
+<p>Recreating the same lists and charts just for the email felt like a duplication nightmare and vulnerable to becoming stale. We wouldn&rsquo;t be able to use the same rendering because most of the charts rendered SVGs, which aren&rsquo;t compatible with most email clients. Additionally, there were a handful of CSS styles needed for the page that while possible to include in the email, felt excessive.</p>
+
+<p>Stepping back from the problem, we realized we wanted the majority of the analytics page, just embedded in the email. Was there a way to do that without rewriting it for email clients?</p>
+
+<h2>The Solution</h2>
+
+<p>We could take a screenshot of the analytics page and embed it as an image in the recap email.</p>
+
+<h3>wkhtmltoimage</h3>
+
+<p>Our first attempt was using <code>wkhtmltoimage</code> and the <a href="https://github.com/csquared/IMGKit"><code>IMGKit</code></a> ruby gem. Aside from the headaches of installing a working OSX version of <code>wkhtmltoimage</code> due to a regression, getting a working configuration was non-trivial.</p>
+
+<p><code>wkhtmltoimage</code> doesn&rsquo;t parse CSS or JavaScript, so those would have to be explicitly included. Since Bark uses the asset pipeline, we&rsquo;d have to get the latest version of the compiled assets both on development and production. This proved to be extremely difficult under the default configuration given how each group is compiled. We use <a href="https://www.nginx.com/resources/wiki/">Nginx</a> to serve our assets in the production and it felt weird to have a configuration we would <em>hope</em> worked when we pushed to production.</p>
+
+<p>After spending almost a full day trying to get the right combination of settings, we gave up. There had to be a better way&hellip;</p>
+
+<h3>Saas FTW</h3>
+
+<p>Frankly, our next step was to look for a Saas service that provided this functionality. Certainly I should be able to send a URL to an API, and they&rsquo;d return an image, perhaps with some configuration options for size and response. To our surprise, there were none (based on a 15 minute internet search. If you know of one, we&rsquo;d love to hear about it). There were plenty of services focused on rendering PDFs geared towards invoices and other documents one would want to email customers.</p>
+
+<h3>PhantomJS</h3>
+
+<p>We were reminded of Capybara&rsquo;s ability to capture screenshots on failed test runs. After poking around this functionality, <code>phantomjs</code> emerged as a potential solution.</p>
+
+<p>If we installed <code>phantomjs</code> on to the server and ran a command line script to <a href="http://phantomjs.org/screen-capture.html">capture the screenshots</a> prior to sending the email, we could <a href="http://guides.rubyonrails.org/action_mailer_basics.html#complete-list-of-action-mailer-methods">inline include those images</a> in the email.</p>
+
+<p>Installation of <code>phantomjs</code> was simplified using the <a href="https://github.com/colszowka/phantomjs-gem"><code>phantomjs-gem</code> ruby gem</a>, which installs the appropriate <code>phantomjs</code> binary for the operating system and provides an API (<code>#run</code>) to execute commands.</p>
+
+<h3>Script the Screenshot</h3>
+
+<p>Using a <a href="https://github.com/ariya/phantomjs/blob/master/examples/rasterize.js">screenshot example</a> from the <a href="https://github.com/ariya/phantomjs">PhantomJS github repo</a>, we put together a script (<code>vendor/assets/javascripts/phantom-screenshot.js</code>) to capture the analytics page:</p>
+
+<p>```</p>
+
+<h1>!/bin/sh</h1>
+
+<p>var page   = require(&lsquo;webpage&rsquo;).create();
+var system = require(&lsquo;system&rsquo;);
+page.viewportSize = { width: 550, height: 600 };
+page.zoomFactor = 0.85;</p>
+
+<p>page.onError = function(msg, trace) {
+  var msgStack = [&lsquo;ERROR: &rsquo; + msg];
+  if (trace &amp;&amp; trace.length) {</p>
+
+<pre><code>msgStack.push('TRACE:');
+trace.forEach(function(t) {
+  msgStack.push(' -&gt; ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+});
+</code></pre>
+
+<p>  }</p>
+
+<p>  console.error(msgStack.join(&lsquo;\n&rsquo;));
+};</p>
+
+<p>page.open(system.args[1], function(status) {
+  if (status !== &lsquo;success&rsquo;) {</p>
+
+<pre><code>console.log('Unable to load the address!');
+phantom.exit(1);
+</code></pre>
+
+<p>  } else {</p>
+
+<pre><code>window.setTimeout(function () {
+  page.render(system.args[2]);
+  phantom.exit();
+}, 2000);
+</code></pre>
+
+<p>  }
+});
+<code>``
+_Note: a variety of the settings (</code>viewPortSize<code>,</code>zoomFactor<code>, and</code>timeout`) were found using trial and error for our particular situation._</p>
+
+<p>We use Sidekiq to enqueue the thousands of recap emails sent to parents each week. Because this approach relies on using our existing website as the source data for the screenshot, we have to be conscious of spreading the job processing over a certain period of time, so we don&rsquo;t overload the application for regular users.</p>
+
+<h3>Create the Screenshot</h3>
+
+<p>With this script in hand, now we can use the following class to create the image for each child:</p>
+
+<p>```
+class RecapAnalytics
+  ScreenshotError = Class.new(StandardError)</p>
+
+<p>  def initialize(analytics_url:)</p>
+
+<pre><code>@analytics_url = analytics_url
+</code></pre>
+
+<p>  end</p>
+
+<p>  def file_path</p>
+
+<pre><code>unless create_screenshot
+  raise ScreenshotError.new("Unable to complete analytics screenshot")
+end
+
+temp_file_path
+</code></pre>
+
+<p>  end</p>
+
+<p>  def create_screenshot</p>
+
+<pre><code>Phantomjs.run screenshot_script, analytics_url, temp_file_path
+</code></pre>
+
+<p>  end</p>
+
+<p>  private</p>
+
+<p>  attr_reader :analytics_url</p>
+
+<p>  def screenshot_script</p>
+
+<pre><code>Rails.root.join('vendor', 'assets', 'javascripts', 'phantom-screenshot.js').to_s
+</code></pre>
+
+<p>  end</p>
+
+<p>  def temp_file_path</p>
+
+<pre><code>@temp_file_path ||= begin
+  file = Tempfile.new("child-analytics")
+  file.path + ".png"
+end
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>For each child, we&rsquo;ll provide the URL to the child&rsquo;s analytics page and run the following <code>file_path</code> method to return the path of the screenshot:</p>
+
+<p><code>
+RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+</code></p>
+
+<h2>Adding as an Inline Email Attachment</h2>
+
+<p>With an image for each child, we can iterate through each child and inline include the image in the mailer:</p>
+
+<p><code>
+file_path = RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+attachments.inline["#{child.first_name}.png"] = File.read(file_path)
+</code></p>
+
+<p>Then in the email template, we can include the following to render the image:</p>
+
+<p><code>erb
+ &lt;%= link_to image_tag(attachments["#{child.first_name}.png"].url), child_url(child) %&gt;
+</code></p>
+
+<p><img class="center" src="/images/phantomjs/email-interactions.png" title="&ldquo;Bark weekly recap email with interactions&rdquo;" ></p>
+
+<p><img class="center" src="/images/phantomjs/email-activities.png" title="&ldquo;Bark weekly recap email with activities&rdquo;" ></p>
+
+<p><img class="center" src="/images/phantomjs/email-time.png" title="&ldquo;Bark weekly recap email over time&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>PhantomJS proved to be the simplest solution for the job. With a small script and no further configuration, we were able to lean on the analytics page we&rsquo;d already built to improve the Bark recap emails.</p>
+
+<p>Parents will now have more visibility in to their child&rsquo;s online activity without leaving their inbox.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-11T21:06:47-08:00</updated>
+  <updated>2017-02-21T08:37:33-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,176 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
+    <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
+    <updated>2017-02-17T09:20:00-08:00</updated>
+    <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
+    <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
+
+<p>Using PhantomJS, we were able to take screenshots of a modified version of the application&rsquo;s child analytics page and include the image in the email sent to the parent. The email now contains everything the parent can see from the application, all without leaving their inbox.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>If you&rsquo;ve every attempted to style an HTML email with anything more than text, you&rsquo;re sadly familiar with its limitations. Tables and other elements from the 90&rsquo;s are the only tools we have to maintain cross-platform compatibility. One of those tools, the subject of this post, is images.</p>
+
+<p>Our weekly recap email contained a line chart illustrating the number of messages the child exchanged during the past week. While this was somewhat helpful to parents, it didn&rsquo;t tell the full story.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/recap-v1.png" title="&#34;First version of the Bark weekly recap email&#34;" alt="&#34;First version of the Bark weekly recap email&#34;"></p>
+
+<p>While this email does include a graph, it&rsquo;s the result of calling out to a service that rendered the graph, stored it, and returned the URL to include as an image. While this service worked well for simple illustrations, it didn&rsquo;t provide us the flexibility we had with modern web tools and visualizations. Aside from that, the styling of the charts is limited.</p>
+
+<p>Elsewhere on Bark, we had already built the full story through other lists and illustrations.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/analytics-interactions.png" title="&#34;Bark analytics with interactions&#34;" alt="&#34;Bark analytics with interactions&#34;"></p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/analytics-activities.png" title="&#34;Bark analytics with activities&#34;" alt="&#34;Bark analytics with activities&#34;"></p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/analytics-time.png" title="&#34;Bark analytics over time&#34;" alt="&#34;Bark analytics over time&#34;"></p>
+
+<p>Recreating the same lists and charts just for the email felt like a duplication nightmare and vulnerable to becoming stale. We wouldn&rsquo;t be able to use the same rendering because most of the charts rendered SVGs, which aren&rsquo;t compatible with most email clients. Additionally, there were a handful of CSS styles needed for the page that while possible to include in the email, felt excessive.</p>
+
+<p>Stepping back from the problem, we realized we wanted the majority of the analytics page, just embedded in the email. Was there a way to do that without rewriting it for email clients?</p>
+
+<h2>The Solution</h2>
+
+<p>We could take a screenshot of the analytics page and embed it as an image in the recap email.</p>
+
+<h3>wkhtmltoimage</h3>
+
+<p>Our first attempt was using <code>wkhtmltoimage</code> and the <a href="https://github.com/csquared/IMGKit"><code>IMGKit</code></a> ruby gem. Aside from the headaches of installing a working OSX version of <code>wkhtmltoimage</code> due to a regression, getting a working configuration was non-trivial.</p>
+
+<p><code>wkhtmltoimage</code> doesn&rsquo;t parse CSS or JavaScript, so those would have to be explicitly included. Since Bark uses the asset pipeline, we&rsquo;d have to get the latest version of the compiled assets both on development and production. This proved to be extremely difficult under the default configuration given how each group is compiled. We use <a href="https://www.nginx.com/resources/wiki/">Nginx</a> to serve our assets in the production and it felt weird to have a configuration we would <em>hope</em> worked when we pushed to production.</p>
+
+<p>After spending almost a full day trying to get the right combination of settings, we gave up. There had to be a better way&hellip;</p>
+
+<h3>Saas FTW</h3>
+
+<p>Frankly, our next step was to look for a Saas service that provided this functionality. Certainly I should be able to send a URL to an API, and they&rsquo;d return an image, perhaps with some configuration options for size and response. To our surprise, there were none (based on a 15 minute internet search. If you know of one, we&rsquo;d love to hear about it). There were plenty of services focused on rendering PDFs geared towards invoices and other documents one would want to email customers.</p>
+
+<h3>PhantomJS</h3>
+
+<p>We were reminded of Capybara&rsquo;s ability to capture screenshots on failed test runs. After poking around this functionality, <code>phantomjs</code> emerged as a potential solution.</p>
+
+<p>If we installed <code>phantomjs</code> on to the server and ran a command line script to <a href="http://phantomjs.org/screen-capture.html">capture the screenshots</a> prior to sending the email, we could <a href="http://guides.rubyonrails.org/action_mailer_basics.html#complete-list-of-action-mailer-methods">inline include those images</a> in the email.</p>
+
+<p>Installation of <code>phantomjs</code> was simplified using the <a href="https://github.com/colszowka/phantomjs-gem"><code>phantomjs-gem</code> ruby gem</a>, which installs the appropriate <code>phantomjs</code> binary for the operating system and provides an API (<code>#run</code>) to execute commands.</p>
+
+<h3>Script the Screenshot</h3>
+
+<p>Using a <a href="https://github.com/ariya/phantomjs/blob/master/examples/rasterize.js">screenshot example</a> from the <a href="https://github.com/ariya/phantomjs">PhantomJS github repo</a>, we put together a script (<code>vendor/assets/javascripts/phantom-screenshot.js</code>) to capture the analytics page:</p>
+
+<figure class='code'><pre><code>#!/bin/sh
+
+var page   = require('webpage').create();
+var system = require('system');
+page.viewportSize = { width: 550, height: 600 };
+page.zoomFactor = 0.85;
+
+page.onError = function(msg, trace) {
+  var msgStack = ['ERROR: ' + msg];
+  if (trace && trace.length) {
+    msgStack.push('TRACE:');
+    trace.forEach(function(t) {
+      msgStack.push(' -&gt; ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+    });
+  }
+
+  console.error(msgStack.join('\n'));
+};
+
+page.open(system.args[1], function(status) {
+  if (status !== 'success') {
+    console.log('Unable to load the address!');
+    phantom.exit(1);
+  } else {
+    window.setTimeout(function () {
+      page.render(system.args[2]);
+      phantom.exit();
+    }, 2000);
+  }
+});</code></pre></figure>
+
+
+<p><em>Note: a variety of the settings (<code>viewPortSize</code>, <code>zoomFactor</code>, and <code>timeout</code>) were found using trial and error for our particular situation.</em></p>
+
+<p>We use Sidekiq to enqueue the thousands of recap emails sent to parents each week. Because this approach relies on using our existing website as the source data for the screenshot, we have to be conscious of spreading the job processing over a certain period of time, so we don&rsquo;t overload the application for regular users.</p>
+
+<h3>Create the Screenshot</h3>
+
+<p>With this script in hand, now we can use the following class to create the image for each child:</p>
+
+<figure class='code'><pre><code>class RecapAnalytics
+  ScreenshotError = Class.new(StandardError)
+
+  def initialize(analytics_url:)
+    @analytics_url = analytics_url
+  end
+
+  def file_path
+    unless create_screenshot
+      raise ScreenshotError.new("Unable to complete analytics screenshot")
+    end
+
+    temp_file_path
+  end
+
+  def create_screenshot
+    Phantomjs.run screenshot_script, analytics_url, temp_file_path
+  end
+
+  private
+
+  attr_reader :analytics_url
+
+  def screenshot_script
+    Rails.root.join('vendor', 'assets', 'javascripts', 'phantom-screenshot.js').to_s
+  end
+
+  def temp_file_path
+    @temp_file_path ||= begin
+      file = Tempfile.new("child-analytics")
+      file.path + ".png"
+    end
+  end
+end</code></pre></figure>
+
+
+<p>For each child, we&rsquo;ll provide the URL to the child&rsquo;s analytics page and run the following <code>file_path</code> method to return the path of the screenshot:</p>
+
+<figure class='code'><pre><code>RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path</code></pre></figure>
+
+
+<h2>Adding as an Inline Email Attachment</h2>
+
+<p>With an image for each child, we can iterate through each child and inline include the image in the mailer:</p>
+
+<figure class='code'><pre><code>file_path = RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+attachments.inline["#{child.first_name}.png"] = File.read(file_path)</code></pre></figure>
+
+
+<p>Then in the email template, we can include the following to render the image:</p>
+
+<figure class='code'><pre><code> &lt;%= link_to image_tag(attachments["#{child.first_name}.png"].url), child_url(child) %&gt;</code></pre></figure>
+
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/email-interactions.png" title="&#34;Bark weekly recap email with interactions&#34;" alt="&#34;Bark weekly recap email with interactions&#34;"></p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/email-activities.png" title="&#34;Bark weekly recap email with activities&#34;" alt="&#34;Bark weekly recap email with activities&#34;"></p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/phantomjs/email-time.png" title="&#34;Bark weekly recap email over time&#34;" alt="&#34;Bark weekly recap email over time&#34;"></p>
+
+<h2>Conclusion</h2>
+
+<p>PhantomJS proved to be the simplest solution for the job. With a small script and no further configuration, we were able to lean on the analytics page we&rsquo;d already built to improve the Bark recap emails.</p>
+
+<p>Parents will now have more visibility in to their child&rsquo;s online activity without leaving their inbox.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
@@ -2971,215 +3141,6 @@ gem 'intercom-rails'</code></pre></figure>
 <h2>Build a Ruby Gem</h2>
 
 <p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Active Record Validation Contexts with Inheritance]]></title>
-    <link href="http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/"/>
-    <updated>2014-11-18T17:20:00-08:00</updated>
-    <id>http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance</id>
-    <content type="html"><![CDATA[<p>If you’ve used <code>validates</code> in a Rails Active Record model, you know they work great &#8211; at least until the first bit of complexity arises. At that point, they can quickly morph in to a ball of conditional spaghetti convoluting the initial reason the validation was added in the first place.</p>
-
-
-
-
-<p>I recently had an experience using <code>has_secure_password</code> where I wanted control the length of the user-supplied password. Adding a length validation to the password accessor invalidated existing records, so I was in a bit of a bind. In the end, I sub-classed the Active Record model to create a unique model made specifically for that context. This allowed me to inherit the core functionality from the model and sprinkle on existing validations for specific use cases. This was a new tactic for me and I’m still not sure how I feel about it. I like the fact that it removed complexity from the <code>User</code> model. This, in hopes, will keep the minimize the likelihood of it becoming a God object.</p>
-
-
-
-
-<!--more-->
-
-
-
-
-<h2>The Problem</h2>
-
-
-
-
-<p>Using <code>has_secure_password</code> is a relatively easy way to add authentication to a Rails app. In order to disguise the plain text passwords, an <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L106">accessor for the plain <code>password</code></a> is added that encrypts it before saving.</p>
-
-
-
-
-<p>The only true Active Record validation <code>has_secure_password</code> adds is a <a href="https://github.com/rails/rails/blob/3bdf7b80a11dcb67b18553ff1fe0da82b0cffc20/activemodel/lib/active_model/secure_password.rb#L68">confirmation of the password</a> — and only when the password is present. This allows us to create a user object without supplying a password, or maybe saving straight to the <code>password_digest</code> field, which is used to store the encrypted password in the database.</p>
-
-
-
-
-<p>I wanted to enforce a minimum password length, because what good is a 1 character password (or 0 for that matter) ?!?!</p>
-
-
-
-
-<p>The first thing I did was add this to the <code>User</code> model:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }
-</code></pre>
-
-
-
-
-<p>This works for new users, but not for those with a <code>password_digest</code> already. Attempting to updated an existing user produces the following error:</p>
-
-
-
-
-<pre><code>ActiveRecord::RecordInvalid: Validation failed: Password is too short (minimum is 8 characters)
-</code></pre>
-
-
-
-
-<p>The next step was to conditionalize only on create:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }, on: :create
-</code></pre>
-
-
-
-
-<p>Except, that wasn’t right either because I’d definitely want to allow users to update their password, in which case, the length validation wouldn’t be enforced.</p>
-
-
-
-
-<p>I found another <a href="http://quickleft.com/blog/rails-tip-validating-users-with-has_secure_password">post suggesting to allow <code>nil</code></a> using:</p>
-
-
-
-
-<pre><code>validates :password, length: { minimum: 8 }, allow_nil: true
-</code></pre>
-
-
-
-
-<p>But, again, that felt weird and doesn’t read particularly well when you’re looking through the source trying to understand what condition would generate a <code>nil</code> password.</p>
-
-
-
-
-<p>Other solutions included <a href="http://stackoverflow.com/a/6486345/2261909">mixing conditionals and checking model dirty state</a> and <a href="http://urgetopunt.com/rails/2012/11/12/validate-password-presence-has-secure-password.html">some combination of all of the above</a>.</p>
-
-
-
-
-<p>I’m guessing some combination of the above would’ve worked, but something didn’t feel quite right. A quick glance over any of those solutions left me wanting something cleaner and more approachable. Because it’s a complex and tremendously important part of the app, I wanted to feel comfortable with the solution.</p>
-
-
-
-
-<h2>The Solution</h2>
-
-
-
-
-<p>I recently read <a href="https://leanpub.com/growing-rails"><em>Growing Rails Application in Practice</em></a>. The most interesting takeaway for me was the idea of sub-classing an Active Record object to exactly the problem described above.</p>
-
-
-
-
-<p>Consider this…we have our <code>User</code> model with <code>has_secure_password</code>:</p>
-
-
-
-
-<pre><code>class User &lt; ActiveRecord::Base
-  has_secure_password
-end
-</code></pre>
-
-
-
-
-<p>As we saw above, the variety of validation contexts made the standard ActiveModel validation awkward. What if we sub-class <code>User</code> and add the validation contexts for a specific use case? In our case, minimum length:</p>
-
-
-
-
-<pre><code>class User::AsSignUp &lt; User
-  validates :password, length: { minimum: 8 }
-end
-</code></pre>
-
-
-
-
-<p>In this case, we’re create a separate model, for the purpose of signing up, and perhaps other user-related attribute management (profile, password reset, etc.).</p>
-
-
-
-
-<p>Now, instead of passing the <code>User</code> model to the view from the controller, we pass an instantiated version of the new context-specific model class:</p>
-
-
-
-
-<pre><code>def create
-  @user = User::AsSignUp.find(current_user.id)
-  …
-end
-</code></pre>
-
-
-
-
-<p>Lastly, because the sub-class name is inferred within the form, we have to do one more thing to make the params are accessible on the <code>create</code> action using <code>params[:user]</code>. We’ll change the form from:</p>
-
-
-
-
-<pre><code>&lt;%= form_for @user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
-</code></pre>
-
-
-
-
-<p>to:</p>
-
-
-
-
-<pre><code>&lt;%= form_for @user, as: :user, url: user_confirm_path(@user.invitation_token) do |f| %&gt;
-</code></pre>
-
-
-
-
-<p>Because the remainder of the app operates fine without any need for the password validation, the <code>User</code> can be used where necessary and without worry of it becoming invalid because the password accessor isn’t present.</p>
-
-
-
-
-<h2>Summary</h2>
-
-
-
-
-<p>While sub-classing models in Rails is generally frowned upon, this use case is one of the few that felt reasonable. It feels relatively low cost and stays in isolation. I’d love to hear how you might have solved this problem. I looked and explored a handful of solutions. While others worked, none seems as expressive as the one above.</p>
-
-
-<p>A form object using
-<a href="http://api.rubyonrails.org/classes/ActiveModel/Model.html">ActiveModel</a> or
-similar could&rsquo;ve been an alternative option. I didn&rsquo;t explore it for this
-particular use case, mostly because I wanted to give this one a shot. However,
-I have no doubt it would&rsquo;ve at least worked equally as well.</p>
-
-<p>I should also point out that I&rsquo;m familiar with the built-in <a href="https://github.com/rails/rails/blob/master/activemodel/lib/active_model/validations.rb#L73">validation
-contexts in ActiveModel</a>.
-And for whatever reason, I&rsquo;ve not used them before. I&rsquo;ll probably give it a
-shot on another occasion for comparison.</p>
-
-<p>What are your thoughts on this technique?</p>
 ]]></content>
   </entry>
   

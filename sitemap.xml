@@ -261,12 +261,18 @@
         <lastmod>2016-10-25T09:53:34-07:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/
+        </loc>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+    </url>
+    <url>
         <loc>http://brandonhilkert.com/about/</loc>
         <lastmod>2015-02-20T18:59:58-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/bonus/sucker-punch.html</loc>
@@ -274,7 +280,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2016-12-04T12:40:27-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
@@ -286,23 +292,23 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/funnel/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
@@ -314,7 +320,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
@@ -334,7 +340,7 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/</loc>
-        <lastmod>2016-12-21T17:03:51-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
     <url>
         <loc>
@@ -360,6 +366,6 @@
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
     </url>
 </urlset>
