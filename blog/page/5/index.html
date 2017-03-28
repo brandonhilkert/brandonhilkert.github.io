@@ -168,7 +168,55 @@
   
 
 
-<time datetime="2014-01-06T06:15:00-08:00" data-updated="true" itemprop="datePublished">January 6<span>th</span>, 2014</time></div>
+<time datetime="2014-01-13T07:01:00-05:00" data-updated="true" itemprop="datePublished">January 13<span>th</span>, 2014</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/relative-timestamps-in-rails/" itemprop="url">Relative Timestamps in Rails</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/javascript/'>javascript</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/timestamps/'>timestamps</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>Facebook’s news feed popularized the relative timestamp format of &ldquo;X hours ago&rdquo;. For good reason too&hellip;why print an absolute timestamp so that people have to do the relative calculation in their head? It’s one less step for the user, and to be fair, pretty easy to implement.</p>
+
+<h2>Rails helpers to the rescue</h2>
+
+<p>Rails has a view helper aptly named <code>time_ago_in_words</code>. If you use the
+<code>created_at</code> attribute from a record, you could easily reference a relative timestamp from a corresponding view:</p>
+
+<pre><code># app/views/posts/show.html.erb
+
+Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
+</code></pre>
+
+<p>That’s great! But not enough…what happens when a user stays on the page for 10 min. and the latest post was no longer posted &ldquo;1 minute ago”? Asking them to refresh the page every 10 minutes is no longer an acceptable answer.</p>
+
+
+		
+		<a href="/blog/relative-timestamps-in-rails/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-06T06:15:00-05:00" data-updated="true" itemprop="datePublished">January 6<span>th</span>, 2014</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/how-i-launched-an-email-course/" itemprop="url">How I Launched an Email Course to 500+ People</a></h1>
   <div class="tags">
 
@@ -208,7 +256,7 @@ gem</a>.</p>
   
 
 
-<time datetime="2013-12-31T13:04:00-08:00" data-updated="true" itemprop="datePublished">December 31<span>st</span>, 2013</time></div>
+<time datetime="2013-12-31T13:04:00-05:00" data-updated="true" itemprop="datePublished">December 31<span>st</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/be-ambitious/" itemprop="url">Be Ambitious</a></h1>
   <div class="tags">
 
@@ -255,7 +303,7 @@ friends I&rsquo;d later have to explain why I bailed &ndash; <em>if I bailed</em
   
 
 
-<time datetime="2013-12-19T18:44:00-08:00" data-updated="true" itemprop="datePublished">December 19<span>th</span>, 2013</time></div>
+<time datetime="2013-12-19T18:44:00-05:00" data-updated="true" itemprop="datePublished">December 19<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/flexible-rails-environment-configuration/" itemprop="url">Flexible Rails Environment Configuration</a></h1>
   <div class="tags">
 
@@ -301,7 +349,7 @@ accessible whether you manage your own infrastructure or use a
   
 
 
-<time datetime="2013-12-09T06:15:00-08:00" data-updated="true" itemprop="datePublished">December 9<span>th</span>, 2013</time></div>
+<time datetime="2013-12-09T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 9<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/" itemprop="url">Build a Ruby Gem Email Course - Weekend Update</a></h1>
   <div class="tags">
 
@@ -363,7 +411,7 @@ had planned.</p>
   
 
 
-<time datetime="2013-12-06T06:15:00-08:00" data-updated="true" itemprop="datePublished">December 6<span>th</span>, 2013</time></div>
+<time datetime="2013-12-06T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 6<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/" itemprop="url">Build a Ruby Gem Email Course - Week of Hustle - Day 6</a></h1>
   <div class="tags">
 
@@ -429,7 +477,7 @@ because of the lack thereof.</p>
   
 
 
-<time datetime="2013-12-05T06:15:00-08:00" data-updated="true" itemprop="datePublished">December 5<span>th</span>, 2013</time></div>
+<time datetime="2013-12-05T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 5<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/" itemprop="url">Build a Ruby Gem Email Course - Week of Hustle - Day 5</a></h1>
   <div class="tags">
 
@@ -490,7 +538,7 @@ on here&hellip;</p>
   
 
 
-<time datetime="2013-12-04T06:15:00-08:00" data-updated="true" itemprop="datePublished">December 4<span>th</span>, 2013</time></div>
+<time datetime="2013-12-04T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 4<span>th</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/" itemprop="url">Build a Ruby Gem Email Course - Week of Hustle - Day 4</a></h1>
   <div class="tags">
 
@@ -552,7 +600,7 @@ a non-trivial amount of time.</p>
   
 
 
-<time datetime="2013-12-03T06:15:00-08:00" data-updated="true" itemprop="datePublished">December 3<span>rd</span>, 2013</time></div>
+<time datetime="2013-12-03T06:15:00-05:00" data-updated="true" itemprop="datePublished">December 3<span>rd</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/" itemprop="url">Build a Ruby Gem Email Course - Week of Hustle - Day 3</a></h1>
   <div class="tags">
 
@@ -614,7 +662,7 @@ wish I had when I started.</p>
   
 
 
-<time datetime="2013-12-02T07:02:00-08:00" data-updated="true" itemprop="datePublished">December 2<span>nd</span>, 2013</time></div>
+<time datetime="2013-12-02T07:02:00-05:00" data-updated="true" itemprop="datePublished">December 2<span>nd</span>, 2013</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/" itemprop="url">Build a Ruby Gem Email Course - Week of Hustle - Day 2</a></h1>
   <div class="tags">
 
@@ -665,81 +713,6 @@ notes?!?!).</p>
 <p>
 		
 		<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-12-01T05:37:00-08:00" data-updated="true" itemprop="datePublished">December 1<span>st</span>, 2013</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/build-a-ruby-gem-woh-day-1/" itemprop="url">Build a Ruby Gem Email Course - Week of Hustle - Day 1</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/email-course/'>email course</a>, <a class='category' href='/blog/categories/gem/'>gem</a>, <a class='category' href='/blog/categories/jfdi/'>jfdi</a>, <a class='category' href='/blog/categories/marketing/'>marketing</a>, <a class='category' href='/blog/categories/open-source/'>open source</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/week-of-hustle/'>week of hustle</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>
-  <em>I did an <strong>8-day sprint</strong> to launch my <a
-  href="/courses/build-a-ruby-gem/" target="_blank"><strong>Build a Ruby Gem</strong> email course</a>
-  and documented my progress through this series of blog posts.</em>
-</p>
-
-
-
-
-<p><p><a href="/blog/build-a-ruby-gem-woh-day-1/">Day 1</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/">Day 2</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/">Day 3</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/">Day 4</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/">Day 5</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/">Day 6</a> |
-<a href="/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/">Weekend Update</a>
-<a href="/blog/how-i-launched-an-email-course/">Summary</a></p>
-
-<h2>JFDI</h2>
-
-<p>Living outside a major metropolitan area has made it hard to surround myself
-with other entrepreneurs. Fortunately, the internet has made the world a
-smaller place. Last week I joined <a href="http://jfdi.bz/">JFDI.bz</a>, a community for
-solo-founders launching their own thing.</p>
-
-<p>My goal for joining this community was to have access to other motivated
-entrepreneurs that I could use as a sounding-board. I also figured it&rsquo;d be
-great opportunity to peek in to other solo founders launch process and
-motivation for a particular product.</p>
-
-<h2>Week of Hustle</h2>
-
-<p>Week of Hustle is an 8-day sprint to launch something. Anything really&hellip;could
-be an existing product that you need to put the finishing touches on, or a
-brand new idea. It was one of the things that attracted most to JFDI.</p>
-
-<p>Launching any kind of product is time consuming. And with a family and other
-full-time responsibilities, life can get in the way. I feel like I&rsquo;m pretty
-good at managing my time efficiently, but when accountability is involved, it&rsquo;s
-much harder to put it off.</p>
-
-<p>
-		
-		<a href="/blog/build-a-ruby-gem-woh-day-1/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

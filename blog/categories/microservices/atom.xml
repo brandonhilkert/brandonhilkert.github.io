@@ -4,7 +4,7 @@
   <title><![CDATA[Category: microservices | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/microservices/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-21T08:37:33-08:00</updated>
+  <updated>2017-03-28T09:59:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-08:00</updated>
+    <updated>2015-11-30T12:06:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 
@@ -182,7 +182,7 @@ end
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
-    <updated>2015-10-15T09:07:00-07:00</updated>
+    <updated>2015-10-15T09:07:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -329,7 +329,7 @@ end
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
-    <updated>2015-08-14T10:32:00-07:00</updated>
+    <updated>2015-08-14T10:32:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -433,7 +433,7 @@ but it&rsquo;s one of the easier to debug and is human-readable, so it tends to 
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/"/>
-    <updated>2015-07-27T11:18:00-07:00</updated>
+    <updated>2015-07-27T11:18:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>

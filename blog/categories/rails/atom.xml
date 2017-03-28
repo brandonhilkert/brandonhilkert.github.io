@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-21T08:37:33-08:00</updated>
+  <updated>2017-03-28T09:59:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,9 +14,203 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
+    <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/"/>
+    <updated>2017-03-27T13:58:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch</id>
+    <content type="html"><![CDATA[<p>A few articles ago, I wrote about <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">how to monitor Sidekiq retries using AWS Lambda</a>. Retries are often the first indication of an issue if your application does a lot of background work.</p>
+
+<p>As <a href="https://www.bark.us">Bark</a> continues to grow, we became interested in how the number of jobs enqueued and retrying trended over time. Using AWS Lambda to post this data to CloudWatch, we were able to visualize this data over time.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p><a href="http://sidekiq.org/">Sidekiq</a> offers a way to visual the jobs processed over time when on the dashboard. In fact, <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">this graph was one of my first open source contributions</a>.</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/sidekiq-dashboard.png" title="&ldquo;Sidekiq Dashboard&rdquo;" ></p>
+
+<p>Unfortunately, these graph don&rsquo;t show the number of retries from 2 am last night, or how long it took to exhaust the queues when 2 million jobs were created.</p>
+
+<p>Historical queue data is important if our application does a lot of background work and number of users is growing. Seeing these performance characteristics over time can help us be more prepared to add more background workers or scale our infrastructure in a way to stay ahead when our application is growing quickly.</p>
+
+<h2>The Solution</h2>
+
+<p>Because Bark is on AWS, we naturally looked to their tools for assistance. We already use CloudWatch to store data about memory, disk, and CPU usage for each server. This has served us well and allows us to set alarms for certain thresholds and graph this data over time:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/cloudwatch-memory.png" title="&ldquo;Monitoring memory usage on AWS CloudWatch&rdquo;" ></p>
+
+<p>Knowing we&rsquo;d have similar data for queue usage, we figured we could do the same with Sidekiq.</p>
+
+<h3>Sidekiq Queue Data Endpoint</h3>
+
+<p>If you remember from the last article on <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">monitoring Sidekiq retries using AWS Lambda</a>, we setup an endpoint in our application to return Sidekiq stats:</p>
+
+<p>```
+require &lsquo;sidekiq/api&rsquo;</p>
+
+<p>class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication</p>
+
+<p>  def index</p>
+
+<pre><code>base_stats = Sidekiq::Stats.new
+stats = {
+   enqueued: base_stats.enqueued,
+   queues: base_stats.queues,
+   busy: Sidekiq::Workers.new.size,
+   retries: base_stats.retry_size
+}
+
+render json: stats
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>along with the route:</p>
+
+<p><code>
+resources :sidekiq_queues, only: [:index]
+</code></p>
+
+<p>Using this resource, we need to poll at some regular interval and store the results.</p>
+
+<h3>AWS Lambda Function</h3>
+
+<p>AWS Lambda functions are perfect for one-off functions that feel like a burden to maintain in our application.</p>
+
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/lambda-trigger.png" title="&ldquo;AWS Lambda trigger&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
+
+<p>```
+var AWS = require(&lsquo;aws-sdk&rsquo;);
+var url = require(&lsquo;url&rsquo;);
+var https = require(&lsquo;https&rsquo;);</p>
+
+<p>if (typeof Promise === &lsquo;undefined&rsquo;) {
+  AWS.config.setPromisesDependency(require(&lsquo;bluebird&rsquo;));
+}</p>
+
+<p>var cloudwatch = new AWS.CloudWatch();</p>
+
+<p>sidekiqUrl = &lsquo;[Sidekiq stat URL]&rsquo;</p>
+
+<p>var logMetric = function(attr, value) {</p>
+
+<pre><code>var params = {
+    MetricData: [
+        {
+            MetricName: attr,
+            Dimensions: [
+                {
+                    Name: "App",
+                    Value: "www"
+                }
+            ],
+            Timestamp: new Date(),
+            Unit: "Count",
+            Value: value
+        }
+    ],
+    Namespace: "Queues"
+};
+
+return cloudwatch.putMetricData(params).promise();
+</code></pre>
+
+<p>}</p>
+
+<p>var getQueueStats = function(statsUrl) {</p>
+
+<pre><code>return new Promise(function(resolve, reject) {
+    var options = url.parse(statsUrl);
+    options.headers = {
+        'Accept': 'application/json',
+    };
+    var req = https.request(options, function(res){
+        var body = '';
+
+        res.setEncoding('utf8');
+
+        //another chunk of data has been recieved, so append it to `str`
+        res.on('data', function (chunk) {
+            body += chunk;
+        });
+
+        //the whole response has been recieved
+        res.on('end', function () {
+            resolve(JSON.parse(body));
+        });
+    });
+
+    req.on('error', function(e) {
+       reject(e);
+    });
+
+    req.end();
+});
+</code></pre>
+
+<p>}</p>
+
+<p>exports.handler = function(event, context) {</p>
+
+<pre><code>getQueueStats(sidekiqUrl).then(function(stats) {
+    console.log('STATS: ', stats);
+
+    var retryPromise = logMetric("Retries", stats.retries);
+    var busyPromise = logMetric("Busy", stats.busy);
+    var enqueuedPromise = logMetric("Enqueued", stats.enqueued);
+
+    Promise.all([retryPromise, busyPromise, enqueuedPromise]).then(function(values) {
+        console.log(values);
+        context.succeed();
+    }).catch(function(err){
+        console.error(err);
+        context.fail("Server error when processing message: " + err );
+    });
+})
+.catch(function(err) {
+    console.error(err);
+    context.fail("Failed to get stats from HTTP request: " + err );
+});
+</code></pre>
+
+<p>};
+```</p>
+
+<p><em>Note: <code>sidekiqURL</code>  need to be defined with appropriate values for this to work.</em></p>
+
+<p>Within CloudWatch, we&rsquo;re defining a new namespace (&ldquo;Queues&rdquo;) where our data will live. Within this namespace, we&rsquo;ll segregate these stats by the Dimension <code>App</code>. As we can see, we chose <code>www</code> for this value. If we wanted to monitor the queues of a few servers, each one could use a unique App name.</p>
+
+<p>Review and save the Lambda function and we&rsquo;re all set!</p>
+
+<h3>Graphing Sidekiq Queue Data</h3>
+
+<p>Once the function has run a few times, under CloudWatch &mdash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/custom-namespace.png" title="&ldquo;AWS CloudWatch Custom Namespace&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll choose the name of our app (<code>www</code>) and graph the values of each of these values over whatever timespan we want:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/sidekiq-queues.png" title="&ldquo;AWS CloudWatch Monitoring Sidekiq Queues&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>I&rsquo;ve found AWS lamba to be a great place for endpoints/functionality that feels cumbersome to include in my applications. Bringing deeper visibility to our Sidekiq queues has given us the ability to see usage trends we weren&rsquo;t aware of throughout the day. This will help us preemptively add infrastructure resources to keep up with our growth.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
     <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
-    <updated>2017-02-17T09:20:00-08:00</updated>
+    <updated>2017-02-17T09:20:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
     <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
 
@@ -215,7 +409,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-07:00</updated>
+    <updated>2016-10-25T11:54:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -477,7 +671,7 @@ getReq.end();
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-07:00</updated>
+    <updated>2016-04-29T09:44:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
@@ -574,7 +768,7 @@ I&rsquo;m looking forward to removing the dependency if it performs similarly.</
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-08:00</updated>
+    <updated>2015-11-30T12:06:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 
@@ -734,153 +928,6 @@ end
 <p>Any architectural decision has risks. Microservices are no exception. Microservices can be easier than an enterprise message broker, cluster of new servers and a handful of devops headaches.</p>
 
 <p>I originally dubbed this the &ldquo;poor man&rsquo;s message bus&rdquo;. With more thought, there&rsquo;s nothing &ldquo;poor&rdquo; about this. Sidekiq has a been a reliable piece of our infrastructure and I have no reason to believe that&rsquo;ll change, even if we are using it for more than just simple background processing from a single application.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
-    <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
-    <updated>2015-10-15T09:07:00-07:00</updated>
-    <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
-    <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
-Blog</a></em></p>
-
-<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we introduced a billing service to determine which features an account could access. If you remember, <a href="/our-path-to-services-part-1-start-small/">the email service</a> was a &ldquo;fire and forget&rdquo; operation and was capable of handling throughput delays given its low value to the core application.</p>
-
-<p>This post will explore how we handle synchronous communication for a service like billing where an inline response is required to service a request from the core application.</p>
-
-<!--more-->
-
-
-<h2>Background</h2>
-
-<p>If you remember from the previous post, we introduced the billing service to an infrastructure that looked like this:</p>
-
-<p><img class="center" src="/images/services/app-email-billing.png" title="&ldquo;Web application with Email and Billing Microservice&rdquo;" ></p>
-
-<p>Handling multiple pricing tiers in a SaaS app means you have to control authorization based on account status. Our billing service encapsulates the knowledge of which features correspond to which pricing tier.</p>
-
-<p>For instance, one feature is the ability to send trackable email to contacts in your PipelineDeals account. To service this request, we add an option to the bulk action menu from a list view:</p>
-
-<p><img class="center" src="/images/services/send-email.png" title="&ldquo;Send email feature&rdquo;" ></p>
-
-<h2>Service Request</h2>
-
-<p>Before we can conditionally show this option based on the pricing tier, we have to first make a request to the billing service to get the list of features available to that user.</p>
-
-<p>```
-class Billing::Features
-  def initialize(user)</p>
-
-<pre><code>@user = user
-@account = user.account
-</code></pre>
-
-<p>  end</p>
-
-<p>  def list</p>
-
-<pre><code>Rails.cache.fetch("account_#{account.id}_billing_features") do
-  response = Billing::Api.get "account/#{account.id}/features"
-  response['features']
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :user, :account
-end
-```</p>
-
-<p><code>Billing::Api</code>, in this case, is a wrapper around the API calls to handle exceptions and other information like security.</p>
-
-<p><em>Note: When making synchronous HTTP calls like this, it&rsquo;s worth considering the failure state and providing a default response set in that case so the user isn&rsquo;t burdened with a failure page. In this case, one option would be dumb down the features on the page to the most basic tier.</em></p>
-
-<h2>Serving a JSON API</h2>
-
-<p>Plenty of articles have been written about how to create a JSON API with Rails, so we won&rsquo;t rehash those techniques here. Instead, we&rsquo;ll highlight patterns we&rsquo;ve used for consistency.</p>
-
-<p>We tend to reserve the root URL namespace for UI-related routes, so we start by creating a unique namespace for the API:</p>
-
-<p>```
-namespace :api do
-  resources :account do</p>
-
-<pre><code>resource :features, only: :show
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>This setup gives us the path <code>/api/account/:account_id/features</code>. We haven&rsquo;t found a need for versioning internal APIs. If we decided to in the future, we could always add the API version as a request header.</p>
-
-<p>The <code>features</code> endpoint looks like:</p>
-
-<p>```
-class Api::FeaturesController &lt; Api::ApiController
-  skip_before_filter :verify_authenticity_token</p>
-
-<p>  def show</p>
-
-<pre><code>render json: {
-  success: true,
-  features: AccountFeatures.new(@account_id).list
-}
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Notice <code>Api::FeaturesController</code> inherits from <code>Api::ApiController</code>. We keep the API-related functionality in this base controller so each endpoint will get access to security and response handling commonalities.</p>
-
-<p><code>AccountFeatures</code> is a PORO that knows how to list billing features for a particular account. We could&rsquo;ve queried it straight from an ActiveRecord-based model, but our handling of features is a little more complicated than picking them straight from the database.</p>
-
-<p>Another note here is that we haven&rsquo;t introduced a serializing library like <code>active_model_serializers</code> or <code>jbuilder</code>. Using <code>render json</code> alone has serviced us well for simple APIs. We reach for something more complex when the response has more attributes than shown above.</p>
-
-<h2>Handling Service Response</h2>
-
-<p>By introducing <code>Rails.cache</code>, we can serve requests (after the initial) without requiring a call to the billing service.</p>
-
-<p>One of the first things we do is serialize the set of features to JavaScript so our client-side code has access:</p>
-
-<p><code>
-&lt;%= javascript_tag do %&gt;
-  window.Features = &lt;%= Billing::Features.new(logged_in_user).list.to_json %&gt;;
-&lt;% end %&gt;
-</code></p>
-
-<p>We also include a helper module in to our Rails views/controllers, so we can handle conditional feature logic:</p>
-
-<p>```
-module Features
-  def feature_enabled?(feature)</p>
-
-<pre><code>Billing::Features.new(logged_in_user).list.include?(feature.to_s)
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<h2>Synchronous Side Effects</h2>
-
-<p>When we <a href="/our-path-to-services-part-2-synchronous-vs-asynchronous/">looked at asynchronous service requests</a>, there was less immediacy associated with the request due to its &ldquo;fire-and-forget&rdquo; nature. A synchronous request, on the other hand, will handle all requests to the core application, so scaling can be challenge and infrastructure costs can add up.</p>
-
-<p><img class="center" src="/images/services/synchronous-service-cost.png" title="&ldquo;Increased cost by introducing synchronous microservice&rdquo;" ></p>
-
-<p>In addition to the infrastructure costs, performance can be a factor. If the original page response time was 100ms and we&rsquo;re adding a synchronous service request that takes another 100ms, all of a sudden we&rsquo;ve doubled our users' response times. And while this architectural decision might seem like an optimization, I&rsquo;m positive none of our users will thank us for making their page load times 2x slower.</p>
-
-<h2>Summary</h2>
-
-<p>As you can see, there&rsquo;s little magic to setting up a synchronous service request.</p>
-
-<p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
-
-<p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
 ]]></content>
   </entry>
   

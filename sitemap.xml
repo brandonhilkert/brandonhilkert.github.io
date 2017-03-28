@@ -2,370 +2,376 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://brandonhilkert.com/blog/the-technology-hump/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/loyalty/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-something/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/serving-fonts-for-firefox-with-fastly/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-woh-day-1/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-2/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-3/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-4/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-5/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-day-6/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/build-a-ruby-gem-email-course-week-of-hustle-weekend-update/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/flexible-rails-environment-configuration/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/be-ambitious/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/how-i-launched-an-email-course/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/relative-timestamps-in-rails/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/page-specific-javascript-in-rails/</loc>
-        <lastmod>2015-06-30T13:51:31-07:00</lastmod>
+        <lastmod>2015-06-30T16:51:31-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-book-update/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/understanding-the-rails-cache-id-environment-variable/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-technical-review/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/</loc>
-        <lastmod>2016-04-20T06:49:52-07:00</lastmod>
+        <lastmod>2016-04-20T09:49:52-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/ruby-gem-configuration-patterns/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-ebook-available-on-thursday/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/how-to-build-a-rails-engine/</loc>
-        <lastmod>2016-11-16T04:59:12-08:00</lastmod>
+        <lastmod>2016-11-16T07:59:12-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-is-live/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/using-rails-4-dot-1-secrets-for-configuration/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/managing-login-passwords-for-capybara-with-minitest-and-rails-fixtures/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/build-a-ruby-gem-ruby-heroes/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/refactoring-logic-from-a-rails-view/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/absolutes-as-an-antipattern/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/introducing-funneloptimizer-dot-io/</loc>
-        <lastmod>2015-04-27T13:58:12-07:00</lastmod>
+        <lastmod>2015-04-27T16:58:12-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/creating-rails-active-record-validation-contexts-with-inheritance/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/
         </loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/2014-in-review/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/
         </loc>
-        <lastmod>2015-07-28T08:23:23-07:00</lastmod>
+        <lastmod>2015-07-28T11:23:23-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators/
         </loc>
-        <lastmod>2015-03-11T03:01:03-07:00</lastmod>
+        <lastmod>2015-03-11T06:01:03-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/how-to-start-with-ruby/</loc>
-        <lastmod>2015-06-30T17:14:44-07:00</lastmod>
+        <lastmod>2015-06-30T20:14:44-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/
         </loc>
-        <lastmod>2016-08-10T05:11:13-07:00</lastmod>
+        <lastmod>2016-08-10T08:11:13-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live/</loc>
-        <lastmod>2015-07-06T05:54:35-07:00</lastmod>
+        <lastmod>2015-07-06T08:54:35-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/</loc>
-        <lastmod>2015-09-04T12:27:09-07:00</lastmod>
+        <lastmod>2015-09-04T15:27:09-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/
         </loc>
-        <lastmod>2015-09-09T04:19:22-07:00</lastmod>
+        <lastmod>2015-09-09T07:19:22-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/</loc>
-        <lastmod>2016-10-25T09:52:50-07:00</lastmod>
+        <lastmod>2016-10-25T12:52:50-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/</loc>
-        <lastmod>2015-12-03T13:28:45-08:00</lastmod>
+        <lastmod>2015-12-03T16:28:45-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/</loc>
-        <lastmod>2016-01-09T12:21:41-08:00</lastmod>
+        <lastmod>2016-01-09T15:21:41-05:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/
         </loc>
-        <lastmod>2016-01-27T03:47:57-08:00</lastmod>
+        <lastmod>2016-01-27T06:47:57-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/ruby-gem-post-install-message/</loc>
-        <lastmod>2016-04-27T03:44:12-07:00</lastmod>
+        <lastmod>2016-04-27T06:44:12-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/
         </loc>
-        <lastmod>2016-06-15T05:37:00-07:00</lastmod>
+        <lastmod>2016-06-15T08:37:00-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/care-about-what-you-build/</loc>
-        <lastmod>2016-08-10T05:11:17-07:00</lastmod>
+        <lastmod>2016-08-10T08:11:17-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/</loc>
-        <lastmod>2016-10-25T09:53:34-07:00</lastmod>
+        <lastmod>2016-10-25T12:53:34-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/
         </loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-02-17T14:21:38-05:00</lastmod>
+    </url>
+    <url>
+        <loc>
+            http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/
+        </loc>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/about/</loc>
-        <lastmod>2015-02-20T18:59:58-08:00</lastmod>
+        <lastmod>2015-02-20T21:59:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/blog/archives/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/bonus/sucker-punch.html</loc>
-        <lastmod>2015-03-11T02:57:53-07:00</lastmod>
+        <lastmod>2015-03-11T05:57:53-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/books/build-a-ruby-gem/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/almost.html</loc>
-        <lastmod>2015-02-19T10:43:40-08:00</lastmod>
+        <lastmod>2015-02-19T13:43:40-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/done.html</loc>
-        <lastmod>2015-02-19T10:43:40-08:00</lastmod>
+        <lastmod>2015-02-19T13:43:40-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/courses/build-a-ruby-gem/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/capture/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/funnel/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/funnel-tools/target/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/almost.html</loc>
-        <lastmod>2015-02-19T10:44:14-08:00</lastmod>
+        <lastmod>2015-02-19T13:44:14-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/done.html</loc>
-        <lastmod>2015-02-19T10:44:14-08:00</lastmod>
+        <lastmod>2015-02-19T13:44:14-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/newsletter/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/robots.txt</loc>
-        <lastmod>2014-12-14T04:41:58-08:00</lastmod>
+        <lastmod>2014-12-14T07:41:58-05:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/bark-techcrunch-disrupt.html</loc>
-        <lastmod>2016-05-22T05:14:15-07:00</lastmod>
+        <lastmod>2016-05-22T08:14:15-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/build-a-ruby-gem-phillyrb.html</loc>
-        <lastmod>2016-05-22T05:24:11-07:00</lastmod>
+        <lastmod>2016-05-22T08:24:11-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/funnel-optimizer-walnut-st-labs-night-owls.html</loc>
-        <lastmod>2016-05-22T05:49:02-07:00</lastmod>
+        <lastmod>2016-05-22T08:49:02-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://brandonhilkert.com/talks/info-products-walnut-st-labs-startup-meetup.html
         </loc>
-        <lastmod>2016-05-22T06:00:41-07:00</lastmod>
+        <lastmod>2016-05-22T09:00:41-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/meeteor-mongodb-philly.html</loc>
-        <lastmod>2016-05-22T05:38:17-07:00</lastmod>
+        <lastmod>2016-05-22T08:38:17-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/open-source-software-general-assembly.html</loc>
-        <lastmod>2016-06-15T05:32:42-07:00</lastmod>
+        <lastmod>2016-06-15T08:32:42-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/services-phillyrb.html</loc>
-        <lastmod>2016-06-15T05:32:42-07:00</lastmod>
+        <lastmod>2016-06-15T08:32:42-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/talks/services-rubyconf-brazil.html</loc>
-        <lastmod>2016-05-22T05:38:21-07:00</lastmod>
+        <lastmod>2016-05-22T08:38:21-04:00</lastmod>
     </url>
     <url>
         <loc>http://brandonhilkert.com/tools/</loc>
-        <lastmod>2017-02-17T11:21:38-08:00</lastmod>
+        <lastmod>2017-03-27T15:33:30-04:00</lastmod>
     </url>
 </urlset>

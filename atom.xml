@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-21T08:37:33-08:00</updated>
+  <updated>2017-03-28T09:59:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,9 +14,188 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
+    <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/"/>
+    <updated>2017-03-27T13:58:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch</id>
+    <content type="html"><![CDATA[<p>A few articles ago, I wrote about <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">how to monitor Sidekiq retries using AWS Lambda</a>. Retries are often the first indication of an issue if your application does a lot of background work.</p>
+
+<p>As <a href="https://www.bark.us">Bark</a> continues to grow, we became interested in how the number of jobs enqueued and retrying trended over time. Using AWS Lambda to post this data to CloudWatch, we were able to visualize this data over time.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p><a href="http://sidekiq.org/">Sidekiq</a> offers a way to visual the jobs processed over time when on the dashboard. In fact, <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">this graph was one of my first open source contributions</a>.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/sidekiq-cloudwatch/sidekiq-dashboard.png" title="&#34;Sidekiq Dashboard&#34;" alt="&#34;Sidekiq Dashboard&#34;"></p>
+
+<p>Unfortunately, these graph don&rsquo;t show the number of retries from 2 am last night, or how long it took to exhaust the queues when 2 million jobs were created.</p>
+
+<p>Historical queue data is important if our application does a lot of background work and number of users is growing. Seeing these performance characteristics over time can help us be more prepared to add more background workers or scale our infrastructure in a way to stay ahead when our application is growing quickly.</p>
+
+<h2>The Solution</h2>
+
+<p>Because Bark is on AWS, we naturally looked to their tools for assistance. We already use CloudWatch to store data about memory, disk, and CPU usage for each server. This has served us well and allows us to set alarms for certain thresholds and graph this data over time:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/sidekiq-cloudwatch/cloudwatch-memory.png" title="&#34;Monitoring memory usage on AWS CloudWatch&#34;" alt="&#34;Monitoring memory usage on AWS CloudWatch&#34;"></p>
+
+<p>Knowing we&rsquo;d have similar data for queue usage, we figured we could do the same with Sidekiq.</p>
+
+<h3>Sidekiq Queue Data Endpoint</h3>
+
+<p>If you remember from the last article on <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">monitoring Sidekiq retries using AWS Lambda</a>, we setup an endpoint in our application to return Sidekiq stats:</p>
+
+<figure class='code'><pre><code>require 'sidekiq/api'
+
+class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication
+
+  def index
+    base_stats = Sidekiq::Stats.new
+    stats = {
+       enqueued: base_stats.enqueued,
+       queues: base_stats.queues,
+       busy: Sidekiq::Workers.new.size,
+       retries: base_stats.retry_size
+    }
+
+    render json: stats
+  end
+end</code></pre></figure>
+
+
+<p>along with the route:</p>
+
+<figure class='code'><pre><code>resources :sidekiq_queues, only: [:index]</code></pre></figure>
+
+
+<p>Using this resource, we need to poll at some regular interval and store the results.</p>
+
+<h3>AWS Lambda Function</h3>
+
+<p>AWS Lambda functions are perfect for one-off functions that feel like a burden to maintain in our application.</p>
+
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/sidekiq-monitor/lambda-trigger.png" title="&#34;AWS Lambda trigger&#34;" alt="&#34;AWS Lambda trigger&#34;"></p>
+
+<p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
+
+<figure class='code'><pre><code>var AWS = require('aws-sdk');
+var url = require('url');
+var https = require('https');
+
+if (typeof Promise === 'undefined') {
+  AWS.config.setPromisesDependency(require('bluebird'));
+}
+
+var cloudwatch = new AWS.CloudWatch();
+
+sidekiqUrl = '[Sidekiq stat URL]'
+
+var logMetric = function(attr, value) {
+    var params = {
+        MetricData: [
+            {
+                MetricName: attr,
+                Dimensions: [
+                    {
+                        Name: "App",
+                        Value: "www"
+                    }
+                ],
+                Timestamp: new Date(),
+                Unit: "Count",
+                Value: value
+            }
+        ],
+        Namespace: "Queues"
+    };
+
+    return cloudwatch.putMetricData(params).promise();
+}
+
+var getQueueStats = function(statsUrl) {
+    return new Promise(function(resolve, reject) {
+        var options = url.parse(statsUrl);
+        options.headers = {
+            'Accept': 'application/json',
+        };
+        var req = https.request(options, function(res){
+            var body = '';
+
+            res.setEncoding('utf8');
+
+            //another chunk of data has been recieved, so append it to `str`
+            res.on('data', function (chunk) {
+                body += chunk;
+            });
+
+            //the whole response has been recieved
+            res.on('end', function () {
+                resolve(JSON.parse(body));
+            });
+        });
+
+        req.on('error', function(e) {
+           reject(e);
+        });
+
+        req.end();
+    });
+}
+
+exports.handler = function(event, context) {
+    getQueueStats(sidekiqUrl).then(function(stats) {
+        console.log('STATS: ', stats);
+
+        var retryPromise = logMetric("Retries", stats.retries);
+        var busyPromise = logMetric("Busy", stats.busy);
+        var enqueuedPromise = logMetric("Enqueued", stats.enqueued);
+
+        Promise.all([retryPromise, busyPromise, enqueuedPromise]).then(function(values) {
+            console.log(values);
+            context.succeed();
+        }).catch(function(err){
+            console.error(err);
+            context.fail("Server error when processing message: " + err );
+        });
+    })
+    .catch(function(err) {
+        console.error(err);
+        context.fail("Failed to get stats from HTTP request: " + err );
+    });
+};</code></pre></figure>
+
+
+<p><em>Note: <code>sidekiqURL</code>  need to be defined with appropriate values for this to work.</em></p>
+
+<p>Within CloudWatch, we&rsquo;re defining a new namespace (&ldquo;Queues&rdquo;) where our data will live. Within this namespace, we&rsquo;ll segregate these stats by the Dimension <code>App</code>. As we can see, we chose <code>www</code> for this value. If we wanted to monitor the queues of a few servers, each one could use a unique App name.</p>
+
+<p>Review and save the Lambda function and we&rsquo;re all set!</p>
+
+<h3>Graphing Sidekiq Queue Data</h3>
+
+<p>Once the function has run a few times, under CloudWatch &mdash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/sidekiq-cloudwatch/custom-namespace.png" title="&#34;AWS CloudWatch Custom Namespace&#34;" alt="&#34;AWS CloudWatch Custom Namespace&#34;"></p>
+
+<p>From here, we&rsquo;ll choose the name of our app (<code>www</code>) and graph the values of each of these values over whatever timespan we want:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/sidekiq-cloudwatch/sidekiq-queues.png" title="&#34;AWS CloudWatch Monitoring Sidekiq Queues&#34;" alt="&#34;AWS CloudWatch Monitoring Sidekiq Queues&#34;"></p>
+
+<h2>Conclusion</h2>
+
+<p>I&rsquo;ve found AWS lamba to be a great place for endpoints/functionality that feels cumbersome to include in my applications. Bringing deeper visibility to our Sidekiq queues has given us the ability to see usage trends we weren&rsquo;t aware of throughout the day. This will help us preemptively add infrastructure resources to keep up with our growth.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
     <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
-    <updated>2017-02-17T09:20:00-08:00</updated>
+    <updated>2017-02-17T09:20:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
     <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
 
@@ -186,7 +365,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)</code></pre
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-07:00</updated>
+    <updated>2016-10-25T11:54:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -430,7 +609,7 @@ exports.handler = function(event, context) {
   <entry>
     <title type="html"><![CDATA[Care About What You Build]]></title>
     <link href="http://brandonhilkert.com/blog/care-about-what-you-build/"/>
-    <updated>2016-07-10T12:08:00-07:00</updated>
+    <updated>2016-07-10T12:08:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/care-about-what-you-build</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve spent the majority of my career working for companies building products I either wasn&rsquo;t interested in, or wasn&rsquo;t the target user. They were jobs. In exchange for my 40 hours, they supplied me a paycheck. As a result, I went home at the end of the day and was able to disconnect.</p>
 
@@ -508,7 +687,7 @@ exports.handler = function(event, context) {
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-07:00</updated>
+    <updated>2016-04-29T09:44:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
@@ -600,7 +779,7 @@ I&rsquo;m looking forward to removing the dependency if it performs similarly.</
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-07:00</updated>
+    <updated>2016-04-22T20:13:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
     <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
 
@@ -753,7 +932,7 @@ Successfully installed sucker_punch-2.0.1
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
     <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
-    <updated>2016-01-26T07:00:00-08:00</updated>
+    <updated>2016-01-26T07:00:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
     <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
 
@@ -1014,7 +1193,7 @@ released</a>!</p>
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
     <link href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
-    <updated>2016-01-04T13:12:00-08:00</updated>
+    <updated>2016-01-04T13:12:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api</id>
     <content type="html"><![CDATA[<p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
 
@@ -1129,7 +1308,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-08:00</updated>
+    <updated>2015-11-30T12:06:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 
@@ -1276,7 +1455,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 3 - Synchronous Events]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events/"/>
-    <updated>2015-10-15T09:07:00-07:00</updated>
+    <updated>2015-10-15T09:07:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-3-synchronous-events</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -1403,7 +1582,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 2 - Synchronous vs. Asynchronous]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/"/>
-    <updated>2015-08-14T10:32:00-07:00</updated>
+    <updated>2015-08-14T10:32:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-2-synchronous-vs-asynchronous</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -1505,7 +1684,7 @@ but it&rsquo;s one of the easier to debug and is human-readable, so it tends to 
   <entry>
     <title type="html"><![CDATA[A Path to Services - Part 1 - Start Small]]></title>
     <link href="http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small/"/>
-    <updated>2015-07-27T11:18:00-07:00</updated>
+    <updated>2015-07-27T11:18:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/a-path-to-services-part-1-start-small</id>
     <content type="html"><![CDATA[<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
 Blog</a></em></p>
@@ -1659,7 +1838,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[The Ruby Book Bundle Is Live]]></title>
     <link href="http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live/"/>
-    <updated>2015-07-06T07:01:00-07:00</updated>
+    <updated>2015-07-06T07:01:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/the-ruby-book-bundle-is-live</id>
     <content type="html"><![CDATA[<p>A few fellow authors and friends of mine have put together the <a href="http://rubybookbundle.com/?c=bh">Ruby Book Bundle</a> including some of the best Ruby/Rails books out there. The <a href="http://rubybookbundle.com/?c=bh">bundle went on sale this morning</a>! It&#8217;ll <strong>only be available for a week</strong>, so be sure to pick it up soon if you&rsquo;re interested.</p>
 
@@ -1707,7 +1886,7 @@ me.</p>
   <entry>
     <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
     <link href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/"/>
-    <updated>2015-06-30T16:10:00-07:00</updated>
+    <updated>2015-06-30T16:10:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks</id>
     <content type="html"><![CDATA[<p>It&rsquo;s impossible to escape Javascript in a Rails application. From a tiny script to a full-on Javascript framework, websites are becoming more and more reliant on Javascript, whether we like it or not.</p>
 
@@ -1965,7 +2144,7 @@ $(document).on "click", "[data-behavior~=update-credit-card]", =&gt;
   <entry>
     <title type="html"><![CDATA[How to Start with Ruby?]]></title>
     <link href="http://brandonhilkert.com/blog/how-to-start-with-ruby/"/>
-    <updated>2015-05-06T06:03:00-07:00</updated>
+    <updated>2015-05-06T06:03:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/how-to-start-with-ruby</id>
     <content type="html"><![CDATA[<p>In light of RailsConf last month, I spent some time thinking about my experience learning Ruby and Rails back in 2009. The conference included quite a few seasoned veterans, but like any popular technology, there was also plenty of people that either just started learning Rails, or are considering doing so in the near future.</p>
 
@@ -2041,7 +2220,7 @@ $(document).on "click", "[data-behavior~=update-credit-card]", =&gt;
   <entry>
     <title type="html"><![CDATA[Adding Functionality to Ruby Classes with Decorators]]></title>
     <link href="http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators/"/>
-    <updated>2015-03-09T15:37:00-07:00</updated>
+    <updated>2015-03-09T15:37:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/adding-functionality-to-ruby-classes-with-decorators</id>
     <content type="html"><![CDATA[<p>In my <a href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/">last article</a>, I presented some code that wrapped up accessing a customer&rsquo;s Stripe data and added a caching layer on top. I wanted to take some time to dig in to that code and see how we can make it better.</p>
 
@@ -2243,7 +2422,7 @@ end</code></pre></figure>
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
-    <updated>2015-02-26T20:46:00-08:00</updated>
+    <updated>2015-02-26T20:46:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
     <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
 
@@ -2403,7 +2582,7 @@ it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data woul
   <entry>
     <title type="html"><![CDATA[Using Rails Fixtures To Seed a Database]]></title>
     <link href="http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database/"/>
-    <updated>2015-02-04T06:13:00-08:00</updated>
+    <updated>2015-02-04T06:13:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-rails-fixtures-to-seed-a-database</id>
     <content type="html"><![CDATA[<p>It’s no mystery that <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">I’ve grown to love Rails fixtures</a>. And I tend to mostly use relational databases in my applications, <a href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/">specifically PostgreSQL</a>.</p>
 
@@ -2500,7 +2679,7 @@ ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)</code></pr
   <entry>
     <title type="html"><![CDATA[2014 In Review]]></title>
     <link href="http://brandonhilkert.com/blog/2014-in-review/"/>
-    <updated>2014-12-29T14:57:00-08:00</updated>
+    <updated>2014-12-29T14:57:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/2014-in-review</id>
     <content type="html"><![CDATA[<p>For the past 2 years, I’ve committed myself to <a href="http://brandonhilkert.com/blog/be-ambitious/">specific
 goals</a> for the year to come. Most
@@ -2567,7 +2746,7 @@ halfway through something, I want to stop and do something else, so be it.</p>
   <entry>
     <title type="html"><![CDATA[A Ruby Refactor: Dependency Injection Options]]></title>
     <link href="http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/"/>
-    <updated>2014-12-17T07:07:00-08:00</updated>
+    <updated>2014-12-17T07:07:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options</id>
     <content type="html"><![CDATA[<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
 
@@ -2994,153 +3173,6 @@ end</code></pre></figure>
 <p>An accessor (or writer…), in this case, provided the same flexibility without changing the signature. I like being able to quickly look at the argument list of <code>initialize</code> and clearly understand its roles and responsibilities within the system.</p>
 
 <p>Which do you prefer?</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
-    <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
-    <updated>2014-12-03T13:14:00-08:00</updated>
-    <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
-    <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
-
-<p>For me, it’s the <code>Gemfile</code>. Think about it&hellip;there&rsquo;s very few other files that contain so much information. It describes the building blocks of the application. And at times, you can even see specific features of the application.</p>
-
-<!--more-->
-
-
-<p>A <code>Gemfile</code> also includes hints about preference and style. And style is something most Ruby developers are very passionate about. It doesn’t take long to find the story of a Rubyist describing their “love at first sight” experience with the language. It’s hard to find another file in a Rails project that’s so telling.</p>
-
-<p>A year ago, I wrote about the <a href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/">Ruby gems I regularly use in my Rails applications</a>. Because technology and the tools we use change so fast, I thought it’d be interesting to take a look at one of my more recent Gemfiles to see what’s changed.</p>
-
-<h2>Rails Templates</h2>
-
-<p>As I mentioned in the last <a href="http://brandonhilkert.com/blog/patterns-in-a-rails-gemfile/">Gemfile post</a>, I tend to write a bunch of small applications sprinkled around some larger ones. Despite the size of the project, I feel like I’ve honed in a set of Ruby gems that feel comfortable and productive for me and my workflow.</p>
-
-<p>Knowing the act of bootstrapping a Rails project is sometimes tedious, I took some time to build a <a href="https://github.com/brandonhilkert/rails_templates">Rails template</a> around the gems and patterns I commonly use. I’ll definitely be writing about this experience in the future since there seems to be very little discussion about it.</p>
-
-<p>In short, extracting my preferences to a template has been a HUGE time saver. It no longer feels like a burden to run <code>rails new</code>. I can jump right in and have a consistent set of tools that enable me to be productive within a few minutes.</p>
-
-<h2>My 2014 Gemfile</h2>
-
-<p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
-
-<figure class='code'><pre><code>source 'https://rubygems.org'
-
-ruby '2.1.4'
-
-gem 'rails', '4.1.8'
-gem 'pg'
-gem 'sass-rails', '~&gt; 4.0.3'
-gem 'uglifier', '&gt;= 1.3.0'
-gem 'coffee-rails', '~&gt; 4.0.0'
-gem 'jquery-rails'
-gem 'turbolinks'
-
-gem 'bcrypt-ruby', '~&gt; 3.1.2'
-
-group :development, :test do
-  gem 'pry'
-end
-
-group :test do
-  gem 'selenium-webdriver'
-  gem 'capybara'
-  gem 'timecop'
-  gem 'mocha'
-end
-
-group :development do
-  gem 'quiet_assets'
-  gem 'spring'
-  gem 'bullet'
-  gem 'stripe_tester', '~&gt; 0.1.0'
-end
-
-group :production, :demo do
-  gem 'rails_12factor'
-  gem 'heroku-deflater'
-end
-
-gem 'font-awesome-rails'
-gem 'unicorn'
-gem 'bootstrap-sass'
-gem 'sidekiq', require: 'sidekiq/web'
-gem 'sinatra'
-gem 'local_time'
-gem 'gravatar_image_tag'
-gem 'so_meta'
-gem 'chronic'
-gem 'recurrence'
-
-gem 'premailer-rails'
-
-gem 'momentjs-rails'
-gem 'bootstrap3-datetimepicker-rails'
-gem 'bootstrap-switch-rails'
-gem 'bootstrap-wysihtml5-rails'
-gem 'bootstrap-select-rails'
-gem 'autosize-rails'
-
-gem 'aws-sdk'
-
-gem 'html-pipeline'
-gem 'rinku'
-
-gem 'newrelic_rpm'
-gem 'doc_raptor'
-gem 'stripe'
-gem 'jquery-ui-rails'
-gem 'active_model_serializers'
-gem 'rubyzip'
-gem 'render_anywhere', require: false
-gem 'pusher'
-gem 'filepicker-rails'
-gem 'memcachier'
-gem 'dalli'
-gem 'intercom-rails'</code></pre></figure>
-
-
-<p>A few comments:</p>
-
-<ul>
-<li><p>I’ve standardized on <a href="http://www.postgresql.org/">Postgres</a> as the database for my apps, even in development. It’s reliable and allows me to be sure that the code I write will work the same way in production, since I tend to deploy most of my apps to <a href="https://www.heroku.com/">Heroku</a>.</p></li>
-<li><p>I leave <code>turbolinks</code> on. Judging from recent posts and comments within the community, this will probably one of the more controversial decisions.</p>
-
-<p>  If I’m being honest, my first experience with Turbolinks wasn’t great. And by “wasn’t great”, I mean — it broke <strong>EVERYTHING</strong>! But the good news was that it brought to light the fact that I sucked at javascript. At the time, I was capable of writing <em>just</em> enough to modify form behavior or fade in an DOM element.</p>
-
-<p>  The time had come to level up on my javascript skills. I was able to improve my javascript and also do it in a way that can took full advantage of the benefits that Turbolinks offers. Since that time, I’ve left Turbolinks on and no longer had to worry that my client-side code will stop working after clicking through a few application links.</p></li>
-<li><p>I’ve standardized on using <code>has_secure_password</code> for authentication. I previously used <a href="https://github.com/plataformatec/devise">devise</a>, but found the extra features are no longer worth the additional complexity. <code>has_secure_password</code> provides me reliable authentication patterns that are simple to understand and maintain. Hence the need for <code>bcrypt</code> in the <code>Gemfile</code> above.</p></li>
-<li><p>As for my test environment, I’ve written about <a href="http://brandonhilkert.com/blog/7-reasons-why-im-sticking-with-minitest-and-fixtures-in-rails/">my switch to Minitest and fixtures</a>. I’m still just as happy with that decision as the time I wrote about it. I’ve seen Rspec go through a variety of API changes since then, and thankful I no longer have to worry about updating my test suite every couple months. I continue to find value in <code>capybara</code> and include <code>mocha</code> for the times <code>Minitest</code>’s stubbing and mocking isn’t enough (I’ve been meaning to dig in to the places I use <code>mocha</code>. I’m guessing if the code was better, I probably wouldn’t need it at all).</p></li>
-<li><p><code>bullet</code> is a killer gem for tracking down performances issues. It’s saved me countless hours of debugging.</p></li>
-<li><p>The inclusion of <code>spring</code> in Rails 4.1 is great. I realize it’s a bandaid in some respects, but waiting for the environment to load on every test run is a drag. I’ve found that because my tests are so responsive when <code>spring</code> is working properly, it encourages me to run my tests more often. Once setup, it works well and only in rare cases has not reloaded when it should have.</p></li>
-<li><p>I generally always include <code>bootstrap</code> and <code>font-awesome</code> in my projects. Being a non-designer, it helps me get something on the screen faster, even if it’s not the final design.</p></li>
-<li><p>I continue to use <code>unicorn</code>. It’s been around for so long and continues to be competitive in benchmarks against other Ruby web servers. I tested Passenger in a few applications, but got scared off when it printed the entire environment to the screen in production on Heroku on an exception. I’m told there are ways around this with some non-trivial configuration, but I think it’s a bizarre default and isn’t conducive to my workflow.</p></li>
-<li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
-<li><p>I’ve written about putting together <a href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
-<li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
-<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="http://brandonhilkert.com/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
-<li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
-<li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
-<li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
-</ul>
-
-
-<p>The rest are very use case-specific. And in general, the defacto solution for each (<code>pusher</code> for real-time features, <code>dalli</code> for memcached, etc.).</p>
-
-<h2>Summary</h2>
-
-<p>I’m happy with my current toolkit. This doesn’t mean I’m not on the lookout for shiny new things, but I’m generally a little more cautious about replacing something reliable, even if it doesn’t do everything under the sun.</p>
-
-<p>Even though Ruby makes it easy to include third party libraries, it doesn’t mean we always should. As developers, we inherit the stability of the dependencies we include. Even though a gem’s code might be locked away behind a separate git repository, it likely has the same holes and complexities that we’re worried about in our applications. And perhaps, even more…</p>
-
-<p><a href="https://www.ruby-toolbox.com/">Ruby toolbox</a> is a great resource when searching for a gem. I generally consider the number of downloads, age of the project and development activity when deciding which one to go with.</p>
-
-<p>What have your favorite gems been this year?</p>
-
-<h2>Build a Ruby Gem</h2>
-
-<p>Ruby gems are the building blocks of Ruby/Rails applications. If you haven’t built one yourself, there’s no better time to start. Github makes it extremely to contribute to existing gems and sometimes that’s <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">the easiest way to get started contributing to open source</a>. My book, <em>Build a Ruby Gem</em>, includes <a href="http://brandonhilkert.com/books/build-a-ruby-gem/">everything you to need to get started building a Ruby gem</a>.</p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: slack | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/slack/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-21T08:37:33-08:00</updated>
+  <updated>2017-03-28T09:59:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,9 +14,203 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
+    <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/"/>
+    <updated>2017-03-27T13:58:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch</id>
+    <content type="html"><![CDATA[<p>A few articles ago, I wrote about <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">how to monitor Sidekiq retries using AWS Lambda</a>. Retries are often the first indication of an issue if your application does a lot of background work.</p>
+
+<p>As <a href="https://www.bark.us">Bark</a> continues to grow, we became interested in how the number of jobs enqueued and retrying trended over time. Using AWS Lambda to post this data to CloudWatch, we were able to visualize this data over time.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p><a href="http://sidekiq.org/">Sidekiq</a> offers a way to visual the jobs processed over time when on the dashboard. In fact, <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">this graph was one of my first open source contributions</a>.</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/sidekiq-dashboard.png" title="&ldquo;Sidekiq Dashboard&rdquo;" ></p>
+
+<p>Unfortunately, these graph don&rsquo;t show the number of retries from 2 am last night, or how long it took to exhaust the queues when 2 million jobs were created.</p>
+
+<p>Historical queue data is important if our application does a lot of background work and number of users is growing. Seeing these performance characteristics over time can help us be more prepared to add more background workers or scale our infrastructure in a way to stay ahead when our application is growing quickly.</p>
+
+<h2>The Solution</h2>
+
+<p>Because Bark is on AWS, we naturally looked to their tools for assistance. We already use CloudWatch to store data about memory, disk, and CPU usage for each server. This has served us well and allows us to set alarms for certain thresholds and graph this data over time:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/cloudwatch-memory.png" title="&ldquo;Monitoring memory usage on AWS CloudWatch&rdquo;" ></p>
+
+<p>Knowing we&rsquo;d have similar data for queue usage, we figured we could do the same with Sidekiq.</p>
+
+<h3>Sidekiq Queue Data Endpoint</h3>
+
+<p>If you remember from the last article on <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">monitoring Sidekiq retries using AWS Lambda</a>, we setup an endpoint in our application to return Sidekiq stats:</p>
+
+<p>```
+require &lsquo;sidekiq/api&rsquo;</p>
+
+<p>class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication</p>
+
+<p>  def index</p>
+
+<pre><code>base_stats = Sidekiq::Stats.new
+stats = {
+   enqueued: base_stats.enqueued,
+   queues: base_stats.queues,
+   busy: Sidekiq::Workers.new.size,
+   retries: base_stats.retry_size
+}
+
+render json: stats
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>along with the route:</p>
+
+<p><code>
+resources :sidekiq_queues, only: [:index]
+</code></p>
+
+<p>Using this resource, we need to poll at some regular interval and store the results.</p>
+
+<h3>AWS Lambda Function</h3>
+
+<p>AWS Lambda functions are perfect for one-off functions that feel like a burden to maintain in our application.</p>
+
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/lambda-trigger.png" title="&ldquo;AWS Lambda trigger&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
+
+<p>```
+var AWS = require(&lsquo;aws-sdk&rsquo;);
+var url = require(&lsquo;url&rsquo;);
+var https = require(&lsquo;https&rsquo;);</p>
+
+<p>if (typeof Promise === &lsquo;undefined&rsquo;) {
+  AWS.config.setPromisesDependency(require(&lsquo;bluebird&rsquo;));
+}</p>
+
+<p>var cloudwatch = new AWS.CloudWatch();</p>
+
+<p>sidekiqUrl = &lsquo;[Sidekiq stat URL]&rsquo;</p>
+
+<p>var logMetric = function(attr, value) {</p>
+
+<pre><code>var params = {
+    MetricData: [
+        {
+            MetricName: attr,
+            Dimensions: [
+                {
+                    Name: "App",
+                    Value: "www"
+                }
+            ],
+            Timestamp: new Date(),
+            Unit: "Count",
+            Value: value
+        }
+    ],
+    Namespace: "Queues"
+};
+
+return cloudwatch.putMetricData(params).promise();
+</code></pre>
+
+<p>}</p>
+
+<p>var getQueueStats = function(statsUrl) {</p>
+
+<pre><code>return new Promise(function(resolve, reject) {
+    var options = url.parse(statsUrl);
+    options.headers = {
+        'Accept': 'application/json',
+    };
+    var req = https.request(options, function(res){
+        var body = '';
+
+        res.setEncoding('utf8');
+
+        //another chunk of data has been recieved, so append it to `str`
+        res.on('data', function (chunk) {
+            body += chunk;
+        });
+
+        //the whole response has been recieved
+        res.on('end', function () {
+            resolve(JSON.parse(body));
+        });
+    });
+
+    req.on('error', function(e) {
+       reject(e);
+    });
+
+    req.end();
+});
+</code></pre>
+
+<p>}</p>
+
+<p>exports.handler = function(event, context) {</p>
+
+<pre><code>getQueueStats(sidekiqUrl).then(function(stats) {
+    console.log('STATS: ', stats);
+
+    var retryPromise = logMetric("Retries", stats.retries);
+    var busyPromise = logMetric("Busy", stats.busy);
+    var enqueuedPromise = logMetric("Enqueued", stats.enqueued);
+
+    Promise.all([retryPromise, busyPromise, enqueuedPromise]).then(function(values) {
+        console.log(values);
+        context.succeed();
+    }).catch(function(err){
+        console.error(err);
+        context.fail("Server error when processing message: " + err );
+    });
+})
+.catch(function(err) {
+    console.error(err);
+    context.fail("Failed to get stats from HTTP request: " + err );
+});
+</code></pre>
+
+<p>};
+```</p>
+
+<p><em>Note: <code>sidekiqURL</code>  need to be defined with appropriate values for this to work.</em></p>
+
+<p>Within CloudWatch, we&rsquo;re defining a new namespace (&ldquo;Queues&rdquo;) where our data will live. Within this namespace, we&rsquo;ll segregate these stats by the Dimension <code>App</code>. As we can see, we chose <code>www</code> for this value. If we wanted to monitor the queues of a few servers, each one could use a unique App name.</p>
+
+<p>Review and save the Lambda function and we&rsquo;re all set!</p>
+
+<h3>Graphing Sidekiq Queue Data</h3>
+
+<p>Once the function has run a few times, under CloudWatch &mdash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/custom-namespace.png" title="&ldquo;AWS CloudWatch Custom Namespace&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll choose the name of our app (<code>www</code>) and graph the values of each of these values over whatever timespan we want:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/sidekiq-queues.png" title="&ldquo;AWS CloudWatch Monitoring Sidekiq Queues&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>I&rsquo;ve found AWS lamba to be a great place for endpoints/functionality that feels cumbersome to include in my applications. Bringing deeper visibility to our Sidekiq queues has given us the ability to see usage trends we weren&rsquo;t aware of throughout the day. This will help us preemptively add infrastructure resources to keep up with our growth.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-07:00</updated>
+    <updated>2016-10-25T11:54:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 

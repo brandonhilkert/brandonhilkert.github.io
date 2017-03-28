@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-21T08:37:33-08:00</updated>
+  <updated>2017-03-28T09:59:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -14,9 +14,203 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
+    <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/"/>
+    <updated>2017-03-27T13:58:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch</id>
+    <content type="html"><![CDATA[<p>A few articles ago, I wrote about <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">how to monitor Sidekiq retries using AWS Lambda</a>. Retries are often the first indication of an issue if your application does a lot of background work.</p>
+
+<p>As <a href="https://www.bark.us">Bark</a> continues to grow, we became interested in how the number of jobs enqueued and retrying trended over time. Using AWS Lambda to post this data to CloudWatch, we were able to visualize this data over time.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p><a href="http://sidekiq.org/">Sidekiq</a> offers a way to visual the jobs processed over time when on the dashboard. In fact, <a href="http://brandonhilkert.com/blog/3-ways-to-get-started-contributing-to-open-source/">this graph was one of my first open source contributions</a>.</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/sidekiq-dashboard.png" title="&ldquo;Sidekiq Dashboard&rdquo;" ></p>
+
+<p>Unfortunately, these graph don&rsquo;t show the number of retries from 2 am last night, or how long it took to exhaust the queues when 2 million jobs were created.</p>
+
+<p>Historical queue data is important if our application does a lot of background work and number of users is growing. Seeing these performance characteristics over time can help us be more prepared to add more background workers or scale our infrastructure in a way to stay ahead when our application is growing quickly.</p>
+
+<h2>The Solution</h2>
+
+<p>Because Bark is on AWS, we naturally looked to their tools for assistance. We already use CloudWatch to store data about memory, disk, and CPU usage for each server. This has served us well and allows us to set alarms for certain thresholds and graph this data over time:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/cloudwatch-memory.png" title="&ldquo;Monitoring memory usage on AWS CloudWatch&rdquo;" ></p>
+
+<p>Knowing we&rsquo;d have similar data for queue usage, we figured we could do the same with Sidekiq.</p>
+
+<h3>Sidekiq Queue Data Endpoint</h3>
+
+<p>If you remember from the last article on <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">monitoring Sidekiq retries using AWS Lambda</a>, we setup an endpoint in our application to return Sidekiq stats:</p>
+
+<p>```
+require &lsquo;sidekiq/api&rsquo;</p>
+
+<p>class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication</p>
+
+<p>  def index</p>
+
+<pre><code>base_stats = Sidekiq::Stats.new
+stats = {
+   enqueued: base_stats.enqueued,
+   queues: base_stats.queues,
+   busy: Sidekiq::Workers.new.size,
+   retries: base_stats.retry_size
+}
+
+render json: stats
+</code></pre>
+
+<p>  end
+end
+```</p>
+
+<p>along with the route:</p>
+
+<p><code>
+resources :sidekiq_queues, only: [:index]
+</code></p>
+
+<p>Using this resource, we need to poll at some regular interval and store the results.</p>
+
+<h3>AWS Lambda Function</h3>
+
+<p>AWS Lambda functions are perfect for one-off functions that feel like a burden to maintain in our application.</p>
+
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+
+<p><img class="center" src="/images/sidekiq-monitor/lambda-trigger.png" title="&ldquo;AWS Lambda trigger&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
+
+<p>```
+var AWS = require(&lsquo;aws-sdk&rsquo;);
+var url = require(&lsquo;url&rsquo;);
+var https = require(&lsquo;https&rsquo;);</p>
+
+<p>if (typeof Promise === &lsquo;undefined&rsquo;) {
+  AWS.config.setPromisesDependency(require(&lsquo;bluebird&rsquo;));
+}</p>
+
+<p>var cloudwatch = new AWS.CloudWatch();</p>
+
+<p>sidekiqUrl = &lsquo;[Sidekiq stat URL]&rsquo;</p>
+
+<p>var logMetric = function(attr, value) {</p>
+
+<pre><code>var params = {
+    MetricData: [
+        {
+            MetricName: attr,
+            Dimensions: [
+                {
+                    Name: "App",
+                    Value: "www"
+                }
+            ],
+            Timestamp: new Date(),
+            Unit: "Count",
+            Value: value
+        }
+    ],
+    Namespace: "Queues"
+};
+
+return cloudwatch.putMetricData(params).promise();
+</code></pre>
+
+<p>}</p>
+
+<p>var getQueueStats = function(statsUrl) {</p>
+
+<pre><code>return new Promise(function(resolve, reject) {
+    var options = url.parse(statsUrl);
+    options.headers = {
+        'Accept': 'application/json',
+    };
+    var req = https.request(options, function(res){
+        var body = '';
+
+        res.setEncoding('utf8');
+
+        //another chunk of data has been recieved, so append it to `str`
+        res.on('data', function (chunk) {
+            body += chunk;
+        });
+
+        //the whole response has been recieved
+        res.on('end', function () {
+            resolve(JSON.parse(body));
+        });
+    });
+
+    req.on('error', function(e) {
+       reject(e);
+    });
+
+    req.end();
+});
+</code></pre>
+
+<p>}</p>
+
+<p>exports.handler = function(event, context) {</p>
+
+<pre><code>getQueueStats(sidekiqUrl).then(function(stats) {
+    console.log('STATS: ', stats);
+
+    var retryPromise = logMetric("Retries", stats.retries);
+    var busyPromise = logMetric("Busy", stats.busy);
+    var enqueuedPromise = logMetric("Enqueued", stats.enqueued);
+
+    Promise.all([retryPromise, busyPromise, enqueuedPromise]).then(function(values) {
+        console.log(values);
+        context.succeed();
+    }).catch(function(err){
+        console.error(err);
+        context.fail("Server error when processing message: " + err );
+    });
+})
+.catch(function(err) {
+    console.error(err);
+    context.fail("Failed to get stats from HTTP request: " + err );
+});
+</code></pre>
+
+<p>};
+```</p>
+
+<p><em>Note: <code>sidekiqURL</code>  need to be defined with appropriate values for this to work.</em></p>
+
+<p>Within CloudWatch, we&rsquo;re defining a new namespace (&ldquo;Queues&rdquo;) where our data will live. Within this namespace, we&rsquo;ll segregate these stats by the Dimension <code>App</code>. As we can see, we chose <code>www</code> for this value. If we wanted to monitor the queues of a few servers, each one could use a unique App name.</p>
+
+<p>Review and save the Lambda function and we&rsquo;re all set!</p>
+
+<h3>Graphing Sidekiq Queue Data</h3>
+
+<p>Once the function has run a few times, under CloudWatch &mdash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/custom-namespace.png" title="&ldquo;AWS CloudWatch Custom Namespace&rdquo;" ></p>
+
+<p>From here, we&rsquo;ll choose the name of our app (<code>www</code>) and graph the values of each of these values over whatever timespan we want:</p>
+
+<p><img class="center" src="/images/sidekiq-cloudwatch/sidekiq-queues.png" title="&ldquo;AWS CloudWatch Monitoring Sidekiq Queues&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>I&rsquo;ve found AWS lamba to be a great place for endpoints/functionality that feels cumbersome to include in my applications. Bringing deeper visibility to our Sidekiq queues has given us the ability to see usage trends we weren&rsquo;t aware of throughout the day. This will help us preemptively add infrastructure resources to keep up with our growth.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
     <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
-    <updated>2017-02-17T09:20:00-08:00</updated>
+    <updated>2017-02-17T09:20:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
     <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
 
@@ -215,7 +409,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-07:00</updated>
+    <updated>2016-10-25T11:54:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -477,7 +671,7 @@ getReq.end();
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-07:00</updated>
+    <updated>2016-04-29T09:44:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
@@ -574,7 +768,7 @@ I&rsquo;m looking forward to removing the dependency if it performs similarly.</
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-07:00</updated>
+    <updated>2016-04-22T20:13:00-04:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
     <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
 
@@ -619,7 +813,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#x69;&#108;&#116;&#x6f;&#x3a;&#98;&#114;&#97;&#x6e;&#x64;&#111;&#x6e;&#x68;&#105;&#x6c;&#107;&#x65;&#x72;&#x74;&#x40;&#103;&#x6d;&#97;&#x69;&#108;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#x72;&#x61;&#110;&#x64;&#111;&#x6e;&#104;&#x69;&#x6c;&#x6b;&#101;&#114;&#x74;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#109;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x62;&#114;&#x61;&#110;&#100;&#x6f;&#x6e;&#x68;&#105;&#x6c;&#x6b;&#x65;&#114;&#x74;&#x40;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#99;&#111;&#109;">&#98;&#x72;&#x61;&#110;&#x64;&#x6f;&#x6e;&#104;&#105;&#108;&#x6b;&#101;&#114;&#116;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -719,317 +913,6 @@ Successfully installed sucker_punch-2.0.1
 <h2>Summary</h2>
 
 <p>In addition to documentation through a <code>README</code> or wiki, post-install messages are a great way to keep users of our gems informed. Having access to the output of their console is a privilege, so use it sparingly. Like the boy who cried wolf, if we include a wall of text with each release of our gem, users will learn to ignore it and that would negatively affect its value for everyone.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
-    <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
-    <updated>2016-01-26T07:00:00-08:00</updated>
-    <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
-    <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
-
-<p>When I published the previous article, <a href="https://twitter.com/mperham/status/684529380446441472">Mike Perham rightly pointed out the opportunity to support the previous versions&rsquo;s API through an opt-in module</a>. I was hesitant to include support for the old syntax by default, but allowing a developer to require a file to get the old syntax made complete sense to me. My intent was never to abandon existing Sucker Punch users, but it felt necessary for the success of the project going forward.</p>
-
-<!--more-->
-
-
-<h2>The Problem</h2>
-
-<p>The following is an example of enqueueing a background job with Sucker Punch using the old syntax:</p>
-
-<p><code>
-LogJob.new.async.perform("new_user")
-</code></p>
-
-<p>And with the new syntax:</p>
-
-<p><code>
-LogJob.perform_async("new_user")
-</code></p>
-
-<p><em>How do we support the old syntax in the new version?</em></p>
-
-<p>Let&rsquo;s step back and reminder ourselves of what a typical job class looks like:</p>
-
-<p>```
-class LogJob
-  include SuckerPunch::Job</p>
-
-<p>  def perform(event)</p>
-
-<pre><code>Log.new(event).track
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Important points to notice:</p>
-
-<ol>
-<li>Each job includes the <code>SuckerPunch::Job</code> module to gain access to asynchronous behavior</li>
-<li>Each job executes its logic using the <code>perform</code> instance method</li>
-<li>Each job passes arguments needed for its logic as arguments to the <code>perform</code> instance method</li>
-</ol>
-
-
-<h2>The Solution</h2>
-
-<p>We&rsquo;ll start with the test:</p>
-
-<p>```</p>
-
-<h1>test/sucker_punch/async_syntax_test.rb</h1>
-
-<p>require &lsquo;test_helper&rsquo;</p>
-
-<p>module SuckerPunch
-  class AsyncSyntaxTest &lt; Minitest::Test</p>
-
-<pre><code>def setup
-  require 'sucker_punch/async_syntax'
-end
-
-def test_perform_async_runs_job_asynchronously
-  arr = []
-  latch = Concurrent::CountDownLatch.new
-  FakeLatchJob.new.async.perform(arr, latch)
-  latch.wait(0.2)
-  assert_equal 1, arr.size
-end
-
-private
-
-class FakeLatchJob
-  include SuckerPunch::Job
-
-  def perform(arr, latch)
-    arr.push true
-    latch.count_down
-  end
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><em>Note: Some details of this are complex because the job&rsquo;s code is running in another thread. I&rsquo;ll walk through those details in a future article.</em></p>
-
-<p>The basic sequence is:
-1. require <code>sucker_punch/async_syntax</code>
-2. Execute a background job using the <code>async</code> syntax
-3. Assert changes made in that job were successful</p>
-
-<p>Running the tests above, we get the following error:</p>
-
-<p><code>``
-1) Error:
-SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
-LoadError: cannot load such file -- sucker_punch/async_syntax
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in</code>require'
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'</p>
-
-<p>1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
-```</p>
-
-<p>Ok, so the file doesn&rsquo;t exist. Let&rsquo;s create it and re-run the tests:</p>
-
-<p><code>
-1) Error:
-SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
-NoMethodError: undefined method `async' for #&lt;SuckerPunch::AsyncSyntaxTest::FakeLatchJob:0x007fbc73cbf548&gt;
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
-
-<p>Progress! The job doesn&rsquo;t have an <code>async</code> method. Let&rsquo;s add it:</p>
-
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async # &lt;--- New method
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p><em>Notice: We&rsquo;re monkey-patching the <code>SuckerPunch::Job</code> module. This will allow us to add methods to the background job since it&rsquo;s included in the job.</em></p>
-
-<p>The tests now:</p>
-
-<p><code>
-1) Error:
-SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
-NoMethodError: undefined method `perform' for nil:NilClass
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
-
-<p>More progress&hellip;the <code>async</code> method we added returns nil, and because of the syntax <code>async.perform</code>, there&rsquo;s no <code>perform</code> method on the output of <code>async</code>. In short, we need to return something from <code>async</code> that responds to <code>perform</code> and can run the job.</p>
-
-<p>In its most basic form, suppose we create a proxy object that responds to <code>perform</code>:</p>
-
-<p><code>
-class AsyncProxy
-  def perform
-  end
-end
-</code></p>
-
-<p>We&rsquo;ll need to do some work in <code>perform</code> to execute the job, but this&rsquo;ll do for now. Now, let&rsquo;s integrate this new proxy to our <code>async_syntax.rb</code> file and return a new instance of the proxy from the <code>async</code> method:</p>
-
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async
-  AsyncProxy.new # &lt;--- new instance of the proxy
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def perform
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Running our tests gives us the following:</p>
-
-<p><code>
-1) Error:
-SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
-ArgumentError: wrong number of arguments (2 for 0)
-  /Users/bhilkert/Dropbox/code/sucker_punch/lib/sucker_punch/async_syntax.rb:9:in `perform'
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
-
-<p>Now we&rsquo;re on to something. We see an error related to the number of arguments on the <code>perform</code> method. Because each job&rsquo;s argument list will be different, we need to find a way to be flexible for whatever&rsquo;s passed in, something like&hellip;the splat operator! Let&rsquo;s try it:</p>
-
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async
-  AsyncProxy.new
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>The tests now:</p>
-
-<p><code>
-1) Failure:
-SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously [/Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:14]:
-Expected: 1
-Actual: 0
-</code></p>
-
-<p>At this point, we&rsquo;ve reached the end of test output suggesting the path forward. This error is saying, &ldquo;Your assertions failed.&rdquo;. This is good because it means our syntax implementation will work and it&rsquo;s just about executing the actual job code in the proxy&rsquo;s <code>perform</code> method.</p>
-
-<p>We want to leverage our new syntax (<code>perform_async</code>) to run the actual job asynchronously so it passes through the standard code path. To do so, we&rsquo;ll need a reference to the original job in the proxy object. Let&rsquo;s pass that to the proxy during instantiation:</p>
-
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async
-  AsyncProxy.new(self) # &lt;--- Pass the job instance
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def initialize(job) # &lt;--- Handle job passed in
-  @job = job
-end
-
-def perform(*args)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
-
-<p>Now that the proxy has a reference to the job instance, we can call the <code>perform_async</code> class method to execute the job:</p>
-
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async
-  AsyncProxy.new(self)
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def initialize(job)
-  @job = job
-end
-
-def perform(*args)
-  @job.class.perform_async(*args) # &lt;---- Execute the job
-end
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>```</p>
-
-<p>Lastly, the tests:</p>
-
-<p>```
-ress ENTER or type command to continue
-bundle exec rake test TEST=&ldquo;test/sucker_punch/async_syntax_test.rb&rdquo;
-Run options: &mdash;seed 43886</p>
-
-<h1>Running:</h1>
-
-<p>.</p>
-
-<p>1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
-```</p>
-
-<p>Success!</p>
-
-<p>Just like that, new users of Sucker Punch will be able to add <code>require 'sucker_punch/async_syntax'</code> to their projects to use the old syntax. This will allow existing projects using Sucker Punch to take advantage of the reworked internals without the need to make sweeping changes to the enqueueing syntax.</p>
-
-<p>Support for the old syntax will be available for foreseeable future via this include. All new code/applications should use the new syntax going forward.</p>
-
-<h2>Conclusion</h2>
-
-<p>Before realizing a proxy object would work, I tinkered with <code>alias_method</code> and a handful of other approaches to latching on to the job&rsquo;s <code>perform</code> method and saving it off to execute later. While some combinations of these might have worked, the proxy object solution is simple and elegant. There&rsquo;s no magic, which means less maintenance going forward. The last thing I want is to make a breaking change, add support for the old syntax and find the support to be bug-ridden.</p>
-
-<p>Ruby is incredibly flexible. Sometimes a 9-line class is enough to get the job done without reaching for an overly complex metaprogramming approach.</p>
-
-<p>Having said all that, <a href="https://github.com/brandonhilkert/sucker_punch">Sucker Punch <code>v2</code> has been
-released</a>!</p>
 ]]></content>
   </entry>
   

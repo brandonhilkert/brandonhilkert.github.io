@@ -4,7 +4,7 @@
   <title><![CDATA[Category: analytics | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/analytics/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-02-21T08:37:33-08:00</updated>
+  <updated>2017-03-28T09:59:51-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
     <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
-    <updated>2017-02-17T09:20:00-08:00</updated>
+    <updated>2017-02-17T09:20:00-05:00</updated>
     <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
     <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
 
