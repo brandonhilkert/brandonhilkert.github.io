@@ -47,6 +47,10 @@ body {
   overflow:hidden;
 }
 
+.row .one_fourth:last-of-type {
+  margin-right: 0;
+}
+
 .row img {
   height: auto;
   max-width: 100%;
@@ -601,6 +605,22 @@ input[type="submit"] {
   }
 }
 
+#video .row.screencasts {
+  padding: 0;
+}
+
+#video .row.screencasts .one_fourth {
+  font-size: 0.8rem;
+}
+
+#video .row.screencasts .one_fourth img {
+  margin-bottom: 5px;
+}
+
+#video .row.screencasts .one_fourth .title {
+  font-weight: bold;
+  text-transform: uppercase;
+}
 
 /* 6.7 Pricing Table */
 
@@ -1055,7 +1075,6 @@ a#contact_close_counter {
     margin: 0 auto;
     padding:25px 0 25px 0;
   }
-
 
   .one_half {
     width: 355px;
