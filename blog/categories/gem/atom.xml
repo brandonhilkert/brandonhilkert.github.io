@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2017-06-26T10:32:29-04:00</updated>
+  <updated>2018-03-19T13:12:47-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -61,7 +61,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#108;&#x74;&#x6f;&#x3a;&#x62;&#x72;&#97;&#110;&#x64;&#111;&#110;&#x68;&#105;&#108;&#107;&#x65;&#114;&#116;&#64;&#x67;&#x6d;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#109;">&#98;&#x72;&#97;&#110;&#100;&#x6f;&#x6e;&#104;&#105;&#x6c;&#107;&#x65;&#x72;&#116;&#64;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#109;&#97;&#105;&#x6c;&#116;&#x6f;&#58;&#98;&#114;&#x61;&#x6e;&#x64;&#111;&#x6e;&#x68;&#105;&#x6c;&#107;&#x65;&#114;&#x74;&#64;&#103;&#x6d;&#97;&#105;&#108;&#46;&#x63;&#x6f;&#x6d;">&#x62;&#x72;&#x61;&#110;&#100;&#111;&#110;&#104;&#105;&#x6c;&#x6b;&#101;&#x72;&#x74;&#x40;&#x67;&#109;&#97;&#105;&#108;&#x2e;&#x63;&#111;&#109;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
