@@ -168,6 +168,44 @@
   
 
 
+<time datetime="2018-04-28T14:42:00-04:00" data-updated="true" itemprop="datePublished">April 28<span>th</span>, 2018</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/reducing-sidekiq-memory-usage-with-jemalloc/" itemprop="url">Reducing Sidekiq Memory Usage With Jemalloc</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/jemalloc/'>jemalloc</a>, <a class='category' href='/blog/categories/memory/'>memory</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>, <a class='category' href='/blog/categories/sidekiq/'>sidekiq</a>, <a class='category' href='/blog/categories/ubuntu/'>ubuntu</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
+
+<p>Turns out&hellip;Ruby’s not the memory hog I&rsquo;d previously thought. After some research and experimentation, I&rsquo;ve found <code>jemalloc</code> to offer significant memory savings while at least preserving performance, if not improving it as well.</p>
+
+
+		
+		<a href="/blog/reducing-sidekiq-memory-usage-with-jemalloc/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2017-03-27T13:58:00-04:00" data-updated="true" itemprop="datePublished">March 27<span>th</span>, 2017</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/" itemprop="url">Monitoring Sidekiq Using AWS Lambda and CloudWatch</a></h1>
   <div class="tags">
@@ -489,47 +527,6 @@ I leave it enabled in all my Rails applications. Most of the negative opinions I
 
 		
 		<a href="/blog/sidekiq-as-a-microservice-message-queue/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2015-10-15T09:07:00-04:00" data-updated="true" itemprop="datePublished">October 15<span>th</span>, 2015</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/a-path-to-services-part-3-synchronous-events/" itemprop="url">A Path to Services - Part 3 - Synchronous Events</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/microservices/'>microservices</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
-Blog</a></em></p>
-
-<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we introduced a billing service to determine which features an account could access. If you remember, <a href="/our-path-to-services-part-1-start-small/">the email service</a> was a &ldquo;fire and forget&rdquo; operation and was capable of handling throughput delays given its low value to the core application.</p>
-
-<p>This post will explore how we handle synchronous communication for a service like billing where an inline response is required to service a request from the core application.</p>
-
-
-		
-		<a href="/blog/a-path-to-services-part-3-synchronous-events/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

@@ -168,6 +168,47 @@
   
 
 
+<time datetime="2015-10-15T09:07:00-04:00" data-updated="true" itemprop="datePublished">October 15<span>th</span>, 2015</time></div>
+	<h1 class="title" itemprop="name"><a href="/blog/a-path-to-services-part-3-synchronous-events/" itemprop="url">A Path to Services - Part 3 - Synchronous Events</a></h1>
+  <div class="tags">
+
+
+	<a class='category' href='/blog/categories/microservices/'>microservices</a>, <a class='category' href='/blog/categories/rails/'>rails</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
+
+
+</div>
+	<div class="meta">
+		
+	</div>
+	<div class="entry-content" itemprop="articleBody">
+		<p><em>This article was originally posted on the <a href="http://plumbing.pipelinedeals.com/">PipelineDeals Engineering
+Blog</a></em></p>
+
+<p>In the <a href="/blog/a-path-to-services-part-1-start-small/">previous article in this series</a>, we introduced a billing service to determine which features an account could access. If you remember, <a href="/our-path-to-services-part-1-start-small/">the email service</a> was a &ldquo;fire and forget&rdquo; operation and was capable of handling throughput delays given its low value to the core application.</p>
+
+<p>This post will explore how we handle synchronous communication for a service like billing where an inline response is required to service a request from the core application.</p>
+
+
+		
+		<a href="/blog/a-path-to-services-part-3-synchronous-events/" class="more-link">continue reading &rarr;</a>
+	</div>
+
+</article>
+
+
+  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="date">
+
+
+
+
+
+
+
+
+  
+
+
 <time datetime="2015-08-14T10:32:00-04:00" data-updated="true" itemprop="datePublished">August 14<span>th</span>, 2015</time></div>
 	<h1 class="title" itemprop="name"><a href="/blog/a-path-to-services-part-2-synchronous-vs-asynchronous/" itemprop="url">A Path to Services - Part 2 - Synchronous vs. Asynchronous</a></h1>
   <div class="tags">
@@ -502,44 +543,6 @@ go well in the previous year. Think weight loss (everyone makes this resolution 
 
 		
 		<a href="/blog/2014-in-review/" class="more-link">continue reading &rarr;</a>
-	</div>
-
-</article>
-
-
-  <article class="post" itemprop="blogPost" itemscope itemtype="http://schema.org/BlogPosting">
-  <div class="date">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-12-17T07:07:00-05:00" data-updated="true" itemprop="datePublished">December 17<span>th</span>, 2014</time></div>
-	<h1 class="title" itemprop="name"><a href="/blog/a-ruby-refactor-exploring-dependency-injection-options/" itemprop="url">A Ruby Refactor: Dependency Injection Options</a></h1>
-  <div class="tags">
-
-
-	<a class='category' href='/blog/categories/dependency-injection/'>dependency injection</a>, <a class='category' href='/blog/categories/refactor/'>refactor</a>, <a class='category' href='/blog/categories/ruby/'>ruby</a>
-
-
-</div>
-	<div class="meta">
-		
-	</div>
-	<div class="entry-content" itemprop="articleBody">
-		<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
-
-<p><a href="http://en.m.wikipedia.org/wiki/Dependency_injection">Dependency injection</a> was a necessary piece of that puzzle. I’ve always been curious about the various forms of dependency injection and the effects each would have on the code. Below I explore 2 options (constructor injection and setter injection).</p>
-
-
-		
-		<a href="/blog/a-ruby-refactor-exploring-dependency-injection-options/" class="more-link">continue reading &rarr;</a>
 	</div>
 
 </article>

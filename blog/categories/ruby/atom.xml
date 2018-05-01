@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-03-19T13:12:47-04:00</updated>
+  <updated>2018-05-01T14:52:07-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,90 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Reducing Sidekiq Memory Usage with Jemalloc]]></title>
+    <link href="http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc/"/>
+    <updated>2018-04-28T14:42:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc</id>
+    <content type="html"><![CDATA[<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
+
+<p>Turns out&hellip;Ruby’s not the memory hog I&rsquo;d previously thought. After some research and experimentation, I&rsquo;ve found <code>jemalloc</code> to offer significant memory savings while at least preserving performance, if not improving it as well.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>At <a href="https://www.bark.us">Bark</a>, we poll external APIs for millions of monitored social media, text, and emails. This is all done through <a href="http://sidekiq.org/">Sidekiq</a> background jobs. Even though Ruby doesn&rsquo;t truly allow parallelism, we see great benefit with Sidekiq concurrency as the jobs wait for external APIs to respond. The API responses can often be large, not to mention any media they might include. As a result, we see the memory usage of our Sidekiq workers increase until they&rsquo;re ultimately killed and restarted by <a href="https://www.freedesktop.org/wiki/Software/systemd/"><code>systemd</code></a>.</p>
+
+<p>The following shows a common memory usage pattern for our queue servers:</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-before.png" title="&ldquo;Sidekiq servers memory usage before using jemalloc&rdquo;" ></p>
+
+<p>Two things to notice:</p>
+
+<ol>
+<li><p><strong>Memory increased quickly</strong> &ndash; The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
+<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> &ndash; The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
+</ol>
+
+
+<h2>The Solution</h2>
+
+<p>As the <a href="https://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">author of a multi-threaded background processing library</a>, I frequently see reports of memory leaks in Rails applications. As a Sidekiq user, <a href="https://github.com/mperham/sidekiq/issues/3824">this one caught my attention</a>. It starts the a classic memory leak report, but later turns towards deeper issues in the underlying operating system, not in the application. With <a href="https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html">Nate Berkopec&rsquo;s post on Ruby memory usage in multi-threaded applications</a> referenced, the reporter found switching to <code>jemalloc</code> to fix their issue.</p>
+
+<p><code>jemalloc</code> describes itself as:</p>
+
+<blockquote><p>a general purpose malloc(3) implementation that emphasizes fragmentation avoidance and scalable concurrency support</p></blockquote>
+
+<p>The description targets our use-case and issues with the current memory allocator. We were seeing terrible fragmentation when using Sidekiq (concurrent workers).</p>
+
+<h3>How to use jemalloc</h3>
+
+<p>Ruby can use <code>jemalloc</code> a few different ways. It can be compiled with <code>jemalloc</code>, but we already had Ruby installed and were interested in trying it with the least amount of infrastructure changes.</p>
+
+<p>It turns out Ruby will attempt to use <code>jemalloc</code> if the <a href="https://github.com/jemalloc/jemalloc/wiki/Getting-Started">well-document environment variable <code>LD_PRELOAD</code></a> is set.</p>
+
+<p>Our Sidekiq servers use Ubuntu 16.04, so we started by installing <code>jemalloc</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">sudo apt-get install libjemalloc-dev</code></pre></figure></p>
+
+<p>From there, we configured the <code>LD_PRELOAD</code> environment variable by adding the following to <code>/etc/environment</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1</code></pre></figure></p>
+
+<p><em>Note: The location of <code>jemalloc</code> may vary depending on version and/or Linux distribution.</em></p>
+
+<h3>Benchmark</h3>
+
+<p>We benchmarked <code>jemalloc</code> on just one of the queue servers. This would allow us to do a true comparison against similar activity.</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-comparison.png" title="&ldquo;Sidekiq server memory usage with one server using jemalloc&rdquo;" ></p>
+
+<p>As we can see, the difference is drastic &mdash; <strong>over 4x decrease in memory usage</strong>!</p>
+
+<p>The more impressive detail was the consistency. Total memory usage doesn&rsquo;t waver much. Processing large payloads and media, I assumed we&rsquo;d continue to see the peaks and valleys common to processing social media content. The sidekiq processes using <code>jemalloc</code> show a better ability to use previously allocated memory.</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-with-jemalloc-details.png" title="&ldquo;Sidekiq server memory usage details with one server using jemalloc&rdquo;" ></p>
+
+<h3>Roll it in to production</h3>
+
+<p>With similar behavior over a 3 day period, we concluded to roll it out to the remaining queue servers.</p>
+
+<p>The reduced memory usage continues to be impressive, all without any noticeable negative trade-offs.</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-after.png" title="&ldquo;Sidekiq server memory usage after using jemalloc&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>We were surprised by the significant decrease in memory usage by switching to <code>jemalloc</code>. Based on the other reports, we assumed it be reasonable, but not a 4x decrease.</p>
+
+<p>Even after looking at these graphs for the last couple days, the differences seem too good to be true. But all is well and it&rsquo;s hard to imagine NOT doing this for any Ruby server we deploy in the future.</p>
+
+<p>Give it a shot. I&rsquo;d love to see your results.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
@@ -762,157 +846,6 @@ $nprogress-color: #37c8c9;</p>
 <p>The <a href="https://github.com/turbolinks/turbolinks/blob/master/src/turbolinks/progress_bar.coffee">latest version of Turbolinks has a progress bar
 built-in</a>.
 I&rsquo;m looking forward to removing the dependency if it performs similarly.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
-    <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-04:00</updated>
-    <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
-    <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
-
-<!--more-->
-
-
-<h2>What are Post-Install Messages?</h2>
-
-<p>As Rubyists, we have plenty experiences installing gems. By running <code>gem install rails</code>, we&rsquo;re asking Rubygems to install the gem named <code>rails</code> on to our system.</p>
-
-<p>The typical output of installing a gem with no other dependencies (assuming it completes successfully) is minimal:</p>
-
-<p><figure class="code"><pre><code class="bash">$ gem install so_meta
-Successfully installed so_meta-0.1
-1 gem installed
-</code></pre></figure></p>
-
-<p>As you can see, we ran <code>gem install so_meta</code> and the output confirmed the install, with nothing more.</p>
-
-<p>If you&rsquo;ve used the <a href="https://github.com/jnunemaker/httparty">HTTParty</a> gem, you&rsquo;ve probably seen the additional line of output it generates when you run <code>gem install httparty</code>:</p>
-
-<p><figure class="code"><pre><code class="bash">$ gem install httparty
-When you HTTParty, you must party hard!
-Successfully installed httparty-0.13.7
-1 gem installed
-</code></pre></figure></p>
-
-<p>Where did <code>When you HTTParty, you must party hard!</code> come from? It turns out the source of that text was a [post-install message defined in the <a href="https://github.com/jnunemaker/httparty/blob/v0.13.7/httparty.gemspec#L22"><code>gemspec</code></a>.</p>
-
-<p>Now, I know what you&rsquo;re probably thinking&hellip;what good is that message? That&rsquo;s up for debate. In fact, that specific message in <code>HTTParty</code> has been the source of much debate over the years.</p>
-
-<h2>How to configure a Post-Install Message</h2>
-
-<p>As we&rsquo;ve seen before, the <code>gemspec</code> file (located at the root of the gem) defines the specification of a Ruby gem. Using bundler to bootstrap a new gem will automatically create this file. Here&rsquo;s an example of a default <code>gemspec</code> file created by bundler using the command <code>bundle gem brandon</code> (<code>brandon</code> being the name of my fake gem):</p>
-
-<p><figure class="code"><pre><code class="ruby"># coding: utf-8
-lib = File.expand_path(&lsquo;../lib&rsquo;, <strong>FILE</strong>)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require &lsquo;brandon/version&rsquo;</p>
-
-<p>Gem::Specification.new do |spec|
-  spec.name          = &ldquo;brandon&rdquo;
-  spec.version       = Brandon::VERSION
-  spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#x62;&#114;&#x61;&#110;&#x64;&#111;&#x6e;&#104;&#x69;&#108;&#x6b;&#x65;&#x72;&#116;&#x40;&#103;&#109;&#97;&#105;&#108;&#46;&#99;&#x6f;&#x6d;">&#98;&#114;&#x61;&#110;&#100;&#x6f;&#110;&#x68;&#x69;&#108;&#x6b;&#101;&#114;&#x74;&#x40;&#x67;&#x6d;&#97;&#x69;&#108;&#46;&#99;&#111;&#109;</a>&rdquo;]</p>
-
-<p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = &ldquo;TODO: Put your gem&rsquo;s website or public repo URL here.&rdquo;</p>
-
-<p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
-  # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)</p>
-
-<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-</code></pre>
-
-<p>  end</p>
-
-<p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
-  spec.bindir        = &ldquo;exe&rdquo;
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
-  spec.require_paths = [&ldquo;lib&rdquo;]</p>
-
-<p>  spec.add_development_dependency &ldquo;bundler&rdquo;, &ldquo;~> 1.11&rdquo;
-  spec.add_development_dependency &ldquo;rake&rdquo;, &ldquo;~> 10.0&rdquo;
-  spec.add_development_dependency &ldquo;minitest&rdquo;, &ldquo;~> 5.0&rdquo;
-end
-</code></pre></figure></p>
-
-<p>Aside from <code>summary</code>, <code>description</code>, and <code>homepage</code>, we can leave the rest of this file intact. These setter attributes on the <code>Gem::Specification.new</code> instance allow us to define the options and metadata necessary to properly configure and release a Ruby gem (see <a href="http://guides.rubygems.org/specification-reference/">the Rubygems specification reference</a> for an extensive list of options).</p>
-
-<p>As you might have guessed by now, a post-install message is an <a href="http://guides.rubygems.org/specification-reference/#post_install_message">option available in the gemspec</a>. The value can be a simple string or a more complex <a href="https://en.wikipedia.org/wiki/Here_document">heredoc</a>.</p>
-
-<p>The simplest example being:</p>
-
-<p><figure class="code"><pre><code class="ruby">spec.post_install_message = &ldquo;My test post-install message.&rdquo;
-</code></pre></figure></p>
-
-<p>With that in our <code>gemspec</code>, now when we install our fake gem <code>brandon</code>, we&rsquo;ll see the following output:</p>
-
-<p><figure class="code"><pre><code class="bash">$ gem install brandon
-My test post-install message.
-Successfully installed brandon-0.1.0
-1 gem installed
-</code></pre></figure></p>
-
-<p>Easy, huh?</p>
-
-<p>If we wanted to include a more complex message with line breaks and other formatting, another option would be something like:</p>
-
-<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
-My test post-install message.</p>
-
-<p>Another post-install message a few lines down.
-}
-</code></pre></figure></p>
-
-<p>The formatting of these messages can get weird because whitespace is preserved in multiline strings. If you&rsquo;re looking to include anything more complex than a simple string literal, it&rsquo;s worth experimenting by installing locally and confirming it&rsquo;s what you want.</p>
-
-<p>The <a href="https://github.com/newrelic/rpm">NewRelic gem</a> is another example that comes to mind that commonly includes more than just a simple string. Looking back at an <a href="https://github.com/newrelic/rpm/blob/v2.12.0/newrelic_rpm.gemspec#L193">older version of the NewRelic gem</a> yields the following <code>post_install_message</code>:</p>
-
-<p><figure class="code"><pre><code class="ruby">s.post_install_message = %q{
-Please see <a href="http://support.newrelic.com/faqs/docs/ruby-agent-release-notes">http://support.newrelic.com/faqs/docs/ruby-agent-release-notes</a>
-for a complete description of the features and enhancements available
-in version 2.12 of the Ruby Agent.</p>
-
-<p>For details on this specific release, refer to the CHANGELOG file.</p>
-
-<p>}
-</code></pre></figure></p>
-
-<p>Notice the message includes a line break both before and after the message. This will help isolate from our post-install messages when included in the longer output of a command like <code>bundle install</code>. Again, if you&rsquo;re focused on formatting and getting it right, it&rsquo;s worth installing locally in to something like a Rails application which yields more output than using <code>gem install [gemname]</code>.</p>
-
-<h2>When to Use Post-Install Messages</h2>
-
-<p>The examples above use post-install messages for different reasons. <code>HTTParty</code>&rsquo;s message wasn&rsquo;t for a serious technical or information reason, just a light-hearted message that&rsquo;s garnered quite a bit of negative attention from users that don&rsquo;t appreciate it.</p>
-
-<p>My suggestion would be to avoid any non-sensical messages and only provide a post-install message for something like breaking changes or information you think is critical to the usage of your gem. In most cases, <strong>post-install messages are most useful when a user is upgrading from an older version of your gem and the new version includes backwards-incompatible changes</strong>. Whether is be syntactical changes or core functionality, post-install messages provide us as gem authors a means to keep our users updated.</p>
-
-<h2>What to Include in Post-Install Messages</h2>
-
-<p>If you&rsquo;re adhering to semantic versioning and introduce any breaking changes in a major release, a post-install message is a great way to warn users about the changes. However, one thing you want to avoid is enumerating your gem&rsquo;s full changelog in the message. In most cases, a short notice about the backwards incompatible changes and a URL for more information is enough.</p>
-
-<p>I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">introduced a new public API in Sucker Punch</a>, which warranted a major release. Because of these backwards-incompatible changes, I added a post-install message to the new version:</p>
-
-<p><figure class="code"><pre><code class="bash">$ gem install sucker_punch
-Fetching: sucker_punch-2.0.1.gem (100%)
-Sucker Punch v2.0 introduces backwards-incompatible changes.
-Please see <a href="https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20">https://github.com/brandonhilkert/sucker_punch/blob/master/CHANGES.md#20</a> for details.
-Successfully installed sucker_punch-2.0.1
-1 gem installed
-</code></pre></figure></p>
-
-<p>&ldquo;Sucker Punch v2.0 introduces backwards-incompatible changes&rdquo; provided the heads up that something was different. The URL in the following line allows the users to see a more extension list of the changes and to make adjustments in their application if necessary.</p>
-
-<h2>Summary</h2>
-
-<p>In addition to documentation through a <code>README</code> or wiki, post-install messages are a great way to keep users of our gems informed. Having access to the output of their console is a privilege, so use it sparingly. Like the boy who cried wolf, if we include a wall of text with each release of our gem, users will learn to ignore it and that would negatively affect its value for everyone.</p>
 ]]></content>
   </entry>
   

@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-03-19T13:12:47-04:00</updated>
+  <updated>2018-05-01T14:52:07-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -12,6 +12,92 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Reducing Sidekiq Memory Usage with Jemalloc]]></title>
+    <link href="http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc/"/>
+    <updated>2018-04-28T14:42:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc</id>
+    <content type="html"><![CDATA[<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
+
+<p>Turns out&hellip;Ruby’s not the memory hog I&rsquo;d previously thought. After some research and experimentation, I&rsquo;ve found <code>jemalloc</code> to offer significant memory savings while at least preserving performance, if not improving it as well.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>At <a href="https://www.bark.us">Bark</a>, we poll external APIs for millions of monitored social media, text, and emails. This is all done through <a href="http://sidekiq.org/">Sidekiq</a> background jobs. Even though Ruby doesn&rsquo;t truly allow parallelism, we see great benefit with Sidekiq concurrency as the jobs wait for external APIs to respond. The API responses can often be large, not to mention any media they might include. As a result, we see the memory usage of our Sidekiq workers increase until they&rsquo;re ultimately killed and restarted by <a href="https://www.freedesktop.org/wiki/Software/systemd/"><code>systemd</code></a>.</p>
+
+<p>The following shows a common memory usage pattern for our queue servers:</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/jemalloc/sidekiq-memory-usage-before.png" title="&#34;Sidekiq servers memory usage before using jemalloc&#34;" alt="&#34;Sidekiq servers memory usage before using jemalloc&#34;"></p>
+
+<p>Two things to notice:</p>
+
+<ol>
+<li><p><strong>Memory increased quickly</strong> &ndash; The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
+<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> &ndash; The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
+</ol>
+
+
+<h2>The Solution</h2>
+
+<p>As the <a href="https://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">author of a multi-threaded background processing library</a>, I frequently see reports of memory leaks in Rails applications. As a Sidekiq user, <a href="https://github.com/mperham/sidekiq/issues/3824">this one caught my attention</a>. It starts the a classic memory leak report, but later turns towards deeper issues in the underlying operating system, not in the application. With <a href="https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html">Nate Berkopec&rsquo;s post on Ruby memory usage in multi-threaded applications</a> referenced, the reporter found switching to <code>jemalloc</code> to fix their issue.</p>
+
+<p><code>jemalloc</code> describes itself as:</p>
+
+<blockquote><p>a general purpose malloc(3) implementation that emphasizes fragmentation avoidance and scalable concurrency support</p></blockquote>
+
+<p>The description targets our use-case and issues with the current memory allocator. We were seeing terrible fragmentation when using Sidekiq (concurrent workers).</p>
+
+<h3>How to use jemalloc</h3>
+
+<p>Ruby can use <code>jemalloc</code> a few different ways. It can be compiled with <code>jemalloc</code>, but we already had Ruby installed and were interested in trying it with the least amount of infrastructure changes.</p>
+
+<p>It turns out Ruby will attempt to use <code>jemalloc</code> if the <a href="https://github.com/jemalloc/jemalloc/wiki/Getting-Started">well-document environment variable <code>LD_PRELOAD</code></a> is set.</p>
+
+<p>Our Sidekiq servers use Ubuntu 16.04, so we started by installing <code>jemalloc</code>:</p>
+
+<figure class="code"><pre><code class="bash">sudo apt-get install libjemalloc-dev</code></pre></figure>
+
+
+<p>From there, we configured the <code>LD_PRELOAD</code> environment variable by adding the following to <code>/etc/environment</code>:</p>
+
+<figure class="code"><pre><code class="bash">LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1</code></pre></figure>
+
+
+<p><em>Note: The location of <code>jemalloc</code> may vary depending on version and/or Linux distribution.</em></p>
+
+<h3>Benchmark</h3>
+
+<p>We benchmarked <code>jemalloc</code> on just one of the queue servers. This would allow us to do a true comparison against similar activity.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/jemalloc/sidekiq-memory-usage-comparison.png" title="&#34;Sidekiq server memory usage with one server using jemalloc&#34;" alt="&#34;Sidekiq server memory usage with one server using jemalloc&#34;"></p>
+
+<p>As we can see, the difference is drastic &mdash; <strong>over 4x decrease in memory usage</strong>!</p>
+
+<p>The more impressive detail was the consistency. Total memory usage doesn&rsquo;t waver much. Processing large payloads and media, I assumed we&rsquo;d continue to see the peaks and valleys common to processing social media content. The sidekiq processes using <code>jemalloc</code> show a better ability to use previously allocated memory.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/jemalloc/sidekiq-memory-usage-with-jemalloc-details.png" title="&#34;Sidekiq server memory usage details with one server using jemalloc&#34;" alt="&#34;Sidekiq server memory usage details with one server using jemalloc&#34;"></p>
+
+<h3>Roll it in to production</h3>
+
+<p>With similar behavior over a 3 day period, we concluded to roll it out to the remaining queue servers.</p>
+
+<p>The reduced memory usage continues to be impressive, all without any noticeable negative trade-offs.</p>
+
+<p><img class="center" src="http://brandonhilkert.com/images/jemalloc/sidekiq-memory-usage-after.png" title="&#34;Sidekiq server memory usage after using jemalloc&#34;" alt="&#34;Sidekiq server memory usage after using jemalloc&#34;"></p>
+
+<h2>Conclusion</h2>
+
+<p>We were surprised by the significant decrease in memory usage by switching to <code>jemalloc</code>. Based on the other reports, we assumed it be reasonable, but not a 4x decrease.</p>
+
+<p>Even after looking at these graphs for the last couple days, the differences seem too good to be true. But all is well and it&rsquo;s hard to imagine NOT doing this for any Ruby server we deploy in the future.</p>
+
+<p>Give it a shot. I&rsquo;d love to see your results.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
@@ -2740,439 +2826,6 @@ halfway through something, I want to stop and do something else, so be it.</p>
 
 
 <p>I’m excited for 2015!</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[A Ruby Refactor: Dependency Injection Options]]></title>
-    <link href="http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options/"/>
-    <updated>2014-12-17T07:07:00-05:00</updated>
-    <id>http://brandonhilkert.com/blog/a-ruby-refactor-exploring-dependency-injection-options</id>
-    <content type="html"><![CDATA[<p>I recently wrote some code to interface with Stripe’s webhooks. After looking at the code and tests, I decided I needed to do something to make it easier to test <em>all</em> pricing tiers— something I wasn’t able to easily do from the start.</p>
-
-<p><a href="http://en.m.wikipedia.org/wiki/Dependency_injection">Dependency injection</a> was a necessary piece of that puzzle. I’ve always been curious about the various forms of dependency injection and the effects each would have on the code. Below I explore 2 options (constructor injection and setter injection).</p>
-
-<!--more-->
-
-
-<p>In the end, setter injection felt for more natural for this case and it didn’t interfere with the classes argument list and felt ancillary to the responsibility of the code. While the change in code was small, it has a huge impact on my confidence in the code and associated tests.</p>
-
-<h2>The Code</h2>
-
-<p>The class below is responsible for handling Stripe’s <code>invoice.created</code> webhook. Prior to a customer being billed monthly subscription, Stripe will ping your application (if configured) — giving you the opportunity to add additional line items (think metered billing…). It could be additional services, or perhaps the entire bill itself (this use case). Nevertheless, the responsibility of the class is to create an invoice item based on the customer’s usage during the previous period.</p>
-
-<figure class='code'><pre><code>module StripeEvent
-  class InvoiceCreated
-    attr_reader :payload
-
-    def initialize(payload)
-      @payload = payload
-    end
-
-    def perform
-      Stripe::InvoiceItem.create(
-        customer: user.stripe_id,
-        amount: additional_charges_in_cents,
-        currency: "usd",
-        description: "Usage charges"
-      )
-    end
-
-    private
-
-    def additional_charges_in_cents
-      Billing::Tier.new(usage).additional_charges_in_cents
-    end
-
-    def usage
-      Billing::Usage.new(user).last_30_days
-    end
-
-    def user
-      @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-    end
-  end
-end</code></pre></figure>
-
-
-<p>I wrote this code pretty quickly and felt pretty good about it. The responsibility of determining the pricing tier had been broken out in to a separate class, as well as determining the customer’s actual usage. At least I thought they were…</p>
-
-<p>So what about the tests?</p>
-
-<figure class='code'><pre><code>require 'test_helper'
-
-class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup
-    @payload = {
-      "data" =&gt; {
-        "object" =&gt; {
-          "customer" =&gt; "stripe_brandon"
-        }
-      }
-    }
-  end
-
-  test 'adds invoice item based on usage' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 1900,
-      currency: "usd",
-      description: "Usage charges"
-    ).returns(true)
-    StripeEvent::InvoiceCreated.new(@payload).perform
-  end
-
-  test 'adds next level charge for usage' do
-    Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 4900,
-      currency: "usd",
-      description: "Usage charges"
-    ).returns(true)
-    StripeEvent::InvoiceCreated.new(@payload).perform
-  end
-end</code></pre></figure>
-
-
-<p>The first thing I noticed with this setup was the detailed usage of <code>Stripe::InvoiceItem.expects</code>. I wasn’t sure if this was necessarily a bad thing because it was a third-party service and it seemed like reasonable boundary of the application.</p>
-
-<p>Aside from the mock, another thing that bothered me was the difficulty simulating different pricing tiers and customer usage. You probably noticed the <code>Stat.create!…</code> in the last test. I could’ve duplicated <code>Stat</code> entries until I reached some arbitrary level of usage that bumped this user to the next pricing tier. But that felt risky and very dependent on knowing the actual value of the subsequent tier.</p>
-
-<p>What if I wanted to change the ceiling of that tier next month? I’d have to come in here and adjust the stats being created until it totaled something above the adjustment. It just felt weird…</p>
-
-<p>What if we had a way to easily swap in implementations of the <code>Billing::Usage</code>? It would then allow me to concoct any combination of usage and mock the expected values sent to Stripe.</p>
-
-<h2>Setter Injection</h2>
-
-<p>In a few other articles, I’ve heard this termed “accessors as collaborators”. Whatever the name, it was surprising how such a little a change could produce so much flexibility in my tests. And with that additional flexibility came confidence because it allowed me to test the edge cases with minimal overhead.</p>
-
-<figure class='code'><pre><code>module StripeEvent
-  class InvoiceCreated
-    attr_writer :usage_service
-    attr_reader :payload
-
-    def initialize(payload)
-      @payload = payload
-    end
-
-    def perform
-      if user.created_at &lt; 14.days.ago
-        Stripe::InvoiceItem.create(
-          customer: user.stripe_id,
-          amount: additional_charges_in_cents,
-          currency: "usd",
-          description: "Usage charges"
-        )
-      end
-    end
-
-    private
-
-    def additional_charges_in_cents
-      Billing::Tier.new(usage).additional_charges_in_cents
-    end
-
-    def usage
-      usage_service.last_30_days
-    end
-
-    def usage_service
-      @usage_service ||= Billing::Usage.new(user)
-    end
-
-    def user
-      @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-    end
-  end
-end</code></pre></figure>
-
-
-<p>A couple things changed:</p>
-
-<ol>
-<li><p><code>usage_service</code> was created to extract the code to calculate customer usage</p></li>
-<li><p>The <code>usage</code> method now calls the <code>last_30_days</code> method on <code>usage_service</code></p>
-
-<p> This is interesting because you’ll notice now that the only important idea about <code>usage_service</code> is the   fact that is has a <code>last_30_days</code> method. We can now take comfort in the idea that <code>usage_service</code> could    be anything really, as long as it implements the <code>last_30_days</code> method.</p></li>
-<li><p><code>attr_writer :usage_service</code> was added to allow for other implementations of the usage class</p></li>
-</ol>
-
-
-<p>This allows us to inject other forms of the <code>usage_service</code> to simulate more or less customer usage:</p>
-
-<figure class='code'><pre><code>require 'test_helper'
-
-class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup
-    @payload = {
-      "data" =&gt; {
-        "object" =&gt; {
-          "customer" =&gt; "stripe_brandon"
-        }
-      }
-    }
-  end
-
-  test 'adds invoice item based on usage' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 1900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    StripeEvent::InvoiceCreated.new(@payload).perform
-  end
-
-  test 'adds next level charge for usage' do
-    Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 4900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    StripeEvent::InvoiceCreated.new(@payload).perform
-  end
-
-  test 'adds highest tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 49900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload)
-    inv.usage_service = Level5Usage.new
-    inv.perform
-  end
-
-  test 'adds 2nd highest tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 24900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload)
-    inv.usage_service = Level4Usage.new
-    inv.perform
-  end
-
-  test 'adds middle tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 12900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload)
-    inv.usage_service = Level3Usage.new
-    inv.perform
-  end
-
-  test 'adds 2nd tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 4900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload)
-    inv.usage_service = Level2Usage.new
-    inv.perform
-  end
-
-  test 'adds 1st tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 1900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload)
-    inv.usage_service = Level1Usage.new
-    inv.perform
-  end
-
-  private
-
-  Level5Usage = Class.new { def last_30_days; 2_000_000; end }
-  Level4Usage = Class.new { def last_30_days; 900_000; end }
-  Level3Usage = Class.new { def last_30_days; 190_000; end }
-  Level2Usage = Class.new { def last_30_days; 19_000; end }
-  Level1Usage = Class.new { def last_30_days; 1_900; end }</code></pre></figure>
-
-
-<p>I’ve created classes for each usage tier that implement the <code>last_30_days</code> method. In real life, this usage service is more complex, but we can test the complexity of it alone through unit tests. The responsibility of this class is to ensure invoice items are added to Stripe correctly, so removing the complexity of <code>Billing::Usage</code> form this test allows us to maximize this test’s value and keep us isolated from the implementation of <code>Billing::Usage</code> — assuming it implements the <code>last_30_days</code> method.</p>
-
-<h2>Constructor Injection</h2>
-
-<p>Most dependency injection posts focus on constructor injection. The idea being that an implementation can be supplied. If not, a reasonable default will be provided. How might that change this scenario?</p>
-
-<figure class='code'><pre><code>module StripeEvent
-  class InvoiceCreated
-    attr_reader :payload
-
-    def initialize(payload, usage_service = Billing::Usage)
-      @payload = payload
-      @usage_service = usage_service
-    end
-
-    def perform
-      if user.created_at &lt; 14.days.ago
-        Stripe::InvoiceItem.create(
-          customer: user.stripe_id,
-          amount: additional_charges_in_cents,
-          currency: "usd",
-          description: "Usage charges"
-        )
-      end
-    end
-
-    private
-
-    def additional_charges_in_cents
-      Billing::Tier.new(usage).additional_charges_in_cents
-    end
-
-    def usage
-      @usage_service.new(user).last_30_days
-    end
-
-    def user
-      @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-    end
-  end
-end</code></pre></figure>
-
-
-<p>Because the <code>usage</code> method requires instantiation from within the class, I had to update the fake test Usage classes to accept <code>user</code> as an argument during instantiation:</p>
-
-<figure class='code'><pre><code>require 'test_helper'
-
-class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup
-    @payload = {
-      "data" =&gt; {
-        "object" =&gt; {
-          "customer" =&gt; "stripe_brandon"
-        }
-      }
-    }
-  end
-
-  test 'adds invoice item based on usage' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 1900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    StripeEvent::InvoiceCreated.new(@payload).perform
-  end
-
-  test 'adds next level charge for usage' do
-    Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 4900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    StripeEvent::InvoiceCreated.new(@payload).perform
-  end
-
-  test 'adds highest tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 49900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload, Level5Usage)
-    inv.perform
-  end
-
-  test 'adds 2nd highest tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 24900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload, Level4Usage)
-    inv.perform
-  end
-
-  test 'adds middle tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 12900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload, Level3Usage)
-    inv.perform
-  end
-
-  test 'adds 2nd tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 4900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload, Level2Usage)
-    inv.perform
-  end
-
-  test 'adds 1st tier' do
-    Stripe::InvoiceItem.expects(:create).with(
-      customer: "stripe_brandon",
-      amount: 1900,
-      currency: "usd",
-      description: "Usage charges"
-    )
-    inv = StripeEvent::InvoiceCreated.new(@payload, Level1Usage)
-    inv.perform
-  end
-
-  private
-
-  Level5Usage = Struct.new(:user) { def last_30_days; 2_000_000; end }
-  Level4Usage = Struct.new(:user) { def last_30_days; 900_000; end }
-  Level3Usage = Struct.new(:user) { def last_30_days; 190_000; end }
-  Level2Usage = Struct.new(:user) { def last_30_days; 19_000; end }
-  Level1Usage = Struct.new(:user) { def last_30_days; 1_900; end }</code></pre></figure>
-
-
-<p>The resulting test classes seem overly complex and sprinkled with details that aren’t particularly relevant to its responsibility. If we were to pass in an already instantiated usage class as an argument, it means we would have to already know the user before-hand, which means we’d have to parse <code>@user ||= User.find_by(stripe_id: payload["data"]["object"]["customer”])</code> outside of this class. I don’t love that solution — the parent that calls this <code>InvoiceCreated</code> class is pretty minimal and I wanted to keep it that way.</p>
-
-<p>Another option would be to provide <code>user</code> as an argument to the to the <code>last_30_days</code> method:</p>
-
-<figure class='code'><pre><code>def usage
-  @usage_service.new.last_30_days(user)
-end</code></pre></figure>
-
-
-<p>We could then change our fake test usage classes back to:</p>
-
-<figure class='code'><pre><code>Level1Usage = Class.new { def last_30_days; 1_900; end }</code></pre></figure>
-
-
-<p>Notice the lack of <code>Struct</code> with an argument…</p>
-
-<h2>Summary</h2>
-
-<p>Of the two options, I prefer the setter injector in this case. There’s something about changing the signature of a class just for tests that didn’t feel natural.</p>
-
-<p>An accessor (or writer…), in this case, provided the same flexibility without changing the signature. I like being able to quickly look at the argument list of <code>initialize</code> and clearly understand its roles and responsibilities within the system.</p>
-
-<p>Which do you prefer?</p>
 ]]></content>
   </entry>
   

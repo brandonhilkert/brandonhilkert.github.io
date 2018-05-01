@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: ubuntu | Brandon Hilkert]]></title>
+  <link href="http://brandonhilkert.com/blog/categories/ubuntu/atom.xml" rel="self"/>
+  <link href="http://brandonhilkert.com/"/>
+  <updated>2018-05-01T14:52:07-04:00</updated>
+  <id>http://brandonhilkert.com/</id>
+  <author>
+    <name><![CDATA[Brandon Hilkert]]></name>
+    <email><![CDATA[brandonhilkert@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Reducing Sidekiq Memory Usage with Jemalloc]]></title>
+    <link href="http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc/"/>
+    <updated>2018-04-28T14:42:00-04:00</updated>
+    <id>http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc</id>
+    <content type="html"><![CDATA[<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
+
+<p>Turns out&hellip;Ruby’s not the memory hog I&rsquo;d previously thought. After some research and experimentation, I&rsquo;ve found <code>jemalloc</code> to offer significant memory savings while at least preserving performance, if not improving it as well.</p>
+
+<!--more-->
+
+
+<h2>The Problem</h2>
+
+<p>At <a href="https://www.bark.us">Bark</a>, we poll external APIs for millions of monitored social media, text, and emails. This is all done through <a href="http://sidekiq.org/">Sidekiq</a> background jobs. Even though Ruby doesn&rsquo;t truly allow parallelism, we see great benefit with Sidekiq concurrency as the jobs wait for external APIs to respond. The API responses can often be large, not to mention any media they might include. As a result, we see the memory usage of our Sidekiq workers increase until they&rsquo;re ultimately killed and restarted by <a href="https://www.freedesktop.org/wiki/Software/systemd/"><code>systemd</code></a>.</p>
+
+<p>The following shows a common memory usage pattern for our queue servers:</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-before.png" title="&ldquo;Sidekiq servers memory usage before using jemalloc&rdquo;" ></p>
+
+<p>Two things to notice:</p>
+
+<ol>
+<li><p><strong>Memory increased quickly</strong> &ndash; The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
+<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> &ndash; The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
+</ol>
+
+
+<h2>The Solution</h2>
+
+<p>As the <a href="https://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">author of a multi-threaded background processing library</a>, I frequently see reports of memory leaks in Rails applications. As a Sidekiq user, <a href="https://github.com/mperham/sidekiq/issues/3824">this one caught my attention</a>. It starts the a classic memory leak report, but later turns towards deeper issues in the underlying operating system, not in the application. With <a href="https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html">Nate Berkopec&rsquo;s post on Ruby memory usage in multi-threaded applications</a> referenced, the reporter found switching to <code>jemalloc</code> to fix their issue.</p>
+
+<p><code>jemalloc</code> describes itself as:</p>
+
+<blockquote><p>a general purpose malloc(3) implementation that emphasizes fragmentation avoidance and scalable concurrency support</p></blockquote>
+
+<p>The description targets our use-case and issues with the current memory allocator. We were seeing terrible fragmentation when using Sidekiq (concurrent workers).</p>
+
+<h3>How to use jemalloc</h3>
+
+<p>Ruby can use <code>jemalloc</code> a few different ways. It can be compiled with <code>jemalloc</code>, but we already had Ruby installed and were interested in trying it with the least amount of infrastructure changes.</p>
+
+<p>It turns out Ruby will attempt to use <code>jemalloc</code> if the <a href="https://github.com/jemalloc/jemalloc/wiki/Getting-Started">well-document environment variable <code>LD_PRELOAD</code></a> is set.</p>
+
+<p>Our Sidekiq servers use Ubuntu 16.04, so we started by installing <code>jemalloc</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">sudo apt-get install libjemalloc-dev</code></pre></figure></p>
+
+<p>From there, we configured the <code>LD_PRELOAD</code> environment variable by adding the following to <code>/etc/environment</code>:</p>
+
+<p><figure class="code"><pre><code class="bash">LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1</code></pre></figure></p>
+
+<p><em>Note: The location of <code>jemalloc</code> may vary depending on version and/or Linux distribution.</em></p>
+
+<h3>Benchmark</h3>
+
+<p>We benchmarked <code>jemalloc</code> on just one of the queue servers. This would allow us to do a true comparison against similar activity.</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-comparison.png" title="&ldquo;Sidekiq server memory usage with one server using jemalloc&rdquo;" ></p>
+
+<p>As we can see, the difference is drastic &mdash; <strong>over 4x decrease in memory usage</strong>!</p>
+
+<p>The more impressive detail was the consistency. Total memory usage doesn&rsquo;t waver much. Processing large payloads and media, I assumed we&rsquo;d continue to see the peaks and valleys common to processing social media content. The sidekiq processes using <code>jemalloc</code> show a better ability to use previously allocated memory.</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-with-jemalloc-details.png" title="&ldquo;Sidekiq server memory usage details with one server using jemalloc&rdquo;" ></p>
+
+<h3>Roll it in to production</h3>
+
+<p>With similar behavior over a 3 day period, we concluded to roll it out to the remaining queue servers.</p>
+
+<p>The reduced memory usage continues to be impressive, all without any noticeable negative trade-offs.</p>
+
+<p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-after.png" title="&ldquo;Sidekiq server memory usage after using jemalloc&rdquo;" ></p>
+
+<h2>Conclusion</h2>
+
+<p>We were surprised by the significant decrease in memory usage by switching to <code>jemalloc</code>. Based on the other reports, we assumed it be reasonable, but not a 4x decrease.</p>
+
+<p>Even after looking at these graphs for the last couple days, the differences seem too good to be true. But all is well and it&rsquo;s hard to imagine NOT doing this for any Ruby server we deploy in the future.</p>
+
+<p>Give it a shot. I&rsquo;d love to see your results.</p>
+]]></content>
+  </entry>
+  
+</feed>
