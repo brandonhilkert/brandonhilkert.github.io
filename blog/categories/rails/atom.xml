@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rails | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rails/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-01T21:11:04-04:00</updated>
+  <updated>2018-05-03T09:23:58-04:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -43,7 +43,7 @@
 
 <h2>The Solution</h2>
 
-<p>As the <a href="https://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">author of a multi-threaded background processing library</a>, I frequently see reports of memory leaks in Rails applications. As a Sidekiq user, <a href="https://github.com/mperham/sidekiq/issues/3824">this one caught my attention</a>. It starts the a classic memory leak report, but later turns towards deeper issues in the underlying operating system, not in the application. With <a href="https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html">Nate Berkopec&rsquo;s post on Ruby memory usage in multi-threaded applications</a> referenced, the reporter found switching to <code>jemalloc</code> to fix their issue.</p>
+<p>As the <a href="https://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">author of a multi-threaded background processing library</a>, I frequently see reports of memory leaks in Rails applications. As a Sidekiq user, <a href="https://github.com/mperham/sidekiq/issues/3824">this one caught my attention</a>. It starts as a classic memory leak report, but later turns towards deeper issues in the underlying operating system, not in the application. With <a href="https://www.speedshop.co/2017/12/04/malloc-doubles-ruby-memory.html">Nate Berkopec&rsquo;s post on Ruby memory usage in multi-threaded applications</a> referenced, the reporter found switching to <code>jemalloc</code> to fix their issue.</p>
 
 <p><code>jemalloc</code> describes itself as:</p>
 
