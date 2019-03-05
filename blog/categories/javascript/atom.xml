@@ -4,7 +4,7 @@
   <title><![CDATA[Category: javascript | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Organizing Javascript in Rails Application with Turbolinks]]></title>
     <link href="http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks/"/>
-    <updated>2015-06-30T16:10:00-04:00</updated>
+    <updated>2015-06-30T16:10:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/organizing-javascript-in-rails-application-with-turbolinks</id>
     <content type="html"><![CDATA[<p>It&rsquo;s impossible to escape Javascript in a Rails application. From a tiny script to a full-on Javascript framework, websites are becoming more and more reliant on Javascript, whether we like it or not.</p>
 
@@ -297,7 +297,7 @@ App.Billing =
   <entry>
     <title type="html"><![CDATA[Page Specific Javascript in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/"/>
-    <updated>2014-02-04T20:51:00-05:00</updated>
+    <updated>2014-02-04T20:51:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/page-specific-javascript-in-rails</id>
     <content type="html"><![CDATA[<p><em>UPDATE: I&rsquo;ve written an updated article on this and the larger topic of
 <a href="/blog/organizing-javascript-in-rails-application-with-turbolinks/">organizing Javascript within a Rails project that includes
@@ -405,7 +405,7 @@ Turbolinks</a>.</strong></p>
   <entry>
     <title type="html"><![CDATA[Relative Timestamps in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/relative-timestamps-in-rails/"/>
-    <updated>2014-01-13T07:01:00-05:00</updated>
+    <updated>2014-01-13T07:01:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/relative-timestamps-in-rails</id>
     <content type="html"><![CDATA[<p>Facebook’s news feed popularized the relative timestamp format of &ldquo;X hours ago&rdquo;. For good reason too&hellip;why print an absolute timestamp so that people have to do the relative calculation in their head? It’s one less step for the user, and to be fair, pretty easy to implement.</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: cloudfront | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/cloudfront/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Setting up a Cloudfront CDN for Rails]]></title>
     <link href="http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails/"/>
-    <updated>2013-11-12T21:18:00-05:00</updated>
+    <updated>2013-11-12T21:18:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/setting-up-a-cloudfront-cdn-for-rails</id>
     <content type="html"><![CDATA[<p><em>Update: I&rsquo;ve since added a post on <a href="/blog/serving-fonts-for-firefox-with-fastly/">serving fonts for Firefox with Fastly</a>.</em></p>
 

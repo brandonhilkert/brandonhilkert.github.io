@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sucker punch | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/sucker-punch/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-04:00</updated>
+    <updated>2016-04-22T20:13:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
     <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
 
@@ -61,7 +61,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#x69;&#x6c;&#116;&#x6f;&#x3a;&#98;&#x72;&#97;&#x6e;&#100;&#111;&#x6e;&#104;&#x69;&#108;&#x6b;&#101;&#114;&#116;&#64;&#x67;&#109;&#97;&#105;&#108;&#46;&#99;&#111;&#109;">&#98;&#x72;&#x61;&#x6e;&#100;&#x6f;&#110;&#104;&#105;&#108;&#x6b;&#101;&#x72;&#116;&#64;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#99;&#x6f;&#x6d;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#108;&#x74;&#111;&#58;&#98;&#x72;&#x61;&#110;&#x64;&#x6f;&#x6e;&#x68;&#x69;&#x6c;&#107;&#101;&#x72;&#116;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#109;">&#x62;&#114;&#97;&#x6e;&#x64;&#111;&#x6e;&#104;&#105;&#108;&#107;&#x65;&#x72;&#x74;&#64;&#103;&#109;&#97;&#x69;&#x6c;&#x2e;&#x63;&#x6f;&#109;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -167,7 +167,7 @@ Successfully installed sucker_punch-2.0.1
   <entry>
     <title type="html"><![CDATA[Solving backwards compatibility in Ruby with a proxy object]]></title>
     <link href="http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object/"/>
-    <updated>2016-01-26T07:00:00-05:00</updated>
+    <updated>2016-01-26T07:00:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/solving-backwards-compatibility-in-ruby-with-a-proxy-object</id>
     <content type="html"><![CDATA[<p>In a previous article, I <a href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/">documented the upcoming public API changes slated for Sucker Punch v2</a>. Because of a poor initial design, these API changes are <strong>backwards incompatible</strong>.</p>
 
@@ -478,7 +478,7 @@ released</a>!</p>
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
     <link href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
-    <updated>2016-01-04T13:12:00-05:00</updated>
+    <updated>2016-01-04T13:12:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api</id>
     <content type="html"><![CDATA[<p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
 
@@ -601,7 +601,7 @@ LogJob.perform_in(5.minutes, "new_user")
   <entry>
     <title type="html"><![CDATA[Using the Sucker Punch Ruby Gem to Cache Stripe Data in Rails]]></title>
     <link href="http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails/"/>
-    <updated>2015-02-26T20:46:00-05:00</updated>
+    <updated>2015-02-26T20:46:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/using-the-sucker-punch-ruby-gem-to-cache-stripe-data-in-rails</id>
     <content type="html"><![CDATA[<p>With so many services available these days, it&rsquo;s almost impossible to find or build an application that doesn&rsquo;t rely on a third-party service. Most developers that have dealt with billing systems within the past few years have likely heard of <a href="https://stripe.com/">Stripe</a>. Stripe is, by far, the most developer-friendly billing service I&rsquo;ve implemented.</p>
 
@@ -797,7 +797,7 @@ it&rsquo;s not the end of the world. At worst, the user&rsquo;s Stripe data woul
   <entry>
     <title type="html"><![CDATA[Absolutes as an AntiPattern]]></title>
     <link href="http://brandonhilkert.com/blog/absolutes-as-an-antipattern/"/>
-    <updated>2014-09-28T22:35:00-04:00</updated>
+    <updated>2014-09-28T22:35:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/absolutes-as-an-antipattern</id>
     <content type="html"><![CDATA[<p>It’s been awhile since my last post — almost 2 months to be specific. A trip to Portugal, getting sick and a minor run-in with a table saw made it challenging to post anything for the last couple weeks. But I’d be lying if I said I was itching to write.</p>
 

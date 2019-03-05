@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sidekiq | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/sidekiq/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Reducing Sidekiq Memory Usage with Jemalloc]]></title>
     <link href="http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc/"/>
-    <updated>2018-04-28T14:42:00-04:00</updated>
+    <updated>2018-04-28T14:42:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc</id>
     <content type="html"><![CDATA[<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
 
@@ -100,7 +100,7 @@
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/"/>
-    <updated>2017-03-27T13:58:00-04:00</updated>
+    <updated>2017-03-27T13:58:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch</id>
     <content type="html"><![CDATA[<p>A few articles ago, I wrote about <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">how to monitor Sidekiq retries using AWS Lambda</a>. Retries are often the first indication of an issue if your application does a lot of background work.</p>
 
@@ -294,7 +294,7 @@ return cloudwatch.putMetricData(params).promise();
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-04:00</updated>
+    <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -556,7 +556,7 @@ getReq.end();
   <entry>
     <title type="html"><![CDATA[Lessons Learned from Building a Ruby Gem API]]></title>
     <link href="http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api/"/>
-    <updated>2016-01-04T13:12:00-05:00</updated>
+    <updated>2016-01-04T13:12:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/lessons-learned-from-building-a-ruby-gem-api</id>
     <content type="html"><![CDATA[<p>Sucker Punch was created because I had a <a href="http://brandonhilkert.com/blog/why-i-wrote-the-sucker-punch-gem/">need for background processing without a separate worker</a>. But I also figured others did too, given that adding a worker dyno on Heroku was $35. For hobby apps, this was a significant cost.</p>
 
@@ -679,7 +679,7 @@ LogJob.perform_in(5.minutes, "new_user")
   <entry>
     <title type="html"><![CDATA[Sidekiq As A Microservice Message Queue]]></title>
     <link href="http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue/"/>
-    <updated>2015-11-30T12:06:00-05:00</updated>
+    <updated>2015-11-30T12:06:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/sidekiq-as-a-microservice-message-queue</id>
     <content type="html"><![CDATA[<p>In the recent series on transitioning to microservices, I detailed a path to move a large legacy Rails monolith to a cluster of a dozen microservices. But not everyone starts out with a legacy monolith. In fact, given Rails popularity amongst startups, <strong>it&rsquo;s likely most Rails applications don&rsquo;t live to see 4+ years in production</strong>. So what if we don&rsquo;t have a huge monolith on our hands? Are microservices still out of the question?</p>
 

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[A Guide to Ruby Gem Post-Install Messages]]></title>
     <link href="http://brandonhilkert.com/blog/ruby-gem-post-install-message/"/>
-    <updated>2016-04-22T20:13:00-04:00</updated>
+    <updated>2016-04-22T20:13:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/ruby-gem-post-install-message</id>
     <content type="html"><![CDATA[<p>As gem authors, one of the ways we can provide important information to users of our gems is through post-install messages. Let&rsquo;s explore what they are, how to set them up, what to include and when to use them.</p>
 
@@ -61,7 +61,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#x3a;&#x62;&#x72;&#97;&#110;&#x64;&#111;&#110;&#x68;&#105;&#108;&#107;&#101;&#114;&#x74;&#x40;&#x67;&#109;&#x61;&#x69;&#x6c;&#x2e;&#99;&#x6f;&#x6d;">&#x62;&#114;&#97;&#110;&#100;&#111;&#x6e;&#x68;&#x69;&#x6c;&#x6b;&#101;&#114;&#x74;&#x40;&#103;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#111;&#109;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#105;&#108;&#x74;&#x6f;&#58;&#x62;&#114;&#x61;&#110;&#x64;&#111;&#110;&#104;&#x69;&#x6c;&#107;&#101;&#x72;&#116;&#x40;&#103;&#x6d;&#x61;&#x69;&#108;&#x2e;&#x63;&#111;&#x6d;">&#x62;&#x72;&#x61;&#x6e;&#x64;&#111;&#110;&#104;&#105;&#x6c;&#x6b;&#x65;&#114;&#x74;&#x40;&#x67;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#x6f;&#x6d;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -167,7 +167,7 @@ Successfully installed sucker_punch-2.0.1
   <entry>
     <title type="html"><![CDATA[Rails Gemfile Teardown - 2014]]></title>
     <link href="http://brandonhilkert.com/blog/rails-gemfile-teardown-2014/"/>
-    <updated>2014-12-03T13:14:00-05:00</updated>
+    <updated>2014-12-03T13:14:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/rails-gemfile-teardown-2014</id>
     <content type="html"><![CDATA[<p>What’s the first thing you look at when you see the source code of a Rails project?</p>
 
@@ -315,7 +315,7 @@ gem &lsquo;intercom-rails&rsquo;
   <entry>
     <title type="html"><![CDATA[Absolutes as an AntiPattern]]></title>
     <link href="http://brandonhilkert.com/blog/absolutes-as-an-antipattern/"/>
-    <updated>2014-09-28T22:35:00-04:00</updated>
+    <updated>2014-09-28T22:35:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/absolutes-as-an-antipattern</id>
     <content type="html"><![CDATA[<p>It’s been awhile since my last post — almost 2 months to be specific. A trip to Portugal, getting sick and a minor run-in with a table saw made it challenging to post anything for the last couple weeks. But I’d be lying if I said I was itching to write.</p>
 
@@ -399,7 +399,7 @@ gem &lsquo;intercom-rails&rsquo;
   <entry>
     <title type="html"><![CDATA[New Rails 4.1 travel_to test helper]]></title>
     <link href="http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper/"/>
-    <updated>2014-05-11T14:08:00-04:00</updated>
+    <updated>2014-05-11T14:08:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-4-1-travel-to-test-helper</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve recently had the good fortune of working on a greenfield Rails app. The app is heavily dependent on times and recurring events (weekly). Naturally, I dragged in the <a href="https://github.com/travisjeffery/timecop">timecop gem</a> to handle freezing time, so my I could properly assert that certain events took place in the tests.</p>
 
@@ -499,7 +499,7 @@ end
   <entry>
     <title type="html"><![CDATA[Rails Reloader: A Lesser Known Railtie Hook]]></title>
     <link href="http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook/"/>
-    <updated>2014-04-21T19:48:00-04:00</updated>
+    <updated>2014-04-21T19:48:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-reloader-a-lesser-known-railtie-hook</id>
     <content type="html"><![CDATA[<p>I recently wrote <a href="http://brandonhilkert.com/books/build-a-ruby-gem/?utm_source=bh-come&amp;utm_medium=web&amp;utm_campaign=reloader">a book about integrating with Rails from a Ruby gem</a>, which specifically touched on using a <a href="http://api.rubyonrails.org/classes/Rails/Railtie.html">Railtie</a> to extend <code>ActiveRecord</code>, <code>ActionController</code> and <code>ActionView</code> . While these are the 3 more popular Rails libraries, there’s plenty others <a href="http://guides.rubyonrails.org/configuring.html">that are configurable</a>.</p>
 

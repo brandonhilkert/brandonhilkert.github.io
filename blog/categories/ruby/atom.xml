@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Reducing Sidekiq Memory Usage with Jemalloc]]></title>
     <link href="http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc/"/>
-    <updated>2018-04-28T14:42:00-04:00</updated>
+    <updated>2018-04-28T14:42:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc</id>
     <content type="html"><![CDATA[<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
 
@@ -100,7 +100,7 @@
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq using AWS Lambda and CloudWatch]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch/"/>
-    <updated>2017-03-27T13:58:00-04:00</updated>
+    <updated>2017-03-27T13:58:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-cloudwatch</id>
     <content type="html"><![CDATA[<p>A few articles ago, I wrote about <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">how to monitor Sidekiq retries using AWS Lambda</a>. Retries are often the first indication of an issue if your application does a lot of background work.</p>
 
@@ -294,7 +294,7 @@ return cloudwatch.putMetricData(params).promise();
   <entry>
     <title type="html"><![CDATA[Using PhantomJS to Capture Analytics for a Rails Email Template]]></title>
     <link href="http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template/"/>
-    <updated>2017-02-17T09:20:00-05:00</updated>
+    <updated>2017-02-17T09:20:00-08:00</updated>
     <id>http://brandonhilkert.com/blog/using-phantomjs-to-capture-analytics-for-a-rails-email-template</id>
     <content type="html"><![CDATA[<p>Every Sunday <a href="https://www.bark.us">Bark</a> sends parents a weekly recap of their children&rsquo;s activity online. The first iteration was pretty basic, things like &ldquo;Your children sent X number of messages this past week&rdquo; and &ldquo;You have 10 messages to review&rdquo;. But we wanted to go deeper&hellip;</p>
 
@@ -493,7 +493,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)
   <entry>
     <title type="html"><![CDATA[Monitoring Sidekiq Using AWS Lambda and Slack]]></title>
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
-    <updated>2016-10-25T11:54:00-04:00</updated>
+    <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
     <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
@@ -755,7 +755,7 @@ getReq.end();
   <entry>
     <title type="html"><![CDATA[Rails Progress Indicator for Turbolinks Using Nprogress]]></title>
     <link href="http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress/"/>
-    <updated>2016-04-29T09:44:00-04:00</updated>
+    <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
 I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>

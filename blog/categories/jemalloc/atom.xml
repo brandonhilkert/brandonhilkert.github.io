@@ -4,7 +4,7 @@
   <title><![CDATA[Category: jemalloc | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/jemalloc/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2018-05-03T09:23:58-04:00</updated>
+  <updated>2019-03-05T13:14:03-08:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Reducing Sidekiq Memory Usage with Jemalloc]]></title>
     <link href="http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc/"/>
-    <updated>2018-04-28T14:42:00-04:00</updated>
+    <updated>2018-04-28T14:42:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/reducing-sidekiq-memory-usage-with-jemalloc</id>
     <content type="html"><![CDATA[<p>Ruby and Rails don&rsquo;t have a reputation of being memory-friendly. This comes with a trade-off of being a higher level language that tends to be more developer-friendly. For me, it works. I&rsquo;m content knowing I might have to pay more to scale a large application knowing I can write it in a language I enjoy.</p>
 
