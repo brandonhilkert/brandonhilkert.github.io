@@ -4,7 +4,7 @@
   <title><![CDATA[Category: view | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/view/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -37,42 +37,36 @@
 
 <p>Here’s what I ended up with:</p>
 
-<p>```</p>
+<pre><code># controller
 
-<h1>controller</h1>
-
-<p>def people
+def people
   @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
   @people = current_user.reports
-end</p>
+end
 
-<h1>view</h1>
+# view
 
-<p>&lt;% @people.each do |person| %>
-  &lt;% checkin = person.checkin_for(@week_of) %>
-  <tr></p>
+&lt;% @people.each do |person| %&gt;
+  &lt;% checkin = person.checkin_for(@week_of) %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;%= profile_picture person %&gt;
+      &lt;%= person %&gt;
+    &lt;/td&gt;
 
-<pre><code>&lt;td&gt;
-  &lt;%= profile_picture person %&gt;
-  &lt;%= person %&gt;
-&lt;/td&gt;
-
-&lt;td&gt;
-  &lt;%= checkin_status(checkin) %&gt;
-&lt;/td&gt;
+    &lt;td&gt;
+      &lt;%= checkin_status(checkin) %&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
 </code></pre>
-
-<p>  </tr>
-&lt;% end %>
-```</p>
 
 <p>For each iteration of <code>@people</code>, I looked up the check-in for that particular week from the model:</p>
 
-<p><code>
-def checkin_for(week_of)
+<pre><code>def checkin_for(week_of)
   Checkin.find_by(user_id: id, week_of: week_of)
 end
-</code></p>
+</code></pre>
 
 <p>This crosses concerns, blurs responsibility — all the things that bad Rails app are made of. But I was doing this knowing it would either be entirely ripped out (we’d change the UI altogether), or refactored to something better.</p>
 
@@ -90,55 +84,48 @@ end
 
 <p>I removed the model method:</p>
 
-<p><code>
-def checkin_for(week_of)
+<pre><code>def checkin_for(week_of)
   Checkin.find_by(user_id: id, week_of: week_of)
-end
-</code></p>
-
-<p>and the line in the view largely responsible for the mess:</p>
-
-<p><code>
-&lt;% checkin = person.checkin_for(@week_of) %&gt;
-</code></p>
-
-<p>I went back to the controller and initialized a new object that would allow me to iterate over a list of check-ins:</p>
-
-<p><code>
-def people
-  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
-  @reports = Checkin::Reports.new(current_user, @week_of)
-end
-</code></p>
-
-<p>Let’s dig in to the new <code>Checkin::Reports</code> class…</p>
-
-<p>```
-class Checkin
-  class Reports</p>
-
-<pre><code>def initialize(user, week_of)
-  @user, @week_of = user, week_of
-end
-
-def checkins
-  reports.map { |person|
-    Checkin.find_or_initialize_by(user_id: person.id, week_of: week_of)
-  }
-end
-
-private
-
-attr_reader :user, :week_of
-
-def reports
-  user.reports
 end
 </code></pre>
 
-<p>  end
+<p>and the line in the view largely responsible for the mess:</p>
+
+<pre><code>&lt;% checkin = person.checkin_for(@week_of) %&gt;
+</code></pre>
+
+<p>I went back to the controller and initialized a new object that would allow me to iterate over a list of check-ins:</p>
+
+<pre><code>def people
+  @week_of = params[:week_of] || Checkin::Week.recent(current_company).first.beginning
+  @reports = Checkin::Reports.new(current_user, @week_of)
 end
-```</p>
+</code></pre>
+
+<p>Let’s dig in to the new <code>Checkin::Reports</code> class…</p>
+
+<pre><code>class Checkin
+  class Reports
+    def initialize(user, week_of)
+      @user, @week_of = user, week_of
+    end
+
+    def checkins
+      reports.map { |person|
+        Checkin.find_or_initialize_by(user_id: person.id, week_of: week_of)
+      }
+    end
+
+    private
+
+    attr_reader :user, :week_of
+
+    def reports
+      user.reports
+    end
+  end
+end
+</code></pre>
 
 <p>I instantiate with the user and week, similar to what the <code>checkin_for</code> model method did above.</p>
 
@@ -146,61 +133,43 @@ end
 
 <p>This means that our <code>checkin_status</code> helper, went from:</p>
 
-<p>```
-def checkin_status(checkin)
-  if checkin &amp;&amp; checkin.completed_at?</p>
-
-<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
-</code></pre>
-
-<p>  end
+<pre><code>def checkin_status(checkin)
+  if checkin &amp;&amp; checkin.completed_at?
+    fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+  else
+    fa_icon("warning", class: "yellow") + " Not completed"
+  end
 end
-```</p>
+</code></pre>
 
 <p>to:</p>
 
-<p>```
-def checkin_status(checkin)
-  if checkin.completed_at?</p>
-
-<pre><code>fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>fa_icon("warning", class: "yellow") + " Not completed"
-</code></pre>
-
-<p>  end
+<pre><code>def checkin_status(checkin)
+  if checkin.completed_at?
+    fa_icon("check-square-o", class: "green") + " Submitted #{local_time checkin.completed_at, format: :short_month_day }".html_safe
+  else
+    fa_icon("warning", class: "yellow") + " Not completed"
+  end
 end
-```</p>
+</code></pre>
 
 <p>It’s a subtle change (removing the check <code>if checkin</code> from the first conditional), but one that’s less susceptible to bizarre edge cases. And clearer — It’s reasonable to expect that by calling the first argument <code>checkin</code>, <strong>the variable should be a <code>Checkin</code></strong>, and not sometimes <code>nil</code>.</p>
 
 <p>Returning back to the view…using the new <code>@reports</code> variable, we no longer have to query during each iteration:</p>
 
-<p>```
-&lt;% @reports.checkins.each do |checkin| %>
-  <tr></p>
+<pre><code>&lt;% @reports.checkins.each do |checkin| %&gt;
+  &lt;tr&gt;
+    &lt;td&gt;
+      &lt;%= profile_picture checkin.user %&gt;
+      &lt;%= checkin.user %&gt;
+    &lt;/td&gt;
 
-<pre><code>&lt;td&gt;
-  &lt;%= profile_picture checkin.user %&gt;
-  &lt;%= checkin.user %&gt;
-&lt;/td&gt;
-
-&lt;td&gt;
-  &lt;%= checkin_status(checkin) %&gt;
-&lt;/td&gt;
+    &lt;td&gt;
+      &lt;%= checkin_status(checkin) %&gt;
+    &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;% end %&gt;
 </code></pre>
-
-<p>  </tr>
-&lt;% end %>
-```</p>
 
 <p>Tests pass, and we’re in a much better place than we were before.</p>
 

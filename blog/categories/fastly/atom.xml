@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fastly | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/fastly/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -31,17 +31,13 @@ assets that were fronted by a <a href="http://aws.amazon.com/cloudfront/">Amazon
 Cloudfront</a> CDN. In order to make it work
 with this setup, I had to add to the following to our Nginx configuration:</p>
 
-<p>```
-location ~* .(ttf|ttc|otf|eot|woff|svg|font.css)$ {</p>
-
-<pre><code>add_header Access-Control-Allow-Origin *;
-expires 1M;
-access_log off;
-add_header Cache-Control "public";
+<pre><code>location ~* \.(ttf|ttc|otf|eot|woff|svg|font.css)$ {
+    add_header Access-Control-Allow-Origin *;
+    expires 1M;
+    access_log off;
+    add_header Cache-Control "public";
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <!--more-->
 
@@ -100,7 +96,7 @@ button, otherwise, you won&rsquo;t see the new headers.</em></p>
 <p>While Fastly can be overwhelming, the power of being able to modify any aspect
 of the caching stack is valuable. Asset download times have generally been
 somewhere between 30-50 ms. Cloudfont offered this performance at times, but
-wasn&rsquo;t very consistent &ndash; some would be 30 ms, and others would take 150 ms. I
+wasn&rsquo;t very consistent - some would be 30 ms, and others would take 150 ms. I
 haven&rsquo;t noticed this inconsistency with Fastly and would happily recommend
 their service to anyone looking to improved their caching layer.</p>
 ]]></content>

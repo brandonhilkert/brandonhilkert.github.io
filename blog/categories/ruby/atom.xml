@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ruby | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ruby/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -36,8 +36,8 @@
 <p>Two things to notice:</p>
 
 <ol>
-<li><p><strong>Memory increased quickly</strong> &ndash; The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
-<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> &ndash; The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
+<li><p><strong>Memory increased quickly</strong> - The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
+<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> - The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
 </ol>
 
 
@@ -73,7 +73,7 @@
 
 <p><img class="center" src="/images/jemalloc/sidekiq-memory-usage-comparison.png" title="&ldquo;Sidekiq server memory usage with one server using jemalloc&rdquo;" ></p>
 
-<p>As we can see, the difference is drastic &mdash; <strong>over 4x decrease in memory usage</strong>!</p>
+<p>As we can see, the difference is drastic &ndash; <strong>over 4x decrease in memory usage</strong>!</p>
 
 <p>The more impressive detail was the consistency. Total memory usage doesn&rsquo;t waver much. Processing large payloads and media, I assumed we&rsquo;d continue to see the peaks and valleys common to processing social media content. The sidekiq processes using <code>jemalloc</code> show a better ability to use previously allocated memory.</p>
 
@@ -131,34 +131,29 @@
 
 <p>If you remember from the last article on <a href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/">monitoring Sidekiq retries using AWS Lambda</a>, we setup an endpoint in our application to return Sidekiq stats:</p>
 
-<p>```
-require &lsquo;sidekiq/api&rsquo;</p>
+<pre><code>require 'sidekiq/api'
 
-<p>class SidekiqQueuesController &lt; ApplicationController
-  skip_before_action :require_authentication</p>
+class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication
 
-<p>  def index</p>
+  def index
+    base_stats = Sidekiq::Stats.new
+    stats = {
+       enqueued: base_stats.enqueued,
+       queues: base_stats.queues,
+       busy: Sidekiq::Workers.new.size,
+       retries: base_stats.retry_size
+    }
 
-<pre><code>base_stats = Sidekiq::Stats.new
-stats = {
-   enqueued: base_stats.enqueued,
-   queues: base_stats.queues,
-   busy: Sidekiq::Workers.new.size,
-   retries: base_stats.retry_size
-}
-
-render json: stats
-</code></pre>
-
-<p>  end
+    render json: stats
+  end
 end
-```</p>
+</code></pre>
 
 <p>along with the route:</p>
 
-<p><code>
-resources :sidekiq_queues, only: [:index]
-</code></p>
+<pre><code>resources :sidekiq_queues, only: [:index]
+</code></pre>
 
 <p>Using this resource, we need to poll at some regular interval and store the results.</p>
 
@@ -166,108 +161,98 @@ resources :sidekiq_queues, only: [:index]
 
 <p>AWS Lambda functions are perfect for one-off functions that feel like a burden to maintain in our application.</p>
 
-<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events - Schedule&rdquo;:</p>
 
 <p><img class="center" src="/images/sidekiq-monitor/lambda-trigger.png" title="&ldquo;AWS Lambda trigger&rdquo;" ></p>
 
 <p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
 
-<p>```
-var AWS = require(&lsquo;aws-sdk&rsquo;);
-var url = require(&lsquo;url&rsquo;);
-var https = require(&lsquo;https&rsquo;);</p>
+<pre><code>var AWS = require('aws-sdk');
+var url = require('url');
+var https = require('https');
 
-<p>if (typeof Promise === &lsquo;undefined&rsquo;) {
-  AWS.config.setPromisesDependency(require(&lsquo;bluebird&rsquo;));
-}</p>
+if (typeof Promise === 'undefined') {
+  AWS.config.setPromisesDependency(require('bluebird'));
+}
 
-<p>var cloudwatch = new AWS.CloudWatch();</p>
+var cloudwatch = new AWS.CloudWatch();
 
-<p>sidekiqUrl = &lsquo;[Sidekiq stat URL]&rsquo;</p>
+sidekiqUrl = '[Sidekiq stat URL]'
 
-<p>var logMetric = function(attr, value) {</p>
-
-<pre><code>var params = {
-    MetricData: [
-        {
-            MetricName: attr,
-            Dimensions: [
-                {
-                    Name: "App",
-                    Value: "www"
-                }
-            ],
-            Timestamp: new Date(),
-            Unit: "Count",
-            Value: value
-        }
-    ],
-    Namespace: "Queues"
-};
-
-return cloudwatch.putMetricData(params).promise();
-</code></pre>
-
-<p>}</p>
-
-<p>var getQueueStats = function(statsUrl) {</p>
-
-<pre><code>return new Promise(function(resolve, reject) {
-    var options = url.parse(statsUrl);
-    options.headers = {
-        'Accept': 'application/json',
+var logMetric = function(attr, value) {
+    var params = {
+        MetricData: [
+            {
+                MetricName: attr,
+                Dimensions: [
+                    {
+                        Name: "App",
+                        Value: "www"
+                    }
+                ],
+                Timestamp: new Date(),
+                Unit: "Count",
+                Value: value
+            }
+        ],
+        Namespace: "Queues"
     };
-    var req = https.request(options, function(res){
-        var body = '';
 
-        res.setEncoding('utf8');
+    return cloudwatch.putMetricData(params).promise();
+}
 
-        //another chunk of data has been recieved, so append it to `str`
-        res.on('data', function (chunk) {
-            body += chunk;
+var getQueueStats = function(statsUrl) {
+    return new Promise(function(resolve, reject) {
+        var options = url.parse(statsUrl);
+        options.headers = {
+            'Accept': 'application/json',
+        };
+        var req = https.request(options, function(res){
+            var body = '';
+
+            res.setEncoding('utf8');
+
+            //another chunk of data has been recieved, so append it to `str`
+            res.on('data', function (chunk) {
+                body += chunk;
+            });
+
+            //the whole response has been recieved
+            res.on('end', function () {
+                resolve(JSON.parse(body));
+            });
         });
 
-        //the whole response has been recieved
-        res.on('end', function () {
-            resolve(JSON.parse(body));
+        req.on('error', function(e) {
+           reject(e);
         });
+
+        req.end();
     });
+}
 
-    req.on('error', function(e) {
-       reject(e);
-    });
+exports.handler = function(event, context) {
+    getQueueStats(sidekiqUrl).then(function(stats) {
+        console.log('STATS: ', stats);
 
-    req.end();
-});
-</code></pre>
+        var retryPromise = logMetric("Retries", stats.retries);
+        var busyPromise = logMetric("Busy", stats.busy);
+        var enqueuedPromise = logMetric("Enqueued", stats.enqueued);
 
-<p>}</p>
-
-<p>exports.handler = function(event, context) {</p>
-
-<pre><code>getQueueStats(sidekiqUrl).then(function(stats) {
-    console.log('STATS: ', stats);
-
-    var retryPromise = logMetric("Retries", stats.retries);
-    var busyPromise = logMetric("Busy", stats.busy);
-    var enqueuedPromise = logMetric("Enqueued", stats.enqueued);
-
-    Promise.all([retryPromise, busyPromise, enqueuedPromise]).then(function(values) {
-        console.log(values);
-        context.succeed();
-    }).catch(function(err){
+        Promise.all([retryPromise, busyPromise, enqueuedPromise]).then(function(values) {
+            console.log(values);
+            context.succeed();
+        }).catch(function(err){
+            console.error(err);
+            context.fail("Server error when processing message: " + err );
+        });
+    })
+    .catch(function(err) {
         console.error(err);
-        context.fail("Server error when processing message: " + err );
+        context.fail("Failed to get stats from HTTP request: " + err );
     });
-})
-.catch(function(err) {
-    console.error(err);
-    context.fail("Failed to get stats from HTTP request: " + err );
-});
+};
 </code></pre>
-
-<p>};
-```</p>
 
 <p><em>Note: <code>sidekiqURL</code>  need to be defined with appropriate values for this to work.</em></p>
 
@@ -277,7 +262,7 @@ return cloudwatch.putMetricData(params).promise();
 
 <h3>Graphing Sidekiq Queue Data</h3>
 
-<p>Once the function has run a few times, under CloudWatch &mdash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
+<p>Once the function has run a few times, under CloudWatch &ndash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
 
 <p><img class="center" src="/images/sidekiq-cloudwatch/custom-namespace.png" title="&ldquo;AWS CloudWatch Custom Namespace&rdquo;" ></p>
 
@@ -353,49 +338,39 @@ return cloudwatch.putMetricData(params).promise();
 
 <p>Using a <a href="https://github.com/ariya/phantomjs/blob/master/examples/rasterize.js">screenshot example</a> from the <a href="https://github.com/ariya/phantomjs">PhantomJS github repo</a>, we put together a script (<code>vendor/assets/javascripts/phantom-screenshot.js</code>) to capture the analytics page:</p>
 
-<p>```</p>
+<pre><code>#!/bin/sh
 
-<h1>!/bin/sh</h1>
-
-<p>var page   = require(&lsquo;webpage&rsquo;).create();
-var system = require(&lsquo;system&rsquo;);
+var page   = require('webpage').create();
+var system = require('system');
 page.viewportSize = { width: 550, height: 600 };
-page.zoomFactor = 0.85;</p>
+page.zoomFactor = 0.85;
 
-<p>page.onError = function(msg, trace) {
-  var msgStack = [&lsquo;ERROR: &rsquo; + msg];
-  if (trace &amp;&amp; trace.length) {</p>
+page.onError = function(msg, trace) {
+  var msgStack = ['ERROR: ' + msg];
+  if (trace &amp;&amp; trace.length) {
+    msgStack.push('TRACE:');
+    trace.forEach(function(t) {
+      msgStack.push(' -&gt; ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+    });
+  }
 
-<pre><code>msgStack.push('TRACE:');
-trace.forEach(function(t) {
-  msgStack.push(' -&gt; ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+  console.error(msgStack.join('\n'));
+};
+
+page.open(system.args[1], function(status) {
+  if (status !== 'success') {
+    console.log('Unable to load the address!');
+    phantom.exit(1);
+  } else {
+    window.setTimeout(function () {
+      page.render(system.args[2]);
+      phantom.exit();
+    }, 2000);
+  }
 });
 </code></pre>
 
-<p>  }</p>
-
-<p>  console.error(msgStack.join(&lsquo;\n&rsquo;));
-};</p>
-
-<p>page.open(system.args[1], function(status) {
-  if (status !== &lsquo;success&rsquo;) {</p>
-
-<pre><code>console.log('Unable to load the address!');
-phantom.exit(1);
-</code></pre>
-
-<p>  } else {</p>
-
-<pre><code>window.setTimeout(function () {
-  page.render(system.args[2]);
-  phantom.exit();
-}, 2000);
-</code></pre>
-
-<p>  }
-});
-<code>``
-_Note: a variety of the settings (</code>viewPortSize<code>,</code>zoomFactor<code>, and</code>timeout`) were found using trial and error for our particular situation._</p>
+<p><em>Note: a variety of the settings (<code>viewPortSize</code>, <code>zoomFactor</code>, and <code>timeout</code>) were found using trial and error for our particular situation.</em></p>
 
 <p>We use Sidekiq to enqueue the thousands of recap emails sent to parents each week. Because this approach relies on using our existing website as the source data for the screenshot, we have to be conscious of spreading the job processing over a certain period of time, so we don&rsquo;t overload the application for regular users.</p>
 
@@ -403,78 +378,59 @@ _Note: a variety of the settings (</code>viewPortSize<code>,</code>zoomFactor<co
 
 <p>With this script in hand, now we can use the following class to create the image for each child:</p>
 
-<p>```
-class RecapAnalytics
-  ScreenshotError = Class.new(StandardError)</p>
+<pre><code>class RecapAnalytics
+  ScreenshotError = Class.new(StandardError)
 
-<p>  def initialize(analytics_url:)</p>
+  def initialize(analytics_url:)
+    @analytics_url = analytics_url
+  end
 
-<pre><code>@analytics_url = analytics_url
-</code></pre>
+  def file_path
+    unless create_screenshot
+      raise ScreenshotError.new("Unable to complete analytics screenshot")
+    end
 
-<p>  end</p>
+    temp_file_path
+  end
 
-<p>  def file_path</p>
+  def create_screenshot
+    Phantomjs.run screenshot_script, analytics_url, temp_file_path
+  end
 
-<pre><code>unless create_screenshot
-  raise ScreenshotError.new("Unable to complete analytics screenshot")
-end
+  private
 
-temp_file_path
-</code></pre>
+  attr_reader :analytics_url
 
-<p>  end</p>
+  def screenshot_script
+    Rails.root.join('vendor', 'assets', 'javascripts', 'phantom-screenshot.js').to_s
+  end
 
-<p>  def create_screenshot</p>
-
-<pre><code>Phantomjs.run screenshot_script, analytics_url, temp_file_path
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :analytics_url</p>
-
-<p>  def screenshot_script</p>
-
-<pre><code>Rails.root.join('vendor', 'assets', 'javascripts', 'phantom-screenshot.js').to_s
-</code></pre>
-
-<p>  end</p>
-
-<p>  def temp_file_path</p>
-
-<pre><code>@temp_file_path ||= begin
-  file = Tempfile.new("child-analytics")
-  file.path + ".png"
+  def temp_file_path
+    @temp_file_path ||= begin
+      file = Tempfile.new("child-analytics")
+      file.path + ".png"
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>For each child, we&rsquo;ll provide the URL to the child&rsquo;s analytics page and run the following <code>file_path</code> method to return the path of the screenshot:</p>
 
-<p><code>
-RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
-</code></p>
+<pre><code>RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+</code></pre>
 
 <h2>Adding as an Inline Email Attachment</h2>
 
 <p>With an image for each child, we can iterate through each child and inline include the image in the mailer:</p>
 
-<p><code>
-file_path = RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+<pre><code>file_path = RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
 attachments.inline["#{child.first_name}.png"] = File.read(file_path)
-</code></p>
+</code></pre>
 
 <p>Then in the email template, we can include the following to render the image:</p>
 
-<p><code>erb
- &lt;%= link_to image_tag(attachments["#{child.first_name}.png"].url), child_url(child) %&gt;
-</code></p>
+<pre><code class="erb"> &lt;%= link_to image_tag(attachments["#{child.first_name}.png"].url), child_url(child) %&gt;
+</code></pre>
 
 <p><img class="center" src="/images/phantomjs/email-interactions.png" title="&ldquo;Bark weekly recap email with interactions&rdquo;" ></p>
 
@@ -495,7 +451,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
     <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
-    <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
+    <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &ndash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
 <p>As a remote company, we use Slack to stay in touch with everyone AND to manage/monitor our infrastructure (hello #chatops). We can deploy from Slack (we don&rsquo;t generally, we have full CI) and be notified of infrastructure and application errors.</p>
 
@@ -508,7 +464,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)
 
 <p><a href="https://www.bark.us/">Bark</a> is background job-heavy. The web application is a glorified CRUD app that sets up the data needed to poll a child&rsquo;s social media feed and monitor for potential issues. The best-case scenario for a parent is that they will never hear from us.</p>
 
-<p>Because Bark&rsquo;s background jobs commonly interact with 3rd-party APIs, failures aren&rsquo;t a big surprise. APIs can be down, network connections can fail &mdash; Sidekiq&rsquo;s retry logic protects us from transient network errors. Under normal circumstances, jobs retry and ultimately run successfully after subsequent attempts. These are non-issues and something we don&rsquo;t need an engineer to investigate.</p>
+<p>Because Bark&rsquo;s background jobs commonly interact with 3rd-party APIs, failures aren&rsquo;t a big surprise. APIs can be down, network connections can fail &ndash; Sidekiq&rsquo;s retry logic protects us from transient network errors. Under normal circumstances, jobs retry and ultimately run successfully after subsequent attempts. These are non-issues and something we don&rsquo;t need an engineer to investigate.</p>
 
 <p>There are times when retries accumulate, giving us a strong indication that something more severe may be wrong. Initially, we setup New Relic to notify us of an increased error rate. This worked for simple cases, but was sometimes a false positive. As a result, we started to ignore them, which potentially masked more important issues.</p>
 
@@ -539,36 +495,31 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)
 
 <p>Instead, we created a new Rails route to respond with some basic details about the Sidekiq system.</p>
 
-<p>```
-require &lsquo;sidekiq/api&rsquo;</p>
+<pre><code>require 'sidekiq/api'
 
-<p>class SidekiqQueuesController &lt; ApplicationController
-  skip_before_action :require_authentication</p>
+class SidekiqQueuesController &lt; ApplicationController
+  skip_before_action :require_authentication
 
-<p>  def index</p>
+  def index
+    base_stats = Sidekiq::Stats.new
+    stats = {
+       enqueued: base_stats.enqueued,
+       queues: base_stats.queues,
+       busy: Sidekiq::Workers.new.size,
+       retries: base_stats.retry_size
+    }
 
-<pre><code>base_stats = Sidekiq::Stats.new
-stats = {
-   enqueued: base_stats.enqueued,
-   queues: base_stats.queues,
-   busy: Sidekiq::Workers.new.size,
-   retries: base_stats.retry_size
-}
-
-render json: stats
-</code></pre>
-
-<p>  end
+    render json: stats
+  end
 end
-```</p>
+</code></pre>
 
 <p>along with the route:</p>
 
-<p><code>
-resources :sidekiq_queues, only: [:index]
-</code></p>
+<pre><code>resources :sidekiq_queues, only: [:index]
+</code></pre>
 
-<p>As you can see, the endpoint is public (there&rsquo;s no job args or names exposed &mdash; just counts). The code digs in to the <a href="https://github.com/mperham/sidekiq/wiki/API">Sidekiq API</a> to interrogate the size of queues.</p>
+<p>As you can see, the endpoint is public (there&rsquo;s no job args or names exposed &ndash; just counts). The code digs in to the <a href="https://github.com/mperham/sidekiq/wiki/API">Sidekiq API</a> to interrogate the size of queues.</p>
 
 <h3>Slack Incoming WebHook</h3>
 
@@ -588,135 +539,122 @@ resources :sidekiq_queues, only: [:index]
 
 <h3>AWS Lambda Function</h3>
 
-<p>Now that we have our endpoint to expose the number of retries (among other things) and the Slack webhook URL to <code>POST</code> to, we need to setup the AWS Lambda function to tie to the two together. We&rsquo;ll start by creating a new Lambda function with the defaults &mdash; using the latest Node.</p>
+<p>Now that we have our endpoint to expose the number of retries (among other things) and the Slack webhook URL to <code>POST</code> to, we need to setup the AWS Lambda function to tie to the two together. We&rsquo;ll start by creating a new Lambda function with the defaults &ndash; using the latest Node.</p>
 
-<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events - Schedule&rdquo;:</p>
 
 <p><img class="center" src="/images/sidekiq-monitor/lambda-trigger.png" title="&ldquo;AWS Lambda trigger&rdquo;" ></p>
 
 <p>From here, we&rsquo;ll enter a name and description for our rule and define its rate (I chose every 5 minutes). Enable the trigger and we&rsquo;ll move to defining our code. Next, we&rsquo;ll give the function a name and choose the latest NodeJS as the runtime. Within the inline editor, we&rsquo;ll use the following code:</p>
 
-<p>```
-var AWS = require(&lsquo;aws-sdk&rsquo;);
-var url = require(&lsquo;url&rsquo;);
-var https = require(&lsquo;https&rsquo;);
-var sidekiqURL, hookUrl, slackChannel, retryThreshold;</p>
+<pre><code>var AWS = require('aws-sdk');
+var url = require('url');
+var https = require('https');
+var sidekiqURL, hookUrl, slackChannel, retryThreshold;
 
-<p>sidekiqUrl = &lsquo;[Sidekiq queue JSON endpoint]&rsquo;
-hookUrl = &lsquo;[Slack Incoming WebHooks URL w/ token]&rsquo;;
-slackChannel = &lsquo;#operations&rsquo;;  // Enter the Slack channel to send a message to
-retryThreshold = 50;</p>
+sidekiqUrl = '[Sidekiq queue JSON endpoint]'
+hookUrl = '[Slack Incoming WebHooks URL w/ token]';
+slackChannel = '#operations';  // Enter the Slack channel to send a message to
+retryThreshold = 50;
 
-<p>var postMessageToSlack = function(message, callback) {</p>
+var postMessageToSlack = function(message, callback) {
+    var body = JSON.stringify(message);
+    var options = url.parse(hookUrl);
+    options.method = 'POST';
+    options.headers = {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(body),
+    };
 
-<pre><code>var body = JSON.stringify(message);
-var options = url.parse(hookUrl);
-options.method = 'POST';
-options.headers = {
-    'Content-Type': 'application/json',
-    'Content-Length': Buffer.byteLength(body),
-};
-
-var postReq = https.request(options, function(res) {
-    var chunks = [];
-    res.setEncoding('utf8');
-    res.on('data', function(chunk) {
-        return chunks.push(chunk);
-    });
-    res.on('end', function() {
-        var body = chunks.join('');
-        if (callback) {
-            callback({
-                body: body,
-                statusCode: res.statusCode,
-                statusMessage: res.statusMessage
-            });
-        }
-    });
-    return res;
-});
-
-postReq.write(body);
-postReq.end();
-</code></pre>
-
-<p>};</p>
-
-<p>var getQueueStats = function(callback) {</p>
-
-<pre><code>var options = url.parse(sidekiqUrl);
-options.headers = {
-    'Accept': 'application/json',
-};
-
-var getReq = https.request(options, function(res){
-    var body = '';
-
-    res.setEncoding('utf8');
-
-    //another chunk of data has been recieved, so append it to `str`
-    res.on('data', function (chunk) {
-        body += chunk;
-    });
-
-    //the whole response has been recieved, so we just print it out here
-    res.on('end', function () {
-        if (callback) {
-            callback({
-                body: JSON.parse(body),
-                statusCode: res.statusCode,
-                statusMessage: res.statusMessage
-            });
-        }
-    });
-})
-
-getReq.end();
-</code></pre>
-
-<p>}</p>
-
-<p>var processEvent = function(event, context) {</p>
-
-<pre><code>getQueueStats(function(stats){
-    console.log('STATS: ', stats.body);
-
-    var retries = stats.body.retries;
-
-    if (retries &gt; retryThreshold) {
-        var slackMessage = {
-            channel: slackChannel,
-            text: "www Sidekiq retries - " + retries
-        };
-
-        postMessageToSlack(slackMessage, function(response) {
-            if (response.statusCode &lt; 400) {
-                console.info('Message posted successfully');
-                context.succeed();
-            } else if (response.statusCode &lt; 500) {
-                console.error("Error posting message to Slack API: " + response.statusCode + " - " + response.statusMessage);
-                context.succeed();  // Don't retry because the error is due to a problem with the request
-            } else {
-                // Let Lambda retry
-                context.fail("Server error when processing message: " + response.statusCode + " - " + response.statusMessage);
+    var postReq = https.request(options, function(res) {
+        var chunks = [];
+        res.setEncoding('utf8');
+        res.on('data', function(chunk) {
+            return chunks.push(chunk);
+        });
+        res.on('end', function() {
+            var body = chunks.join('');
+            if (callback) {
+                callback({
+                    body: body,
+                    statusCode: res.statusCode,
+                    statusMessage: res.statusMessage
+                });
             }
         });
-    } else {
-        console.info('Sidekiq retries were ' + retries + ' . Below threshold.');
-        context.succeed();
-    }
-})
+        return res;
+    });
+
+    postReq.write(body);
+    postReq.end();
+};
+
+var getQueueStats = function(callback) {
+    var options = url.parse(sidekiqUrl);
+    options.headers = {
+        'Accept': 'application/json',
+    };
+
+    var getReq = https.request(options, function(res){
+        var body = '';
+
+        res.setEncoding('utf8');
+
+        //another chunk of data has been recieved, so append it to `str`
+        res.on('data', function (chunk) {
+            body += chunk;
+        });
+
+        //the whole response has been recieved, so we just print it out here
+        res.on('end', function () {
+            if (callback) {
+                callback({
+                    body: JSON.parse(body),
+                    statusCode: res.statusCode,
+                    statusMessage: res.statusMessage
+                });
+            }
+        });
+    })
+
+    getReq.end();
+}
+
+var processEvent = function(event, context) {
+    getQueueStats(function(stats){
+        console.log('STATS: ', stats.body);
+
+        var retries = stats.body.retries;
+
+        if (retries &gt; retryThreshold) {
+            var slackMessage = {
+                channel: slackChannel,
+                text: "www Sidekiq retries - " + retries
+            };
+
+            postMessageToSlack(slackMessage, function(response) {
+                if (response.statusCode &lt; 400) {
+                    console.info('Message posted successfully');
+                    context.succeed();
+                } else if (response.statusCode &lt; 500) {
+                    console.error("Error posting message to Slack API: " + response.statusCode + " - " + response.statusMessage);
+                    context.succeed();  // Don't retry because the error is due to a problem with the request
+                } else {
+                    // Let Lambda retry
+                    context.fail("Server error when processing message: " + response.statusCode + " - " + response.statusMessage);
+                }
+            });
+        } else {
+            console.info('Sidekiq retries were ' + retries + ' . Below threshold.');
+            context.succeed();
+        }
+    })
+};
+
+exports.handler = function(event, context) {
+    processEvent(event, context);
+};
 </code></pre>
-
-<p>};</p>
-
-<p>exports.handler = function(event, context) {</p>
-
-<pre><code>processEvent(event, context);
-</code></pre>
-
-<p>};
-```</p>
 
 <p><em>Note: <code>sidekiqURL</code> and <code>hookURL</code> need to be defined with appropriate values for this to work.</em></p>
 
@@ -758,7 +696,7 @@ getReq.end();
     <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
-I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
+I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &ndash; just requires the plugin to be initialized differently.</p>
 
 <!--more-->
 
@@ -783,22 +721,19 @@ I leave it enabled in all my Rails applications. Most of the negative opinions I
 
 <p>We&rsquo;ll first add <code>nprogress-rails</code> to our Gemfile:</p>
 
-<p><code>
-gem "nprogress-rails"
-</code></p>
+<pre><code>gem "nprogress-rails"
+</code></pre>
 
 <p>Bundle to install the new gem:</p>
 
-<p><code>
-$ bundle install
-</code></p>
+<pre><code>$ bundle install
+</code></pre>
 
 <p>Now with <code>nprogress</code> installed, we need to include the JavaScript in our application. We&rsquo;ll do this by adding the following the <code>app/assets/javascripts/application.js</code> manifest:</p>
 
-<p><code>
-//= require nprogress
+<pre><code>//= require nprogress
 //= require nprogress-turbolinks
-</code></p>
+</code></pre>
 
 <p>We first include the <code>nprogress</code> JavaScript source, and then an adapter that&rsquo;ll hook the Turbolinks request to the progress indicator.</p>
 
@@ -806,10 +741,9 @@ $ bundle install
 
 <p>By default, the <code>nprogress</code> loading bar is anchored to the top of the browser window, but we need to include some CSS to make this work. Let&rsquo;s open the <code>app/assets/stylesheets/application.scss</code> manifest file and add the following:</p>
 
-<p><code>
-*= require nprogress
+<pre><code>*= require nprogress
 *= require nprogress-bootstrap
-</code></p>
+</code></pre>
 
 <p><em>Note: Including <code>nprogress-bootstrap</code> isn&rsquo;t necessary if you don&rsquo;t use <a href="http://getbootstrap.com/css/">Bootstrap</a> in your application. I typically do, so I&rsquo;m going to include it.</em></p>
 
@@ -832,12 +766,11 @@ $ bundle install
 
 <p>Back in our <code>app/assets/stylesheets/application.scss</code>, I overwrote the variable before including the <code>nprogress</code> source code:</p>
 
-<p>```
-$nprogress-color: #37c8c9;</p>
+<pre><code>$nprogress-color: #37c8c9;
 
-<p>@import &ldquo;nprogress&rdquo;;
-@import &ldquo;nprogress-bootstrap&rdquo;;
-```</p>
+@import "nprogress";
+@import "nprogress-bootstrap";
+</code></pre>
 
 <h2>Summary</h2>
 

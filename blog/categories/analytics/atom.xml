@@ -4,7 +4,7 @@
   <title><![CDATA[Category: analytics | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/analytics/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -75,49 +75,39 @@
 
 <p>Using a <a href="https://github.com/ariya/phantomjs/blob/master/examples/rasterize.js">screenshot example</a> from the <a href="https://github.com/ariya/phantomjs">PhantomJS github repo</a>, we put together a script (<code>vendor/assets/javascripts/phantom-screenshot.js</code>) to capture the analytics page:</p>
 
-<p>```</p>
+<pre><code>#!/bin/sh
 
-<h1>!/bin/sh</h1>
-
-<p>var page   = require(&lsquo;webpage&rsquo;).create();
-var system = require(&lsquo;system&rsquo;);
+var page   = require('webpage').create();
+var system = require('system');
 page.viewportSize = { width: 550, height: 600 };
-page.zoomFactor = 0.85;</p>
+page.zoomFactor = 0.85;
 
-<p>page.onError = function(msg, trace) {
-  var msgStack = [&lsquo;ERROR: &rsquo; + msg];
-  if (trace &amp;&amp; trace.length) {</p>
+page.onError = function(msg, trace) {
+  var msgStack = ['ERROR: ' + msg];
+  if (trace &amp;&amp; trace.length) {
+    msgStack.push('TRACE:');
+    trace.forEach(function(t) {
+      msgStack.push(' -&gt; ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+    });
+  }
 
-<pre><code>msgStack.push('TRACE:');
-trace.forEach(function(t) {
-  msgStack.push(' -&gt; ' + t.file + ': ' + t.line + (t.function ? ' (in function "' + t.function +'")' : ''));
+  console.error(msgStack.join('\n'));
+};
+
+page.open(system.args[1], function(status) {
+  if (status !== 'success') {
+    console.log('Unable to load the address!');
+    phantom.exit(1);
+  } else {
+    window.setTimeout(function () {
+      page.render(system.args[2]);
+      phantom.exit();
+    }, 2000);
+  }
 });
 </code></pre>
 
-<p>  }</p>
-
-<p>  console.error(msgStack.join(&lsquo;\n&rsquo;));
-};</p>
-
-<p>page.open(system.args[1], function(status) {
-  if (status !== &lsquo;success&rsquo;) {</p>
-
-<pre><code>console.log('Unable to load the address!');
-phantom.exit(1);
-</code></pre>
-
-<p>  } else {</p>
-
-<pre><code>window.setTimeout(function () {
-  page.render(system.args[2]);
-  phantom.exit();
-}, 2000);
-</code></pre>
-
-<p>  }
-});
-<code>``
-_Note: a variety of the settings (</code>viewPortSize<code>,</code>zoomFactor<code>, and</code>timeout`) were found using trial and error for our particular situation._</p>
+<p><em>Note: a variety of the settings (<code>viewPortSize</code>, <code>zoomFactor</code>, and <code>timeout</code>) were found using trial and error for our particular situation.</em></p>
 
 <p>We use Sidekiq to enqueue the thousands of recap emails sent to parents each week. Because this approach relies on using our existing website as the source data for the screenshot, we have to be conscious of spreading the job processing over a certain period of time, so we don&rsquo;t overload the application for regular users.</p>
 
@@ -125,78 +115,59 @@ _Note: a variety of the settings (</code>viewPortSize<code>,</code>zoomFactor<co
 
 <p>With this script in hand, now we can use the following class to create the image for each child:</p>
 
-<p>```
-class RecapAnalytics
-  ScreenshotError = Class.new(StandardError)</p>
+<pre><code>class RecapAnalytics
+  ScreenshotError = Class.new(StandardError)
 
-<p>  def initialize(analytics_url:)</p>
+  def initialize(analytics_url:)
+    @analytics_url = analytics_url
+  end
 
-<pre><code>@analytics_url = analytics_url
-</code></pre>
+  def file_path
+    unless create_screenshot
+      raise ScreenshotError.new("Unable to complete analytics screenshot")
+    end
 
-<p>  end</p>
+    temp_file_path
+  end
 
-<p>  def file_path</p>
+  def create_screenshot
+    Phantomjs.run screenshot_script, analytics_url, temp_file_path
+  end
 
-<pre><code>unless create_screenshot
-  raise ScreenshotError.new("Unable to complete analytics screenshot")
-end
+  private
 
-temp_file_path
-</code></pre>
+  attr_reader :analytics_url
 
-<p>  end</p>
+  def screenshot_script
+    Rails.root.join('vendor', 'assets', 'javascripts', 'phantom-screenshot.js').to_s
+  end
 
-<p>  def create_screenshot</p>
-
-<pre><code>Phantomjs.run screenshot_script, analytics_url, temp_file_path
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :analytics_url</p>
-
-<p>  def screenshot_script</p>
-
-<pre><code>Rails.root.join('vendor', 'assets', 'javascripts', 'phantom-screenshot.js').to_s
-</code></pre>
-
-<p>  end</p>
-
-<p>  def temp_file_path</p>
-
-<pre><code>@temp_file_path ||= begin
-  file = Tempfile.new("child-analytics")
-  file.path + ".png"
+  def temp_file_path
+    @temp_file_path ||= begin
+      file = Tempfile.new("child-analytics")
+      file.path + ".png"
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>For each child, we&rsquo;ll provide the URL to the child&rsquo;s analytics page and run the following <code>file_path</code> method to return the path of the screenshot:</p>
 
-<p><code>
-RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
-</code></p>
+<pre><code>RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+</code></pre>
 
 <h2>Adding as an Inline Email Attachment</h2>
 
 <p>With an image for each child, we can iterate through each child and inline include the image in the mailer:</p>
 
-<p><code>
-file_path = RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
+<pre><code>file_path = RecapAnalytics.new(analytics_url: "https://www.bark.us/children/XXX/analytics").file_path
 attachments.inline["#{child.first_name}.png"] = File.read(file_path)
-</code></p>
+</code></pre>
 
 <p>Then in the email template, we can include the following to render the image:</p>
 
-<p><code>erb
- &lt;%= link_to image_tag(attachments["#{child.first_name}.png"].url), child_url(child) %&gt;
-</code></p>
+<pre><code class="erb"> &lt;%= link_to image_tag(attachments["#{child.first_name}.png"].url), child_url(child) %&gt;
+</code></pre>
 
 <p><img class="center" src="/images/phantomjs/email-interactions.png" title="&ldquo;Bark weekly recap email with interactions&rdquo;" ></p>
 

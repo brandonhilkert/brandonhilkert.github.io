@@ -4,7 +4,7 @@
   <title><![CDATA[Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -36,8 +36,8 @@
 <p>Two things to notice:</p>
 
 <ol>
-<li><p><strong>Memory increased quickly</strong> &ndash; The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
-<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> &ndash; The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
+<li><p><strong>Memory increased quickly</strong> - The rise of memory happens immediately after the processes are restarted. We deploy multiple times a day, but this was especially problematic on the weekends when deploys are happening less frequently</p></li>
+<li><p><strong>Memory wasn&rsquo;t reused until restarted</strong> - The jaggedness of graph towards the center is the result of the memory limits we imposed on the <code>systemd</code> processes, causing them to be killed and ultimately restarted until they later reach the configured max memory setting again. Because the processes didn&rsquo;t appear to be reusing memory, we saw this happen just a few minutes after being restarted.</p></li>
 </ol>
 
 
@@ -75,7 +75,7 @@
 
 <p><img class="center" src="http://brandonhilkert.com/images/jemalloc/sidekiq-memory-usage-comparison.png" title="&#34;Sidekiq server memory usage with one server using jemalloc&#34;" alt="&#34;Sidekiq server memory usage with one server using jemalloc&#34;"></p>
 
-<p>As we can see, the difference is drastic &mdash; <strong>over 4x decrease in memory usage</strong>!</p>
+<p>As we can see, the difference is drastic &ndash; <strong>over 4x decrease in memory usage</strong>!</p>
 
 <p>The more impressive detail was the consistency. Total memory usage doesn&rsquo;t waver much. Processing large payloads and media, I assumed we&rsquo;d continue to see the peaks and valleys common to processing social media content. The sidekiq processes using <code>jemalloc</code> show a better ability to use previously allocated memory.</p>
 
@@ -163,7 +163,7 @@ end</code></pre></figure>
 
 <p>AWS Lambda functions are perfect for one-off functions that feel like a burden to maintain in our application.</p>
 
-<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events - Schedule&rdquo;:</p>
 
 <p><img class="center" src="http://brandonhilkert.com/images/sidekiq-monitor/lambda-trigger.png" title="&#34;AWS Lambda trigger&#34;" alt="&#34;AWS Lambda trigger&#34;"></p>
 
@@ -264,7 +264,7 @@ exports.handler = function(event, context) {
 
 <h3>Graphing Sidekiq Queue Data</h3>
 
-<p>Once the function has run a few times, under CloudWatch &mdash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
+<p>Once the function has run a few times, under CloudWatch &ndash;> Metrics, we&rsquo;ll see the following custom namespace:</p>
 
 <p><img class="center" src="http://brandonhilkert.com/images/sidekiq-cloudwatch/custom-namespace.png" title="&#34;AWS CloudWatch Custom Namespace&#34;" alt="&#34;AWS CloudWatch Custom Namespace&#34;"></p>
 
@@ -453,7 +453,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)</code></pre
     <link href="http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack/"/>
     <updated>2016-10-25T11:54:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/monitoring-sidekiq-using-aws-lambda-and-slack</id>
-    <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &mdash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
+    <content type="html"><![CDATA[<p>It&rsquo;s no mystery I&rsquo;m a <a href="http://sidekiq.org/">Sidekiq</a> fan &ndash; my background job processing library of choice for any non-trivial applications. My favorite feature of Sidekiq has to be retries. By default, failed jobs will retry 25 times over the course of 21 days.</p>
 
 <p>As a remote company, we use Slack to stay in touch with everyone AND to manage/monitor our infrastructure (hello #chatops). We can deploy from Slack (we don&rsquo;t generally, we have full CI) and be notified of infrastructure and application errors.</p>
 
@@ -466,7 +466,7 @@ attachments.inline["#{child.first_name}.png"] = File.read(file_path)</code></pre
 
 <p><a href="https://www.bark.us/">Bark</a> is background job-heavy. The web application is a glorified CRUD app that sets up the data needed to poll a child&rsquo;s social media feed and monitor for potential issues. The best-case scenario for a parent is that they will never hear from us.</p>
 
-<p>Because Bark&rsquo;s background jobs commonly interact with 3rd-party APIs, failures aren&rsquo;t a big surprise. APIs can be down, network connections can fail &mdash; Sidekiq&rsquo;s retry logic protects us from transient network errors. Under normal circumstances, jobs retry and ultimately run successfully after subsequent attempts. These are non-issues and something we don&rsquo;t need an engineer to investigate.</p>
+<p>Because Bark&rsquo;s background jobs commonly interact with 3rd-party APIs, failures aren&rsquo;t a big surprise. APIs can be down, network connections can fail &ndash; Sidekiq&rsquo;s retry logic protects us from transient network errors. Under normal circumstances, jobs retry and ultimately run successfully after subsequent attempts. These are non-issues and something we don&rsquo;t need an engineer to investigate.</p>
 
 <p>There are times when retries accumulate, giving us a strong indication that something more severe may be wrong. Initially, we setup New Relic to notify us of an increased error rate. This worked for simple cases, but was sometimes a false positive. As a result, we started to ignore them, which potentially masked more important issues.</p>
 
@@ -521,7 +521,7 @@ end</code></pre></figure>
 <figure class='code'><pre><code>resources :sidekiq_queues, only: [:index]</code></pre></figure>
 
 
-<p>As you can see, the endpoint is public (there&rsquo;s no job args or names exposed &mdash; just counts). The code digs in to the <a href="https://github.com/mperham/sidekiq/wiki/API">Sidekiq API</a> to interrogate the size of queues.</p>
+<p>As you can see, the endpoint is public (there&rsquo;s no job args or names exposed &ndash; just counts). The code digs in to the <a href="https://github.com/mperham/sidekiq/wiki/API">Sidekiq API</a> to interrogate the size of queues.</p>
 
 <h3>Slack Incoming WebHook</h3>
 
@@ -541,9 +541,9 @@ end</code></pre></figure>
 
 <h3>AWS Lambda Function</h3>
 
-<p>Now that we have our endpoint to expose the number of retries (among other things) and the Slack webhook URL to <code>POST</code> to, we need to setup the AWS Lambda function to tie to the two together. We&rsquo;ll start by creating a new Lambda function with the defaults &mdash; using the latest Node.</p>
+<p>Now that we have our endpoint to expose the number of retries (among other things) and the Slack webhook URL to <code>POST</code> to, we need to setup the AWS Lambda function to tie to the two together. We&rsquo;ll start by creating a new Lambda function with the defaults &ndash; using the latest Node.</p>
 
-<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events &ndash; Schedule&rdquo;:</p>
+<p>For the trigger, we&rsquo;ll use &ldquo;CloudWatch Events - Schedule&rdquo;:</p>
 
 <p><img class="center" src="http://brandonhilkert.com/images/sidekiq-monitor/lambda-trigger.png" title="&#34;AWS Lambda trigger&#34;" alt="&#34;AWS Lambda trigger&#34;"></p>
 
@@ -699,7 +699,7 @@ exports.handler = function(event, context) {
     <id>http://brandonhilkert.com/blog/care-about-what-you-build</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve spent the majority of my career working for companies building products I either wasn&rsquo;t interested in, or wasn&rsquo;t the target user. They were jobs. In exchange for my 40 hours, they supplied me a paycheck. As a result, I went home at the end of the day and was able to disconnect.</p>
 
-<p>Fast forward almost 15 years and I&rsquo;m on the opposite end of the spectrum &mdash; I build a product I want to exist, a parent like me is the target user and furthermore, I have equity in the company.</p>
+<p>Fast forward almost 15 years and I&rsquo;m on the opposite end of the spectrum &ndash; I build a product I want to exist, a parent like me is the target user and furthermore, I have equity in the company.</p>
 
 <!--more-->
 
@@ -716,7 +716,7 @@ exports.handler = function(event, context) {
 
 <p>Most software developers I know are introverts. They generally like writing code, shipping new features, but avoid meetings at all costs. The rise of slack and other remote-focused tooling further increases the human contact void that most developers experience.</p>
 
-<p>My experience with sales people have been the polar opposite. They thrive on human interaction. Sales people, no matter the company, generally position their product/services as the perfect fit for you and your company. That’s ultimately their job &mdash; match the customers&#8217; need(s) with a solution they hopefully sell.</p>
+<p>My experience with sales people have been the polar opposite. They thrive on human interaction. Sales people, no matter the company, generally position their product/services as the perfect fit for you and your company. That’s ultimately their job &ndash; match the customers&#8217; need(s) with a solution they hopefully sell.</p>
 
 <p>It&rsquo;s not surprising that being in a sales role for a company/product that you love and genuinely want to see succeed is much easier than one you could care less about. This is where roles at a small company often cross-over.</p>
 
@@ -748,7 +748,7 @@ exports.handler = function(event, context) {
 
 <h2>Ditch the Product, Love the Craft</h2>
 
-<p>I know what you’re thinking, you don&rsquo;t love what you’re building, so where do you go from here? Not everyone has the freedom and ability to choose a position where they’re 100% happy. There will always be personal trade-offs, some of which might leave you working for a company/product you don&rsquo;t care about and don&rsquo;t have the luxury to leave anytime soon. I&rsquo;ve been there before &mdash; ultimately leaving &mdash; but I made it work for a period of time.</p>
+<p>I know what you’re thinking, you don&rsquo;t love what you’re building, so where do you go from here? Not everyone has the freedom and ability to choose a position where they’re 100% happy. There will always be personal trade-offs, some of which might leave you working for a company/product you don&rsquo;t care about and don&rsquo;t have the luxury to leave anytime soon. I&rsquo;ve been there before &ndash; ultimately leaving &ndash; but I made it work for a period of time.</p>
 
 <p>One of the ways I separated myself was to focus on the software development craft. If you’re like me, you care about designing things in a maintainable and reliable way. Whether it’s good design, well-written tests, or using the latest and greatest, shifting your focus away from a product you have no interest levels the playing field.</p>
 
@@ -776,7 +776,7 @@ exports.handler = function(event, context) {
     <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
-I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
+I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &ndash; just requires the plugin to be initialized differently.</p>
 
 <!--more-->
 
@@ -1659,7 +1659,7 @@ end</code></pre></figure>
 
 <p>As you can see, there&rsquo;s little magic to setting up a synchronous service request.</p>
 
-<p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
+<p>Challenges appear when you consider failure states at every point in the service communication - the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
 
 <p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
 ]]></content>
@@ -1957,7 +1957,7 @@ end</code></pre></figure>
 
 <h2>How long will the sale run?</h2>
 
-<p>The bundle will be <strong>available for 1 week only</strong> &ndash; ending <strong>July 10th, 11:59PM PDT</strong>.</p>
+<p>The bundle will be <strong>available for 1 week only</strong> - ending <strong>July 10th, 11:59PM PDT</strong>.</p>
 
 <h2>What if I’m not happy with the bundle?</h2>
 
@@ -2121,7 +2121,7 @@ $(document).on "turbolinks:load", -&gt;
 
 <h3>Structure</h3>
 
-<p>I created a class in the <code>App</code> namespace &mdash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
+<p>I created a class in the <code>App</code> namespace &ndash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
 
 <p>You might notice the file takes the form:</p>
 
@@ -2170,7 +2170,7 @@ invocation
 
 <h2>User-Triggered Javascript</h2>
 
-<p>This type of Javascript is exactly what you&rsquo;d think &mdash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
+<p>This type of Javascript is exactly what you&rsquo;d think &ndash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
 
 <h3>&ldquo;data-behavior&rdquo; Attribute</h3>
 
@@ -2367,7 +2367,7 @@ end</code></pre></figure>
 end</code></pre></figure>
 
 
-<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &ndash; no change in functionality. But certainly more organized and isolated.</p>
 
 <p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
 
@@ -2384,7 +2384,7 @@ end</code></pre></figure>
 end</code></pre></figure>
 
 
-<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem - an adapter if you will.</p>
 
 <h2>Create a Decorator</h2>
 
@@ -2434,7 +2434,7 @@ end</code></pre></figure>
 end</code></pre></figure>
 
 
-<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
+<p>As you can see, we only had to change one line &ndash; the line where we decorated the original billing class:</p>
 
 <figure class='code'><pre><code>BillingWithCache.new(Billing.new(current_user.stripe_id))</code></pre></figure>
 
@@ -2497,11 +2497,11 @@ end</code></pre></figure>
 
 <h2>Summary</h2>
 
-<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+<p>Separating your application and third-party services helps keeps your applications flexible &ndash; offering the freedom to switch to another service when one no longer fits the bill.</p>
 
 <p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
 
-<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &ndash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
 ]]></content>
   </entry>
   
@@ -2608,7 +2608,7 @@ end</code></pre></figure>
 @upcoming_invoice = stripe.invoices</code></pre></figure>
 
 
-<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
+<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &ndash; for 15 minutes, of course.</p>
 
 <p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
 
@@ -2631,7 +2631,7 @@ end</code></pre></figure>
 
 <p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
 
-<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
+<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &ndash; all without a request to stripe on page load.</p>
 
 <p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
 

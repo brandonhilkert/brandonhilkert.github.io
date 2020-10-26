@@ -4,7 +4,7 @@
   <title><![CDATA[Category: testing | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/testing/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -33,34 +33,31 @@
 
 <p>I started with a simple <code>users.yml</code> fixture that looked like this:</p>
 
-<p><code>
-fred:
+<pre><code>fred:
   first_name: Fred
   last_name: Flintstone
   email: fred@flintstone.com
   title: CEO
   company: flintstone
   admin: true
-</code></p>
+</code></pre>
 
 <h3>Bcrypt</h3>
 
 <p>As mentioned above, <code>has_secure_password</code> uses <code>Bcrypt</code> to encrypt the plain text passwords provided. The specific implementation to create the password digest is:</p>
 
-<p><code>
-BCrypt::Password.create("password", cost: 4)
-</code></p>
+<pre><code>BCrypt::Password.create("password", cost: 4)
+</code></pre>
 
 <p>This method takes the plain text password (“password”) and encrypts it with what it calls the “cost”. It’s not terribly important for this article, but to save some speed, I’ve specified a cost of 4 — <a href="https://github.com/codahale/bcrypt-ruby/blob/master/lib/bcrypt/engine.rb#L7">the minimum cost support by the <code>Bcrypt</code> algorithm</a>. The default is 10, which will make your production applications safer. However, for testing, we don’t care.</p>
 
 <p>The result of the method above looks like this:</p>
 
-<p><code>
-irb(main):001:0&gt; require "bcrypt"
+<pre><code>irb(main):001:0&gt; require "bcrypt"
 =&gt; true
 irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
 =&gt; "$2a$04$gw09FM67MDnzduXmlK46BOsdVTtzWKaSIkAdmnF/sJSLgcQhJBAUe"
-</code></p>
+</code></pre>
 
 <p>That output value is what’s being stored in our database when a user inputs and saves a password. From the application’s standpoint, we could print a value like this in to our fixtures, but what’s the fun in that?!?!</p>
 
@@ -68,8 +65,7 @@ irb(main):002:0&gt; BCrypt::Password.create("password", cost: 4)
 
 <p>Since fixtures allow us to use ERB in them, we could provide the <code>Bcrypt</code> method above to produce the password digest like so:</p>
 
-<p><code>
-fred:
+<pre><code>fred:
   first_name: Fred
   last_name: Flintstone
   email: fred@flintstone.com
@@ -77,7 +73,7 @@ fred:
   title: CEO
   company: flintstone
   admin: true
-</code></p>
+</code></pre>
 
 <p>The downside is that the actual password (“password”) is here in plain text. To fill in our login form using Capybara, we don’t have a variable to access to the get the password — we literally have to type “password”. So this isn’t the most DRY thing in the world. While it would certainly work, I think we can do better…</p>
 
@@ -85,57 +81,47 @@ fred:
 
 <p>Let’s say I have a test that looks like this:</p>
 
-<p><code>
-visit signin_path
+<pre><code>visit signin_path
 fill_in "email", with: user.email
 fill_in "password", with: "password"
 click_on "Sign in"
-</code></p>
+</code></pre>
 
 <h3>Extract a Module</h3>
 
 <p>Our goal was to not sprinkle these plan text passwords all over the place. So let’s extract a module call <code>TestPasswordHelper</code> and put the plain text password in there:</p>
 
-<p>```
-require &ldquo;bcrypt&rdquo;</p>
+<pre><code>require "bcrypt"
 
-<p>module TestPasswordHelper
-  def default_password_digest</p>
+module TestPasswordHelper
+  def default_password_digest
+    BCrypt::Password.create(default_password, cost: 4)
+  end
 
-<pre><code>BCrypt::Password.create(default_password, cost: 4)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def default_password</p>
-
-<pre><code>"password"
-</code></pre>
-
-<p>  end
+  def default_password
+    "password"
+  end
 end
-```</p>
+</code></pre>
 
 <p>We’ll have our default password accessible via a method named…get this, <code>default_password</code>! The module also contains a method (<code>default_password_digest</code>) that will allow us to send the password digest to the fixture using the Bcrypt algorithm we explored above.</p>
 
 <p>Now that we have a helper module ready all set up, we add the following to our <code>test/test_helper.rb</code> to make these methods accessible in our tests:</p>
 
-<p>```
-require &ldquo;support/test_password_helper&rdquo;</p>
+<pre><code>require "support/test_password_helper"
 
-<p>class ActiveSupport::TestCase
+class ActiveSupport::TestCase
   include TestPasswordHelper
 end
-```</p>
+</code></pre>
 
 <p>With these methods mixed in, we can update our Capybara test to use the <code>default_password</code> method:</p>
 
-<p><code>
-visit signin_path
+<pre><code>visit signin_path
 fill_in "email", with: user.email
 fill_in "password", with: default_password
 click_on "Sign in"
-</code></p>
+</code></pre>
 
 <h3>Helpers in Fixtures</h3>
 
@@ -147,14 +133,12 @@ click_on "Sign in"
 
 <p>So back in our <code>test_helper.rb</code>, we can mix in our test helpers methods like so:</p>
 
-<p><code>
-ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper
-</code></p>
+<pre><code>ActiveRecord::FixtureSet.context_class.send :include, TestPasswordHelper
+</code></pre>
 
 <p>Now, back in our <code>users.yml</code> fixture, we can use the new <code>default_password_digest</code> method:</p>
 
-<p><code>
-fred:
+<pre><code>fred:
   first_name: Fred
   last_name: Flintstone
   email: fred@flintstone.com
@@ -162,7 +146,7 @@ fred:
   title: CEO
   company: flintstone
   admin: true
-</code></p>
+</code></pre>
 
 <p>We can now run our tests and verify the fixtures properly insert the digest using the default password and the Capybara tests reference that same default password.</p>
 
@@ -198,8 +182,7 @@ fred:
 
 <p>Here’s what a typical <code>Gemfile</code> looked like in one of my previous projects:</p>
 
-<p><code>
-group :test do
+<pre><code>group :test do
   gem "rspec-rails"
   gem "factory_girl_rails"
   gem "capybara"
@@ -207,7 +190,7 @@ group :test do
   gem "database_cleaner"
   gem "shoulda-matchers"
 end
-</code></p>
+</code></pre>
 
 <p>Aside from the additional gems, my <code>spec_helper.rb</code> had a number of settings like turning off transactions (in favor of <code>database_cleaner</code>) that went against the standard Rails testing conventions.</p>
 
@@ -265,27 +248,23 @@ wilma:
 
 <p>What about the fancy syntax around methods ending with &ldquo;?&rdquo;.</p>
 
-<p><code>
-post.should be_active
-</code></p>
+<pre><code>post.should be_active
+</code></pre>
 
 <p>Wait, so where’s the <code>be_active</code> method? Nope! Rspec parses the method due to the fact that <code>active?</code> is a legitimate method in the application under test. At first, I was enamored with the magic. However, later, I found thinking too much about how and what to write, when I should’ve just been typing out <code>active?</code> and asserting it’s <code>false</code> or <code>true</code> (which of course is an entirely other way to write it):</p>
 
-<p><code>
-post.active?.should be_true
-</code></p>
+<pre><code>post.active?.should be_true
+</code></pre>
 
 <p>&hellip;or what about:</p>
 
-<p><code>
-post.active?.should == true
-</code></p>
+<pre><code>post.active?.should == true
+</code></pre>
 
 <p>Does that even work? I’ve learned to appreciate simplicity and knowing that there’s generally only one way to write an assertion:</p>
 
-<p><code>
-assert post.active?
-</code></p>
+<pre><code>assert post.active?
+</code></pre>
 
 <p>Aside from not floundering over the right assertion to make, I’ve found it leads to less syntax errors in my tests. Going through 2 or 3 iterations of test errors before the test actually gets to the application code is frustrating and a waste of time. Having fewer ways to do the same thing has led me to make fewer syntax errors when writing tests.</p>
 
@@ -295,52 +274,35 @@ assert post.active?
 
 <p><a href="http://devblog.avdi.org/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/">Avdi’s post on configuring database_cleaner</a> has been my goto configuration:</p>
 
-<p>```
-RSpec.configure do |config|</p>
+<pre><code>RSpec.configure do |config|
 
-<p>  config.before(:suite) do</p>
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
 
-<pre><code>DatabaseCleaner.clean_with(:truncation)
+  config.before(:each) do
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.before(:each, :js =&gt; true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+
+end
 </code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each) do</p>
-
-<pre><code>DatabaseCleaner.strategy = :transaction
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each, :js => true) do</p>
-
-<pre><code>DatabaseCleaner.strategy = :truncation
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each) do</p>
-
-<pre><code>DatabaseCleaner.start
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.after(:each) do</p>
-
-<pre><code>DatabaseCleaner.clean
-</code></pre>
-
-<p>  end</p>
-
-<p>end
-```</p>
 
 <p>This is after you first disable transactions in the <code>spec_helper.rb</code>, of course:</p>
 
-<p><code>
-config.use_transactional_fixtures = false
-</code></p>
+<pre><code>config.use_transactional_fixtures = false
+</code></pre>
 
 <p><em>Why is all this necessary?</em></p>
 
@@ -348,11 +310,10 @@ config.use_transactional_fixtures = false
 
 <p>When you use a javascript-enabled driver like selenium to run integration tests, browser actions run in a different thread. This removes the ability to see data setup within another thread/transaction. Because of this, you have to resort to a truncation strategy instead. Hence the following config option shown above:</p>
 
-<p><code>
-config.before(:each, js: true) do
+<pre><code>config.before(:each, js: true) do
   DatabaseCleaner.strategy = :truncation
 end
-</code></p>
+</code></pre>
 
 <p>This is complex and not obvious for newcomers. Not to mention the complexity that arises if you actually use <a href="https://github.com/brandonhilkert/sucker_punch#cleaning-test-data-transactions">multi-threaded code or gems</a>.</p>
 
@@ -360,13 +321,12 @@ end
 
 <p>Using fixtures instead of factories removes the need for <code>database_cleaner</code> entirely under normal circumstances. Additionally, the only change that’s necessary to setup <code>Capybara</code> is the following addition to <code>test_helper.rb</code>:</p>
 
-<p>```
-require &ldquo;capybara/rails&rdquo;</p>
+<pre><code>require "capybara/rails"
 
-<p>class ActionDispatch::IntegrationTest
+class ActionDispatch::IntegrationTest
   include Capybara::DSL
 end
-```</p>
+</code></pre>
 
 <p>That’s it&hellip;seriously…the crazy part to me is this configuration is largely commonplace in Rails test suites that use Capybara and Rspec. We’ve been largely spoiled by Rails in that the framework provides a solution for just about every common problem we encounter. The fact that a complex setup with database cleaner and deciding on truncating vs. transactions ever seemed reasonable seems counter-intuitive to the Rails experience. I’m, frankly, surprised that it’s seemed reasonable for so long.</p>
 
@@ -390,7 +350,7 @@ end
 
 <h2>6. Minitest is just Ruby</h2>
 
-<p>To be fair, Rspec is just Ruby too. But generally Rspec seems to have magic ways to do just about everything &ndash; shared examples, test setup, configuration. All these things have an “Rspec way”.</p>
+<p>To be fair, Rspec is just Ruby too. But generally Rspec seems to have magic ways to do just about everything - shared examples, test setup, configuration. All these things have an “Rspec way”.</p>
 
 <p>Minitest deals with this by just using Ruby. If you need shared examples, why not <a href="http://ntl.ghost.io/how-i-use-test-unit-syntax/">include a module that includes the shared tests</a>?</p>
 
@@ -438,17 +398,13 @@ end
 
 <p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
 
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Timecop.freeze Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
+  Timecop.freeze Chronic.parse("4/15/14") do
+    Reminders::Checkin.new.email
+    assert_equal 3, ActionMailer::Base.deliveries.size
+  end
 end
-```</p>
+</code></pre>
 
 <p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
 
@@ -468,17 +424,13 @@ end
 
 <p>Using the <code>travel_to</code> method with the example above results in the following:</p>
 
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
+  travel_to Chronic.parse("4/15/14") do
+    Reminders::Checkin.new.email
+    assert_equal 3, ActionMailer::Base.deliveries.size
+  end
 end
-```</p>
+</code></pre>
 
 <p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
 
@@ -486,31 +438,29 @@ end
 
 <p>Additionally, the same test could be written as:</p>
 
-<p><code>
-test "sends reminders on tuesday for those scheduled on wednesday" do
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
   travel_to Chronic.parse("4/15/14")
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
   travel_back
 end
-</code></p>
+</code></pre>
 
 <p>or with <code>setup</code> and <code>teardown</code>:</p>
 
-<p>```
-def setup
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;)
-end</p>
+<pre><code>def setup
+  travel_to Chronic.parse("4/15/14")
+end
 
-<p>test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
+test "sends reminders on tuesday for those scheduled on wednesday" do
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
-end</p>
+end
 
-<p>def teardown
+def teardown
   travel_back
 end
-```</p>
+</code></pre>
 
 <h2>Summary</h2>
 

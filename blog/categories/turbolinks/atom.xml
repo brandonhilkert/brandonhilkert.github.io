@@ -4,7 +4,7 @@
   <title><![CDATA[Category: turbolinks | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/turbolinks/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -19,7 +19,7 @@
     <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
-I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
+I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &ndash; just requires the plugin to be initialized differently.</p>
 
 <!--more-->
 
@@ -44,22 +44,19 @@ I leave it enabled in all my Rails applications. Most of the negative opinions I
 
 <p>We&rsquo;ll first add <code>nprogress-rails</code> to our Gemfile:</p>
 
-<p><code>
-gem "nprogress-rails"
-</code></p>
+<pre><code>gem "nprogress-rails"
+</code></pre>
 
 <p>Bundle to install the new gem:</p>
 
-<p><code>
-$ bundle install
-</code></p>
+<pre><code>$ bundle install
+</code></pre>
 
 <p>Now with <code>nprogress</code> installed, we need to include the JavaScript in our application. We&rsquo;ll do this by adding the following the <code>app/assets/javascripts/application.js</code> manifest:</p>
 
-<p><code>
-//= require nprogress
+<pre><code>//= require nprogress
 //= require nprogress-turbolinks
-</code></p>
+</code></pre>
 
 <p>We first include the <code>nprogress</code> JavaScript source, and then an adapter that&rsquo;ll hook the Turbolinks request to the progress indicator.</p>
 
@@ -67,10 +64,9 @@ $ bundle install
 
 <p>By default, the <code>nprogress</code> loading bar is anchored to the top of the browser window, but we need to include some CSS to make this work. Let&rsquo;s open the <code>app/assets/stylesheets/application.scss</code> manifest file and add the following:</p>
 
-<p><code>
-*= require nprogress
+<pre><code>*= require nprogress
 *= require nprogress-bootstrap
-</code></p>
+</code></pre>
 
 <p><em>Note: Including <code>nprogress-bootstrap</code> isn&rsquo;t necessary if you don&rsquo;t use <a href="http://getbootstrap.com/css/">Bootstrap</a> in your application. I typically do, so I&rsquo;m going to include it.</em></p>
 
@@ -93,12 +89,11 @@ $ bundle install
 
 <p>Back in our <code>app/assets/stylesheets/application.scss</code>, I overwrote the variable before including the <code>nprogress</code> source code:</p>
 
-<p>```
-$nprogress-color: #37c8c9;</p>
+<pre><code>$nprogress-color: #37c8c9;
 
-<p>@import &ldquo;nprogress&rdquo;;
-@import &ldquo;nprogress-bootstrap&rdquo;;
-```</p>
+@import "nprogress";
+@import "nprogress-bootstrap";
+</code></pre>
 
 <h2>Summary</h2>
 
@@ -146,21 +141,19 @@ to not only handle page-specific Javascript, but overall organization and struct
 
 <p>I still like to scope the body element of the layout(s) with the controller and action name:</p>
 
-<p><code>
-&lt;body class="&lt;%= controller_name %&gt; &lt;%= action_name %&gt;"&gt;
+<pre><code>&lt;body class="&lt;%= controller_name %&gt; &lt;%= action_name %&gt;"&gt;
   &lt;%= yield %&gt;
 &lt;/body&gt;
-</code></p>
+</code></pre>
 
 <p>This not only let&rsquo;s us control access to the DOM through jQuery if we need to, but also provides some top-level styling classes to allow us to easily add page-specific CSS.</p>
 
 <p>In the case we&rsquo;re working on the proverbial blog posts application, the body tag ends up looking like:</p>
 
-<p><code>
-&lt;body class="posts index"&gt;
+<pre><code>&lt;body class="posts index"&gt;
   &lt;%= yield %&gt;
 &lt;/body&gt;
-</code></p>
+</code></pre>
 
 <p>This gives us the opportunity to scope CSS and Javascripts to all <code>posts</code>-related pages in the controller with the <code>.posts</code> class, or down to the specific page using a combination of both the controller and action: <code>.posts.index</code>.</p>
 
@@ -168,8 +161,7 @@ to not only handle page-specific Javascript, but overall organization and struct
 
 <p>Here&rsquo;s the default <code>app/assets/javascripts/application.js</code>:</p>
 
-<p><code>
-// This is a manifest file that'll be compiled into application.js, which will include all the files
+<pre><code>// This is a manifest file that'll be compiled into application.js, which will include all the files
 // listed below.
 //
 // Any JavaScript/Coffee file within this directory, lib/assets/javascripts, vendor/assets/javascripts,
@@ -185,65 +177,60 @@ to not only handle page-specific Javascript, but overall organization and struct
 //= require jquery_ujs
 //= require turbolinks
 //= require_tree .
-</code></p>
+</code></pre>
 
 <p>I start by removing the line <code>//= require_tree .</code>. I do this because if you don&rsquo;t, the javascript files in the folder will be loaded in alphabetical order. As you&rsquo;ll see below, there&rsquo;s an initialization file that needs to be loaded before other Javascript. We&rsquo;ll also remove the comments from the top of the file to preserve space.</p>
 
 <p>So we&rsquo;re left with:</p>
 
-<p><code>
-//= require jquery
+<pre><code>//= require jquery
 //= require jquery_ujs
 //= require turbolinks
-</code></p>
+</code></pre>
 
 <h2>Initialization</h2>
 
 <p>Let&rsquo;s start by adding the file <code>app/assets/javascripts/init.coffee</code> with the following:</p>
 
-<p>```
-window.App ||= {}</p>
+<pre><code>window.App ||= {}
 
-<p>App.init = &ndash;>
-  $(&ldquo;a, span, i, div&rdquo;).tooltip()</p>
+App.init = -&gt;
+  $("a, span, i, div").tooltip()
 
-<p>$(document).on &ldquo;turbolinks:load&rdquo;, &ndash;>
+$(document).on "turbolinks:load", -&gt;
   App.init()
-```</p>
+</code></pre>
 
 <p>Let&rsquo;s dig in to each pagef of this:</p>
 
-<p><code>
-window.App ||= {}
-</code></p>
+<pre><code>window.App ||= {}
+</code></pre>
 
 <p>We&rsquo;re creating the <code>App</code> object on window so the functionality added to the object is available throughout the application.</p>
 
 <p>Next, we define an <code>init()</code> function on <code>App</code> to initialize common jQuery plugins and other Javascript libraries:</p>
 
-<p><code>
-App.init = -&gt;
+<pre><code>App.init = -&gt;
   $("a, span, i, div").tooltip()
-</code></p>
+</code></pre>
 
 <p>The call to <code>$("a, span, i, div").tooltip()</code> initializes Bootstrap Tooltips. This is an example of the type of libraries that can/should be setup here. Obviously, if you&rsquo;re not using Bootstrap tooltips, you would haven&rsquo;t this here, but coupled with the next line, we&rsquo;ll see why this works.</p>
 
 <p>As many have found out the hard way, <strong>when Turbolinks is enabled</strong> in a project, jQuery <code>$(document).ready</code> functions <strong>don&rsquo;t get fired from page to page</strong>. In order to call the <code>init()</code> function on each page transition, we&rsquo;ll hook in to the <code>turbolinks:load</code> event:</p>
 
-<p><code>
-$(document).on "turbolinks:load", -&gt;
+<pre><code>$(document).on "turbolinks:load", -&gt;
   App.init()
-</code>
-<em>Note: the <code>turbolinks:load</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
+</code></pre>
+
+<p><em>Note: the <code>turbolinks:load</code> transition is also triggered on the well known document ready event, so there&rsquo;s no need to add any special handling for first page load.</em></p>
 
 <p>Lastly, we need to add <code>init.coffee</code> to the asset pipeline:</p>
 
-<p><code>
-//= require jquery
+<pre><code>//= require jquery
 //= require jquery_ujs
 //= require turbolinks
 //= require init
-</code></p>
+</code></pre>
 
 <h2>&ldquo;Always On&rdquo; Javascript Functionality</h2>
 
@@ -251,46 +238,39 @@ $(document).on "turbolinks:load", -&gt;
 
 <p>Let&rsquo;s assume one of our pages will show a Javascript graph of data. We&rsquo;ll start by adding a file with a name related to that responsibility.</p>
 
-<p>```</p>
+<pre><code># app/assets/javascripts/app.chart.coffee
 
-<h1>app/assets/javascripts/app.chart.coffee</h1>
+class App.Chart
+  constructor: (@el) -&gt;
+    # intialize some stuff
 
-<p>class App.Chart
-  constructor: (@el) &ndash;></p>
+  render: -&gt;
+    # do some stuff
 
-<pre><code># intialize some stuff
+$(document).on "turbolinks:load", -&gt;
+  chart = new App.Chart $("#chart")
+  chart.render()
 </code></pre>
-
-<p>  render: &ndash;></p>
-
-<pre><code># do some stuff
-</code></pre>
-
-<p>$(document).on &ldquo;turbolinks:load&rdquo;, &ndash;>
-  chart = new App.Chart $(&ldquo;#chart&rdquo;)
-  chart.render()</p>
-
-<p>```</p>
 
 <p>A few things to note here&hellip;</p>
 
 <h3>Structure</h3>
 
-<p>I created a class in the <code>App</code> namespace &mdash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
+<p>I created a class in the <code>App</code> namespace &ndash; the same we initialized in <code>app/assets/javascripts/init.coffee</code>. This gives us an isolated class that has a clear responsiblity. Like our Ruby, we want to do our best to keep its responsibilities to a minimium.</p>
 
 <p>You might notice the file takes the form:</p>
 
-<p>```
-|
+<pre><code>|
 |
 class definition
 |
-|</p>
+|
 
-<p>|
+
+|
 invocation
 |
-```</p>
+</code></pre>
 
 <p>While this may seem obvious, it&rsquo;s an important point to keep in mind. I&rsquo;ve found it offers a predictable structure that allows me to open any coffeescript file that we&rsquo;ve written in the project and generally know where to look for what.</p>
 
@@ -302,13 +282,12 @@ invocation
 
 <p>Because we removed the <code>//= require_tree .</code> line in the default <code>application.js</code> manifest file, we&rsquo;ll have to add our chart file to be included in the asset pipeline (last line):</p>
 
-<p><code>
-//= require jquery
+<pre><code>//= require jquery
 //= require jquery_ujs
 //= require turbolinks
 //= require init
 //= require app.chart
-</code></p>
+</code></pre>
 
 <h3>Page-Specific Javascript</h3>
 
@@ -316,55 +295,48 @@ invocation
 
 <p>We can limit the page pages certain functionality is loaded on by using the classes we added to the body of the layout. In this case, a small conditional to the invocation can prevent this being triggered on pages it shouldn&rsquo;t be.</p>
 
-<p><code>
-$(document).on "turbolinks:load", -&gt;
+<pre><code>$(document).on "turbolinks:load", -&gt;
   return unless $(".posts.index").length &gt; 0
   f = new App.Chart $("#chart")
   f.render()
-</code></p>
+</code></pre>
 
 <p>We added <code>return unless $(".posts.index").length &gt; 0</code> to make sure <code>App.Chart</code> never gets instantiated if we&rsquo;re on the <code>.posts.index</code> page. While this may seem verbose, I&rsquo;ve found that it&rsquo;s not very common to need page-specific functionality. There are probably plenty of libraries that do something similar, like <a href="http://brandonhilkert.com/blog/page-specific-javascript-in-rails/">the one I previously suggested</a>. <strong>However, to me, limiting javascript to a single page and very explicit when I read the code, it&rsquo;s almost never worth dragging in a separate plugin for this. YMMV.</strong></p>
 
 <h2>User-Triggered Javascript</h2>
 
-<p>This type of Javascript is exactly what you&rsquo;d think &mdash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
+<p>This type of Javascript is exactly what you&rsquo;d think &ndash; Javascript invoked as a result of a user clicking or performing some type of action. You&rsquo;re probably thinking, &ldquo;I know how to do this, I&rsquo;ll just add a random file to the javascripts directory and throw in some jQuery&rdquo;. While this will functionally work just fine, I&rsquo;ve found that keeping the structure of these files similar will give you great piece of mind going forward.</p>
 
 <h3>&ldquo;data-behavior&rdquo; Attribute</h3>
 
 <p>Let&rsquo;s assume there&rsquo;s a link in the user&rsquo;s account that allows them to update their credit card. In this case, we have the following:</p>
 
-<p><code>
-&lt;%= link_to "Update Credit Card", "#", data: { behavior: "update-credit-card" } %&gt;
-</code></p>
+<pre><code>&lt;%= link_to "Update Credit Card", "#", data: { behavior: "update-credit-card" } %&gt;
+</code></pre>
 
 <p>You&rsquo;ll probably notice the <code>data-behavior</code> tag being added to the link. This is the key we&rsquo;ll use to attach the Javascript behavior.</p>
 
 <p>We could have added a unique class to the link:</p>
 
-<p><code>
-&lt;%= link_to "Update Credit Card", "#", class: "update-credit-card" %&gt;
-</code></p>
+<pre><code>&lt;%= link_to "Update Credit Card", "#", class: "update-credit-card" %&gt;
+</code></pre>
 
 <p>or, perhaps, even assign an ID:</p>
 
-<p><code>
-&lt;%= link_to "Update Credit Card", "#", id: "update-credit-card" %&gt;
-</code></p>
+<pre><code>&lt;%= link_to "Update Credit Card", "#", id: "update-credit-card" %&gt;
+</code></pre>
 
 <p>Both of these techniques don&rsquo;t really indicate whether we added the <code>update-card-card</code> for the use of CSS styling, or to attach Javascript behavior. So in my applications, I leave classes for <strong>styling ONLY</strong>.</p>
 
 <p>So now to the Javascript:</p>
 
-<p>```
-App.Billing =
-  update: &ndash;></p>
+<pre><code>App.Billing =
+  update: -&gt;
+    # do some stuff
 
-<pre><code># do some stuff
-</code></pre>
-
-<p>$(document).on &ldquo;click&rdquo;, &ldquo;[data-behavior~=update-credit-card]&rdquo;, =>
+$(document).on "click", "[data-behavior~=update-credit-card]", =&gt;
   App.Billing.update()
-```</p>
+</code></pre>
 
 <p>We can use the selector <code>[data-behavior~=update-credit-card]</code> to latch on to the <code>data-behavior</code> tag we defined in the view. We use the <code>on</code> jQuery method to ensure that we&rsquo;re listening to this event whether the element&rsquo;s on the page or not. This is what allows us to load this Javascript when on other pages and have it still work when a user clicks through to the page with the actual link on it.</p>
 
@@ -374,14 +346,13 @@ App.Billing =
 
 <p>Again, because Javascripts assets we add to <code>app/assets/javascripts</code> won&rsquo;t automatically be inserted in to the asset pipeline, we&rsquo;ll add <code>//= require app.billing</code> to the manifest file:</p>
 
-<p><code>
-//= require jquery
+<pre><code>//= require jquery
 //= require jquery_ujs
 //= require turbolinks
 //= require init
 //= require app.chart
 //= require app.billing
-</code></p>
+</code></pre>
 
 <h2>Summary</h2>
 

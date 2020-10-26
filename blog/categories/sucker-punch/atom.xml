@@ -4,7 +4,7 @@
   <title><![CDATA[Category: sucker punch | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/sucker-punch/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -61,7 +61,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#97;&#x69;&#x6c;&#x74;&#x6f;&#x3a;&#x62;&#114;&#x61;&#x6e;&#100;&#x6f;&#110;&#x68;&#105;&#108;&#107;&#x65;&#x72;&#x74;&#64;&#x67;&#x6d;&#x61;&#x69;&#x6c;&#46;&#99;&#x6f;&#109;">&#x62;&#x72;&#x61;&#110;&#x64;&#111;&#x6e;&#104;&#x69;&#108;&#x6b;&#x65;&#x72;&#x74;&#64;&#x67;&#109;&#97;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#108;&#116;&#111;&#58;&#x62;&#x72;&#97;&#x6e;&#100;&#x6f;&#x6e;&#x68;&#x69;&#x6c;&#107;&#x65;&#114;&#x74;&#64;&#103;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#111;&#x6d;">&#x62;&#x72;&#x61;&#x6e;&#100;&#x6f;&#110;&#x68;&#105;&#108;&#107;&#x65;&#x72;&#x74;&#64;&#x67;&#x6d;&#97;&#105;&#x6c;&#46;&#99;&#111;&#x6d;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -69,17 +69,11 @@ require &lsquo;brandon/version&rsquo;</p>
 
 <p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
   # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)</p>
-
-<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-</code></pre>
-
-<p>  end</p>
+  if spec.respond_to?(:metadata)
+    spec.metadata[&lsquo;allowed_push_host&rsquo;] = &ldquo;TODO: Set to &lsquo;<a href="http://mygemserver.com">http://mygemserver.com</a>&rsquo;&rdquo;
+  else
+    raise &ldquo;RubyGems 2.0 or newer is required to protect against public gem pushes.&rdquo;
+  end</p>
 
 <p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = &ldquo;exe&rdquo;
@@ -180,32 +174,26 @@ Successfully installed sucker_punch-2.0.1
 
 <p>The following is an example of enqueueing a background job with Sucker Punch using the old syntax:</p>
 
-<p><code>
-LogJob.new.async.perform("new_user")
-</code></p>
+<pre><code>LogJob.new.async.perform("new_user")
+</code></pre>
 
 <p>And with the new syntax:</p>
 
-<p><code>
-LogJob.perform_async("new_user")
-</code></p>
+<pre><code>LogJob.perform_async("new_user")
+</code></pre>
 
 <p><em>How do we support the old syntax in the new version?</em></p>
 
 <p>Let&rsquo;s step back and reminder ourselves of what a typical job class looks like:</p>
 
-<p>```
-class LogJob
-  include SuckerPunch::Job</p>
+<pre><code>class LogJob
+  include SuckerPunch::Job
 
-<p>  def perform(event)</p>
-
-<pre><code>Log.new(event).track
-</code></pre>
-
-<p>  end
+  def perform(event)
+    Log.new(event).track
+  end
 end
-```</p>
+</code></pre>
 
 <p>Important points to notice:</p>
 
@@ -220,42 +208,37 @@ end
 
 <p>We&rsquo;ll start with the test:</p>
 
-<p>```</p>
+<pre><code># test/sucker_punch/async_syntax_test.rb
 
-<h1>test/sucker_punch/async_syntax_test.rb</h1>
+require 'test_helper'
 
-<p>require &lsquo;test_helper&rsquo;</p>
+module SuckerPunch
+  class AsyncSyntaxTest &lt; Minitest::Test
+    def setup
+      require 'sucker_punch/async_syntax'
+    end
 
-<p>module SuckerPunch
-  class AsyncSyntaxTest &lt; Minitest::Test</p>
+    def test_perform_async_runs_job_asynchronously
+      arr = []
+      latch = Concurrent::CountDownLatch.new
+      FakeLatchJob.new.async.perform(arr, latch)
+      latch.wait(0.2)
+      assert_equal 1, arr.size
+    end
 
-<pre><code>def setup
-  require 'sucker_punch/async_syntax'
-end
+    private
 
-def test_perform_async_runs_job_asynchronously
-  arr = []
-  latch = Concurrent::CountDownLatch.new
-  FakeLatchJob.new.async.perform(arr, latch)
-  latch.wait(0.2)
-  assert_equal 1, arr.size
-end
+    class FakeLatchJob
+      include SuckerPunch::Job
 
-private
-
-class FakeLatchJob
-  include SuckerPunch::Job
-
-  def perform(arr, latch)
-    arr.push true
-    latch.count_down
+      def perform(arr, latch)
+        arr.push true
+        latch.count_down
+      end
+    end
   end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p><em>Note: Some details of this are complex because the job&rsquo;s code is running in another thread. I&rsquo;ll walk through those details in a future article.</em></p>
 
@@ -266,197 +249,157 @@ end
 
 <p>Running the tests above, we get the following error:</p>
 
-<p><code>``
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 LoadError: cannot load such file -- sucker_punch/async_syntax
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in</code>require'
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'</p>
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `require'
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'
 
-<p>1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
-```</p>
+1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
+</code></pre>
 
 <p>Ok, so the file doesn&rsquo;t exist. Let&rsquo;s create it and re-run the tests:</p>
 
-<p><code>
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 NoMethodError: undefined method `async' for #&lt;SuckerPunch::AsyncSyntaxTest::FakeLatchJob:0x007fbc73cbf548&gt;
   /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
+</code></pre>
 
 <p>Progress! The job doesn&rsquo;t have an <code>async</code> method. Let&rsquo;s add it:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async # &lt;--- New method
+<pre><code>module SuckerPunch
+  module Job
+    def async # &lt;--- New method
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p><em>Notice: We&rsquo;re monkey-patching the <code>SuckerPunch::Job</code> module. This will allow us to add methods to the background job since it&rsquo;s included in the job.</em></p>
 
 <p>The tests now:</p>
 
-<p><code>
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 NoMethodError: undefined method `perform' for nil:NilClass
   /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
+</code></pre>
 
 <p>More progress&hellip;the <code>async</code> method we added returns nil, and because of the syntax <code>async.perform</code>, there&rsquo;s no <code>perform</code> method on the output of <code>async</code>. In short, we need to return something from <code>async</code> that responds to <code>perform</code> and can run the job.</p>
 
 <p>In its most basic form, suppose we create a proxy object that responds to <code>perform</code>:</p>
 
-<p><code>
-class AsyncProxy
+<pre><code>class AsyncProxy
   def perform
   end
 end
-</code></p>
+</code></pre>
 
 <p>We&rsquo;ll need to do some work in <code>perform</code> to execute the job, but this&rsquo;ll do for now. Now, let&rsquo;s integrate this new proxy to our <code>async_syntax.rb</code> file and return a new instance of the proxy from the <code>async</code> method:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new # &lt;--- new instance of the proxy
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new # &lt;--- new instance of the proxy
+  class AsyncProxy
+    def perform
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def perform
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>Running our tests gives us the following:</p>
 
-<p><code>
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 ArgumentError: wrong number of arguments (2 for 0)
   /Users/bhilkert/Dropbox/code/sucker_punch/lib/sucker_punch/async_syntax.rb:9:in `perform'
   /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
+</code></pre>
 
 <p>Now we&rsquo;re on to something. We see an error related to the number of arguments on the <code>perform</code> method. Because each job&rsquo;s argument list will be different, we need to find a way to be flexible for whatever&rsquo;s passed in, something like&hellip;the splat operator! Let&rsquo;s try it:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new
+  class AsyncProxy
+    def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>The tests now:</p>
 
-<p><code>
-1) Failure:
+<pre><code>1) Failure:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously [/Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:14]:
 Expected: 1
 Actual: 0
-</code></p>
+</code></pre>
 
 <p>At this point, we&rsquo;ve reached the end of test output suggesting the path forward. This error is saying, &ldquo;Your assertions failed.&rdquo;. This is good because it means our syntax implementation will work and it&rsquo;s just about executing the actual job code in the proxy&rsquo;s <code>perform</code> method.</p>
 
 <p>We want to leverage our new syntax (<code>perform_async</code>) to run the actual job asynchronously so it passes through the standard code path. To do so, we&rsquo;ll need a reference to the original job in the proxy object. Let&rsquo;s pass that to the proxy during instantiation:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new(self) # &lt;--- Pass the job instance
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new(self) # &lt;--- Pass the job instance
+  class AsyncProxy
+    def initialize(job) # &lt;--- Handle job passed in
+      @job = job
+    end
+
+    def perform(*args)
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def initialize(job) # &lt;--- Handle job passed in
-  @job = job
-end
-
-def perform(*args)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>Now that the proxy has a reference to the job instance, we can call the <code>perform_async</code> class method to execute the job:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new(self)
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new(self)
+  class AsyncProxy
+    def initialize(job)
+      @job = job
+    end
+
+    def perform(*args)
+      @job.class.perform_async(*args) # &lt;---- Execute the job
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def initialize(job)
-  @job = job
-end
-
-def perform(*args)
-  @job.class.perform_async(*args) # &lt;---- Execute the job
-end
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>```</p>
 
 <p>Lastly, the tests:</p>
 
-<p>```
-ress ENTER or type command to continue
-bundle exec rake test TEST=&ldquo;test/sucker_punch/async_syntax_test.rb&rdquo;
-Run options: &mdash;seed 43886</p>
+<pre><code>ress ENTER or type command to continue
+bundle exec rake test TEST="test/sucker_punch/async_syntax_test.rb"
+Run options: --seed 43886
 
-<h1>Running:</h1>
+# Running:
 
-<p>.</p>
+.
 
-<p>1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
-```</p>
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+</code></pre>
 
 <p>Success!</p>
 
@@ -513,24 +456,19 @@ released</a>!</p>
 
 <p>A basic Sucker Punch job looks like:</p>
 
-<p>```
-class LogJob
-  include SuckerPunch::Job</p>
+<pre><code>class LogJob
+  include SuckerPunch::Job
 
-<p>  def perform(event)</p>
-
-<pre><code>Log.new(event).track
-</code></pre>
-
-<p>  end
+  def perform(event)
+    Log.new(event).track
+  end
 end
-```</p>
+</code></pre>
 
 <p>To run the job asynchronously, we use the following syntax:</p>
 
-<p><code>
-LogJob.new.async.perform("new_user")
-</code></p>
+<pre><code>LogJob.new.async.perform("new_user")
+</code></pre>
 
 <p>The most interesting part of this method chain is the <code>async</code>. Removing <code>async</code>, leaves us with a call to a regular instance method.</p>
 
@@ -560,9 +498,8 @@ LogJob.new.async.perform("new_user")
 
 <p>If you&rsquo;re familiar with Sidekiq, using the <code>perform_async</code> class method should look familiar:</p>
 
-<p><code>
-LogJob.peform_async("new_user")
-</code></p>
+<pre><code>LogJob.peform_async("new_user")
+</code></pre>
 
 <p><strong>So why not use the same for Sucker Punch?</strong></p>
 
@@ -576,15 +513,13 @@ LogJob.peform_async("new_user")
 
 <p>Sucker Punch <code>2.0.0</code> will have 2 class methods to enqueue jobs:</p>
 
-<p><code>
-LogJob.perform_async("new_user")
-</code></p>
+<pre><code>LogJob.perform_async("new_user")
+</code></pre>
 
 <p>and</p>
 
-<p><code>
-LogJob.perform_in(5.minutes, "new_user")
-</code></p>
+<pre><code>LogJob.perform_in(5.minutes, "new_user")
+</code></pre>
 
 <p>The latter defining a delayed processing of the <code>perform</code> method 5 minutes from now.</p>
 
@@ -618,16 +553,14 @@ LogJob.perform_in(5.minutes, "new_user")
 
 <p>If you&rsquo;re familiary with the Stripe gem, you&rsquo;ve probably seen something like this:</p>
 
-<p><code>
-customer = Stripe::Customer.retrieve(user.stripe_id)
-</code></p>
+<pre><code>customer = Stripe::Customer.retrieve(user.stripe_id)
+</code></pre>
 
 <p>With the response of <code>customer</code>, we can further query customer data with the following methods:</p>
 
-<p><code>
-invoices = customer.invoices
+<pre><code>invoices = customer.invoices
 upcoming_invoices = customer.upcoming_invoices
-</code></p>
+</code></pre>
 
 <p>If we make all 3 of these method calls on page load, we&rsquo;d have 3 separate lookups from Stripe. This is pretty common for the typical billing page where you might want to show the customer&rsquo;s current credit card on file, their past invoices, and charges they can expect for the next invoice.</p>
 
@@ -639,97 +572,71 @@ upcoming_invoices = customer.upcoming_invoices
 
 <p>First, we can move the code to fetch the relevant stripe data in to a class of it&rsquo;s own, which wraps the notion of caching around the data retrieval.</p>
 
-<p>```
-class StripeCache
-  def initialize(user)</p>
+<pre><code>class StripeCache
+  def initialize(user)
+    @user = user
+  end
 
-<pre><code>@user = user
-</code></pre>
+  def refresh
+    purge_all
+    cache_all
+    self
+  end
 
-<p>  end</p>
+  def customer
+    return @customer if @customer
 
-<p>  def refresh</p>
+    @customer = Rails.cache.fetch(cache_key("customer"), expires_in: 15.minutes) do
+      Stripe::Customer.retrieve(user.stripe_id)
+    end
+  end
 
-<pre><code>purge_all
-cache_all
-self
-</code></pre>
+  def invoices
+    Rails.cache.fetch(cache_key("invoices"), expires_in: 15.minutes) do
+      customer.invoices
+    end
+  end
 
-<p>  end</p>
+  def upcoming_invoice
+    Rails.cache.fetch(cache_key("upcoming_invoice"), expires_in: 15.minutes) do
+      customer.upcoming_invoice
+    end
+  end
 
-<p>  def customer</p>
+  private
 
-<pre><code>return @customer if @customer
+  attr_reader :user
 
-@customer = Rails.cache.fetch(cache_key("customer"), expires_in: 15.minutes) do
-  Stripe::Customer.retrieve(user.stripe_id)
+  def cache_all
+    customer
+    invoices
+    upcoming_invoice
+  end
+
+  def purge_all
+    Rails.cache.delete_matched("#{user.id}/stripe")
+  end
+
+
+  def cache_key(item)
+    "user/#{user.id}/stripe/#{item}"
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>Rails.cache.fetch(cache_key("invoices"), expires_in: 15.minutes) do
-  customer.invoices
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>Rails.cache.fetch(cache_key("upcoming_invoice"), expires_in: 15.minutes) do
-  customer.upcoming_invoice
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :user</p>
-
-<p>  def cache_all</p>
-
-<pre><code>customer
-invoices
-upcoming_invoice
-</code></pre>
-
-<p>  end</p>
-
-<p>  def purge_all</p>
-
-<pre><code>Rails.cache.delete_matched("#{user.id}/stripe")
-</code></pre>
-
-<p>  end</p>
-
-<p>  def cache_key(item)</p>
-
-<pre><code>"user/#{user.id}/stripe/#{item}"
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>To use this on a billing page, we could do:</p>
 
-<p><code>
-stripe = StripeCache.new(current_user).refresh
-</code></p>
+<pre><code>stripe = StripeCache.new(current_user).refresh
+</code></pre>
 
 <p>And from the response of that class, we could access the <code>customer</code>, <code>invoices</code>, and <code>upcoming_invoice</code> respectively:</p>
 
-<p><code>
-@customer = stripe.customer
+<pre><code>@customer = stripe.customer
 @invoices = stripe.invoices
 @upcoming_invoice = stripe.invoices
-</code></p>
+</code></pre>
 
-<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &mdash; for 15 minutes, of course.</p>
+<p>This is great! All future calls to this customer&rsquo;s Stripe data will be fast &ndash; for 15 minutes, of course.</p>
 
 <p>However, the first time the page is load, the user is still burdened with the initial fetch of the data. So the method above works for every request to the billing page after the first.</p>
 
@@ -739,46 +646,38 @@ stripe = StripeCache.new(current_user).refresh
 
 <p>In this case, rather than send a transactional email or perform some database calculation, we can write a job thats only responsibility is to run the Stripe caching code.</p>
 
-<p>```
-class StripeCacheJob
-  include SuckerPunch::Job</p>
+<pre><code>class StripeCacheJob
+  include SuckerPunch::Job
 
-<p>  def perform(user)</p>
-
-<pre><code>StripeCache.new(user).refresh
-</code></pre>
-
-<p>  end
+  def perform(user)
+    StripeCache.new(user).refresh
+  end
 end
-```</p>
+</code></pre>
 
 <p>The next question is, when do you run this?</p>
 
 <p>Well, I chose to run it on user login, but you could run it anywhere you think would give you a head start if the user were about to go to the billing page. In my case, on login meant that if they didn&rsquo;t go to the billing page at all, after 15 minutes the data would be exhausted from the cache anyway, so no hard done.</p>
 
-<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &mdash; all without a request to stripe on page load.</p>
+<p>But if the user did navigate to the billing page during that session, they would have up the latest Stripe customer and invoice data to see &ndash; all without a request to stripe on page load.</p>
 
 <p>One other thing to keep in mind is there may be times when we&rsquo;d want invalidate the Rails cache data. One example would be when the user&rsquo;s card information is updated. In that case, we can slip in another call to the Stripe cache job, which would invalidate the previous cache and re-request the customer&rsquo;s billing information:</p>
 
-<p>```
-module Accounts
-  class CardsController &lt; ApplicationController</p>
+<pre><code>module Accounts
+  class CardsController &lt; ApplicationController
+    before_action :require_authentication
 
-<pre><code>before_action :require_authentication
+    def create
+      cust = StripeCache.new(current_user).customer
+      cust.save(card: params[:stripeToken])
 
-def create
-  cust = StripeCache.new(current_user).customer
-  cust.save(card: params[:stripeToken])
+      StripeCacheJob.new.async.perform(current_user)
 
-  StripeCacheJob.new.async.perform(current_user)
-
-  redirect_to account_path, notice: t("card.update.success")
+      redirect_to account_path, notice: t("card.update.success")
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <h2>Summary</h2>
 

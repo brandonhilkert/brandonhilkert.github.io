@@ -4,7 +4,7 @@
   <title><![CDATA[Category: book | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/book/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -186,26 +186,21 @@ including __14 chapters of code__ and over 2 hours of screencasts_.
 
 <p>To start, let’s create our new gem:</p>
 
-<p>```bash
-$ bundle gem time_ago</p>
-
-<pre><code>  create  time_ago/Gemfile
-  create  time_ago/Rakefile
-  create  time_ago/LICENSE.txt
-  create  time_ago/README.md
-  create  time_ago/.gitignore
-  create  time_ago/time_ago.gemspec
-  create  time_ago/lib/time_ago.rb
-  create  time_ago/lib/time_ago/version.rb
+<pre><code class="bash">$ bundle gem time_ago
+      create  time_ago/Gemfile
+      create  time_ago/Rakefile
+      create  time_ago/LICENSE.txt
+      create  time_ago/README.md
+      create  time_ago/.gitignore
+      create  time_ago/time_ago.gemspec
+      create  time_ago/lib/time_ago.rb
+      create  time_ago/lib/time_ago/version.rb
+Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago
 </code></pre>
-
-<p>Initializing git repo in /Users/bhilkert/Dropbox/code/time_ago
-```</p>
 
 <p>When we include javascript libraries from external sources, the <code>vendor/</code> directory is the most appropriate place for them. Let’s create the directory <code>vendor/assets/javascripts/</code> and place the source for the <code>timeago.js</code> plugin there:</p>
 
-<p>```bash
-├── Gemfile
+<pre><code class="bash">├── Gemfile
 ├── LICENSE.txt
 ├── Rakefile
 ├── lib
@@ -213,19 +208,15 @@ $ bundle gem time_ago</p>
 │   │   └── version.rb
 │   └── time_ago.rb
 ├── time_ago.gemspec
-└── vendor</p>
-
-<pre><code>└── assets
-    └── javascripts
-        └── jquery.timeago.js
+└── vendor
+    └── assets
+        └── javascripts
+            └── jquery.timeago.js
 </code></pre>
-
-<p>```</p>
 
 <p>To create our view helper, we’ll add the <code>/app/helpers/</code> directory:</p>
 
-<p>```bash
-├── Gemfile
+<pre><code class="bash">├── Gemfile
 ├── LICENSE.txt
 ├── Rakefile
 ├── app
@@ -236,141 +227,118 @@ $ bundle gem time_ago</p>
 │   │   └── version.rb
 │   └── time_ago.rb
 ├── time_ago.gemspec
-└── vendor</p>
-
-<pre><code>└── assets
-    └── javascripts
-        └── jquery.timeago.js
+└── vendor
+    └── assets
+        └── javascripts
+            └── jquery.timeago.js
 </code></pre>
-
-<p>```</p>
 
 <p>The code for the view helper is shown below:</p>
 
-<p>```ruby
-module TimeAgoHelper
-  def timeago(time, options = {})</p>
-
-<pre><code>options[:class] ||= "timeago"
-content_tag(
- :time,
- time.to_s,
- options.merge(datetime: time.getutc.iso8601)
-) if time
-</code></pre>
-
-<p>  end
+<pre><code class="ruby">module TimeAgoHelper
+  def timeago(time, options = {})
+    options[:class] ||= "timeago"
+    content_tag(
+     :time,
+     time.to_s,
+     options.merge(datetime: time.getutc.iso8601)
+    ) if time
+  end
 end
-```</p>
+</code></pre>
 
 <p>Lastly, we want to include a javascript asset to invoke the <code>timeago.js</code> plugin on page change (this includes the initial page load). This is almost identical to the first step of including the vendored <code>timeago.js</code> asset, except we’re going to put it in the <code>app/assets/javascripts/</code> directory since it’s not an external library, but rather a javascript include that will invoke the javascript plugin.</p>
 
 <p>Let’s create the directory <code>app/assets/javascripts/</code> and place the following file there:</p>
 
-<p>```javascript
-// app/assets/javascripts/timeago.js
+<pre><code class="javascript">// app/assets/javascripts/timeago.js
 //
 // jQuery Timeago setup for timeago helper
 //
-//= require jquery.timeago</p>
+//= require jquery.timeago
 
-<p>$(document).on(&lsquo;page:change&rsquo;, function() {
-  $(&ldquo;time.timeago&rdquo;).timeago();
+$(document).on('page:change', function() {
+  $("time.timeago").timeago();
 });
-```</p>
+</code></pre>
 
 <p>This file serves as both a manifest file for the <code>jquery.timeago.js</code> asset and a function to invoke the plugin whenever the page loads or changes.</p>
 
 <p>Lastly, we need to designate our gem as an engine. The default entry file that was created when we used bundler to bootstrap our gem looked like this:</p>
 
-<p>```ruby
-require &ldquo;time_ago/version&rdquo;</p>
+<pre><code class="ruby">require "time_ago/version"
 
-<p>module TimeAgo
+module TimeAgo
 end
-```</p>
+</code></pre>
 
 <p>All we need to do is add the <code>Engine</code> class and inherit from <code>Rails::Engine</code>, giving us:</p>
 
-<p>```ruby
-require &ldquo;time_ago/version&rdquo;</p>
+<pre><code class="ruby">require "time_ago/version"
 
-<p>module TimeAgo
+module TimeAgo
   class Engine &lt; ::Rails::Engine
   end
 end
-```</p>
+</code></pre>
 
 <p>At this point, because our gem is so closely tied to Rails, we should add Rails as a dependency in our gemspec:</p>
 
-<p>```ruby</p>
-
-<h1>coding: utf-8</h1>
-
-<p>lib = File.expand_path(&lsquo;../lib&rsquo;, <strong>FILE</strong>)
+<pre><code class="ruby"># coding: utf-8
+lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require &lsquo;time_ago/version&rsquo;</p>
+require 'time_ago/version'
 
-<p>Gem::Specification.new do |spec|
-  spec.name          = &ldquo;time_ago&rdquo;
+Gem::Specification.new do |spec|
+  spec.name          = "time_ago"
   spec.version       = TimeAgo::VERSION
-  spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#x69;&#x6c;&#116;&#111;&#58;&#x62;&#114;&#97;&#110;&#x64;&#x6f;&#110;&#104;&#x69;&#108;&#x6b;&#101;&#114;&#116;&#x40;&#x67;&#109;&#97;&#105;&#x6c;&#x2e;&#99;&#111;&#x6d;">&#x62;&#114;&#97;&#x6e;&#100;&#111;&#x6e;&#104;&#105;&#x6c;&#107;&#x65;&#x72;&#x74;&#x40;&#103;&#x6d;&#97;&#105;&#108;&#x2e;&#x63;&#x6f;&#x6d;</a>&rdquo;]
+  spec.authors       = ["Brandon Hilkert"]
+  spec.email         = ["brandonhilkert@gmail.com"]
   spec.summary       = %q{A gem to integrate the timeago.js}
   spec.description   = %q{A gem to integrate the timeago.js}
-  spec.homepage      = &ldquo;&rdquo;
-  spec.license       = &ldquo;MIT&rdquo;</p>
+  spec.homepage      = ""
+  spec.license       = "MIT"
 
-<p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;)
+  spec.files         = `git ls-files -z`.split("\x0")
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
-  spec.require_paths = [&ldquo;lib&rdquo;]</p>
+  spec.require_paths = ["lib"]
 
-<p>  spec.add_dependency &ldquo;rails&rdquo;, &ldquo;>= 3.1&rdquo;</p>
+  spec.add_dependency "rails", "&gt;= 3.1"
 
-<p>  spec.add_development_dependency &ldquo;bundler&rdquo;, &ldquo;~> 1.5&rdquo;
-  spec.add_development_dependency &ldquo;rake&rdquo;
+  spec.add_development_dependency "bundler", "~&gt; 1.5"
+  spec.add_development_dependency "rake"
 end
-```</p>
+</code></pre>
 
 <p><em>Note: In addition to adding Rails as a dependency, we’ve also specified that it’s only compatible with Rails version <code>3.1</code> or later because of the need for the asset pipeline.</em></p>
 
 <p>Moving to a sample Rails application, we can include the gem in our host application by adding it to the <code>Gemfile</code> using the path option:</p>
 
-<p><code>ruby
-gem "time_ago", path: "../time_ago"
-</code></p>
+<pre><code class="ruby">gem "time_ago", path: "../time_ago"
+</code></pre>
 
 <p>Since we included an asset that needs to be included in the Rails asset pipeline, we have to take one more step and instruct the user to add the following to their <code>app/assets/javascripts/application.js</code> manifest file:</p>
 
-<p><code>javascript
-//= require timeago
-</code></p>
+<pre><code class="javascript">//= require timeago
+</code></pre>
 
 <p>This directive actually refers to the <code>app/assets/javascripts/timeago.js</code> file we included in our gem to invoke the timeago.js plugin on page change.</p>
 
 <p>Now when we load our Rails application, tags using the <code>timeago</code> view helper get rendered to UI as:</p>
 
-<p>```html
-<time class="timeago" datetime="2014-01-08T14:55:58Z"></p>
-
-<pre><code>2014-01-08 14:55:58 UTC
+<pre><code class="html">&lt;time class="timeago" datetime="2014-01-08T14:55:58Z"&gt;
+    2014-01-08 14:55:58 UTC
+&lt;/time&gt;
 </code></pre>
-
-<p></time>
-```</p>
 
 <p>and are updated by the javascript plugin to:</p>
 
-<p>```html
-<time class="timeago" datetime="2014-01-08T15:04:10Z"
-   title="2014-01-08 15:04:10 UTC"></p>
-
-<pre><code> 18 days ago
+<pre><code class="html">&lt;time class="timeago" datetime="2014-01-08T15:04:10Z"
+   title="2014-01-08 15:04:10 UTC"&gt;
+     18 days ago
+&lt;/time&gt;
 </code></pre>
-
-<p></time>
-```</p>
 
 <h2>Implementations in the Wild</h2>
 

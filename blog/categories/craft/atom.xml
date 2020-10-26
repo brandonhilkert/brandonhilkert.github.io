@@ -4,7 +4,7 @@
   <title><![CDATA[Category: craft | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/craft/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -20,7 +20,7 @@
     <id>http://brandonhilkert.com/blog/care-about-what-you-build</id>
     <content type="html"><![CDATA[<p>I&rsquo;ve spent the majority of my career working for companies building products I either wasn&rsquo;t interested in, or wasn&rsquo;t the target user. They were jobs. In exchange for my 40 hours, they supplied me a paycheck. As a result, I went home at the end of the day and was able to disconnect.</p>
 
-<p>Fast forward almost 15 years and I&rsquo;m on the opposite end of the spectrum &mdash; I build a product I want to exist, a parent like me is the target user and furthermore, I have equity in the company.</p>
+<p>Fast forward almost 15 years and I&rsquo;m on the opposite end of the spectrum &ndash; I build a product I want to exist, a parent like me is the target user and furthermore, I have equity in the company.</p>
 
 <!--more-->
 
@@ -37,7 +37,7 @@
 
 <p>Most software developers I know are introverts. They generally like writing code, shipping new features, but avoid meetings at all costs. The rise of slack and other remote-focused tooling further increases the human contact void that most developers experience.</p>
 
-<p>My experience with sales people have been the polar opposite. They thrive on human interaction. Sales people, no matter the company, generally position their product/services as the perfect fit for you and your company. That’s ultimately their job &mdash; match the customers' need(s) with a solution they hopefully sell.</p>
+<p>My experience with sales people have been the polar opposite. They thrive on human interaction. Sales people, no matter the company, generally position their product/services as the perfect fit for you and your company. That’s ultimately their job &ndash; match the customers' need(s) with a solution they hopefully sell.</p>
 
 <p>It&rsquo;s not surprising that being in a sales role for a company/product that you love and genuinely want to see succeed is much easier than one you could care less about. This is where roles at a small company often cross-over.</p>
 
@@ -69,7 +69,7 @@
 
 <h2>Ditch the Product, Love the Craft</h2>
 
-<p>I know what you’re thinking, you don&rsquo;t love what you’re building, so where do you go from here? Not everyone has the freedom and ability to choose a position where they’re 100% happy. There will always be personal trade-offs, some of which might leave you working for a company/product you don&rsquo;t care about and don&rsquo;t have the luxury to leave anytime soon. I&rsquo;ve been there before &mdash; ultimately leaving &mdash; but I made it work for a period of time.</p>
+<p>I know what you’re thinking, you don&rsquo;t love what you’re building, so where do you go from here? Not everyone has the freedom and ability to choose a position where they’re 100% happy. There will always be personal trade-offs, some of which might leave you working for a company/product you don&rsquo;t care about and don&rsquo;t have the luxury to leave anytime soon. I&rsquo;ve been there before &ndash; ultimately leaving &ndash; but I made it work for a period of time.</p>
 
 <p>One of the ways I separated myself was to focus on the software development craft. If you’re like me, you care about designing things in a maintainable and reliable way. Whether it’s good design, well-written tests, or using the latest and greatest, shifting your focus away from a product you have no interest levels the playing field.</p>
 

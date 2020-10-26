@@ -4,7 +4,7 @@
   <title><![CDATA[Category: rspec | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/rspec/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -37,8 +37,7 @@
 
 <p>Here’s what a typical <code>Gemfile</code> looked like in one of my previous projects:</p>
 
-<p><code>
-group :test do
+<pre><code>group :test do
   gem "rspec-rails"
   gem "factory_girl_rails"
   gem "capybara"
@@ -46,7 +45,7 @@ group :test do
   gem "database_cleaner"
   gem "shoulda-matchers"
 end
-</code></p>
+</code></pre>
 
 <p>Aside from the additional gems, my <code>spec_helper.rb</code> had a number of settings like turning off transactions (in favor of <code>database_cleaner</code>) that went against the standard Rails testing conventions.</p>
 
@@ -104,27 +103,23 @@ wilma:
 
 <p>What about the fancy syntax around methods ending with &ldquo;?&rdquo;.</p>
 
-<p><code>
-post.should be_active
-</code></p>
+<pre><code>post.should be_active
+</code></pre>
 
 <p>Wait, so where’s the <code>be_active</code> method? Nope! Rspec parses the method due to the fact that <code>active?</code> is a legitimate method in the application under test. At first, I was enamored with the magic. However, later, I found thinking too much about how and what to write, when I should’ve just been typing out <code>active?</code> and asserting it’s <code>false</code> or <code>true</code> (which of course is an entirely other way to write it):</p>
 
-<p><code>
-post.active?.should be_true
-</code></p>
+<pre><code>post.active?.should be_true
+</code></pre>
 
 <p>&hellip;or what about:</p>
 
-<p><code>
-post.active?.should == true
-</code></p>
+<pre><code>post.active?.should == true
+</code></pre>
 
 <p>Does that even work? I’ve learned to appreciate simplicity and knowing that there’s generally only one way to write an assertion:</p>
 
-<p><code>
-assert post.active?
-</code></p>
+<pre><code>assert post.active?
+</code></pre>
 
 <p>Aside from not floundering over the right assertion to make, I’ve found it leads to less syntax errors in my tests. Going through 2 or 3 iterations of test errors before the test actually gets to the application code is frustrating and a waste of time. Having fewer ways to do the same thing has led me to make fewer syntax errors when writing tests.</p>
 
@@ -134,52 +129,35 @@ assert post.active?
 
 <p><a href="http://devblog.avdi.org/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/">Avdi’s post on configuring database_cleaner</a> has been my goto configuration:</p>
 
-<p>```
-RSpec.configure do |config|</p>
+<pre><code>RSpec.configure do |config|
 
-<p>  config.before(:suite) do</p>
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+  end
 
-<pre><code>DatabaseCleaner.clean_with(:truncation)
+  config.before(:each) do
+    DatabaseCleaner.strategy = :transaction
+  end
+
+  config.before(:each, :js =&gt; true) do
+    DatabaseCleaner.strategy = :truncation
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+
+end
 </code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each) do</p>
-
-<pre><code>DatabaseCleaner.strategy = :transaction
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each, :js => true) do</p>
-
-<pre><code>DatabaseCleaner.strategy = :truncation
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.before(:each) do</p>
-
-<pre><code>DatabaseCleaner.start
-</code></pre>
-
-<p>  end</p>
-
-<p>  config.after(:each) do</p>
-
-<pre><code>DatabaseCleaner.clean
-</code></pre>
-
-<p>  end</p>
-
-<p>end
-```</p>
 
 <p>This is after you first disable transactions in the <code>spec_helper.rb</code>, of course:</p>
 
-<p><code>
-config.use_transactional_fixtures = false
-</code></p>
+<pre><code>config.use_transactional_fixtures = false
+</code></pre>
 
 <p><em>Why is all this necessary?</em></p>
 
@@ -187,11 +165,10 @@ config.use_transactional_fixtures = false
 
 <p>When you use a javascript-enabled driver like selenium to run integration tests, browser actions run in a different thread. This removes the ability to see data setup within another thread/transaction. Because of this, you have to resort to a truncation strategy instead. Hence the following config option shown above:</p>
 
-<p><code>
-config.before(:each, js: true) do
+<pre><code>config.before(:each, js: true) do
   DatabaseCleaner.strategy = :truncation
 end
-</code></p>
+</code></pre>
 
 <p>This is complex and not obvious for newcomers. Not to mention the complexity that arises if you actually use <a href="https://github.com/brandonhilkert/sucker_punch#cleaning-test-data-transactions">multi-threaded code or gems</a>.</p>
 
@@ -199,13 +176,12 @@ end
 
 <p>Using fixtures instead of factories removes the need for <code>database_cleaner</code> entirely under normal circumstances. Additionally, the only change that’s necessary to setup <code>Capybara</code> is the following addition to <code>test_helper.rb</code>:</p>
 
-<p>```
-require &ldquo;capybara/rails&rdquo;</p>
+<pre><code>require "capybara/rails"
 
-<p>class ActionDispatch::IntegrationTest
+class ActionDispatch::IntegrationTest
   include Capybara::DSL
 end
-```</p>
+</code></pre>
 
 <p>That’s it&hellip;seriously…the crazy part to me is this configuration is largely commonplace in Rails test suites that use Capybara and Rspec. We’ve been largely spoiled by Rails in that the framework provides a solution for just about every common problem we encounter. The fact that a complex setup with database cleaner and deciding on truncating vs. transactions ever seemed reasonable seems counter-intuitive to the Rails experience. I’m, frankly, surprised that it’s seemed reasonable for so long.</p>
 
@@ -229,7 +205,7 @@ end
 
 <h2>6. Minitest is just Ruby</h2>
 
-<p>To be fair, Rspec is just Ruby too. But generally Rspec seems to have magic ways to do just about everything &ndash; shared examples, test setup, configuration. All these things have an “Rspec way”.</p>
+<p>To be fair, Rspec is just Ruby too. But generally Rspec seems to have magic ways to do just about everything - shared examples, test setup, configuration. All these things have an “Rspec way”.</p>
 
 <p>Minitest deals with this by just using Ruby. If you need shared examples, why not <a href="http://ntl.ghost.io/how-i-use-test-unit-syntax/">include a module that includes the shared tests</a>?</p>
 

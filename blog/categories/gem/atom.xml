@@ -4,7 +4,7 @@
   <title><![CDATA[Category: gem | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/gem/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -61,7 +61,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#105;&#x6c;&#x74;&#111;&#x3a;&#x62;&#114;&#97;&#110;&#x64;&#111;&#110;&#104;&#105;&#108;&#x6b;&#x65;&#114;&#x74;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#46;&#99;&#x6f;&#109;">&#x62;&#114;&#97;&#x6e;&#x64;&#x6f;&#110;&#104;&#x69;&#108;&#x6b;&#x65;&#114;&#x74;&#x40;&#103;&#109;&#x61;&#x69;&#108;&#46;&#99;&#x6f;&#109;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#x6d;&#97;&#105;&#x6c;&#x74;&#111;&#58;&#x62;&#114;&#x61;&#110;&#100;&#x6f;&#110;&#104;&#105;&#108;&#x6b;&#x65;&#x72;&#x74;&#64;&#x67;&#x6d;&#x61;&#105;&#x6c;&#x2e;&#x63;&#x6f;&#109;">&#98;&#x72;&#97;&#110;&#x64;&#111;&#110;&#104;&#105;&#x6c;&#107;&#x65;&#114;&#x74;&#x40;&#103;&#x6d;&#97;&#x69;&#x6c;&#x2e;&#99;&#111;&#109;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -69,17 +69,11 @@ require &lsquo;brandon/version&rsquo;</p>
 
 <p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
   # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)</p>
-
-<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-</code></pre>
-
-<p>  end</p>
+  if spec.respond_to?(:metadata)
+    spec.metadata[&lsquo;allowed_push_host&rsquo;] = &ldquo;TODO: Set to &lsquo;<a href="http://mygemserver.com">http://mygemserver.com</a>&rsquo;&rdquo;
+  else
+    raise &ldquo;RubyGems 2.0 or newer is required to protect against public gem pushes.&rdquo;
+  end</p>
 
 <p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = &ldquo;exe&rdquo;
@@ -192,82 +186,81 @@ Successfully installed sucker_punch-2.0.1
 
 <p>The <code>Gemfile</code> below is one of the larger projects I worked on this year. I thought it’d give a good sense of some of my more practical everyday preferences, along with some feature-specific choices for this particular application.</p>
 
-<p>```
-source &lsquo;<a href="https://rubygems.org">https://rubygems.org</a>&rsquo;</p>
+<pre><code>source 'https://rubygems.org'
 
-<p>ruby &lsquo;2.1.4&rsquo;</p>
+ruby '2.1.4'
 
-<p>gem &lsquo;rails&rsquo;, &lsquo;4.1.8&rsquo;
-gem &lsquo;pg&rsquo;
-gem &lsquo;sass-rails&rsquo;, &lsquo;~> 4.0.3&rsquo;
-gem &lsquo;uglifier&rsquo;, &lsquo;>= 1.3.0&rsquo;
-gem &lsquo;coffee-rails&rsquo;, &lsquo;~> 4.0.0&rsquo;
-gem &lsquo;jquery-rails&rsquo;
-gem &lsquo;turbolinks&rsquo;</p>
+gem 'rails', '4.1.8'
+gem 'pg'
+gem 'sass-rails', '~&gt; 4.0.3'
+gem 'uglifier', '&gt;= 1.3.0'
+gem 'coffee-rails', '~&gt; 4.0.0'
+gem 'jquery-rails'
+gem 'turbolinks'
 
-<p>gem &lsquo;bcrypt-ruby&rsquo;, &lsquo;~> 3.1.2&rsquo;</p>
+gem 'bcrypt-ruby', '~&gt; 3.1.2'
 
-<p>group :development, :test do
-  gem &lsquo;pry&rsquo;
-end</p>
+group :development, :test do
+  gem 'pry'
+end
 
-<p>group :test do
-  gem &lsquo;selenium-webdriver&rsquo;
-  gem &lsquo;capybara&rsquo;
-  gem &lsquo;timecop&rsquo;
-  gem &lsquo;mocha&rsquo;
-end</p>
+group :test do
+  gem 'selenium-webdriver'
+  gem 'capybara'
+  gem 'timecop'
+  gem 'mocha'
+end
 
-<p>group :development do
-  gem &lsquo;quiet_assets&rsquo;
-  gem &lsquo;spring&rsquo;
-  gem &lsquo;bullet&rsquo;
-  gem &lsquo;stripe_tester&rsquo;, &lsquo;~> 0.1.0&rsquo;
-end</p>
+group :development do
+  gem 'quiet_assets'
+  gem 'spring'
+  gem 'bullet'
+  gem 'stripe_tester', '~&gt; 0.1.0'
+end
 
-<p>group :production, :demo do
-  gem &lsquo;rails_12factor&rsquo;
-  gem &lsquo;heroku-deflater&rsquo;
-end</p>
+group :production, :demo do
+  gem 'rails_12factor'
+  gem 'heroku-deflater'
+end
 
-<p>gem &lsquo;font-awesome-rails&rsquo;
-gem &lsquo;unicorn&rsquo;
-gem &lsquo;bootstrap-sass&rsquo;
-gem &lsquo;sidekiq&rsquo;, require: &lsquo;sidekiq/web&rsquo;
-gem &lsquo;sinatra&rsquo;
-gem &lsquo;local_time&rsquo;
-gem &lsquo;gravatar_image_tag&rsquo;
-gem &lsquo;so_meta&rsquo;
-gem &lsquo;chronic&rsquo;
-gem &lsquo;recurrence&rsquo;</p>
+gem 'font-awesome-rails'
+gem 'unicorn'
+gem 'bootstrap-sass'
+gem 'sidekiq', require: 'sidekiq/web'
+gem 'sinatra'
+gem 'local_time'
+gem 'gravatar_image_tag'
+gem 'so_meta'
+gem 'chronic'
+gem 'recurrence'
 
-<p>gem &lsquo;premailer-rails&rsquo;</p>
+gem 'premailer-rails'
 
-<p>gem &lsquo;momentjs-rails&rsquo;
-gem &lsquo;bootstrap3-datetimepicker-rails&rsquo;
-gem &lsquo;bootstrap-switch-rails&rsquo;
-gem &lsquo;bootstrap-wysihtml5-rails&rsquo;
-gem &lsquo;bootstrap-select-rails&rsquo;
-gem &lsquo;autosize-rails&rsquo;</p>
+gem 'momentjs-rails'
+gem 'bootstrap3-datetimepicker-rails'
+gem 'bootstrap-switch-rails'
+gem 'bootstrap-wysihtml5-rails'
+gem 'bootstrap-select-rails'
+gem 'autosize-rails'
 
-<p>gem &lsquo;aws-sdk&rsquo;</p>
+gem 'aws-sdk'
 
-<p>gem &lsquo;html-pipeline&rsquo;
-gem &lsquo;rinku&rsquo;</p>
+gem 'html-pipeline'
+gem 'rinku'
 
-<p>gem &lsquo;newrelic_rpm&rsquo;
-gem &lsquo;doc_raptor&rsquo;
-gem &lsquo;stripe&rsquo;
-gem &lsquo;jquery-ui-rails&rsquo;
-gem &lsquo;active_model_serializers&rsquo;
-gem &lsquo;rubyzip&rsquo;
-gem &lsquo;render_anywhere&rsquo;, require: false
-gem &lsquo;pusher&rsquo;
-gem &lsquo;filepicker-rails&rsquo;
-gem &lsquo;memcachier&rsquo;
-gem &lsquo;dalli&rsquo;
-gem &lsquo;intercom-rails&rsquo;
-```</p>
+gem 'newrelic_rpm'
+gem 'doc_raptor'
+gem 'stripe'
+gem 'jquery-ui-rails'
+gem 'active_model_serializers'
+gem 'rubyzip'
+gem 'render_anywhere', require: false
+gem 'pusher'
+gem 'filepicker-rails'
+gem 'memcachier'
+gem 'dalli'
+gem 'intercom-rails'
+</code></pre>
 
 <p>A few comments:</p>
 
@@ -287,7 +280,7 @@ gem &lsquo;intercom-rails&rsquo;
 <li><p>For the apps that need background processing, <code>sidekiq</code> continues to be my goto when a separate worker is necessary. I generally mount Sidekiq’s web UI to provide insight to the state of the jobs, which is why <code>sinatra</code> is included.</p></li>
 <li><p>I’ve written about putting together <a href="/blog/relative-timestamps-in-rails/">a gem to render relative timestamps</a> on the client side. While I’d love to sit here and tell you I use it, I don’t. Basecamp’s <a href="https://github.com/basecamp/local_time">local_time</a> gem is exceptional for that need and I’m pretty sure we can count on it being updated and maintained well going forward (one of the biggest changes in my mindset for including a new gem).</p></li>
 <li><p>This particular app has some pretty hairy time calculations and scheduling. It’s not something I was very experienced with prior, but found value in the combination of <code>chronic</code> and <code>recurrence</code>. Both make the process of targeting a specific <code>datetime</code> and scheduling something in the future relatively simple.</p></li>
-<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note &ndash; I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
+<li><p>I included a number of bootstrap related javascript gems (<code>bootstrap3-datetimepicker-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-switch-rails</code>, <code>bootstrap-select-rails</code>). All are little more than a <a href="/blog/how-to-build-a-rails-engine/">Rails engine</a> that exposes the appropriate javascript and stylesheets to the asset pipeline. These are particularly dependent on the project. I’d normally not start by including anything like this. Side note - I could’ve copied the relevant assets to <code>vendor/assets</code> rather than requiring a gem that does the same. In a few cases, some added view helpers as well.</p></li>
 <li><p>I’ve standardized on using New Relic to collect application metrics and exceptions.</p></li>
 <li><p>It shouldn’t be a surprise that <code>stripe</code> is the payment processor I reach for when I’m in control. It’s super developer-friendly and, at this point, I’ve done enough that integration is not much more than a copy/paste from other apps. I recently started using <code>stripe_tester</code> in the test environment. It’s been great for stubbing out calls to Stripe so the test suite continues to be performant. It also allows me to setup some unique edge-case data coming from Stripe so I can protect users from ending up in a crappy state.</p></li>
 <li><p>I generally reach for <code>active_model_serializers</code> anytime I need a <code>json</code> response that contains more than a simple hash (in which case I’d continue to render it in the controller response). I’ve used the view equivalent solutions a few times (<code>jbuilder</code>, etc.) and they worked ok too, but for whatever reason, <code>active_model_serializers</code> does it for me.</p></li>
@@ -414,17 +407,13 @@ gem &lsquo;intercom-rails&rsquo;
 
 <p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
 
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Timecop.freeze Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
+  Timecop.freeze Chronic.parse("4/15/14") do
+    Reminders::Checkin.new.email
+    assert_equal 3, ActionMailer::Base.deliveries.size
+  end
 end
-```</p>
+</code></pre>
 
 <p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
 
@@ -444,17 +433,13 @@ end
 
 <p>Using the <code>travel_to</code> method with the example above results in the following:</p>
 
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
+  travel_to Chronic.parse("4/15/14") do
+    Reminders::Checkin.new.email
+    assert_equal 3, ActionMailer::Base.deliveries.size
+  end
 end
-```</p>
+</code></pre>
 
 <p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
 
@@ -462,31 +447,29 @@ end
 
 <p>Additionally, the same test could be written as:</p>
 
-<p><code>
-test "sends reminders on tuesday for those scheduled on wednesday" do
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
   travel_to Chronic.parse("4/15/14")
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
   travel_back
 end
-</code></p>
+</code></pre>
 
 <p>or with <code>setup</code> and <code>teardown</code>:</p>
 
-<p>```
-def setup
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;)
-end</p>
+<pre><code>def setup
+  travel_to Chronic.parse("4/15/14")
+end
 
-<p>test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
+test "sends reminders on tuesday for those scheduled on wednesday" do
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
-end</p>
+end
 
-<p>def teardown
+def teardown
   travel_back
 end
-```</p>
+</code></pre>
 
 <h2>Summary</h2>
 
@@ -514,24 +497,19 @@ end
 
 <p>This works swimmingly in production, but not so much in development. Rails makes our lives easier by reloading code in between requests while in development, due to this setting in <code>config/environments/development.rb</code>:</p>
 
-<p><code>
-  config.cache_classes = false
-</code></p>
+<pre><code>  config.cache_classes = false
+</code></pre>
 
 <p>Without it, we’d be forced to restart the server after almost every request. If that sounds like a giant PITA to you, I whole heartedly agree!</p>
 
 <p>So now you make your awesome job class, do some background work (send an email for example) and reload the page and boom:</p>
 
-<p><code>``
-Celluloid::PoolManager: async call</code>perform` aborted!
-ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!</p>
-
-<pre><code>    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
-    gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
-    my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'
+<pre><code>Celluloid::PoolManager: async call `perform` aborted!
+ArgumentError: A copy of SendInvitationJob has been removed from the module tree but is still active!
+        gems/activesupport-4.0.3/lib/active_support/dependencies.rb:446:in `load_missing_constant'
+        gems/activesupport-4.0.3/lib/active_support/dependencies.rb:184:in `const_missing'
+        my-app/app/jobs/send_invitation_job.rb:6:in `block in perform'
 </code></pre>
-
-<p>```</p>
 
 <p>The Celluloid registry still has reference to a the original <code>SendInvitationJob</code> class when it was initialized, however, reloading the code has caused the original reference to disappear and all hell breaks loose when the queue key is fetched to send another job to the class.</p>
 
@@ -543,38 +521,33 @@ ArgumentError: A copy of SendInvitationJob has been removed from the module tree
 
 <p>Knowing the issue was related to the setting <code>config.cache_classes = false</code> in the development environment, I broke open the Rails source code and searched for <code>cache_classes</code>. The first result was the <a href="https://github.com/rails/rails/blob/master/actionpack/lib/action_dispatch/middleware/reloader.rb"><code>ActionDispatch</code> reloader middleware</a>. Fortunately, there’s a very descriptive comment at the top of the class:</p>
 
-<p><code>
-  # By default, ActionDispatch::Reloader is included in the middleware stack
+<pre><code>  # By default, ActionDispatch::Reloader is included in the middleware stack
   # only in the development environment; specifically, when +config.cache_classes+
   # is false. Callbacks may be registered even when it is not included in the
   # middleware stack, but are executed only when &lt;tt&gt;ActionDispatch::Reloader.prepare!&lt;/tt&gt;
   # or &lt;tt&gt;ActionDispatch::Reloader.cleanup!&lt;/tt&gt; are called manually.
-</code></p>
+</code></pre>
 
 <p>This functionality is exactly what I needed!. From here, I just needed to know what callbacks were valid. A few lines in to the class are the following methods:</p>
 
-<p>```</p>
+<pre><code>    # Add a prepare callback. Prepare callbacks are run before each request, prior
+    # to ActionDispatch::Callback's before callbacks.
+    def self.to_prepare(*args, &amp;block)
+      unless block_given?
+        warn "to_prepare without a block is deprecated. Please use a block"
+      end
+      set_callback(:prepare, *args, &amp;block)
+    end
 
-<pre><code># Add a prepare callback. Prepare callbacks are run before each request, prior
-# to ActionDispatch::Callback's before callbacks.
-def self.to_prepare(*args, &amp;block)
-  unless block_given?
-    warn "to_prepare without a block is deprecated. Please use a block"
-  end
-  set_callback(:prepare, *args, &amp;block)
-end
-
-# Add a cleanup callback. Cleanup callbacks are run after each request is
-# complete (after #close is called on the response body).
-def self.to_cleanup(*args, &amp;block)
-  unless block_given?
-    warn "to_cleanup without a block is deprecated. Please use a block"
-  end
-  set_callback(:cleanup, *args, &amp;block)
-end
+    # Add a cleanup callback. Cleanup callbacks are run after each request is
+    # complete (after #close is called on the response body).
+    def self.to_cleanup(*args, &amp;block)
+      unless block_given?
+        warn "to_cleanup without a block is deprecated. Please use a block"
+      end
+      set_callback(:cleanup, *args, &amp;block)
+    end
 </code></pre>
-
-<p>```</p>
 
 <p><code>to_prepare</code> and <code>to_cleanup</code>…and like the comments say, they do exactly what you’d expect. Given that I wanted to clear our the Celluloid registry BEFORE each request, <code>on_prepare</code> is the golden ticket. Now I just needed to figure out how to clear the registry.</p>
 
@@ -582,37 +555,29 @@ end
 
 <p>Now that we all the pieces of the puzzle, it was time to put together a Railtie to trigger the behavior. Prior to needing this functionality, the Railtie in Sucker Punch was pretty simple:</p>
 
-<p>```
-module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie</p>
-
-<pre><code>initializer "sucker_punch.logger" do
-  SuckerPunch.logger = Rails.logger
+<pre><code>module SuckerPunch
+  class Railtie &lt; ::Rails::Railtie
+    initializer "sucker_punch.logger" do
+      SuckerPunch.logger = Rails.logger
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>All it did was connect the logger to the existing Rails logger. Adding the callback to <code>ActionDispatch</code> looks like:</p>
 
-<p>```
-module SuckerPunch
-  class Railtie &lt; ::Rails::Railtie</p>
+<pre><code>module SuckerPunch
+  class Railtie &lt; ::Rails::Railtie
+    initializer "sucker_punch.logger" do
+      SuckerPunch.logger = Rails.logger
+    end
 
-<pre><code>initializer "sucker_punch.logger" do
-  SuckerPunch.logger = Rails.logger
-end
-
-config.to_prepare do
-  Celluloid::Actor.clear_registry
+    config.to_prepare do
+      Celluloid::Actor.clear_registry
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>Now when the Railtie is loaded, the <code>Celluloid::Actor.clear_registry</code> method is triggered before the reloading of code in the development environment, clearing out the Celluloid registry and allowing Sucker Punch to instantiate new job queues for each request.</p>
 

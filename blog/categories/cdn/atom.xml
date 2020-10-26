@@ -4,7 +4,7 @@
   <title><![CDATA[Category: cdn | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/cdn/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -31,17 +31,13 @@ assets that were fronted by a <a href="http://aws.amazon.com/cloudfront/">Amazon
 Cloudfront</a> CDN. In order to make it work
 with this setup, I had to add to the following to our Nginx configuration:</p>
 
-<p>```
-location ~* .(ttf|ttc|otf|eot|woff|svg|font.css)$ {</p>
-
-<pre><code>add_header Access-Control-Allow-Origin *;
-expires 1M;
-access_log off;
-add_header Cache-Control "public";
+<pre><code>location ~* \.(ttf|ttc|otf|eot|woff|svg|font.css)$ {
+    add_header Access-Control-Allow-Origin *;
+    expires 1M;
+    access_log off;
+    add_header Cache-Control "public";
+}
 </code></pre>
-
-<p>}
-```</p>
 
 <!--more-->
 
@@ -100,7 +96,7 @@ button, otherwise, you won&rsquo;t see the new headers.</em></p>
 <p>While Fastly can be overwhelming, the power of being able to modify any aspect
 of the caching stack is valuable. Asset download times have generally been
 somewhere between 30-50 ms. Cloudfont offered this performance at times, but
-wasn&rsquo;t very consistent &ndash; some would be 30 ms, and others would take 150 ms. I
+wasn&rsquo;t very consistent - some would be 30 ms, and others would take 150 ms. I
 haven&rsquo;t noticed this inconsistency with Fastly and would happily recommend
 their service to anyone looking to improved their caching layer.</p>
 ]]></content>
@@ -142,13 +138,13 @@ engage them.</p>
 you make a request, the request is served from a server closest
 to you. This can often reduce transmission time by several
 seconds (&hellip;think users in Asia requesting content that&rsquo;s
-served from Virginia &ndash; this is the case if you deploy to Heroku).</p>
+served from Virginia - this is the case if you deploy to Heroku).</p>
 
 <p>The use of a CDN also reduces the number of requests to your
 application servers. Most Ruby applications use
 <a href="http://wiki.nginx.org/Main">Nginx</a> or <a href="http://httpd.apache.org/">Apache</a> in
 front of the Ruby processes. These HTTP servers are really good at serving
-static content, but no one will deny &ndash; the fewer requests, the better.</p>
+static content, but no one will deny - the fewer requests, the better.</p>
 
 <h2>Option 1: <em>Push</em> your assets to the CDN during deployment</h2>
 
@@ -181,7 +177,7 @@ this option generally makes it my preferred option.</p>
 
 <p><img class="center" src="/images/cdn/create.png" title="&ldquo;Create a Cloudfront distribution endpoint&rdquo;" ></p>
 
-<p>Enter the domain where your assets currently live (ignore Origin ID &ndash; it&rsquo;ll be filled in for you):</p>
+<p>Enter the domain where your assets currently live (ignore Origin ID - it&rsquo;ll be filled in for you):</p>
 
 <p><img class="center" src="/images/cdn/settings.png" title="&ldquo;Settings for a typical CDN&rdquo;" ></p>
 
@@ -195,24 +191,18 @@ this option generally makes it my preferred option.</p>
 stylesheets, javascripts, fonts&hellip;). Enter the Cloudfront
 distribution URL from above as the Rails <code>asset_host</code>.</p>
 
-<p>```</p>
-
-<h1>config/environments/production.rb</h1>
-
-<p>config.action_controller.asset_host = &ldquo;d24xjtg100euk4.cloudfront.net&rdquo;
-```</p>
+<pre><code># config/environments/production.rb
+config.action_controller.asset_host = "d24xjtg100euk4.cloudfront.net"
+</code></pre>
 
 <p>At this point, the domain of all Rails asset helpers <code>image_tag</code>, <code>stylesheet_link_tag</code>, and <code>javascript_include_tag</code>
 will be prefaced with the asset host URL that you configured above.</p>
 
 <p>For example:</p>
 
-<p>```
-image_tag(&ldquo;shark_teeth.png&rdquo;)</p>
-
-<h1><a href="http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png">http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png</a></h1>
-
-<p>```</p>
+<pre><code>image_tag("shark_teeth.png")
+# http://d24xjtg100euk4.cloudfront.net/assets/images/shark_teeth.png
+</code></pre>
 
 <p><em>Note: if you only change <code>config/environments/production.rb</code>, you won&rsquo;t see
 any changes in your <code>development</code> environment.</em></p>

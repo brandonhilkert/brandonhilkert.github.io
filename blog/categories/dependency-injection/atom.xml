@@ -4,7 +4,7 @@
   <title><![CDATA[Category: dependency injection | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/dependency-injection/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -31,94 +31,80 @@
 
 <p>The class below is responsible for handling Stripe’s <code>invoice.created</code> webhook. Prior to a customer being billed monthly subscription, Stripe will ping your application (if configured) — giving you the opportunity to add additional line items (think metered billing…). It could be additional services, or perhaps the entire bill itself (this use case). Nevertheless, the responsibility of the class is to create an invoice item based on the customer’s usage during the previous period.</p>
 
-<p>```
-module StripeEvent
-  class InvoiceCreated</p>
+<pre><code>module StripeEvent
+  class InvoiceCreated
+    attr_reader :payload
 
-<pre><code>attr_reader :payload
+    def initialize(payload)
+      @payload = payload
+    end
 
-def initialize(payload)
-  @payload = payload
-end
+    def perform
+      Stripe::InvoiceItem.create(
+        customer: user.stripe_id,
+        amount: additional_charges_in_cents,
+        currency: "usd",
+        description: "Usage charges"
+      )
+    end
 
-def perform
-  Stripe::InvoiceItem.create(
-    customer: user.stripe_id,
-    amount: additional_charges_in_cents,
-    currency: "usd",
-    description: "Usage charges"
-  )
-end
+    private
 
-private
+    def additional_charges_in_cents
+      Billing::Tier.new(usage).additional_charges_in_cents
+    end
 
-def additional_charges_in_cents
-  Billing::Tier.new(usage).additional_charges_in_cents
-end
+    def usage
+      Billing::Usage.new(user).last_30_days
+    end
 
-def usage
-  Billing::Usage.new(user).last_30_days
-end
-
-def user
-  @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
+    def user
+      @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>I wrote this code pretty quickly and felt pretty good about it. The responsibility of determining the pricing tier had been broken out in to a separate class, as well as determining the customer’s actual usage. At least I thought they were…</p>
 
 <p>So what about the tests?</p>
 
-<p>```
-require &lsquo;test_helper&rsquo;</p>
+<pre><code>require 'test_helper'
 
-<p>class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup</p>
-
-<pre><code>@payload = {
-  "data" =&gt; {
-    "object" =&gt; {
-      "customer" =&gt; "stripe_brandon"
+class InvoiceCreatedTest &lt; ActiveSupport::TestCase
+  def setup
+    @payload = {
+      "data" =&gt; {
+        "object" =&gt; {
+          "customer" =&gt; "stripe_brandon"
+        }
+      }
     }
-  }
-}
-</code></pre>
+  end
 
-<p>  end</p>
+  test 'adds invoice item based on usage' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 1900,
+      currency: "usd",
+      description: "Usage charges"
+    ).returns(true)
+    StripeEvent::InvoiceCreated.new(@payload).perform
+  end
 
-<p>  test &lsquo;adds invoice item based on usage&rsquo; do</p>
+  test 'adds next level charge for usage' do
+    Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
 
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-).returns(true)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds next level charge for usage&rsquo; do</p>
-
-<pre><code>Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
-
-Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-).returns(true)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
-
-<p>  end
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 4900,
+      currency: "usd",
+      description: "Usage charges"
+    ).returns(true)
+    StripeEvent::InvoiceCreated.new(@payload).perform
+  end
 end
-```</p>
+</code></pre>
 
 <p>The first thing I noticed with this setup was the detailed usage of <code>Stripe::InvoiceItem.expects</code>. I wasn’t sure if this was necessarily a bad thing because it was a third-party service and it seemed like reasonable boundary of the application.</p>
 
@@ -132,50 +118,46 @@ end
 
 <p>In a few other articles, I’ve heard this termed “accessors as collaborators”. Whatever the name, it was surprising how such a little a change could produce so much flexibility in my tests. And with that additional flexibility came confidence because it allowed me to test the edge cases with minimal overhead.</p>
 
-<p>```
-module StripeEvent
-  class InvoiceCreated</p>
+<pre><code>module StripeEvent
+  class InvoiceCreated
+    attr_writer :usage_service
+    attr_reader :payload
 
-<pre><code>attr_writer :usage_service
-attr_reader :payload
+    def initialize(payload)
+      @payload = payload
+    end
 
-def initialize(payload)
-  @payload = payload
-end
+    def perform
+      if user.created_at &lt; 14.days.ago
+        Stripe::InvoiceItem.create(
+          customer: user.stripe_id,
+          amount: additional_charges_in_cents,
+          currency: "usd",
+          description: "Usage charges"
+        )
+      end
+    end
 
-def perform
-  if user.created_at &lt; 14.days.ago
-    Stripe::InvoiceItem.create(
-      customer: user.stripe_id,
-      amount: additional_charges_in_cents,
-      currency: "usd",
-      description: "Usage charges"
-    )
+    private
+
+    def additional_charges_in_cents
+      Billing::Tier.new(usage).additional_charges_in_cents
+    end
+
+    def usage
+      usage_service.last_30_days
+    end
+
+    def usage_service
+      @usage_service ||= Billing::Usage.new(user)
+    end
+
+    def user
+      @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
+    end
   end
 end
-
-private
-
-def additional_charges_in_cents
-  Billing::Tier.new(usage).additional_charges_in_cents
-end
-
-def usage
-  usage_service.last_30_days
-end
-
-def usage_service
-  @usage_service ||= Billing::Usage.new(user)
-end
-
-def user
-  @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>A couple things changed:</p>
 
@@ -190,134 +172,109 @@ end
 
 <p>This allows us to inject other forms of the <code>usage_service</code> to simulate more or less customer usage:</p>
 
-<p>```
-require &lsquo;test_helper&rsquo;</p>
+<pre><code>require 'test_helper'
 
-<p>class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup</p>
-
-<pre><code>@payload = {
-  "data" =&gt; {
-    "object" =&gt; {
-      "customer" =&gt; "stripe_brandon"
+class InvoiceCreatedTest &lt; ActiveSupport::TestCase
+  def setup
+    @payload = {
+      "data" =&gt; {
+        "object" =&gt; {
+          "customer" =&gt; "stripe_brandon"
+        }
+      }
     }
-  }
-}
-</code></pre>
+  end
 
-<p>  end</p>
+  test 'adds invoice item based on usage' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 1900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    StripeEvent::InvoiceCreated.new(@payload).perform
+  end
 
-<p>  test &lsquo;adds invoice item based on usage&rsquo; do</p>
+  test 'adds next level charge for usage' do
+    Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
 
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 4900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    StripeEvent::InvoiceCreated.new(@payload).perform
+  end
 
-<p>  end</p>
+  test 'adds highest tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 49900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload)
+    inv.usage_service = Level5Usage.new
+    inv.perform
+  end
 
-<p>  test &lsquo;adds next level charge for usage&rsquo; do</p>
+  test 'adds 2nd highest tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 24900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload)
+    inv.usage_service = Level4Usage.new
+    inv.perform
+  end
 
-<pre><code>Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
+  test 'adds middle tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 12900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload)
+    inv.usage_service = Level3Usage.new
+    inv.perform
+  end
 
-Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
+  test 'adds 2nd tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 4900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload)
+    inv.usage_service = Level2Usage.new
+    inv.perform
+  end
 
-<p>  end</p>
+  test 'adds 1st tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 1900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload)
+    inv.usage_service = Level1Usage.new
+    inv.perform
+  end
 
-<p>  test &lsquo;adds highest tier&rsquo; do</p>
+  private
 
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 49900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level5Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd highest tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 24900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level4Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds middle tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 12900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level3Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level2Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 1st tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload)
-inv.usage_service = Level1Usage.new
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  Level5Usage = Class.new { def last_30_days; 2_000_000; end }
+  Level5Usage = Class.new { def last_30_days; 2_000_000; end }
   Level4Usage = Class.new { def last_30_days; 900_000; end }
   Level3Usage = Class.new { def last_30_days; 190_000; end }
   Level2Usage = Class.new { def last_30_days; 19_000; end }
   Level1Usage = Class.new { def last_30_days; 1_900; end }
-```</p>
+</code></pre>
 
 <p>I’ve created classes for each usage tier that implement the <code>last_30_days</code> method. In real life, this usage service is more complex, but we can test the complexity of it alone through unit tests. The responsibility of this class is to ensure invoice items are added to Stripe correctly, so removing the complexity of <code>Billing::Usage</code> form this test allows us to maximize this test’s value and keep us isolated from the implementation of <code>Billing::Usage</code> — assuming it implements the <code>last_30_days</code> method.</p>
 
@@ -325,188 +282,157 @@ inv.perform
 
 <p>Most dependency injection posts focus on constructor injection. The idea being that an implementation can be supplied. If not, a reasonable default will be provided. How might that change this scenario?</p>
 
-<p>```
-module StripeEvent
-  class InvoiceCreated</p>
+<pre><code>module StripeEvent
+  class InvoiceCreated
+    attr_reader :payload
 
-<pre><code>attr_reader :payload
+    def initialize(payload, usage_service = Billing::Usage)
+      @payload = payload
+      @usage_service = usage_service
+    end
 
-def initialize(payload, usage_service = Billing::Usage)
-  @payload = payload
-  @usage_service = usage_service
-end
+    def perform
+      if user.created_at &lt; 14.days.ago
+        Stripe::InvoiceItem.create(
+          customer: user.stripe_id,
+          amount: additional_charges_in_cents,
+          currency: "usd",
+          description: "Usage charges"
+        )
+      end
+    end
 
-def perform
-  if user.created_at &lt; 14.days.ago
-    Stripe::InvoiceItem.create(
-      customer: user.stripe_id,
-      amount: additional_charges_in_cents,
-      currency: "usd",
-      description: "Usage charges"
-    )
+    private
+
+    def additional_charges_in_cents
+      Billing::Tier.new(usage).additional_charges_in_cents
+    end
+
+    def usage
+      @usage_service.new(user).last_30_days
+    end
+
+    def user
+      @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
+    end
   end
 end
-
-private
-
-def additional_charges_in_cents
-  Billing::Tier.new(usage).additional_charges_in_cents
-end
-
-def usage
-  @usage_service.new(user).last_30_days
-end
-
-def user
-  @user ||= User.find_by(stripe_id: payload["data"]["object"]["customer"])
-end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>Because the <code>usage</code> method requires instantiation from within the class, I had to update the fake test Usage classes to accept <code>user</code> as an argument during instantiation:</p>
 
-<p>```
-require &lsquo;test_helper&rsquo;</p>
+<pre><code>require 'test_helper'
 
-<p>class InvoiceCreatedTest &lt; ActiveSupport::TestCase
-  def setup</p>
-
-<pre><code>@payload = {
-  "data" =&gt; {
-    "object" =&gt; {
-      "customer" =&gt; "stripe_brandon"
+class InvoiceCreatedTest &lt; ActiveSupport::TestCase
+  def setup
+    @payload = {
+      "data" =&gt; {
+        "object" =&gt; {
+          "customer" =&gt; "stripe_brandon"
+        }
+      }
     }
-  }
-}
-</code></pre>
+  end
 
-<p>  end</p>
+  test 'adds invoice item based on usage' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 1900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    StripeEvent::InvoiceCreated.new(@payload).perform
+  end
 
-<p>  test &lsquo;adds invoice item based on usage&rsquo; do</p>
+  test 'adds next level charge for usage' do
+    Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
 
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 4900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    StripeEvent::InvoiceCreated.new(@payload).perform
+  end
 
-<p>  end</p>
+  test 'adds highest tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 49900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload, Level5Usage)
+    inv.perform
+  end
 
-<p>  test &lsquo;adds next level charge for usage&rsquo; do</p>
+  test 'adds 2nd highest tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 24900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload, Level4Usage)
+    inv.perform
+  end
 
-<pre><code>Stat.create!(user: users(:brandon), step: steps(:nav_one), impressions: 3_000, date: 5.days.ago)
+  test 'adds middle tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 12900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload, Level3Usage)
+    inv.perform
+  end
 
-Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-StripeEvent::InvoiceCreated.new(@payload).perform
-</code></pre>
+  test 'adds 2nd tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 4900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload, Level2Usage)
+    inv.perform
+  end
 
-<p>  end</p>
+  test 'adds 1st tier' do
+    Stripe::InvoiceItem.expects(:create).with(
+      customer: "stripe_brandon",
+      amount: 1900,
+      currency: "usd",
+      description: "Usage charges"
+    )
+    inv = StripeEvent::InvoiceCreated.new(@payload, Level1Usage)
+    inv.perform
+  end
 
-<p>  test &lsquo;adds highest tier&rsquo; do</p>
+  private
 
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 49900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level5Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd highest tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 24900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level4Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds middle tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 12900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level3Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 2nd tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 4900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level2Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  test &lsquo;adds 1st tier&rsquo; do</p>
-
-<pre><code>Stripe::InvoiceItem.expects(:create).with(
-  customer: "stripe_brandon",
-  amount: 1900,
-  currency: "usd",
-  description: "Usage charges"
-)
-inv = StripeEvent::InvoiceCreated.new(@payload, Level1Usage)
-inv.perform
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  Level5Usage = Struct.new(:user) { def last_30_days; 2_000_000; end }
+  Level5Usage = Struct.new(:user) { def last_30_days; 2_000_000; end }
   Level4Usage = Struct.new(:user) { def last_30_days; 900_000; end }
   Level3Usage = Struct.new(:user) { def last_30_days; 190_000; end }
   Level2Usage = Struct.new(:user) { def last_30_days; 19_000; end }
   Level1Usage = Struct.new(:user) { def last_30_days; 1_900; end }
-```</p>
+</code></pre>
 
 <p>The resulting test classes seem overly complex and sprinkled with details that aren’t particularly relevant to its responsibility. If we were to pass in an already instantiated usage class as an argument, it means we would have to already know the user before-hand, which means we’d have to parse <code>@user ||= User.find_by(stripe_id: payload["data"]["object"]["customer”])</code> outside of this class. I don’t love that solution — the parent that calls this <code>InvoiceCreated</code> class is pretty minimal and I wanted to keep it that way.</p>
 
 <p>Another option would be to provide <code>user</code> as an argument to the to the <code>last_30_days</code> method:</p>
 
-<p><code>
-def usage
+<pre><code>def usage
   @usage_service.new.last_30_days(user)
 end
-</code></p>
+</code></pre>
 
 <p>We could then change our fake test usage classes back to:</p>
 
-<p><code>
-Level1Usage = Class.new { def last_30_days; 1_900; end }
-</code></p>
+<pre><code>Level1Usage = Class.new { def last_30_days; 1_900; end }
+</code></pre>
 
 <p>Notice the lack of <code>Struct</code> with an argument…</p>
 

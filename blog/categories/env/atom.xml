@@ -4,7 +4,7 @@
   <title><![CDATA[Category: env | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/env/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -31,20 +31,17 @@
 
 <p>Below is a default <code>config/secrets.yml</code> file generated from a Rails 4.1 app. As you can see, both the development and test environments rely on statically set values, where the production environment relies on environment variables being set on the system. The latter is perfect for platforms like <a href="https://www.heroku.com">Heroku</a>, and just as easy if you manage your own systems on EC2 or similar infrastructure.</p>
 
-<p>```
-development:
-  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8</p>
+<pre><code>development:
+  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
 
-<p>test:
-  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20</p>
+test:
+  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20
 
-<h1>Do not keep production secrets in the repository,</h1>
-
-<h1>instead read values from the environment.</h1>
-
-<p>production:
-  secret_key_base: &lt;%= ENV[&ldquo;SECRET_KEY_BASE&rdquo;] %>
-```</p>
+# Do not keep production secrets in the repository,
+# instead read values from the environment.
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
+</code></pre>
 
 <p>Notice how ERB is processed in the file. This gives us the opportunity to use Ruby to generate random strings, dates, or anything else that can be expressed through code.</p>
 
@@ -58,98 +55,80 @@ development:
 
 <p>A static array at the top of the file seemed to hold some values for the application as shown below:</p>
 
-<p>```
-INITIAL_VARIABLES = [:config, :railties, :routes_reloader, :reloaders,</p>
-
-<pre><code>                    :routes, :helpers, :app_env_config, :secrets] # :nodoc:
+<pre><code>INITIAL_VARIABLES = [:config, :railties, :routes_reloader, :reloaders,
+                        :routes, :helpers, :app_env_config, :secrets] # :nodoc:
 </code></pre>
-
-<p>```</p>
 
 <p>Looks like we’re on the right track. Going further down the file leads us to the getter:</p>
 
-<p>```
-def secrets #:nodoc:
-  @secrets ||= begin</p>
+<pre><code>def secrets #:nodoc:
+  @secrets ||= begin
+    secrets = ActiveSupport::OrderedOptions.new
+    yaml = config.paths["config/secrets"].first
 
-<pre><code>secrets = ActiveSupport::OrderedOptions.new
-yaml = config.paths["config/secrets"].first
+    if File.exist?(yaml)
+      require "erb"
+      all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
+      env_secrets = all_secrets[Rails.env]
+      secrets.merge!(env_secrets.symbolize_keys) if env_secrets
+    end
 
-if File.exist?(yaml)
-  require "erb"
-  all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
-  env_secrets = all_secrets[Rails.env]
-  secrets.merge!(env_secrets.symbolize_keys) if env_secrets
+    # Fallback to config.secret_key_base if secrets.secret_key_base isn't set
+    secrets.secret_key_base ||= config.secret_key_base
+
+    secrets
+  end
 end
-
-# Fallback to config.secret_key_base if secrets.secret_key_base isn't set
-secrets.secret_key_base ||= config.secret_key_base
-
-secrets
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>As you can see, the file path <code>config/secrets</code> is referenced as the <code>yaml</code> source:</p>
 
-<p><code>
-yaml = config.paths["config/secrets"].first
-</code></p>
+<pre><code>yaml = config.paths["config/secrets"].first
+</code></pre>
 
 <p>and the result of reading the file is sent through ERB and YAML:</p>
 
-<p><code>
-all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
-</code></p>
+<pre><code>all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
+</code></pre>
 
 <p>The environment group is parsed:</p>
 
-<p><code>
-env_secrets = all_secrets[Rails.env]
-</code></p>
+<pre><code>env_secrets = all_secrets[Rails.env]
+</code></pre>
 
 <p>The result of the output is returned, leaving us with a hash of options based on the environment group. With a little luck we should be able to query the application from the console and get the configuration values.</p>
 
-<p><code>
-irb(main):001:0&gt; Rails.application.secrets.class
+<pre><code>irb(main):001:0&gt; Rails.application.secrets.class
 =&gt; ActiveSupport::OrderedOptions
 irb(main):002:0&gt; Rails.application.secrets
 =&gt; {:secret_key_base=&gt;"9ac2d0ad8ebcc312090e99d745006d3cf8"}
 irb(main):003:0&gt; Rails.application.secrets.secret_key_base
 =&gt; "a1580ad61ccb6ac60f9f256948cf63d6e20"
-</code></p>
+</code></pre>
 
 <p>That’s great news because it means we can put other values in this file and reference them throughout our application using the parent hash <code>Rails.application.secrets</code>.</p>
 
 <p>For example, let’s assume we need to configuration Pusher URL again. We could add it to the <code>secrets.yml</code> file like so:</p>
 
-<p>```
-development:
+<pre><code>development:
   secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
-  pusher_url: <a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a></p>
+  pusher_url: http://asdfa@api.pusherapp.com
 
-<p>test:
-  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20</p>
+test:
+  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20
 
-<h1>Do not keep production secrets in the repository,</h1>
-
-<h1>instead read values from the environment.</h1>
-
-<p>production:
-  secret_key_base: &lt;%= ENV[&ldquo;SECRET_KEY_BASE&rdquo;] %>
-  pusher_url: &lt;%= ENV[&ldquo;PUSHER_URL&rdquo;] %>
-```</p>
+# Do not keep production secrets in the repository,
+# instead read values from the environment.
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
+  pusher_url: &lt;%= ENV["PUSHER_URL"] %&gt;
+</code></pre>
 
 <p>Now within our application we can set the Pusher URL within the initializer using the secret value:</p>
 
-<p>```</p>
-
-<h1>config/initializers/pusher.rb</h1>
-
-<p>Pusher.url = Rails.application.secrets.pusher_url
-```</p>
+<pre><code># config/initializers/pusher.rb
+Pusher.url = Rails.application.secrets.pusher_url
+</code></pre>
 
 <h2>Summary</h2>
 
@@ -170,7 +149,7 @@ checking passwords in to source control is generally a bad practice, we need a
 good way to safely and reliably access these values in code.</p>
 
 <p>I&rsquo;ve tried a few gems that attempt to make this process easier and ultimately
-settled on a simpler solution &ndash; the combination of a few lines of code and
+settled on a simpler solution - the combination of a few lines of code and
 <a href="http://en.wikipedia.org/wiki/Environment_variable">ENV variables</a>, which are
 accessible whether you manage your own infrastructure or use a
 <a href="http://en.wikipedia.org/wiki/Platform_as_a_service">PaaS</a> service like
@@ -184,14 +163,12 @@ accessible whether you manage your own infrastructure or use a
 <p>In a recent Rails app, I used <a href="http://pusher.com/">Pusher</a> and it requires the
 unique URL to be setup in an initializer:</p>
 
-<p>```</p>
+<pre><code># config/initializers/pusher.rb
 
-<h1>config/initializers/pusher.rb</h1>
+Pusher.url = "http://asdfa@api.pusherapp.com"
+</code></pre>
 
-<p>Pusher.url = &ldquo;<a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a>&rdquo;
-```</p>
-
-<p>If I need to set this URL in multiple place &ndash; copying/pasting is not a great
+<p>If I need to set this URL in multiple place - copying/pasting is not a great
 solution because it sets me up for copy/paste errors. It&rsquo;s also a headache to
 find all occurrences of the URL when it changes.</p>
 
@@ -199,72 +176,56 @@ find all occurrences of the URL when it changes.</p>
 
 <p>Setup a <a href="http://en.wikipedia.org/wiki/YAML">yaml</a> file similar to this:</p>
 
-<p>```</p>
+<pre><code># config/application.yml
 
-<h1>config/application.yml</h1>
+defaults: &amp;defaults
+  PUSHER_URL: http://asdfa@api.pusherapp.com
 
-<p>defaults: &amp;defaults
-  PUSHER_URL: <a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a></p>
-
-<p>development:
-  &lt;&lt;: *defaults</p>
-
-<p>test:
+development:
   &lt;&lt;: *defaults
-```</p>
+
+test:
+  &lt;&lt;: *defaults
+</code></pre>
 
 <p>Add the following to <code>config/application.rb</code> before the Rails application class
 is defined:</p>
 
-<p>```
-if File.exists?(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>))
-  config = YAML.load(File.read(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>)))
+<pre><code>if File.exists?(File.expand_path('../application.yml', __FILE__))
+  config = YAML.load(File.read(File.expand_path('../application.yml', __FILE__)))
   config.merge! config.fetch(Rails.env, {})
-  config.each do |key, value|</p>
-
-<pre><code>ENV[key] ||= value.to_s unless value.kind_of? Hash
-</code></pre>
-
-<p>  end
+  config.each do |key, value|
+    ENV[key] ||= value.to_s unless value.kind_of? Hash
+  end
 end
-```</p>
+</code></pre>
 
 <p>Resulting in a <code>config/application.rb</code> that looks something like this:</p>
 
-<p>```</p>
+<pre><code># config/application.rb
 
-<h1>config/application.rb</h1>
+require File.expand_path('../boot', __FILE__)
 
-<p>require File.expand_path(&lsquo;../boot&rsquo;, <strong>FILE</strong>)</p>
+require 'rails/all'
 
-<p>require &lsquo;rails/all&rsquo;</p>
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
+Bundler.require(:default, Rails.env)
 
-<h1>Require the gems listed in Gemfile, including any gems</h1>
-
-<h1>you&rsquo;ve limited to :test, :development, or :production.</h1>
-
-<p>Bundler.require(:default, Rails.env)</p>
-
-<p>if File.exists?(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>))
-  config = YAML.load(File.read(File.expand_path(&lsquo;../application.yml&rsquo;, <strong>FILE</strong>)))
+if File.exists?(File.expand_path('../application.yml', __FILE__))
+  config = YAML.load(File.read(File.expand_path('../application.yml', __FILE__)))
   config.merge! config.fetch(Rails.env, {})
-  config.each do |key, value|</p>
-
-<pre><code>ENV[key] ||= value.to_s unless value.kind_of? Hash
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>module NewApp
-  class Application &lt; Rails::Application</p>
-
-<pre><code># ...
-</code></pre>
-
-<p>  end
+  config.each do |key, value|
+    ENV[key] ||= value.to_s unless value.kind_of? Hash
+  end
 end
-```</p>
+
+module NewApp
+  class Application &lt; Rails::Application
+    # ...
+  end
+end
+</code></pre>
 
 <p>The added code first looks for an <code>application.yml</code> file. If it finds one, it
 reads in the values for that environment (development, test, production, etc.)
@@ -277,12 +238,10 @@ control.</em></p>
 <p>Now, when the application is initialized, <code>PUSHER_URL</code> is
 available in the ENV hash. This allows me to the update the pusher initializer to:</p>
 
-<p>```</p>
+<pre><code># config/initializers/pusher.rb
 
-<h1>config/initializers/pusher.rb</h1>
-
-<p>Pusher.url = ENV[&ldquo;PUSHER_URL&rdquo;]
-```</p>
+Pusher.url = ENV["PUSHER_URL"]
+</code></pre>
 
 <p>If I&rsquo;m deploying to Heroku, I need to set the config value using the following
 command:</p>
@@ -291,13 +250,11 @@ command:</p>
 
 <p>Or if I&rsquo;m deploying to Ubuntu, I can set the ENV variable for all users on the system:</p>
 
-<p>```</p>
+<pre><code># /etc/environment
 
-<h1>/etc/environment</h1>
-
-<p>&hellip;
-PUSHER_URL=<a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a>
-```</p>
+...
+PUSHER_URL=http://asdfa@api.pusherapp.com
+</code></pre>
 
 <p><em>Note: If you choose not to set ENV variables on the host system, you can
 easily mimic the development environment and drop the <code>config/application.yml</code>

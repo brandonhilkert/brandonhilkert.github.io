@@ -4,7 +4,7 @@
   <title><![CDATA[Category: decorators | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/decorators/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -37,20 +37,16 @@
 
 <p>Let&rsquo;s start with the most basic form of accessing our Stripe customer data with the <a href="https://github.com/stripe/stripe-ruby">Stripe gem</a>:</p>
 
-<p>```
-class AccountsController &lt; ApplicationController
-  before_action :require_authentication</p>
+<pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
 
-<p>  def show</p>
-
-<pre><code>@customer = Stripe::Customer.retrieve(current_user.stripe_id)
-@invoices = @customer.invoices
-@upcoming_invoice = @customer.upcoming_invoice
-</code></pre>
-
-<p>  end
+  def show
+    @customer = Stripe::Customer.retrieve(current_user.stripe_id)
+    @invoices = @customer.invoices
+    @upcoming_invoice = @customer.upcoming_invoice
+  end
 end
-```</p>
+</code></pre>
 
 <h2>Extract an Adapter</h2>
 
@@ -60,62 +56,45 @@ end
 
 <p>Let&rsquo;s start by removing the notion that it&rsquo;s Stripe and all and call it <code>Billing</code>. Here we can expose the methods needed from the  <code>AccountsController</code> above:</p>
 
-<p>```
-class Billing
-  attr_reader :billing_id</p>
+<pre><code>class Billing
+  attr_reader :billing_id
 
-<p>  def initialize(billing_id)</p>
+  def initialize(billing_id)
+    @billing_id = billing_id
+  end
 
-<pre><code>@billing_id = billing_id
-</code></pre>
+  def customer
+    Stripe::Customer.retrieve(billing_id)
+  end
 
-<p>  end</p>
+  def invoices
+    customer.invoices
+  end
 
-<p>  def customer</p>
-
-<pre><code>Stripe::Customer.retrieve(billing_id)
-</code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>customer.invoices
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>customer.upcoming_invoice
-</code></pre>
-
-<p>  end
+  def upcoming_invoice
+    customer.upcoming_invoice
+  end
 end
-```</p>
+</code></pre>
 
-<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &ndash; no change in functionality. But certainly more organized and isolated.</p>
 
 <p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
 
-<p>```
-class AccountsController &lt; ApplicationController
-  before_action :require_authentication</p>
+<pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
 
-<p>  def show</p>
+  def show
+    billing = Billing.new(current_user.stripe_id)
 
-<pre><code>billing = Billing.new(current_user.stripe_id)
-
-@customer = billing.customer
-@invoices = billing.invoices
-@upcoming_invoice = billing.upcoming_invoice
+    @customer = billing.customer
+    @invoices = billing.invoices
+    @upcoming_invoice = billing.upcoming_invoice
+  end
+end
 </code></pre>
 
-<p>  end
-end
-```</p>
-
-<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem - an adapter if you will.</p>
 
 <h2>Create a Decorator</h2>
 
@@ -125,68 +104,50 @@ end
 
 <p>Let&rsquo;s create a base form of  <code>BillingWithCache</code> that <strong>does nothing more</strong> than call the host methods:</p>
 
-<p>```
-class BillingWithCache
-  def initialize(billing_service)</p>
+<pre><code>class BillingWithCache
+  def initialize(billing_service)
+    @billing_service = billing_service
+  end
 
-<pre><code>@billing_service = billing_service
-</code></pre>
+  def customer
+    billing_service.customer
+  end
 
-<p>  end</p>
+  def invoices
+    customer.invoices
+  end
 
-<p>  def customer</p>
+  def upcoming_invoice
+    customer.upcoming_invoice
+  end
 
-<pre><code>billing_service.customer
-</code></pre>
+  private
 
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>customer.invoices
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>customer.upcoming_invoice
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :billing_service
+  attr_reader :billing_service
 end
-```</p>
+</code></pre>
 
 <p>So while we haven&rsquo;t added any additional functionality, we have created the ability for this class to be used in place of our existing <code>Billing</code> class because it responds to the same API (<code>#customer</code>, <code>#invoices</code>, <code>#upcoming_invoice</code>).</p>
 
 <p>Integrating this new class with <code>AccountsController</code> looks like:</p>
 
-<p>```
-class AccountsController &lt; ApplicationController
-  before_action :require_authentication</p>
+<pre><code>class AccountsController &lt; ApplicationController
+  before_action :require_authentication
 
-<p>  def show</p>
+  def show
+    billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
 
-<pre><code>billing = BillingWithCache.new(Billing.new(current_user.stripe_id))
-
-@customer = billing.customer
-@invoices = billing.invoices
-@upcoming_invoice = billing.upcoming_invoice
+    @customer = billing.customer
+    @invoices = billing.invoices
+    @upcoming_invoice = billing.upcoming_invoice
+  end
+end
 </code></pre>
 
-<p>  end
-end
-```</p>
+<p>As you can see, we only had to change one line &ndash; the line where we decorated the original billing class:</p>
 
-<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
-
-<p><code>
-BillingWithCache.new(Billing.new(current_user.stripe_id))
-</code></p>
+<pre><code>BillingWithCache.new(Billing.new(current_user.stripe_id))
+</code></pre>
 
 <p>I know what you&rsquo;re thinking, &ldquo;But it doesn&rsquo;t actually cache anything!&rdquo;. You&rsquo;re right! Let&rsquo;s dig in to the <code>BillingWithCache</code> class and add that.</p>
 
@@ -194,80 +155,63 @@ BillingWithCache.new(Billing.new(current_user.stripe_id))
 
 <p>In order to cache data using <code>Rails.cache</code>, we&rsquo;re going to need a cache key of some kind. Fortunately, the original <code>Billing</code> class provides a reader for <code>billing_id</code> that will allow us to make this unique to that user.</p>
 
-<p><code>
-def cache_key(item)
+<pre><code>def cache_key(item)
   "user/#{billing_id}/billing/#{item}"
 end
-</code></p>
+</code></pre>
 
 <p>In this case, <code>item</code> can refer to things like <code>"customer"</code>, <code>"invoices"</code>, or <code>"upcoming_invoice"</code>. This gives us a method we can use internally with <code>BillingWithCache</code> to provide a cache key unique to the both the user and the type of data we&rsquo;re caching.</p>
 
 <p>Adding in the calls to actually cache the data:</p>
 
-<p>```
-class BillingWithCache
-  def initialize(billing_service)</p>
+<pre><code>class BillingWithCache
+  def initialize(billing_service)
+    @billing_service = billing_service
+  end
 
-<pre><code>@billing_service = billing_service
-</code></pre>
+  def customer
+    key = cache_key("customer")
 
-<p>  end</p>
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      billing_service.customer
+    end
+  end
 
-<p>  def customer</p>
+  def invoices
+    key = cache_key("invoices")
 
-<pre><code>key = cache_key("customer")
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      customer.invoices
+    end
+  end
 
-Rails.cache.fetch(key, expires: 15.minutes) do
-  billing_service.customer
+  def upcoming_invoice
+    key = cache_key("upcoming_invoice")
+
+    Rails.cache.fetch(key, expires: 15.minutes) do
+      customer.upcoming_invoice
+    end
+  end
+
+  private
+
+  attr_reader :billing_service
+
+  def cache_key(item)
+    "user/#{billing_service.billing_id}/billing/#{item}"
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  def invoices</p>
-
-<pre><code>key = cache_key("invoices")
-
-Rails.cache.fetch(key, expires: 15.minutes) do
-  customer.invoices
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  def upcoming_invoice</p>
-
-<pre><code>key = cache_key("upcoming_invoice")
-
-Rails.cache.fetch(key, expires: 15.minutes) do
-  customer.upcoming_invoice
-end
-</code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :billing_service</p>
-
-<p>  def cache_key(item)</p>
-
-<pre><code>"user/#{billing_service.billing_id}/billing/#{item}"
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>The code above caches the call to each of these methods for 15 minutes. We could go further and move that to an argument with a default value, but I&rsquo;ll leave as an exercise for another time.</p>
 
 <h2>Summary</h2>
 
-<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+<p>Separating your application and third-party services helps keeps your applications flexible &ndash; offering the freedom to switch to another service when one no longer fits the bill.</p>
 
 <p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
 
-<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &ndash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
 ]]></content>
   </entry>
   

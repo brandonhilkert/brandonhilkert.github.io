@@ -4,7 +4,7 @@
   <title><![CDATA[Category: config | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/config/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -31,20 +31,17 @@
 
 <p>Below is a default <code>config/secrets.yml</code> file generated from a Rails 4.1 app. As you can see, both the development and test environments rely on statically set values, where the production environment relies on environment variables being set on the system. The latter is perfect for platforms like <a href="https://www.heroku.com">Heroku</a>, and just as easy if you manage your own systems on EC2 or similar infrastructure.</p>
 
-<p>```
-development:
-  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8</p>
+<pre><code>development:
+  secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
 
-<p>test:
-  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20</p>
+test:
+  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20
 
-<h1>Do not keep production secrets in the repository,</h1>
-
-<h1>instead read values from the environment.</h1>
-
-<p>production:
-  secret_key_base: &lt;%= ENV[&ldquo;SECRET_KEY_BASE&rdquo;] %>
-```</p>
+# Do not keep production secrets in the repository,
+# instead read values from the environment.
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
+</code></pre>
 
 <p>Notice how ERB is processed in the file. This gives us the opportunity to use Ruby to generate random strings, dates, or anything else that can be expressed through code.</p>
 
@@ -58,98 +55,80 @@ development:
 
 <p>A static array at the top of the file seemed to hold some values for the application as shown below:</p>
 
-<p>```
-INITIAL_VARIABLES = [:config, :railties, :routes_reloader, :reloaders,</p>
-
-<pre><code>                    :routes, :helpers, :app_env_config, :secrets] # :nodoc:
+<pre><code>INITIAL_VARIABLES = [:config, :railties, :routes_reloader, :reloaders,
+                        :routes, :helpers, :app_env_config, :secrets] # :nodoc:
 </code></pre>
-
-<p>```</p>
 
 <p>Looks like we’re on the right track. Going further down the file leads us to the getter:</p>
 
-<p>```
-def secrets #:nodoc:
-  @secrets ||= begin</p>
+<pre><code>def secrets #:nodoc:
+  @secrets ||= begin
+    secrets = ActiveSupport::OrderedOptions.new
+    yaml = config.paths["config/secrets"].first
 
-<pre><code>secrets = ActiveSupport::OrderedOptions.new
-yaml = config.paths["config/secrets"].first
+    if File.exist?(yaml)
+      require "erb"
+      all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
+      env_secrets = all_secrets[Rails.env]
+      secrets.merge!(env_secrets.symbolize_keys) if env_secrets
+    end
 
-if File.exist?(yaml)
-  require "erb"
-  all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
-  env_secrets = all_secrets[Rails.env]
-  secrets.merge!(env_secrets.symbolize_keys) if env_secrets
+    # Fallback to config.secret_key_base if secrets.secret_key_base isn't set
+    secrets.secret_key_base ||= config.secret_key_base
+
+    secrets
+  end
 end
-
-# Fallback to config.secret_key_base if secrets.secret_key_base isn't set
-secrets.secret_key_base ||= config.secret_key_base
-
-secrets
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>As you can see, the file path <code>config/secrets</code> is referenced as the <code>yaml</code> source:</p>
 
-<p><code>
-yaml = config.paths["config/secrets"].first
-</code></p>
+<pre><code>yaml = config.paths["config/secrets"].first
+</code></pre>
 
 <p>and the result of reading the file is sent through ERB and YAML:</p>
 
-<p><code>
-all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
-</code></p>
+<pre><code>all_secrets = YAML.load(ERB.new(IO.read(yaml)).result) || {}
+</code></pre>
 
 <p>The environment group is parsed:</p>
 
-<p><code>
-env_secrets = all_secrets[Rails.env]
-</code></p>
+<pre><code>env_secrets = all_secrets[Rails.env]
+</code></pre>
 
 <p>The result of the output is returned, leaving us with a hash of options based on the environment group. With a little luck we should be able to query the application from the console and get the configuration values.</p>
 
-<p><code>
-irb(main):001:0&gt; Rails.application.secrets.class
+<pre><code>irb(main):001:0&gt; Rails.application.secrets.class
 =&gt; ActiveSupport::OrderedOptions
 irb(main):002:0&gt; Rails.application.secrets
 =&gt; {:secret_key_base=&gt;"9ac2d0ad8ebcc312090e99d745006d3cf8"}
 irb(main):003:0&gt; Rails.application.secrets.secret_key_base
 =&gt; "a1580ad61ccb6ac60f9f256948cf63d6e20"
-</code></p>
+</code></pre>
 
 <p>That’s great news because it means we can put other values in this file and reference them throughout our application using the parent hash <code>Rails.application.secrets</code>.</p>
 
 <p>For example, let’s assume we need to configuration Pusher URL again. We could add it to the <code>secrets.yml</code> file like so:</p>
 
-<p>```
-development:
+<pre><code>development:
   secret_key_base: 9ac2d0ad8ebcc312090e99d745006d3cf8
-  pusher_url: <a href="http://asdfa@api.pusherapp.com">http://asdfa@api.pusherapp.com</a></p>
+  pusher_url: http://asdfa@api.pusherapp.com
 
-<p>test:
-  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20</p>
+test:
+  secret_key_base: a1580ad61ccb6ac60f9f256948cf63d6e20
 
-<h1>Do not keep production secrets in the repository,</h1>
-
-<h1>instead read values from the environment.</h1>
-
-<p>production:
-  secret_key_base: &lt;%= ENV[&ldquo;SECRET_KEY_BASE&rdquo;] %>
-  pusher_url: &lt;%= ENV[&ldquo;PUSHER_URL&rdquo;] %>
-```</p>
+# Do not keep production secrets in the repository,
+# instead read values from the environment.
+production:
+  secret_key_base: &lt;%= ENV["SECRET_KEY_BASE"] %&gt;
+  pusher_url: &lt;%= ENV["PUSHER_URL"] %&gt;
+</code></pre>
 
 <p>Now within our application we can set the Pusher URL within the initializer using the secret value:</p>
 
-<p>```</p>
-
-<h1>config/initializers/pusher.rb</h1>
-
-<p>Pusher.url = Rails.application.secrets.pusher_url
-```</p>
+<pre><code># config/initializers/pusher.rb
+Pusher.url = Rails.application.secrets.pusher_url
+</code></pre>
 
 <h2>Summary</h2>
 
@@ -355,7 +334,7 @@ end
 
 <h2>Summary</h2>
 
-<p>Before Rails 4, it was common to use a version number in the view <code>cache</code> method so that when you changed a encompassed view template, the cache would bust and the changes would be shown. However, now that <code>cache_digests</code> are part of Rails 4, the contents of the template block is evaluated and an MD5 string is created from the contents (the latter part of the cache key &ndash; <code>c39e6bde261c006ffe9ddf27fb9d5318</code> in the last example). This ensures that whenever the contents of the view template are changed, the cache is busted and the new template is properly stored and rendered.</p>
+<p>Before Rails 4, it was common to use a version number in the view <code>cache</code> method so that when you changed a encompassed view template, the cache would bust and the changes would be shown. However, now that <code>cache_digests</code> are part of Rails 4, the contents of the template block is evaluated and an MD5 string is created from the contents (the latter part of the cache key - <code>c39e6bde261c006ffe9ddf27fb9d5318</code> in the last example). This ensures that whenever the contents of the view template are changed, the cache is busted and the new template is properly stored and rendered.</p>
 
 <p>Given the <code>cache_key</code> of fragment caching is dependent on the contents of the template, I have trouble finding value in setting the <code>RAILS_CACHE_ID</code> environmental variable for fragment caching alone.</p>
 

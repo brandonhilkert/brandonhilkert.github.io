@@ -4,7 +4,7 @@
   <title><![CDATA[Category: open source | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/open-source/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -19,7 +19,7 @@
     <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
-I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
+I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &ndash; just requires the plugin to be initialized differently.</p>
 
 <!--more-->
 
@@ -44,22 +44,19 @@ I leave it enabled in all my Rails applications. Most of the negative opinions I
 
 <p>We&rsquo;ll first add <code>nprogress-rails</code> to our Gemfile:</p>
 
-<p><code>
-gem "nprogress-rails"
-</code></p>
+<pre><code>gem "nprogress-rails"
+</code></pre>
 
 <p>Bundle to install the new gem:</p>
 
-<p><code>
-$ bundle install
-</code></p>
+<pre><code>$ bundle install
+</code></pre>
 
 <p>Now with <code>nprogress</code> installed, we need to include the JavaScript in our application. We&rsquo;ll do this by adding the following the <code>app/assets/javascripts/application.js</code> manifest:</p>
 
-<p><code>
-//= require nprogress
+<pre><code>//= require nprogress
 //= require nprogress-turbolinks
-</code></p>
+</code></pre>
 
 <p>We first include the <code>nprogress</code> JavaScript source, and then an adapter that&rsquo;ll hook the Turbolinks request to the progress indicator.</p>
 
@@ -67,10 +64,9 @@ $ bundle install
 
 <p>By default, the <code>nprogress</code> loading bar is anchored to the top of the browser window, but we need to include some CSS to make this work. Let&rsquo;s open the <code>app/assets/stylesheets/application.scss</code> manifest file and add the following:</p>
 
-<p><code>
-*= require nprogress
+<pre><code>*= require nprogress
 *= require nprogress-bootstrap
-</code></p>
+</code></pre>
 
 <p><em>Note: Including <code>nprogress-bootstrap</code> isn&rsquo;t necessary if you don&rsquo;t use <a href="http://getbootstrap.com/css/">Bootstrap</a> in your application. I typically do, so I&rsquo;m going to include it.</em></p>
 
@@ -93,12 +89,11 @@ $ bundle install
 
 <p>Back in our <code>app/assets/stylesheets/application.scss</code>, I overwrote the variable before including the <code>nprogress</code> source code:</p>
 
-<p>```
-$nprogress-color: #37c8c9;</p>
+<pre><code>$nprogress-color: #37c8c9;
 
-<p>@import &ldquo;nprogress&rdquo;;
-@import &ldquo;nprogress-bootstrap&rdquo;;
-```</p>
+@import "nprogress";
+@import "nprogress-bootstrap";
+</code></pre>
 
 <h2>Summary</h2>
 
@@ -158,7 +153,7 @@ require &lsquo;brandon/version&rsquo;</p>
   spec.name          = &ldquo;brandon&rdquo;
   spec.version       = Brandon::VERSION
   spec.authors       = [&ldquo;Brandon Hilkert&rdquo;]
-  spec.email         = [&ldquo;<a href="&#109;&#x61;&#105;&#x6c;&#116;&#x6f;&#58;&#x62;&#x72;&#97;&#110;&#100;&#111;&#x6e;&#104;&#105;&#x6c;&#107;&#x65;&#114;&#x74;&#x40;&#103;&#x6d;&#x61;&#105;&#x6c;&#46;&#x63;&#111;&#109;">&#x62;&#x72;&#97;&#110;&#x64;&#x6f;&#110;&#x68;&#x69;&#108;&#x6b;&#x65;&#114;&#x74;&#x40;&#103;&#109;&#x61;&#105;&#108;&#x2e;&#x63;&#111;&#109;</a>&rdquo;]</p>
+  spec.email         = [&ldquo;<a href="&#x6d;&#x61;&#x69;&#108;&#116;&#111;&#58;&#x62;&#114;&#97;&#x6e;&#x64;&#111;&#x6e;&#x68;&#x69;&#x6c;&#107;&#101;&#x72;&#x74;&#x40;&#103;&#109;&#x61;&#x69;&#x6c;&#46;&#x63;&#111;&#109;">&#x62;&#x72;&#97;&#x6e;&#x64;&#111;&#110;&#104;&#105;&#108;&#x6b;&#x65;&#x72;&#x74;&#x40;&#103;&#109;&#x61;&#105;&#x6c;&#46;&#x63;&#x6f;&#109;</a>&rdquo;]</p>
 
 <p>  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
   spec.description   = %q{TODO: Write a longer description or delete this line.}
@@ -166,17 +161,11 @@ require &lsquo;brandon/version&rsquo;</p>
 
 <p>  # Prevent pushing this gem to RubyGems.org by setting &lsquo;allowed_push_host&rsquo;, or
   # delete this section to allow pushing this gem to any host.
-  if spec.respond_to?(:metadata)</p>
-
-<pre><code>spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-</code></pre>
-
-<p>  else</p>
-
-<pre><code>raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
-</code></pre>
-
-<p>  end</p>
+  if spec.respond_to?(:metadata)
+    spec.metadata[&lsquo;allowed_push_host&rsquo;] = &ldquo;TODO: Set to &lsquo;<a href="http://mygemserver.com">http://mygemserver.com</a>&rsquo;&rdquo;
+  else
+    raise &ldquo;RubyGems 2.0 or newer is required to protect against public gem pushes.&rdquo;
+  end</p>
 
 <p>  spec.files         = <code>git ls-files -z</code>.split(&ldquo;\x0&rdquo;).reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = &ldquo;exe&rdquo;
@@ -277,32 +266,26 @@ Successfully installed sucker_punch-2.0.1
 
 <p>The following is an example of enqueueing a background job with Sucker Punch using the old syntax:</p>
 
-<p><code>
-LogJob.new.async.perform("new_user")
-</code></p>
+<pre><code>LogJob.new.async.perform("new_user")
+</code></pre>
 
 <p>And with the new syntax:</p>
 
-<p><code>
-LogJob.perform_async("new_user")
-</code></p>
+<pre><code>LogJob.perform_async("new_user")
+</code></pre>
 
 <p><em>How do we support the old syntax in the new version?</em></p>
 
 <p>Let&rsquo;s step back and reminder ourselves of what a typical job class looks like:</p>
 
-<p>```
-class LogJob
-  include SuckerPunch::Job</p>
+<pre><code>class LogJob
+  include SuckerPunch::Job
 
-<p>  def perform(event)</p>
-
-<pre><code>Log.new(event).track
-</code></pre>
-
-<p>  end
+  def perform(event)
+    Log.new(event).track
+  end
 end
-```</p>
+</code></pre>
 
 <p>Important points to notice:</p>
 
@@ -317,42 +300,37 @@ end
 
 <p>We&rsquo;ll start with the test:</p>
 
-<p>```</p>
+<pre><code># test/sucker_punch/async_syntax_test.rb
 
-<h1>test/sucker_punch/async_syntax_test.rb</h1>
+require 'test_helper'
 
-<p>require &lsquo;test_helper&rsquo;</p>
+module SuckerPunch
+  class AsyncSyntaxTest &lt; Minitest::Test
+    def setup
+      require 'sucker_punch/async_syntax'
+    end
 
-<p>module SuckerPunch
-  class AsyncSyntaxTest &lt; Minitest::Test</p>
+    def test_perform_async_runs_job_asynchronously
+      arr = []
+      latch = Concurrent::CountDownLatch.new
+      FakeLatchJob.new.async.perform(arr, latch)
+      latch.wait(0.2)
+      assert_equal 1, arr.size
+    end
 
-<pre><code>def setup
-  require 'sucker_punch/async_syntax'
-end
+    private
 
-def test_perform_async_runs_job_asynchronously
-  arr = []
-  latch = Concurrent::CountDownLatch.new
-  FakeLatchJob.new.async.perform(arr, latch)
-  latch.wait(0.2)
-  assert_equal 1, arr.size
-end
+    class FakeLatchJob
+      include SuckerPunch::Job
 
-private
-
-class FakeLatchJob
-  include SuckerPunch::Job
-
-  def perform(arr, latch)
-    arr.push true
-    latch.count_down
+      def perform(arr, latch)
+        arr.push true
+        latch.count_down
+      end
+    end
   end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p><em>Note: Some details of this are complex because the job&rsquo;s code is running in another thread. I&rsquo;ll walk through those details in a future article.</em></p>
 
@@ -363,197 +341,157 @@ end
 
 <p>Running the tests above, we get the following error:</p>
 
-<p><code>``
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 LoadError: cannot load such file -- sucker_punch/async_syntax
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in</code>require'
-  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'</p>
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `require'
+  /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:6:in `setup'
 
-<p>1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
-```</p>
+1 runs, 0 assertions, 0 failures, 1 errors, 0 skips
+</code></pre>
 
 <p>Ok, so the file doesn&rsquo;t exist. Let&rsquo;s create it and re-run the tests:</p>
 
-<p><code>
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 NoMethodError: undefined method `async' for #&lt;SuckerPunch::AsyncSyntaxTest::FakeLatchJob:0x007fbc73cbf548&gt;
   /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
+</code></pre>
 
 <p>Progress! The job doesn&rsquo;t have an <code>async</code> method. Let&rsquo;s add it:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
-
-<pre><code>def async # &lt;--- New method
+<pre><code>module SuckerPunch
+  module Job
+    def async # &lt;--- New method
+    end
+  end
 end
 </code></pre>
-
-<p>  end
-end
-```</p>
 
 <p><em>Notice: We&rsquo;re monkey-patching the <code>SuckerPunch::Job</code> module. This will allow us to add methods to the background job since it&rsquo;s included in the job.</em></p>
 
 <p>The tests now:</p>
 
-<p><code>
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 NoMethodError: undefined method `perform' for nil:NilClass
   /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
+</code></pre>
 
 <p>More progress&hellip;the <code>async</code> method we added returns nil, and because of the syntax <code>async.perform</code>, there&rsquo;s no <code>perform</code> method on the output of <code>async</code>. In short, we need to return something from <code>async</code> that responds to <code>perform</code> and can run the job.</p>
 
 <p>In its most basic form, suppose we create a proxy object that responds to <code>perform</code>:</p>
 
-<p><code>
-class AsyncProxy
+<pre><code>class AsyncProxy
   def perform
   end
 end
-</code></p>
+</code></pre>
 
 <p>We&rsquo;ll need to do some work in <code>perform</code> to execute the job, but this&rsquo;ll do for now. Now, let&rsquo;s integrate this new proxy to our <code>async_syntax.rb</code> file and return a new instance of the proxy from the <code>async</code> method:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new # &lt;--- new instance of the proxy
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new # &lt;--- new instance of the proxy
+  class AsyncProxy
+    def perform
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def perform
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>Running our tests gives us the following:</p>
 
-<p><code>
-1) Error:
+<pre><code>1) Error:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously:
 ArgumentError: wrong number of arguments (2 for 0)
   /Users/bhilkert/Dropbox/code/sucker_punch/lib/sucker_punch/async_syntax.rb:9:in `perform'
   /Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:12:in `test_perform_async_runs_job_asynchronously'
-</code></p>
+</code></pre>
 
 <p>Now we&rsquo;re on to something. We see an error related to the number of arguments on the <code>perform</code> method. Because each job&rsquo;s argument list will be different, we need to find a way to be flexible for whatever&rsquo;s passed in, something like&hellip;the splat operator! Let&rsquo;s try it:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new
+  class AsyncProxy
+    def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def perform(*args) # &lt;--- Adding the splat operator, will handle any # of args
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>The tests now:</p>
 
-<p><code>
-1) Failure:
+<pre><code>1) Failure:
 SuckerPunch::AsyncSyntaxTest#test_perform_async_runs_job_asynchronously [/Users/bhilkert/Dropbox/code/sucker_punch/test/sucker_punch/async_syntax_test.rb:14]:
 Expected: 1
 Actual: 0
-</code></p>
+</code></pre>
 
 <p>At this point, we&rsquo;ve reached the end of test output suggesting the path forward. This error is saying, &ldquo;Your assertions failed.&rdquo;. This is good because it means our syntax implementation will work and it&rsquo;s just about executing the actual job code in the proxy&rsquo;s <code>perform</code> method.</p>
 
 <p>We want to leverage our new syntax (<code>perform_async</code>) to run the actual job asynchronously so it passes through the standard code path. To do so, we&rsquo;ll need a reference to the original job in the proxy object. Let&rsquo;s pass that to the proxy during instantiation:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new(self) # &lt;--- Pass the job instance
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new(self) # &lt;--- Pass the job instance
+  class AsyncProxy
+    def initialize(job) # &lt;--- Handle job passed in
+      @job = job
+    end
+
+    def perform(*args)
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def initialize(job) # &lt;--- Handle job passed in
-  @job = job
-end
-
-def perform(*args)
-end
-</code></pre>
-
-<p>  end
-end
-```</p>
 
 <p>Now that the proxy has a reference to the job instance, we can call the <code>perform_async</code> class method to execute the job:</p>
 
-<p>```
-module SuckerPunch
-  module Job</p>
+<pre><code>module SuckerPunch
+  module Job
+    def async
+      AsyncProxy.new(self)
+    end
+  end
 
-<pre><code>def async
-  AsyncProxy.new(self)
+  class AsyncProxy
+    def initialize(job)
+      @job = job
+    end
+
+    def perform(*args)
+      @job.class.perform_async(*args) # &lt;---- Execute the job
+    end
+  end
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  class AsyncProxy</p>
-
-<pre><code>def initialize(job)
-  @job = job
-end
-
-def perform(*args)
-  @job.class.perform_async(*args) # &lt;---- Execute the job
-end
-</code></pre>
-
-<p>  end
-end</p>
-
-<p>```</p>
 
 <p>Lastly, the tests:</p>
 
-<p>```
-ress ENTER or type command to continue
-bundle exec rake test TEST=&ldquo;test/sucker_punch/async_syntax_test.rb&rdquo;
-Run options: &mdash;seed 43886</p>
+<pre><code>ress ENTER or type command to continue
+bundle exec rake test TEST="test/sucker_punch/async_syntax_test.rb"
+Run options: --seed 43886
 
-<h1>Running:</h1>
+# Running:
 
-<p>.</p>
+.
 
-<p>1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
-```</p>
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips
+</code></pre>
 
 <p>Success!</p>
 
@@ -610,24 +548,19 @@ released</a>!</p>
 
 <p>A basic Sucker Punch job looks like:</p>
 
-<p>```
-class LogJob
-  include SuckerPunch::Job</p>
+<pre><code>class LogJob
+  include SuckerPunch::Job
 
-<p>  def perform(event)</p>
-
-<pre><code>Log.new(event).track
-</code></pre>
-
-<p>  end
+  def perform(event)
+    Log.new(event).track
+  end
 end
-```</p>
+</code></pre>
 
 <p>To run the job asynchronously, we use the following syntax:</p>
 
-<p><code>
-LogJob.new.async.perform("new_user")
-</code></p>
+<pre><code>LogJob.new.async.perform("new_user")
+</code></pre>
 
 <p>The most interesting part of this method chain is the <code>async</code>. Removing <code>async</code>, leaves us with a call to a regular instance method.</p>
 
@@ -657,9 +590,8 @@ LogJob.new.async.perform("new_user")
 
 <p>If you&rsquo;re familiar with Sidekiq, using the <code>perform_async</code> class method should look familiar:</p>
 
-<p><code>
-LogJob.peform_async("new_user")
-</code></p>
+<pre><code>LogJob.peform_async("new_user")
+</code></pre>
 
 <p><strong>So why not use the same for Sucker Punch?</strong></p>
 
@@ -673,15 +605,13 @@ LogJob.peform_async("new_user")
 
 <p>Sucker Punch <code>2.0.0</code> will have 2 class methods to enqueue jobs:</p>
 
-<p><code>
-LogJob.perform_async("new_user")
-</code></p>
+<pre><code>LogJob.perform_async("new_user")
+</code></pre>
 
 <p>and</p>
 
-<p><code>
-LogJob.perform_in(5.minutes, "new_user")
-</code></p>
+<pre><code>LogJob.perform_in(5.minutes, "new_user")
+</code></pre>
 
 <p>The latter defining a delayed processing of the <code>perform</code> method 5 minutes from now.</p>
 
@@ -729,54 +659,43 @@ LogJob.perform_in(5.minutes, "new_user")
 
 <p>A typical worker might look like:</p>
 
-<p>```
-class ImportantWorker
-  include Sidekiq::Worker</p>
+<pre><code>class ImportantWorker
+  include Sidekiq::Worker
 
-<p>  def perform(id)</p>
-
-<pre><code># Do the important stuff
-</code></pre>
-
-<p>  end
+  def perform(id)
+    # Do the important stuff
+  end
 end
-```</p>
+</code></pre>
 
 <p>If we want to send this job to a different queue, we&rsquo;d add <code>sidekiq_options queue: :important</code> to the worker, resulting in:</p>
 
-<p>```
-class ImportantWorker
+<pre><code>class ImportantWorker
   include Sidekiq::Worker
-  sidekiq_options queue: :important</p>
+  sidekiq_options queue: :important
 
-<p>  def perform(id)</p>
-
-<pre><code># Do the important stuff
-</code></pre>
-
-<p>  end
+  def perform(id)
+    # Do the important stuff
+  end
 end
-```</p>
+</code></pre>
 
 <p>Now, we need to make sure the worker process that&rsquo;s running the jobs knows to process jobs off this queue. A typical worker might be invoked with:</p>
 
-<p><code>
-bin/sidekiq
-</code></p>
+<pre><code>bin/sidekiq
+</code></pre>
 
 <p>Since new jobs going through this worker will end up on the <code>important</code> queue, we want to make sure the worker is processing jobs from the <code>important</code> queue too:</p>
 
-<p><code>
-bin/sidekiq -q important -q default
-</code></p>
+<pre><code>bin/sidekiq -q important -q default
+</code></pre>
 
 <p><em>Note: Jobs that don&rsquo;t specify a queue will go to the <code>default</code> queue. We have to include the <code>default</code> queue when we using the <code>-q</code> option, otherwise the default queue will be ignored in favor of the queue passed to the <code>-q</code> option.</em></p>
 
 <p>The best part, you don&rsquo;t even have to have multiple worker processes to process jobs from multiple queues. Furthermore, the <code>important</code> queue can be checked twice as often as the <code>default</code> queue:</p>
 
-<p><code>
-bin/sidekiq -q important,2 -q default
-</code></p>
+<pre><code>bin/sidekiq -q important,2 -q default
+</code></pre>
 
 <p>This flexibility of where jobs are enqueued and how they&rsquo;re processed gives us an incredible amount of freedom when building our applications.</p>
 
@@ -800,22 +719,19 @@ bin/sidekiq -q important,2 -q default
 
 <p>Typically, to enqueue the <code>ImportantWorker</code> above, we&rsquo;d call the following from our application:</p>
 
-<p><code>
-ImportantWorker.perform_async(1)
-</code></p>
+<pre><code>ImportantWorker.perform_async(1)
+</code></pre>
 
 <p>This works great when <code>ImportantWorker</code> is defined in our application. With the expanded stack above, <code>ImportantWorker</code> now lives in a new microservice, which means we don&rsquo;t have access to the <code>ImportantWorker</code> class from within the application. We <em>could</em> define it in the application just so we can enqueue it, with the intent that the application won&rsquo;t process jobs for that worker, but that feels funny to me.</p>
 
 <p>Rather, we can turn to the underlying Sidekiq client API to enqueue the job instead:</p>
 
-<p>```
-Sidekiq::Client.push(
-  &ldquo;class&rdquo; => &ldquo;ImportantWorker&rdquo;,
-  &ldquo;queue&rdquo; => &ldquo;important&rdquo;,
-  &ldquo;args&rdquo; => [1]
-)</p>
-
-<p>```</p>
+<pre><code>Sidekiq::Client.push(
+  "class" =&gt; "ImportantWorker",
+  "queue" =&gt; "important",
+  "args" =&gt; [1]
+)
+</code></pre>
 
 <p><em>Note: We have to be sure to define the <code>class</code> as a string <code>"ImportantWorker"</code>, otherwise we&rsquo;ll get an exception during enqueuing because the worker isn&rsquo;t defined in the application.</em></p>
 
@@ -823,31 +739,25 @@ Sidekiq::Client.push(
 
 <p>Now we&rsquo;re pushing jobs to the <code>important</code> queue, but have nothing in our application to process them. In fact, our worker process isn&rsquo;t even looking at that queue:</p>
 
-<p><code>
-bin/sidekiq -q default
-</code></p>
+<pre><code>bin/sidekiq -q default
+</code></pre>
 
 <p>From our microservice, we setup a worker process to <strong>ONLY</strong> look at the <code>important</code> queue:</p>
 
-<p><code>
-bin/sidekiq -q important
-</code></p>
+<pre><code>bin/sidekiq -q important
+</code></pre>
 
 <p>We define the <code>ImportantWorker</code> in our microservice:</p>
 
-<p>```
-class ImportantWorker
+<pre><code>class ImportantWorker
   include Sidekiq::Worker
-  sidekiq_options queue: :important</p>
+  sidekiq_options queue: :important
 
-<p>  def perform(id)</p>
-
-<pre><code># Do the important stuff
-</code></pre>
-
-<p>  end
+  def perform(id)
+    # Do the important stuff
+  end
 end
-```</p>
+</code></pre>
 
 <p>And now when the worker picks jobs out of the <code>important</code> queue, it&rsquo;ll process them using the <code>ImportantWorker</code> defined above in our microservice.</p>
 

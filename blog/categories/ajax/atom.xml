@@ -4,7 +4,7 @@
   <title><![CDATA[Category: ajax | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/ajax/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -19,7 +19,7 @@
     <updated>2016-04-29T09:44:00-07:00</updated>
     <id>http://brandonhilkert.com/blog/rails-progress-indicator-for-turbolinks-using-nprogress</id>
     <content type="html"><![CDATA[<p>Contrary to popular opinion, I&rsquo;m a fan of <a href="https://github.com/turbolinks/turbolinks">Turbolinks</a>.
-I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &mdash; just requires the plugin to be initialized differently.</p>
+I leave it enabled in all my Rails applications. Most of the negative opinions I hear relate to it &ldquo;breaking&rdquo; third-party jQuery plugins. I say &ldquo;breaking&rdquo; because it&rsquo;s not <em>really</em> changing the plugin&rsquo;s behavior &ndash; just requires the plugin to be initialized differently.</p>
 
 <!--more-->
 
@@ -44,22 +44,19 @@ I leave it enabled in all my Rails applications. Most of the negative opinions I
 
 <p>We&rsquo;ll first add <code>nprogress-rails</code> to our Gemfile:</p>
 
-<p><code>
-gem "nprogress-rails"
-</code></p>
+<pre><code>gem "nprogress-rails"
+</code></pre>
 
 <p>Bundle to install the new gem:</p>
 
-<p><code>
-$ bundle install
-</code></p>
+<pre><code>$ bundle install
+</code></pre>
 
 <p>Now with <code>nprogress</code> installed, we need to include the JavaScript in our application. We&rsquo;ll do this by adding the following the <code>app/assets/javascripts/application.js</code> manifest:</p>
 
-<p><code>
-//= require nprogress
+<pre><code>//= require nprogress
 //= require nprogress-turbolinks
-</code></p>
+</code></pre>
 
 <p>We first include the <code>nprogress</code> JavaScript source, and then an adapter that&rsquo;ll hook the Turbolinks request to the progress indicator.</p>
 
@@ -67,10 +64,9 @@ $ bundle install
 
 <p>By default, the <code>nprogress</code> loading bar is anchored to the top of the browser window, but we need to include some CSS to make this work. Let&rsquo;s open the <code>app/assets/stylesheets/application.scss</code> manifest file and add the following:</p>
 
-<p><code>
-*= require nprogress
+<pre><code>*= require nprogress
 *= require nprogress-bootstrap
-</code></p>
+</code></pre>
 
 <p><em>Note: Including <code>nprogress-bootstrap</code> isn&rsquo;t necessary if you don&rsquo;t use <a href="http://getbootstrap.com/css/">Bootstrap</a> in your application. I typically do, so I&rsquo;m going to include it.</em></p>
 
@@ -93,12 +89,11 @@ $ bundle install
 
 <p>Back in our <code>app/assets/stylesheets/application.scss</code>, I overwrote the variable before including the <code>nprogress</code> source code:</p>
 
-<p>```
-$nprogress-color: #37c8c9;</p>
+<pre><code>$nprogress-color: #37c8c9;
 
-<p>@import &ldquo;nprogress&rdquo;;
-@import &ldquo;nprogress-bootstrap&rdquo;;
-```</p>
+@import "nprogress";
+@import "nprogress-bootstrap";
+</code></pre>
 
 <h2>Summary</h2>
 

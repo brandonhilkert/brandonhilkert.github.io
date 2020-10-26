@@ -4,7 +4,7 @@
   <title><![CDATA[Category: learning | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/learning/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -99,7 +99,7 @@ newsletter.</em></p>
 
 <p>Learning new technologies can be a challenge. With books, forums, videos, blog
 posts&hellip;where do you start?!?! I&rsquo;ve used all these resources in the past and
-only one thing has reliably led to me to really learn the concepts &ndash; building something REAL!</p>
+only one thing has reliably led to me to really learn the concepts - building something REAL!</p>
 
 <h2>How I learned Ruby and Rails</h2>
 
@@ -109,7 +109,7 @@ worth the time. I ended up starting with <a href="http://pragprog.com/book/rails
 Rails</a>,
 which was a fantastic introduction to the features and benefits you&rsquo;ll get from
 learning the Rails framework. However, like many other books, it guides you
-through building a website with little real world value &ndash; an e-commerce
+through building a website with little real world value - an e-commerce
 shopping cart (you&rsquo;ve heard this one before, right???).  The concepts in the
 book generally apply to other products built with Rails, but it was sometimes
 hard for me to see their value elsewhere.  I found that the books and articles often skipped over things that were fairly
@@ -173,7 +173,7 @@ application within the first 10 minutes of usage.</p>
 
 <h2>Sharing (this is my favorite part)</h2>
 
-<p>You&rsquo;ve now spent several weeks/months building something interesting &ndash; tell the
+<p>You&rsquo;ve now spent several weeks/months building something interesting - tell the
 world about it. Tweet about it, post it to your local user group mailing list,
 email your friends, anything&hellip;the more people that see it, the better. Like
 dogfooding, you&rsquo;ll get valuable feedback that you might not have gotten

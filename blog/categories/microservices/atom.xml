@@ -4,7 +4,7 @@
   <title><![CDATA[Category: microservices | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/microservices/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -47,54 +47,43 @@
 
 <p>A typical worker might look like:</p>
 
-<p>```
-class ImportantWorker
-  include Sidekiq::Worker</p>
+<pre><code>class ImportantWorker
+  include Sidekiq::Worker
 
-<p>  def perform(id)</p>
-
-<pre><code># Do the important stuff
-</code></pre>
-
-<p>  end
+  def perform(id)
+    # Do the important stuff
+  end
 end
-```</p>
+</code></pre>
 
 <p>If we want to send this job to a different queue, we&rsquo;d add <code>sidekiq_options queue: :important</code> to the worker, resulting in:</p>
 
-<p>```
-class ImportantWorker
+<pre><code>class ImportantWorker
   include Sidekiq::Worker
-  sidekiq_options queue: :important</p>
+  sidekiq_options queue: :important
 
-<p>  def perform(id)</p>
-
-<pre><code># Do the important stuff
-</code></pre>
-
-<p>  end
+  def perform(id)
+    # Do the important stuff
+  end
 end
-```</p>
+</code></pre>
 
 <p>Now, we need to make sure the worker process that&rsquo;s running the jobs knows to process jobs off this queue. A typical worker might be invoked with:</p>
 
-<p><code>
-bin/sidekiq
-</code></p>
+<pre><code>bin/sidekiq
+</code></pre>
 
 <p>Since new jobs going through this worker will end up on the <code>important</code> queue, we want to make sure the worker is processing jobs from the <code>important</code> queue too:</p>
 
-<p><code>
-bin/sidekiq -q important -q default
-</code></p>
+<pre><code>bin/sidekiq -q important -q default
+</code></pre>
 
 <p><em>Note: Jobs that don&rsquo;t specify a queue will go to the <code>default</code> queue. We have to include the <code>default</code> queue when we using the <code>-q</code> option, otherwise the default queue will be ignored in favor of the queue passed to the <code>-q</code> option.</em></p>
 
 <p>The best part, you don&rsquo;t even have to have multiple worker processes to process jobs from multiple queues. Furthermore, the <code>important</code> queue can be checked twice as often as the <code>default</code> queue:</p>
 
-<p><code>
-bin/sidekiq -q important,2 -q default
-</code></p>
+<pre><code>bin/sidekiq -q important,2 -q default
+</code></pre>
 
 <p>This flexibility of where jobs are enqueued and how they&rsquo;re processed gives us an incredible amount of freedom when building our applications.</p>
 
@@ -118,22 +107,19 @@ bin/sidekiq -q important,2 -q default
 
 <p>Typically, to enqueue the <code>ImportantWorker</code> above, we&rsquo;d call the following from our application:</p>
 
-<p><code>
-ImportantWorker.perform_async(1)
-</code></p>
+<pre><code>ImportantWorker.perform_async(1)
+</code></pre>
 
 <p>This works great when <code>ImportantWorker</code> is defined in our application. With the expanded stack above, <code>ImportantWorker</code> now lives in a new microservice, which means we don&rsquo;t have access to the <code>ImportantWorker</code> class from within the application. We <em>could</em> define it in the application just so we can enqueue it, with the intent that the application won&rsquo;t process jobs for that worker, but that feels funny to me.</p>
 
 <p>Rather, we can turn to the underlying Sidekiq client API to enqueue the job instead:</p>
 
-<p>```
-Sidekiq::Client.push(
-  &ldquo;class&rdquo; => &ldquo;ImportantWorker&rdquo;,
-  &ldquo;queue&rdquo; => &ldquo;important&rdquo;,
-  &ldquo;args&rdquo; => [1]
-)</p>
-
-<p>```</p>
+<pre><code>Sidekiq::Client.push(
+  "class" =&gt; "ImportantWorker",
+  "queue" =&gt; "important",
+  "args" =&gt; [1]
+)
+</code></pre>
 
 <p><em>Note: We have to be sure to define the <code>class</code> as a string <code>"ImportantWorker"</code>, otherwise we&rsquo;ll get an exception during enqueuing because the worker isn&rsquo;t defined in the application.</em></p>
 
@@ -141,31 +127,25 @@ Sidekiq::Client.push(
 
 <p>Now we&rsquo;re pushing jobs to the <code>important</code> queue, but have nothing in our application to process them. In fact, our worker process isn&rsquo;t even looking at that queue:</p>
 
-<p><code>
-bin/sidekiq -q default
-</code></p>
+<pre><code>bin/sidekiq -q default
+</code></pre>
 
 <p>From our microservice, we setup a worker process to <strong>ONLY</strong> look at the <code>important</code> queue:</p>
 
-<p><code>
-bin/sidekiq -q important
-</code></p>
+<pre><code>bin/sidekiq -q important
+</code></pre>
 
 <p>We define the <code>ImportantWorker</code> in our microservice:</p>
 
-<p>```
-class ImportantWorker
+<pre><code>class ImportantWorker
   include Sidekiq::Worker
-  sidekiq_options queue: :important</p>
+  sidekiq_options queue: :important
 
-<p>  def perform(id)</p>
-
-<pre><code># Do the important stuff
-</code></pre>
-
-<p>  end
+  def perform(id)
+    # Do the important stuff
+  end
 end
-```</p>
+</code></pre>
 
 <p>And now when the worker picks jobs out of the <code>important</code> queue, it&rsquo;ll process them using the <code>ImportantWorker</code> defined above in our microservice.</p>
 
@@ -210,31 +190,24 @@ Blog</a></em></p>
 
 <p>Before we can conditionally show this option based on the pricing tier, we have to first make a request to the billing service to get the list of features available to that user.</p>
 
-<p>```
-class Billing::Features
-  def initialize(user)</p>
+<pre><code>class Billing::Features
+  def initialize(user)
+    @user = user
+    @account = user.account
+  end
 
-<pre><code>@user = user
-@account = user.account
-</code></pre>
+  def list
+    Rails.cache.fetch("account_#{account.id}_billing_features") do
+      response = Billing::Api.get "account/#{account.id}/features"
+      response['features']
+    end
+  end
 
-<p>  end</p>
+  private
 
-<p>  def list</p>
-
-<pre><code>Rails.cache.fetch("account_#{account.id}_billing_features") do
-  response = Billing::Api.get "account/#{account.id}/features"
-  response['features']
+  attr_reader :user, :account
 end
 </code></pre>
-
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  attr_reader :user, :account
-end
-```</p>
 
 <p><code>Billing::Api</code>, in this case, is a wrapper around the API calls to handle exceptions and other information like security.</p>
 
@@ -246,36 +219,28 @@ end
 
 <p>We tend to reserve the root URL namespace for UI-related routes, so we start by creating a unique namespace for the API:</p>
 
-<p>```
-namespace :api do
-  resources :account do</p>
-
-<pre><code>resource :features, only: :show
-</code></pre>
-
-<p>  end
+<pre><code>namespace :api do
+  resources :account do
+    resource :features, only: :show
+  end
 end
-```</p>
+</code></pre>
 
 <p>This setup gives us the path <code>/api/account/:account_id/features</code>. We haven&rsquo;t found a need for versioning internal APIs. If we decided to in the future, we could always add the API version as a request header.</p>
 
 <p>The <code>features</code> endpoint looks like:</p>
 
-<p>```
-class Api::FeaturesController &lt; Api::ApiController
-  skip_before_filter :verify_authenticity_token</p>
+<pre><code>class Api::FeaturesController &lt; Api::ApiController
+  skip_before_filter :verify_authenticity_token
 
-<p>  def show</p>
-
-<pre><code>render json: {
-  success: true,
-  features: AccountFeatures.new(@account_id).list
-}
-</code></pre>
-
-<p>  end
+  def show
+    render json: {
+      success: true,
+      features: AccountFeatures.new(@account_id).list
+    }
+  end
 end
-```</p>
+</code></pre>
 
 <p>Notice <code>Api::FeaturesController</code> inherits from <code>Api::ApiController</code>. We keep the API-related functionality in this base controller so each endpoint will get access to security and response handling commonalities.</p>
 
@@ -289,24 +254,19 @@ end
 
 <p>One of the first things we do is serialize the set of features to JavaScript so our client-side code has access:</p>
 
-<p><code>
-&lt;%= javascript_tag do %&gt;
+<pre><code>&lt;%= javascript_tag do %&gt;
   window.Features = &lt;%= Billing::Features.new(logged_in_user).list.to_json %&gt;;
 &lt;% end %&gt;
-</code></p>
+</code></pre>
 
 <p>We also include a helper module in to our Rails views/controllers, so we can handle conditional feature logic:</p>
 
-<p>```
-module Features
-  def feature_enabled?(feature)</p>
-
-<pre><code>Billing::Features.new(logged_in_user).list.include?(feature.to_s)
-</code></pre>
-
-<p>  end
+<pre><code>module Features
+  def feature_enabled?(feature)
+    Billing::Features.new(logged_in_user).list.include?(feature.to_s)
+  end
 end
-```</p>
+</code></pre>
 
 <h2>Synchronous Side Effects</h2>
 
@@ -320,7 +280,7 @@ end
 
 <p>As you can see, there&rsquo;s little magic to setting up a synchronous service request.</p>
 
-<p>Challenges appear when you consider failure states at every point in the service communication &ndash; the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
+<p>Challenges appear when you consider failure states at every point in the service communication - the service could be down, or the HTTP request itself could fail due to network connectivity. As mentioned above, providing a default response during service failure is a great start to increasing the application&rsquo;s reliability. Optionally, <a href="https://en.wikipedia.org/wiki/Circuit_breaker_design_pattern">the circuit break pattern</a> can provide robust handling of network failures.</p>
 
 <p>Part 4 in this series will cover how we manage asynchronous communication between services, specifically around an <a href="https://github.com/PipelineDeals/mantle">open source gem we built called Mantle</a>.</p>
 ]]></content>
@@ -379,15 +339,13 @@ needed for email template.</p>
 
 <p>As shown in the previous article, the call to send the email looks something like this:</p>
 
-<p><code>ruby
-Email.to current_user, :user_welcome
-</code></p>
+<pre><code class="ruby">Email.to current_user, :user_welcome
+</code></pre>
 
 <p>The value in this call is that under the covers, it&rsquo;s enqueuing a Sidekiq job:</p>
 
-<p><code>ruby
-EmailWorker.perform_async(opts)
-</code></p>
+<pre><code class="ruby">EmailWorker.perform_async(opts)
+</code></pre>
 
 <p>where <code>opts</code> is a hash of data related to the email and the variables needed for the template.</p>
 
@@ -487,49 +445,37 @@ up [x] (some neglected feature of the application)?</em>&rdquo;.</p>
 
 <p>So now, rather than invoking a built-in Rails mailer like:</p>
 
-<p><code>
-UserMailer.welcome(current_user).deliver
-</code></p>
+<pre><code>UserMailer.welcome(current_user).deliver
+</code></pre>
 
 <p>we invoke a PORO to send off the communication:</p>
 
-<p><code>
-Email.to current_user, :user_welcome
-</code></p>
+<pre><code>Email.to current_user, :user_welcome
+</code></pre>
 
 <p>where <code>Email</code> is defined as</p>
 
-<p>```
-class Email
-  def initialize(users, email_key, opts)</p>
+<pre><code>class Email
+  def initialize(users, email_key, opts)
+    @users, @email_key, @opts = users, email_key, opts
+  end
 
-<pre><code>@users, @email_key, @opts = users, email_key, opts
-</code></pre>
+  def self.to(users, email_key, opts = {})
+    new(users, email_key, opts).queue_email
+  end
 
-<p>  end</p>
+  def queue_email
+    opts[:email_key] = email_key
+    opts[:to] ||= email_array
+    opts[:name] ||= first_users_name
+    opts[:user_id] ||= user_id
+    opts[:account_id] ||= account_id
 
-<p>  def self.to(users, email_key, opts = {})</p>
-
-<pre><code>new(users, email_key, opts).queue_email
-</code></pre>
-
-<p>  end</p>
-
-<p>  def queue_email</p>
-
-<pre><code>opts[:email_key] = email_key
-opts[:to] ||= email_array
-opts[:name] ||= first_users_name
-opts[:user_id] ||= user_id
-opts[:account_id] ||= account_id
-
-json = JSON.generate(opts)
-RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
-</code></pre>
-
-<p>  end
+    json = JSON.generate(opts)
+    RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
+  end
 end
-```</p>
+</code></pre>
 
 <p>There&rsquo;re a number of use-case specific variables above, but the <code>email_key</code> is probably the most important. We used that to describe what email should be invoked on the service.</p>
 
@@ -547,23 +493,21 @@ end
 
 <p>Rather than invoke the following method in the email object:</p>
 
-<p><code>
-RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
-</code></p>
+<pre><code>RestClient.post(ENV["PIPELINE_EMAIL_URL"], json, :content_type =&gt; :json)
+</code></pre>
 
 <p>we&rsquo;ll shoot off a Sidekiq job instead, changing the <code>queue_email</code> method to:</p>
 
-<p>```
-def queue_email
+<pre><code>def queue_email
   opts[:email_key] = email_key
   opts[:to] ||= email_array
   opts[:name] ||= first_users_name
   opts[:user_id] ||= user_id
-  opts[:account_id] ||= account_id</p>
+  opts[:account_id] ||= account_id
 
-<p>  EmailWorker.perform_async(opts)
+  EmailWorker.perform_async(opts)
 end
-```</p>
+</code></pre>
 
 <p>There we have it. Network-proof email requests!</p>
 
@@ -573,25 +517,18 @@ end
 
 <p>On the <strong>service side</strong>, we have a controller that takes in the request for the email and immediately serializes it to a Sidekiq job:</p>
 
-<p>```
-  def create</p>
+<pre><code>  def create
+    EmailWorker.perform_async(parsed_params)
+    head :accepted
+  end
 
-<pre><code>EmailWorker.perform_async(parsed_params)
-head :accepted
-</code></pre>
+  private
 
-<p>  end</p>
-
-<p>  private</p>
-
-<p>  def parse_params</p>
-
-<pre><code>JSON.parse(request.body) || {}
-</code></pre>
-
-<p>  end
+  def parse_params
+    JSON.parse(request.body) || {}
+  end
 end
-```</p>
+</code></pre>
 
 <p>Because we immediately serialize the job to Sidekiq, we&rsquo;ve successfully acknowledged the job was received, and the main app&rsquo;s Sidekiq job completes successfully. Now the email service can move on to doing the heavy-lifting in whatever way makes the most sense. In our case, we use Mailgun to send our emails, so the <code>EmailWorker</code> Sidekiq job invokes a new mailer based on the <code>email_key</code> param and sends it off to mailgun for transport. And because it&rsquo;s wrapped in a Sidekiq job, we can sleep well knowing that the Mailgun request can fail and the job will successfully retry until it goes through.</p>
 

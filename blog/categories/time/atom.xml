@@ -4,7 +4,7 @@
   <title><![CDATA[Category: time | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/time/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -31,17 +31,13 @@
 
 <p>Prior to utilizing the changes in Rails 4.1, one of my tests looked like:</p>
 
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  Timecop.freeze Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
+  Timecop.freeze Chronic.parse("4/15/14") do
+    Reminders::Checkin.new.email
+    assert_equal 3, ActionMailer::Base.deliveries.size
+  end
 end
-```</p>
+</code></pre>
 
 <p><em>Note: <a href="https://github.com/mojombo/chronic">Chronic</a> is a gem that helps create dates/times by using standard language.</em></p>
 
@@ -61,17 +57,13 @@ end
 
 <p>Using the <code>travel_to</code> method with the example above results in the following:</p>
 
-<p>```
-test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;) do</p>
-
-<pre><code>Reminders::Checkin.new.email
-assert_equal 3, ActionMailer::Base.deliveries.size
-</code></pre>
-
-<p>  end
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
+  travel_to Chronic.parse("4/15/14") do
+    Reminders::Checkin.new.email
+    assert_equal 3, ActionMailer::Base.deliveries.size
+  end
 end
-```</p>
+</code></pre>
 
 <p>Because I&rsquo;m using the <code>travel_to</code> method with a block, there&rsquo;s no need to use the <code>travel_back</code> method to reset time back to the current time. Supply a block <a href="https://github.com/rafaelfranca/rails/blob/fa1f20e6549f962112948f5b3c27d09ab5e5faaf/activesupport/lib/active_support/testing/time_helpers.rb#L86">automatically calls <code>travel_back</code></a>.</p>
 
@@ -79,31 +71,29 @@ end
 
 <p>Additionally, the same test could be written as:</p>
 
-<p><code>
-test "sends reminders on tuesday for those scheduled on wednesday" do
+<pre><code>test "sends reminders on tuesday for those scheduled on wednesday" do
   travel_to Chronic.parse("4/15/14")
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
   travel_back
 end
-</code></p>
+</code></pre>
 
 <p>or with <code>setup</code> and <code>teardown</code>:</p>
 
-<p>```
-def setup
-  travel_to Chronic.parse(&ldquo;4/15/14&rdquo;)
-end</p>
+<pre><code>def setup
+  travel_to Chronic.parse("4/15/14")
+end
 
-<p>test &ldquo;sends reminders on tuesday for those scheduled on wednesday&rdquo; do
+test "sends reminders on tuesday for those scheduled on wednesday" do
   Reminders::Checkin.new.email
   assert_equal 3, ActionMailer::Base.deliveries.size
-end</p>
+end
 
-<p>def teardown
+def teardown
   travel_back
 end
-```</p>
+</code></pre>
 
 <h2>Summary</h2>
 

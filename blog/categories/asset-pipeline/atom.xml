@@ -4,7 +4,7 @@
   <title><![CDATA[Category: asset pipeline | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/asset-pipeline/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -69,7 +69,7 @@ alert("My example alert box.");
 config.assets.precompile += %w( alert.js )
 </code></pre>
 
-<p>Like the previous solution, it too, mixes the concerns of HTML and javascript, but introduces a new problem &ndash; this javascript file is included and download separately from the rest of the app&rsquo;s asset. This causes the browser to make another request to the server, thus increasing the page load time and in turn, causing bad bad user pain (Ok, maybe not that bad…). But it’s still not ideal.</p>
+<p>Like the previous solution, it too, mixes the concerns of HTML and javascript, but introduces a new problem - this javascript file is included and download separately from the rest of the app&rsquo;s asset. This causes the browser to make another request to the server, thus increasing the page load time and in turn, causing bad bad user pain (Ok, maybe not that bad…). But it’s still not ideal.</p>
 
 <h2>The Solution</h2>
 

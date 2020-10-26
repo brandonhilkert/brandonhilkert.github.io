@@ -40,7 +40,6 @@
 	<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
   <link href='//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
   <link href="//fonts.googleapis.com/css?family=Open+Sans:300" rel="stylesheet" type="text/css">
-  <link rel="author" href="https://plus.google.com/u/0/116002935339410846674" />
   <script src="/javascripts/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
 
@@ -76,12 +75,10 @@
   <ul class="main-navigation">
     <li><a href="/about/">About</a></li>
     <li><a href="/">Blog</a></li>
-    <li><a href="/newsletter/">Newsletter</a></li>
     <!-- <li> -->
     <!--   <a href="/courses/build&#45;a&#45;ruby&#45;gem/">Courses</a> -->
     <!-- </li> -->
     <li>
-      <div class="new-label">New</div>
       <a href="/books/build-a-ruby-gem/">Books</a>
     </li>
     <li>
@@ -236,7 +233,7 @@ end</code></pre></figure>
 end</code></pre></figure>
 
 
-<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &mdash; no change in functionality. But certainly more organized and isolated.</p>
+<p>There we have it. A simple <code>Billing</code> class that wraps the methods that we used in the first place &ndash; no change in functionality. But certainly more organized and isolated.</p>
 
 <p>Let&rsquo;s now use this new class in the accounts controller from earlier:</p>
 
@@ -253,7 +250,7 @@ end</code></pre></figure>
 end</code></pre></figure>
 
 
-<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem &ndash; an adapter if you will.</p>
+<p>Not too bad! At this point we&rsquo;ve provide the exact same functionality we had before, but we have a class that sits in the middle between the controller and Stripe gem - an adapter if you will.</p>
 
 <h2>Create a Decorator</h2>
 
@@ -303,7 +300,7 @@ end</code></pre></figure>
 end</code></pre></figure>
 
 
-<p>As you can see, we only had to change one line &mdash; the line where we decorated the original billing class:</p>
+<p>As you can see, we only had to change one line &ndash; the line where we decorated the original billing class:</p>
 
 <figure class='code'><pre><code>BillingWithCache.new(Billing.new(current_user.stripe_id))</code></pre></figure>
 
@@ -366,133 +363,13 @@ end</code></pre></figure>
 
 <h2>Summary</h2>
 
-<p>Separating your application and third-party services helps keeps your applications flexible &mdash; offering the freedom to switch to another service when one no longer fits the bill.</p>
+<p>Separating your application and third-party services helps keeps your applications flexible &ndash; offering the freedom to switch to another service when one no longer fits the bill.</p>
 
 <p>Another benefit of an adapter is you have the freedom to name the class and methods whatever you like. The base gem for a service might not have the best names, or it may be that the names don&rsquo;t make sense when dragged in to your application&rsquo;s domain. This is a small but important point as applications get larger and its code more complex. The more variable/method names you need to think about when you poke around the code, the harder it&rsquo;ll be to remember what was going on. Not to mention the pain new developers will have if they acquire the code. Whether it&rsquo;s you or the next developer, the time you invest in creating great names will be greatly appreciated.</p>
 
-<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &mdash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
+<p>Using decorators in this way makes it easier for clients of the code to avoid change, but keep your applications flexible. The <code>Billing</code> class above was relatively simple &ndash; intentionally so. If the class being decorated has more than a few methods, it might be worth incorporating <code>SimpleDelegator</code> to ensure the methods that don&rsquo;t need additional functionality still continue to respond appropriately.</p>
 
   </div>
-
-  
-    <script src="/javascripts/funnel-tools-funnel.min.js"></script>
-
-<div class="funnel-tools-funnel funnel-tools-funnel-default">
-  <section class="newsletter-top">
-  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
-</section>
-<section class="newsletter clearfix">
-  <div class="ribbon">
-    <span>
-      Join 4,000+ Rubyists
-    </span>
-  </div>
-  <section class="picture">
-    <img src="/images/newsletter/brandon-hilkert-point-right.png" alt="Brandon Hilkert pointing right">
-  </section>
-  <section class="signup">
-    <h2>Want More?</h2>
-    <h3>Ruby and Rails tips delivered to <br />your inbox twice a month</h3>
-
-    <form data-drip-embedded-form="6902355" action="https://www.getdrip.com/forms/6902355/submissions" method="post">
-  <div class="email-input-container">
-    <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
-  </div>
-  <input type="hidden" name="fields[location]" value="Adding Functionality to Ruby Classes with Decorators" />
-  <div style="display: none;" aria-hidden="true">
-    <label for="website">Website</label><br />
-    <input type="text" id="website" name="website" tabindex="-1" autocomplete="false" value="" />
-  </div>
-  <input type="submit" value="Send me articles like this!" name="subscribe" class="button">
-  <br class="clear">
-</form>
-
-
-
-    <aside>
-      I hate spam as much as you do!
-      <br />
-      Unsubscribe at any time.
-    </aside>
-  </section>
-</section>
-
-
-</div>
-
-<div class="funnel-tools-funnel funnel-tools-funnel-course-gem">
-  <section class="newsletter-top">
-  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
-</section>
-<section class="newsletter clearfix">
-  <div class="ribbon">
-    <span>
-      Join 1,300+ Rubyists
-    </span>
-  </div>
-  <section class="picture" style="padding-top: 30px;">
-    <img src="/images/newsletter/ruby-logo.png" alt="Ruby lanugage logo">
-  </section>
-  <section class="signup">
-    <h2>Want to Build a Ruby Gem?</h2>
-    <h3>A <strong>FREE</strong> 10-day email course helping you <br />build a Ruby Gem from start to finish.</h3>
-
-    <form data-drip-embedded-form="8461781" action="https://www.getdrip.com/forms/8461781/submissions" method="post">
-  <div class="email-input-container">
-    <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
-  </div>
-  <input type="hidden" name="fields[location]" value="Adding Functionality to Ruby Classes with Decorators" />
-  <div style="display: none;" aria-hidden="true">
-    <label for="website">Website</label><br />
-    <input type="text" id="website" name="website" tabindex="-1" autocomplete="false" value="" />
-  </div>
-  <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
-  <br class="clear">
-</form>
-
-
-
-    <aside>
-      I hate spam as much as you do!
-      <br />
-      Unsubscribe at any time.
-    </aside>
-  </section>
-</section>
-
-
-
-</div>
-
-<div class="funnel-tools-funnel funnel-tools-funnel-book-gem">
-  <section class="newsletter-top">
-  <img src="/images/newsletter/brandon-hilkert-point-down.png" alt="Brandon Hilkert pointing down">
-</section>
-<section class="newsletter clearfix">
-  <div class="ribbon">
-    <span>
-      Join 400+ Rubyists
-    </span>
-  </div>
-  <section class="picture">
-    <img src="/images/newsletter/build-a-ruby-gem-book.png" style="padding-bottom: 15px;" alt="Build a Ruby Gem book">
-  </section>
-  <section class="signup">
-    <h2>Build a Ruby Gem</h2>
-    <h3>Learn to build a <br />Ruby gem from start to finish</h3>
-    <h3>19 chapters and 2+ hours of screencasts</h3>
-    <h3>Use the link below to get <strong>25% off</strong> any package</h3>
-    <a href="/books/build-a-ruby-gem/?utm_source=fo&utm_medium=web&utm_campaign=fo14&c=fo14" class="button">Take me to the book!</a>
-  </section>
-</section>
-
-</div>
-
-<script>
-  FunnelTools.Funnel.load();
-</script>
-
-  
 
   
 
@@ -592,68 +469,5 @@ end</code></pre></figure>
       
 		</div>
 	</div>
-  <link href="/stylesheets/funnel-tools-capture.css" media="screen, projection" rel="stylesheet" type="text/css">
-
-<div id="funnel-tools-capture" class="bounceInUp">
-  <div class="close">&#10005;</div>
-  <div class="open">&#8593;</div>
-
-  <div class="title">
-    Build a Ruby Gem Course - FREE!
-  </div>
-  <div class="description">
-    <p>
-      Join <strong>1,300+</strong> other Rubyists and take your Ruby gem skills to the next level!
-    </p>
-    <p>
-      Whether you're an expert Rubyist, or just starting out,
-      this <strong>FREE 10-day</strong> email course will guide you through
-      the process of creating your own Ruby gems from start to finish.
-    </p>
-
-    <p>
-      Enter your email below to get started today:
-    </p>
-  </div>
-
-  <form data-drip-embedded-form="8461781" action="https://www.getdrip.com/forms/8461781/submissions" method="post">
-  <div class="email-input-container">
-    <input type="email" value="" name="fields[email]" class="email" placeholder="your@email.com" required>
-  </div>
-  <input type="hidden" name="fields[location]" value="Adding Functionality to Ruby Classes with Decorators" />
-  <div style="display: none;" aria-hidden="true">
-    <label for="website">Website</label><br />
-    <input type="text" id="website" name="website" tabindex="-1" autocomplete="false" value="" />
-  </div>
-  <input type="submit" value="I want the FREE course!" name="subscribe" class="button">
-  <br class="clear">
-</form>
-
-
-  <p class="funnel-tools-footer">
-  Powered by <a href="http://brandonhilkert.com/tools?utm_source=bh-com&utm_medium=web&utm_campaign=ft-capture">Funnel Tools</a>
-</p>
-
-</div>
-
-
-<script src="/javascripts/funnel-tools-capture.min.js"></script>
-
-
-  <!-- Drip -->
-<script type="text/javascript">
-  var _dcq = _dcq || [];
-  var _dcs = _dcs || {};
-  _dcs.account = '7901432';
-
-  (function() {
-    var dc = document.createElement('script');
-    dc.type = 'text/javascript'; dc.async = true;
-    dc.src = '//tag.getdrip.com/7901432.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(dc, s);
-  })();
-</script>
-
 </body>
 </html>

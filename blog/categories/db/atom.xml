@@ -4,7 +4,7 @@
   <title><![CDATA[Category: db | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/db/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -33,16 +33,15 @@
 
 <p>Let’s assume our application requires us have a list of supported credit card types, and the user is required to pick from the list to pay for the awesome stuff we sell. A sample fixture might look like:</p>
 
-<p>```
-visa:
-  name: Visa</p>
+<pre><code>visa:
+  name: Visa
 
-<p>mastercard:
-  name: Mastercard</p>
+mastercard:
+  name: Mastercard
 
-<p>amex:
+amex:
   name: American Express
-```</p>
+</code></pre>
 
 <p>This is a somewhat trivial example because the <code>name</code> matches what one might expect in a potential transaction record if we had a <code>credit_card_type</code> field or something similar if we denormalized.</p>
 
@@ -54,11 +53,10 @@ visa:
 
 <p>Fortunately, Rails has our backs. The following rake test is available from a default Rails application:</p>
 
-<p><code>
-$ bin/rake -T
+<pre><code>$ bin/rake -T
 ...
 rake db:fixtures:load # Load fixtures into the current environment's database
-</code></p>
+</code></pre>
 
 <p>The <code>db:fixtures:load</code> task is an interesting start, but quickly we realize it might be a little heavy-handed. If this application has users, we probably wouldn&rsquo;t want to copy them to production. They might, however, be a great starting pointing for development.</p>
 
@@ -66,9 +64,8 @@ rake db:fixtures:load # Load fixtures into the current environment's database
 
 <p>It turns out that we can specify <strong>ONLY</strong> the models we want to load by using the <code>FIXTURES</code> environment variable:</p>
 
-<p><code>
-rake db:fixtures:load FIXTURES=credit_card_types
-</code></p>
+<pre><code>rake db:fixtures:load FIXTURES=credit_card_types
+</code></pre>
 
 <p><em>Note: The name of the fixture file (usually the database table name) should be used as the value for <code>FIXTURES</code>, not the model name.</em></p>
 
@@ -78,32 +75,26 @@ rake db:fixtures:load FIXTURES=credit_card_types
 
 <p>Additionally, if we wanted to load more than just a single fixture, we can specify the names of the files separated by commas:</p>
 
-<p><code>
-rake db:fixtures:load FIXTURES=credit_card_types,states,cities
-</code></p>
+<pre><code>rake db:fixtures:load FIXTURES=credit_card_types,states,cities
+</code></pre>
 
 <p>Let&rsquo;s take a quick look at how Rails implements this functionality, specifically the determination of single models:</p>
 
-<p>```
-fixtures_dir = if ENV[&lsquo;FIXTURES_DIR&rsquo;]</p>
+<pre><code>fixtures_dir = if ENV['FIXTURES_DIR']
+                 File.join base_dir, ENV['FIXTURES_DIR']
+               else
+                 base_dir
+               end
 
-<pre><code>             File.join base_dir, ENV['FIXTURES_DIR']
-           else
-             base_dir
-           end
+fixture_files = if ENV['FIXTURES']
+                  ENV['FIXTURES'].split(',')
+                else
+                  # The use of String#[] here is to support namespaced fixtures
+                  Dir["#{fixtures_dir}/**/*.yml"].map {|f| f[(fixtures_dir.size + 1)..-5] }
+                end
+
+ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)
 </code></pre>
-
-<p>fixture_files = if ENV[&lsquo;FIXTURES&rsquo;]</p>
-
-<pre><code>              ENV['FIXTURES'].split(',')
-            else
-              # The use of String#[] here is to support namespaced fixtures
-              Dir["#{fixtures_dir}/**/*.yml"].map {|f| f[(fixtures_dir.size + 1)..-5] }
-            end
-</code></pre>
-
-<p>ActiveRecord::FixtureSet.create_fixtures(fixtures_dir, fixture_files)
-```</p>
 
 <p>If the <code>FIXTURES</code> variable is present, code teases appart the model names and looks in the fixtures directory and loads the YAML fixture file for that table name.</p>
 

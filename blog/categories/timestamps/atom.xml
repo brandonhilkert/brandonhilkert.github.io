@@ -4,7 +4,7 @@
   <title><![CDATA[Category: timestamps | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/timestamps/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-03-08T16:44:21-07:00</updated>
+  <updated>2020-10-25T20:02:01-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -72,7 +72,7 @@ Posted: &lt;%= time_ago_in_words(post.created_at) %&gt; ago
    end
  end
 </code></pre></li>
-<li><p>Reference the new helper method from your view &ndash; passing in the time attribute of the model:</p>
+<li><p>Reference the new helper method from your view - passing in the time attribute of the model:</p>
 
 <pre><code> # app/views/posts/show.html.erb
  Posted: &lt;%= timeago(post.created_at) %&gt;
