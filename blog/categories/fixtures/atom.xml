@@ -4,7 +4,7 @@
   <title><![CDATA[Category: fixtures | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/fixtures/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-10-25T20:02:01-07:00</updated>
+  <updated>2021-04-19T09:29:00-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -251,7 +251,7 @@ click_on "Sign in"
 
 <h2>Summary</h2>
 
-<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we put our big boy pants on and make use of the language we’ve all come to know and love — Ruby!</p>
+<p>One of the things I’m constantly reminding myself during this process is whenever I have a problem, to step back and think about ways the Ruby language can help solve it rather than looking for some special sauce or gem to get me through the turmoil. Minitest is just Ruby — as most other gems are. Minitest generally provides enough utility to get us through the bigger use cases, but when it comes to special cases, it’s not there to hold our hand. That’s when we step up and make use of the language we’ve all come to know and love — Ruby!</p>
 ]]></content>
   </entry>
   

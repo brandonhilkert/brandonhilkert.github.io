@@ -4,7 +4,7 @@
   <title><![CDATA[Category: programming | Brandon Hilkert]]></title>
   <link href="http://brandonhilkert.com/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://brandonhilkert.com/"/>
-  <updated>2020-10-25T20:02:01-07:00</updated>
+  <updated>2021-04-19T09:29:00-07:00</updated>
   <id>http://brandonhilkert.com/</id>
   <author>
     <name><![CDATA[Brandon Hilkert]]></name>
@@ -262,7 +262,7 @@ shot on another occasion for comparison.</p>
 
 <p>Whether you follow agile or any other methodology, predictions and absolutes have no place in conversations. There are plenty of examples of failed software projects. I’m pretty sure all of them featured people promising the work would be done in time and under budget. Buuuuuuut, it wasn’t.</p>
 
-<h2>Background Jobs for the Big Boys</h2>
+<h2>Background Job Options</h2>
 
 <p>Delayed Job was the first Ruby background processing library I used. I remember feeling badass that I was doing all this complicated stuff in the background. But at some point, there we so many jobs and so much activity that pushing and pulling jobs out of the primary data store wasn’t efficient. Reads from the web UI would slow down (and ultimately stop) and users would bail. Unfortunately, I couldn’t pop up a message and say, <em>”hey, hope you don’t mind, but I’m doing some pretty crucial shit in the background here, so you’re experience is gonna be sucky for a bit! sorry :(”</em>.</p>
 
